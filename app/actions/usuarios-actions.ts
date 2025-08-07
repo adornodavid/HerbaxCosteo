@@ -8,12 +8,13 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 // Función para insertar un nuevo usuario
-export async function insUsuario(
-  nombrecompleto: string,
-  p_email: string,
-  password: string,
-  rolid: number
-) {
+export async function insUsuario(formData: FormData) {
+  // Extraer los valores del FormData
+  const nombrecompleto = formData.get('nombrecompleto') as string;
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  const rolid = parseInt(formData.get('rolid') as string); // Convertir a número
+  
   try {
     // Hashear la contraseña antes de insertarla
     const hashedPassword = await bcrypt.hash(password, 10)
