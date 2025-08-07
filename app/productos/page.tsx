@@ -481,7 +481,7 @@ export default function ProductosPage() {
           <form
             id="frmProductosBuscar"
             name="frmProductosBuscar"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 gap-4 items-end"
             onSubmit={handleFormSubmit}
           >
             <div className="lg:col-span-2">
@@ -545,7 +545,7 @@ export default function ProductosPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex gap-2 col-span-full md:col-span-2 lg:col-span-4 justify-end">
+            <div className="flex gap-2 col-span-full md:col-span-2 lg:col-span-2 justify-end">
               <Button
                 id="btnProductosLimpiar"
                 name="btnProductosLimpiar"
