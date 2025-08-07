@@ -77,7 +77,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[url('https://nxtrsibnomdqmzcrwedc.supabase.co/storage/v1/object/public/imagenes/Backgrouds/FondoInicioSesion.jpg')] bg-cover bg-center">
+    <div className="min-h-screen relative overflow-hidden bg-[url('https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/1034899_6498.svg')] bg-cover bg-center">
       {/* Iconos de fondo */}
       {/*<div className="absolute inset-0 pointer-events-none z-0">
         <div className="absolute top-10 left-10 text-blue-700/20">
@@ -106,13 +106,14 @@ export default function LoginPage() {
        
 
         {/* Formulario */}
-        <Card className="bg-[#fffcf5] w-full max-w-md z-20 shadow-2xl">
+        <Card className="bg-[#fffcf5]/90 w-full max-w-md z-20 shadow-2xl">
           <CardHeader className="text-center">
             <div className="bg-[#fffcf5] mb-8 rounded-lg">
           <div className="bg-[#fffcf5] flex items-center space-x-3 rounded-lg">
             <div className="w-full h-12 rounded-lg flex items-center justify-center">
              
-          <Icons.Utensils className="w-8 h-8 text-black mr-4"/><h1 className="text-3xl font-bold text-black"> Sistema de Costeo </h1>
+          {/*<Icons.Utensils className="w-8 h-8 text-black mr-4"/>*/}
+          <h1 className="text-3xl font-bold text-black"> Sistema de Costeo Healthylab</h1>
           
             </div>
             
@@ -181,7 +182,7 @@ export default function LoginPage() {
               day: "numeric",
             })}
           </p>
-          <p className="text-xs mt-1 mb-4 text-black">Sistema de Gestión de Restaurantes</p>
+          <p className="text-xs mt-1 mb-4 text-black">Sistema de Gestión de Productos Healthylab</p>
         </div>
         </Card>
 

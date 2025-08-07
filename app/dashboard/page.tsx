@@ -177,7 +177,22 @@ export default function DashboardPage() {
       <div className="w-full text-center space-y-2">
         <h1 className="text-4xl font-bold text-gray-900">Sistema de costeo</h1>
         <h2 className="text-2xl font-semibold text-gray-700">Dashboard</h2>
+
+        <div className="w-80 flex flex-col gap-2 p-8 shadow-xl sm:flex-row sm:items-center sm:gap-6 sm:py-4 ...">
+       <img className="mx-auto block h-24 rounded-full sm:mx-0 sm:shrink-0" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/quimico.png" alt="" />
+      <div className="space-y-2 text-center sm:text-left">
+    <div className="space-y-0.5">
+      <p className="text-lg font-semibold text-black">{sesion.NombreCompleto}</p>
+      <p className="font-medium text-gray-500">Product Engineer</p>
+    </div>
+    <button className="border-purple-200 text-purple-600 hover:border-transparent hover:bg-purple-600 hover:text-white active:bg-purple-700 ...">
+      Message
+    </button>
+    </div>
+    </div>
+    
       </div>
+      
 
       {/* Sección de bienvenida */}
       <div className="w-full">

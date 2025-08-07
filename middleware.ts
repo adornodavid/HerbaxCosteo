@@ -1,30 +1,38 @@
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { getSession } from '@/lib/session' // Asume que getSession es una función para obtener la sesión
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Rutas públicas que no requieren autenticación
-  const publicRoutes = ["/login", "/logout", "/debug-session"]
+  // Rutas que no requieren autenticación
+  const publicRoutes = [
+    '/login',
+    '/logout',
+    '/pruebas', // Añadido para permitir acceso sin sesión
+    '/test',    // Añadido para permitir acceso sin sesión
+    '/',        // La página de inicio también puede ser pública
+  ]
 
-  // Si es una ruta pública, permitir acceso
-  if (publicRoutes.includes(pathname)) {
+  // Verificar si la ruta actual es una ruta pública
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+
+  // Si es una ruta pública, permite el acceso
+  if (isPublicRoute) {
     return NextResponse.next()
   }
 
-  // Verificar si hay sesión activa
-  const sesionActiva = request.cookies.get("SesionActiva")?.value
-  const rolId = request.cookies.get("RolId")?.value
+  // Para todas las demás rutas, verifica la sesión
+  const session = await getSession()
 
-  // Si no hay sesión activa o RolId no es válido, redirigir al login
-  if (sesionActiva !== "true" || !rolId || Number.parseInt(rolId) === 0) {
-    const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = "/login"
-    redirectUrl.searchParams.set("redirectedFrom", request.nextUrl.pathname)
-    return NextResponse.redirect(redirectUrl)
+  // Si no hay sesión y no es una ruta pública, redirige al login
+  if (!session) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
   }
 
-  // Si hay sesión activa y RolId es válido, permitir acceso
+  // Si hay sesión, permite el acceso
   return NextResponse.next()
 }
 
@@ -32,12 +40,12 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public folder
+     * - api/auth (NextAuth.js routes)
+     * - public folder (e.g. /public/images)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|public).*)",
+    '/((?!_next/static|_next/image|favicon.ico|api/auth|images|placeholder).*)',
   ],
 }

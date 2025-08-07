@@ -10,6 +10,9 @@ if (!secretKey) {
   // Es crucial que esta variable esté configurada.
   throw new Error("SESSION_SECRET environment variable is not set.")
 }
+else{
+  console.log("Si existe skey")
+}
 
 const SESSION_NAME = "session"
 
