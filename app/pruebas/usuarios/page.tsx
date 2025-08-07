@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,9 +14,9 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Loader2 } from 'lucide-react'
-import { insUsuario } from '@/app/actions/usuarios-actions' // Update the import path for insUsuario
+import { insUsuario, obtenerUsuarios } from '@/app/actions/usuarios-actions' // Update the import path for insUsuario and obtenerUsuarios
 
-export default function CrearUsuarioPruebasPage() {
+export default function UsuariosPage() {
   const [nombrecompleto, setNombreCompleto] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -24,10 +24,27 @@ export default function CrearUsuarioPruebasPage() {
   const [rolid, setRolid] = useState('')
   const [isPending, startTransition] = useTransition()
 
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
   const [showModal, setShowModal] = useState(false)
   const [modalTitle, setModalTitle] = useState('')
   const [modalMessage, setModalMessage] = useState('')
   const [modalSuccess, setModalSuccess] = useState(false)
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const result = await obtenerUsuarios()
+      if (result.success) {
+        setUsers(result.data)
+      } else {
+        setError(result.error)
+      }
+      setLoading(false)
+    }
+    fetchUsers()
+  }, [])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -88,6 +105,9 @@ export default function CrearUsuarioPruebasPage() {
       setShowModal(true)
     })
   }
+
+  if (loading) return <div>Cargando usuarios...</div>
+  if (error) return <div>Error: {error}</div>
 
   return (
     <div className="flex min-h-[calc(100vh-theme(spacing.16))] flex-col items-center justify-center p-4">
@@ -163,6 +183,15 @@ export default function CrearUsuarioPruebasPage() {
           </form>
         </CardContent>
       </Card>
+
+      <div className="mt-8">
+        <h1 className="text-2xl font-bold mb-4">Lista de Usuarios</h1>
+        <ul className="list-disc list-inside">
+          {users.map((user: any) => (
+            <li key={user.id}>{user.nombre} - {user.email}</li>
+          ))}
+        </ul>
+      </div>
 
       <AlertDialog open={showModal} onOpenChange={setShowModal}>
         <AlertDialogContent>

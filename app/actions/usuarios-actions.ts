@@ -1,6 +1,11 @@
-import { createClient } from '@/lib/supabase'
+"use server"
+import { createClient } from "@supabase/supabase-js"
 import bcrypt from 'bcrypt'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath } from "next/cache"
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
 // Función para insertar un nuevo usuario
 export async function insUsuario(
@@ -9,7 +14,7 @@ export async function insUsuario(
   password: string,
   rolid: number
 ) {
-  const supabase = createClient()
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
   try {
     // Hashear la contraseña antes de insertarla
@@ -46,7 +51,7 @@ export async function selUsuarioLogin(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
-  const supabase = createClient()
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
   try {
     const { data: users, error: fetchError } = await supabase
@@ -76,5 +81,19 @@ export async function selUsuarioLogin(formData: FormData) {
   } catch (error: any) {
     console.error('Error en selUsuarioLogin:', error.message)
     return { success: false, message: `Error en el servidor: ${error.message}` }
+  }
+}
+
+export async function obtenerUsuarios() {
+  try {
+    const { data, error } = await supabaseAdmin.from("usuarios").select("*")
+    if (error) {
+      console.error("Error obteniendo usuarios:", error)
+      return { success: false, error: error.message }
+    }
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en obtenerUsuarios:", error)
+    return { success: false, error: "Error interno del servidor" }
   }
 }
