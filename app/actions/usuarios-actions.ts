@@ -24,7 +24,7 @@ export async function insUsuario(formData: FormData) {
       .insert([
         {
           nombrecompleto: nombrecompleto,
-          email: p_email,
+          email: email,
           password: hashedPassword, // Guardar la contraseña hasheada
           rolid: rolid,
           activo: true, // Asumimos que el usuario está activo por defecto
