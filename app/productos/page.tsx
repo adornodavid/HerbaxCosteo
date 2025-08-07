@@ -155,7 +155,7 @@ export default function ProductosPage() {
           ProductoId: p.id,
           ProductoNombre: p.nombre,
           ProductoDescripcion: p.descripcion,
-          ProductoTiempo: p.tiempopreparacion,
+          ProductoTiempo: p.propositoprincipal,
           ProductoCosto: p.costototal,
           ProductoCostoAdministrativo: p.costoadministrativo,
           ProductoActivo: p.activo,
