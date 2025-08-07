@@ -42,7 +42,7 @@ export function AppSidebar() {
     loadSession()
   }, [])
 
-  // **NUEVO: Inicialización de Preline UI**
+  // Inicialización de Preline UI
   useEffect(() => {
     if (typeof window !== 'undefined' && window.HSStaticMethods) {
       window.HSStaticMethods.autoInit();
