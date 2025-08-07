@@ -28,7 +28,6 @@ export async function insUsuario(formData: FormData) {
           password: hashedPassword, // Guardar la contraseña hasheada
           rolid: rolid,
           activo: true, // Asumimos que el usuario está activo por defecto
-          fechacreacion: new Date().toISOString(),
         },
       ])
       .select()
@@ -38,7 +37,7 @@ export async function insUsuario(formData: FormData) {
       return { success: false, message: `Error al insertar usuario: ${error.message}` }
     }
 
-    revalidatePath('/usuarios') // Revalidar la ruta de usuarios para mostrar el nuevo usuario
+    revalidatePath('/pruebas/usuarios') // Revalidar la ruta de usuarios para mostrar el nuevo usuario
     return { success: true, message: 'Usuario insertado exitosamente.' }
   } catch (error: any) {
     console.error('Error en insUsuario:', error.message)

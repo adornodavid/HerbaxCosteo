@@ -16,10 +16,9 @@ export async function getProductoDetailsForModal(productoId: number) {
         id,
         nombre as Producto,
         descripcion,
-        instruccionespreparacion,
-        tiempopreparacion,
+        propositoprincipal,
         imgurl,
-        costototal as CostoTotal,
+        costo as CostoTotal,
         productosxcatalogo (
           id,
           precioventa,
