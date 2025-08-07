@@ -127,7 +127,7 @@ export default function ProductosPage() {
 
     try {
       let query = supabase.from("productos").select(`
-          id, nombre, descripcion, propositoprincipal, costo as costotal, costoadministrativo, activo, imgurl,
+          id, nombre, descripcion, propositoprincipal, costo, costoadministrativo, activo, imgurl,
           productosxcatalogo!inner(
             catalogos!inner(
               id, nombre,
@@ -156,7 +156,7 @@ export default function ProductosPage() {
           ProductoNombre: p.nombre,
           ProductoDescripcion: p.descripcion,
           ProductoTiempo: p.propositoprincipal,
-          ProductoCosto: p.costototal,
+          ProductoCosto: p.costo,
           ProductoCostoAdministrativo: p.costoadministrativo,
           ProductoActivo: p.activo,
           ProductoImagenUrl: p.imgurl,
@@ -187,10 +187,10 @@ export default function ProductosPage() {
         data: statsData,
         error: statsError,
         count,
-      } = await supabase.from("productos").select("costo as costototal, propositoprincipal", { count: "exact" })
+      } = await supabase.from("productos").select("costo, propositoprincipal", { count: "exact" })
 
       if (!statsError && statsData && statsData.length > 0) {
-        const costoTotal = statsData.reduce((sum, p) => sum + (p.costototal || 0), 0)
+        const costoTotal = statsData.reduce((sum, p) => sum + (p.costo || 0), 0)
         const costoPromedio = count ? costoTotal / count : 0
         setEstadisticas({
           totalProductos: count || 0,
@@ -784,7 +784,7 @@ export default function ProductosPage() {
                   )}
                   <p className="text-sm text-gray-600">
                     <span className="text-base font-medium">Costo Total:</span>{" "}
-                    {formatCurrency(selectedProductoDetails[0].CostoTotal)}
+                    {formatCurrency(selectedProductoDetails[0].Costo)}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="text-base font-medium">Precio Mínimo:</span>{" "}
