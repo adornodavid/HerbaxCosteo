@@ -85,7 +85,7 @@ export default function UsuariosPage() {
       formData.append('hotelid', '1') // Valor por defecto para pruebas
       formData.append('activo', 'on') // Valor por defecto para pruebas (checkbox checked)
 
-      const result = await insUsuario({}, formData) // Pasar un estado inicial vacío y formData
+      const result = await insUsuario(formData) // Pasar un estado inicial vacío y formData
 
       if (result.success) {
         setModalTitle('Éxito')
