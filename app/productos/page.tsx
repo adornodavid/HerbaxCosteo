@@ -498,8 +498,8 @@ export default function ProductosPage() {
                 onChange={(e) => setFiltroNombre(e.target.value)}
               />
             </div>
-            <div>
-              <label htmlFor="ddlClientes" className="text-sm font-medium lg:col-span-2">
+            <div className="lg:col-span-2">
+              <label htmlFor="ddlClientes" className="text-sm font-medium">
                 Cliente
               </label>
               <Select name="ddlCliente" value={filtroCliente} onValueChange={handleClienteChange}>
@@ -515,8 +515,8 @@ export default function ProductosPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <label htmlFor="ddlCatalogo" className="text-sm font-medium lg:col-span-2">
+            <div className="lg:col-span-2">
+              <label htmlFor="ddlCatalogo" className="text-sm font-medium">
                 Catálogo
               </label>
               <Select name="ddlCatalogo" value={filtroCatalogo} onValueChange={setFiltroCatalogo}>
