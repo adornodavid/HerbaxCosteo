@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 // Función para insertar un nuevo usuario
 export async function insUsuario(
@@ -14,8 +14,6 @@ export async function insUsuario(
   password: string,
   rolid: number
 ) {
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
-
   try {
     // Hashear la contraseña antes de insertarla
     const hashedPassword = await bcrypt.hash(password, 10)
