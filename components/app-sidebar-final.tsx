@@ -8,6 +8,15 @@ import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { useNavigationGuard } from "@/contexts/navigation-guard-context" // Importar el hook del contexto
 
+// Declarar HSStaticMethods globalmente para TypeScript
+declare global {
+  interface Window {
+    HSStaticMethods: {
+      autoInit: () => void;
+    };
+  }
+}
+
 interface SessionData {
   UsuarioId: number
   Email: string
@@ -32,6 +41,13 @@ export function AppSidebar() {
     }
     loadSession()
   }, [])
+
+  // **NUEVO: Inicialización de Preline UI**
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.HSStaticMethods) {
+      window.HSStaticMethods.autoInit();
+    }
+  }, []); // Se ejecuta una vez al montar el componente
 
   const toggleMenu = (menuName: string) => {
     setOpenMenus((prev) => (prev.includes(menuName) ? prev.filter((name) => name !== menuName) : [...prev, menuName]))
