@@ -413,7 +413,7 @@ export default function ProductosPage() {
                 className="absolute inset-0 animate-bounce-slow"
               />
             </div>
-            <p className="text-lg font-semibold text-gray-800">Cargando Pagina...</p>
+            <p className="text-lg font-semibold text-gray-800"></p>
           </div>
         </div>
       </div>
