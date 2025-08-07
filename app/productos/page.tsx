@@ -481,7 +481,7 @@ export default function ProductosPage() {
           <form
             id="frmProductosBuscar"
             name="frmProductosBuscar"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end"
             onSubmit={handleFormSubmit}
           >
             <div className="lg:col-span-2">
