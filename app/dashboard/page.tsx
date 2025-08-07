@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Hotel, Building, Menu, Utensils, Package, TrendingUp, Activity } from "lucide-react"
+import { Loader2, Hotel, Building, Menu, Utensils, Package, TrendingUp, Activity } from 'lucide-react'
 import { obtenerResumenesDashboard } from "@/app/actions/dashboard-actions"
 import Link from "next/link"
 import Image from "next/image" // Importar Image de next/image
