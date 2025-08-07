@@ -60,10 +60,10 @@ export function AppSidebar() {
     
     {
       name: "Insumos",
-      icon: Icons.Package,
+      icon: Icons.Pill,
       hasSubmenu: true,
       submenu: [
-        { name: "Ingredientes", href: "/ingredientes", icon: Icons.Salad },
+        { name: "Ingredientes", href: "/ingredientes", icon: Icons.Pill },
         { name: "Categorías", href: "/categorias", icon: Icons.Package },
       ],
     },
