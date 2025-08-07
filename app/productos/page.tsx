@@ -481,7 +481,7 @@ export default function ProductosPage() {
           <form
             id="frmProductosBuscar"
             name="frmProductosBuscar"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-9 gap-4 items-end"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end"
             onSubmit={handleFormSubmit}
           >
             <div className="lg:col-span-2">
@@ -532,7 +532,7 @@ export default function ProductosPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div>
+            <div className="lg:col-span-2">
               <label htmlFor="ddlEstatus" className="text-sm font-medium">
                 Estatus
               </label>
