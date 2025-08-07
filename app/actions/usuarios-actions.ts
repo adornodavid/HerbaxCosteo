@@ -28,6 +28,7 @@ export async function insUsuario(formData: FormData) {
           password: hashedPassword, // Guardar la contraseña hasheada
           rolid: rolid,
           activo: true, // Asumimos que el usuario está activo por defecto
+          fechacreacion: new Date().toISOString(),
         },
       ])
       .select()
