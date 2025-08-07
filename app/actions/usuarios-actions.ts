@@ -85,7 +85,7 @@ export async function selUsuarioLogin(formData: FormData) {
 
 export async function obtenerUsuarios() {
   try {
-    const { data, error } = await supabaseAdmin.from("usuarios").select("*")
+    const { data, error } = await supabase.from("usuarios").select("*")
     if (error) {
       console.error("Error obteniendo usuarios:", error)
       return { success: false, error: error.message }
