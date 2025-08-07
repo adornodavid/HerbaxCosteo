@@ -532,6 +532,19 @@ export default function ProductosPage() {
                 </SelectContent>
               </Select>
             </div>
+            <div>
+              <label htmlFor="ddlEstatus" className="text-sm font-medium">
+                Estatus
+              </label>
+              <Select name="ddlEstatus" value={} onValueChange={}>
+                <SelectTrigger id="ddlEstatus">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  
+                </SelectContent>
+              </Select>
+            </div>
             <div className="flex gap-2 col-span-full md:col-span-2 lg:col-span-4 justify-end">
               <Button
                 id="btnProductosLimpiar"
