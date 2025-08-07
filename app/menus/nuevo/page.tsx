@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast" // Mantener si se usa en otros luga
 import { useRouter } from "next/navigation"
 import { useState, useEffect, useMemo } from "react"
 import { crearMenu } from "@/app/actions/menus-actions"
-import { obtenerHoteles } from "@/app/actions/ingredientes-actions" // Reutilizando obtenerHoteles
+import { obtenerHoteles } from "@/app/actions/ingredientess-actions" // Reutilizando obtenerHoteles
 import { useAuth } from "@/contexts/auth-context"
 import { supabase } from "@/lib/supabase"
 import { toast as sonnerToast } from "sonner" // Mantener si se usa en otros lugares, aunque no para los errores de handleSubmit

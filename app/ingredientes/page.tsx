@@ -15,7 +15,7 @@ import {
   obtenerCategoriasIngredientes,
   buscarIngredientes,
   eliminarIngrediente,
-} from "@/app/actions/ingredientes-actions"
+} from "@/app/actions/ingredientess-actions"
 
 interface Hotel {
   id: number
