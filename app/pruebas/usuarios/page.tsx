@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Loader2 } from 'lucide-react'
-import { insUsuario } from '@/app/actions/usuarios' // Importa la acción existente
+import { insUsuario } from '@/app/actions/usuarios-actions' // Update the import path for insUsuario
 
 export default function CrearUsuarioPruebasPage() {
   const [nombrecompleto, setNombreCompleto] = useState('')
