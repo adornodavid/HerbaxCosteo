@@ -46,6 +46,9 @@ export function AppSidebar() {
   useEffect(() => {
     if (typeof window !== 'undefined' && window.HSStaticMethods) {
       window.HSStaticMethods.autoInit();
+      console.log("Preline UI initialized."); // Agregado para depuración
+    } else {
+      console.log("HSStaticMethods no disponible, esperando..."); // Agregado para depuración
     }
   }, []); // Se ejecuta una vez al montar el componente
 
