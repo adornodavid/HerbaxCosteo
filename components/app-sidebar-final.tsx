@@ -72,7 +72,7 @@ export function AppSidebar() {
       icon: Icons.PillBottle,
       hasSubmenu: true,
       submenu: [
-        { name: "Productos", href: "/platillos", icon: Icons.PillBottle },
+        { name: "Productos", href: "/productos", icon: Icons.PillBottle },
         //{ name: "Sub-Recetas", href: "/recetas", icon: Icons.FileText },
       ],
     },
@@ -123,9 +123,9 @@ export function AppSidebar() {
   ]
 
   return (
-    <div id="SideBar" className="w-64 h-screen bg-[#528A94] text-white flex flex-col">
+    <div id="SideBar" className="w-64 h-screen bg-[#4a728a] text-white flex flex-col">
       {/* Logo */}
-      <div className="p-4 border-b border-[#a6d1cc]">
+      <div className="p-4 border-b border-[#a1cbd4]">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
             <Icons.PillBottle className="w-5 h-5 text-black" />
@@ -135,7 +135,7 @@ export function AppSidebar() {
       </div>
 
       {/* Nombre del usuario */}
-      <div className="p-4 border-b border-[#a6d1cc]">
+      <div className="p-4 border-b border-[#a1cbd4]">
         <div className="flex items-center space-x-2">
           <Icons.User className="w-5 h-5 text-white" />
           <span className="text-sm font-medium">{sessionData?.NombreCompleto || "Usuario"}</span>
