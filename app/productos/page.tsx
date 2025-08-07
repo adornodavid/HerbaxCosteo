@@ -776,10 +776,10 @@ export default function ProductosPage() {
                       {selectedProductoDetails[0].instruccionespreparacion}
                     </p>
                   )}
-                  {selectedProductoDetails[0].tiempopreparacion && (
+                  {selectedProductoDetails[0].propositoprincipal && (
                     <p className="mt-2 text-sm text-gray-600">
-                      <span className="text-base font-medium">Tiempo de Preparación:</span>{" "}
-                      {selectedProductoDetails[0].tiempopreparacion}
+                      <span className="text-base font-medium">Proposito Principal:</span>{" "}
+                      {selectedProductoDetails[0].propositoprincipal}
                     </p>
                   )}
                   <p className="text-sm text-gray-600">
