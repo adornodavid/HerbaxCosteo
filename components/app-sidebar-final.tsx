@@ -128,7 +128,7 @@ export function AppSidebar() {
       <div className="p-4 border-b border-[#a6d1cc]">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
-            <Icons.Utensils className="w-5 h-5 text-black" />
+            <Icons.PillBottle className="w-5 h-5 text-black" />
           </div>
           <span className="font-bold text-lg">Sistema de Costeo</span>
         </div>
