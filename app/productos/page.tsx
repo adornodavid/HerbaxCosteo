@@ -60,7 +60,7 @@ interface ProductoListado {
 interface EstadisticasProductos {
   totalProductos: number
   costoPromedio: number
-  costoTotal: number
+  costo: number
   tiempoPromedio: string
 }
 
@@ -77,7 +77,7 @@ interface ProductoDetail {
   CostoElaboracion: number
   precioventa: number | null
   margenutilidad: number | null
-  CostoTotal: number
+  Costo: number
   PrecioSugerido: number
 }
 
@@ -91,7 +91,7 @@ export default function ProductosPage() {
   const [estadisticas, setEstadisticas] = useState<EstadisticasProductos>({
     totalProductos: 0,
     costoPromedio: 0,
-    costoTotal: 0,
+    Costo: 0,
     tiempoPromedio: "N/A",
   })
   const [clientes, setClientes] = useState<DropdownItem[]>([])
@@ -127,7 +127,7 @@ export default function ProductosPage() {
 
     try {
       let query = supabase.from("productos").select(`
-          id, nombre, descripcion, propositoprincipal, costototal, costoadministrativo, activo, imgurl,
+          id, nombre, descripcion, propositoprincipal, costo as costotal, costoadministrativo, activo, imgurl,
           productosxcatalogo!inner(
             catalogos!inner(
               id, nombre,
