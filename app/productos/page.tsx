@@ -127,7 +127,7 @@ export default function ProductosPage() {
 
     try {
       let query = supabase.from("productos").select(`
-          id, nombre, descripcion, propositoprincipal, costo, costoadministrativo, activo, imgurl,
+          id, nombre, descripcion, propositoprincipal, costo, activo, imgurl,
           productosxcatalogo!inner(
             catalogos!inner(
               id, nombre,
@@ -157,7 +157,6 @@ export default function ProductosPage() {
           ProductoDescripcion: p.descripcion,
           ProductoTiempo: p.propositoprincipal,
           ProductoCosto: p.costo,
-          ProductoCostoAdministrativo: p.costoadministrativo,
           ProductoActivo: p.activo,
           ProductoImagenUrl: p.imgurl,
           ClienteId: x.catalogos.clientes.id,
