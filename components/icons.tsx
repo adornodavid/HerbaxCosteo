@@ -29,6 +29,7 @@ import {
   Lock,
   KeyRound,
   PillBottle,
+  Pill,
 } from "lucide-react"
 
 export const Icons = {
@@ -62,6 +63,7 @@ export const Icons = {
   Lock,
   KeyRound,
   PillBottle,
+  Pill,
 }
 
 export type Icon = keyof typeof Icons
