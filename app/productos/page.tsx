@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,7 +59,7 @@ interface ProductoListado {
 interface EstadisticasProductos {
   totalProductos: number
   costoPromedio: number
-  costo: number
+  costoTotal: number // Cambiado de 'costo' a 'costoTotal' para mayor claridad
   tiempoPromedio: string
 }
 
@@ -91,7 +90,7 @@ export default function ProductosPage() {
   const [estadisticas, setEstadisticas] = useState<EstadisticasProductos>({
     totalProductos: 0,
     costoPromedio: 0,
-    Costo: 0,
+    costoTotal: 0, // Inicializado a 0
     tiempoPromedio: "N/A",
   })
   const [clientes, setClientes] = useState<DropdownItem[]>([])
@@ -100,7 +99,7 @@ export default function ProductosPage() {
   const [isSearching, setIsSearching] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [productoToToggle, setProductoToToggle] = useState<{ id: number; activo: boolean } | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("") // Este estado no se usa en la búsqueda actual, pero se mantiene
   const [productoToDelete, setProductoToDelete] = useState<number | null>(null)
 
   // Estados para el modal de detalles
@@ -112,6 +111,7 @@ export default function ProductosPage() {
   const [filtroNombre, setFiltroNombre] = useState("")
   const [filtroCliente, setFiltroCliente] = useState("-1")
   const [filtroCatalogo, setFiltroCatalogo] = useState("-1")
+  const [filtroEstatus, setFiltroEstatus] = useState("-1") // Nuevo filtro de estatus
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1)
@@ -120,7 +120,7 @@ export default function ProductosPage() {
   const esAdmin = useMemo(() => user && [1, 2, 3, 4].includes(user.RolId), [user])
 
   // --- Función de búsqueda SIN dependencias automáticas ---
-  const ejecutarBusquedaProductos = async (nombre: string, clienteId: number, catalogoId: number) => {
+  const ejecutarBusquedaProductos = async (nombre: string, clienteId: number, catalogoId: number, estatus: string) => {
     if (!user) return
     setIsSearching(true)
     setPaginaActual(1)
@@ -128,17 +128,25 @@ export default function ProductosPage() {
     try {
       let query = supabase.from("productos").select(`
           id, nombre, descripcion, propositoprincipal, costo, activo, imgurl,
-          productosxcatalogo!inner(
-            catalogos!inner(
+          productosxcatalogo!left(
+            catalogos!left(
               id, nombre,
-              clientes!inner(id, nombre)
+              clientes!left(id, nombre)
             )
           )
         `)
 
-      if (nombre) query = query.like("nombre", `%${nombre}%`)
-      if (clienteId !== -1) query = query.eq("productosxcatalogo.catalogos.clientes.id", clienteId)
-      if (catalogoId !== -1) query = query.eq("productosxcatalogo.catalogos.id", catalogoId)
+      if (nombre) query = query.ilike("nombre", `%${nombre}%`) // Cambiado a ilike para búsqueda insensible a mayúsculas/minúsculas
+
+      if (clienteId !== -1) {
+        query = query.eq("productosxcatalogo.catalogos.clientes.id", clienteId)
+      }
+      if (catalogoId !== -1) {
+        query = query.eq("productosxcatalogo.catalogos.id", catalogoId)
+      }
+      if (estatus !== "-1") {
+        query = query.eq("activo", estatus === "true")
+      }
 
       const { data: queryData, error: queryError } = await query.order("nombre", { ascending: true })
 
@@ -149,9 +157,26 @@ export default function ProductosPage() {
         return
       }
 
-      // Transformar datos de la consulta
-      const flattenedData = queryData.flatMap((p: any) =>
-        p.productosxcatalogo.map((x: any) => ({
+      // Transformar datos de la consulta para manejar productos sin asociación
+      const flattenedData = queryData.flatMap((p: any) => {
+        if (p.productosxcatalogo.length === 0) {
+          // Producto sin asociaciones, mostrarlo una vez
+          return {
+            ProductoId: p.id,
+            ProductoNombre: p.nombre,
+            ProductoDescripcion: p.descripcion,
+            ProductoTiempo: p.propositoprincipal,
+            ProductoCosto: p.costo,
+            ProductoActivo: p.activo,
+            ProductoImagenUrl: p.imgurl,
+            ClienteId: -1, // O algún valor que indique "N/A"
+            ClienteNombre: "N/A",
+            CatalogoId: -1, // O algún valor que indique "N/A"
+            CatalogoNombre: "N/A",
+          }
+        }
+        // Producto con asociaciones, aplanarlas
+        return p.productosxcatalogo.map((x: any) => ({
           ProductoId: p.id,
           ProductoNombre: p.nombre,
           ProductoDescripcion: p.descripcion,
@@ -159,14 +184,19 @@ export default function ProductosPage() {
           ProductoCosto: p.costo,
           ProductoActivo: p.activo,
           ProductoImagenUrl: p.imgurl,
-          ClienteId: x.catalogos.clientes.id,
-          ClienteNombre: x.catalogos.clientes.nombre,
-          CatalogoId: x.catalogos.id,
-          CatalogoNombre: x.catalogos.nombre,
-        })),
-      )
-      setProductos(flattenedData)
-      toast.success(`Búsqueda completada. Se encontraron ${flattenedData.length} resultados.`)
+          ClienteId: x.catalogos?.clientes?.id || -1,
+          ClienteNombre: x.catalogos?.clientes?.nombre || "N/A",
+          CatalogoId: x.catalogos?.id || -1,
+          CatalogoNombre: x.catalogos?.nombre || "N/A",
+        }))
+      })
+
+      // Eliminar duplicados si un producto aparece varias veces debido a múltiples asociaciones
+      const uniqueProducts = Array.from(new Map(flattenedData.map((item: ProductoListado) => [item.ProductoId, item])).values());
+
+
+      setProductos(uniqueProducts)
+      toast.success(`Búsqueda completada. Se encontraron ${uniqueProducts.length} resultados.`)
     } catch (error) {
       console.error("Error inesperado al buscar productos:", error)
       toast.error("Error inesperado al buscar productos")
@@ -188,16 +218,19 @@ export default function ProductosPage() {
         count,
       } = await supabase.from("productos").select("costo, propositoprincipal", { count: "exact" })
 
-      if (!statsError && statsData && statsData.length > 0) {
+      if (!statsError && statsData) {
         const costoTotal = statsData.reduce((sum, p) => sum + (p.costo || 0), 0)
         const costoPromedio = count ? costoTotal / count : 0
         setEstadisticas({
           totalProductos: count || 0,
           costoPromedio,
           costoTotal,
-          tiempoPromedio: "25 min",
+          tiempoPromedio: "25 min", // Esto es un valor fijo, considera calcularlo si es dinámico
         })
+      } else if (statsError) {
+        console.error("Error cargando estadísticas:", statsError);
       }
+
 
       // Cargar clientes
       let clientesQuery = supabase.from("clientes").select("id, nombre").order("nombre")
@@ -211,17 +244,14 @@ export default function ProductosPage() {
         ]
         setClientes(clientesConTodos)
         setFiltroCliente("-1")
+      } else {
+        console.error("Error cargando clientes:", clientesError);
       }
 
-      // Cargar catálogos iniciales
+      // Cargar catálogos iniciales (todos, sin filtro de cliente al inicio)
       let catalogosQuery = supabase
         .from("catalogos")
-        .select(`
-          id, nombre,
-          clientes!inner(
-            id
-          )
-        `)
+        .select(`id, nombre`)
         .eq("activo", true)
         .order("nombre")
 
@@ -234,10 +264,12 @@ export default function ProductosPage() {
         ]
         setCatalogos(catalogosConTodos)
         setFiltroCatalogo("-1")
+      } else {
+        console.error("Error cargando catálogos iniciales:", catalogosError);
       }
 
-      // Ejecutar búsqueda inicial
-      await ejecutarBusquedaProductos("", -1, -1)
+      // Ejecutar búsqueda inicial con todos los filtros en -1
+      await ejecutarBusquedaProductos("", -1, -1, "-1")
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error)
       toast.error("Error al cargar datos iniciales")
@@ -265,19 +297,14 @@ export default function ProductosPage() {
   // --- Handlers de Eventos ---
   const handleClienteChange = async (value: string) => {
     setFiltroCliente(value)
-    setFiltroCatalogo("-1")
+    setFiltroCatalogo("-1") // Resetear catálogo al cambiar cliente
 
     try {
       const clienteIdNum = Number.parseInt(value, 10)
 
       let query = supabase
         .from("catalogos")
-        .select(`
-          id, nombre,
-          clientes!inner(
-            id
-          )
-        `)
+        .select(`id, nombre`)
         .eq("activo", true)
         .order("nombre")
 
@@ -293,6 +320,8 @@ export default function ProductosPage() {
           ...(data || []).map((c: any) => ({ id: c.id, nombre: c.nombre })),
         ]
         setCatalogos(catalogosConTodos)
+      } else {
+        console.error("Error al cargar catálogos por cliente:", error);
       }
     } catch (error) {
       console.error("Error al cambiar cliente:", error)
@@ -304,14 +333,18 @@ export default function ProductosPage() {
     e.preventDefault()
     const clienteId = Number.parseInt(filtroCliente, 10)
     const catalogoId = Number.parseInt(filtroCatalogo, 10)
-    ejecutarBusquedaProductos(filtroNombre, clienteId, catalogoId)
+    ejecutarBusquedaProductos(filtroNombre, clienteId, catalogoId, filtroEstatus)
   }
 
   const clearProductosBusqueda = () => {
     setFiltroNombre("")
     setFiltroCliente("-1")
+    setFiltroCatalogo("-1")
+    setFiltroEstatus("-1") // Limpiar también el filtro de estatus
     handleClienteChange("-1") // Resetear también los catálogos
     toast.info("Filtros limpiados.")
+    // Volver a ejecutar la búsqueda con filtros limpios
+    ejecutarBusquedaProductos("", -1, -1, "-1")
   }
 
   const handleToggleStatusClickProducto = (id: number, activo: boolean) => {
@@ -331,6 +364,7 @@ export default function ProductosPage() {
         console.error("Error al cambiar estado:", error)
         toast.error(`Error al cambiar estado del producto.`)
       } else {
+        // Actualizar el estado local para reflejar el cambio sin recargar todo
         setProductos((prev) => prev.map((p) => (p.ProductoId === id ? { ...p, ProductoActivo: nuevoEstado } : p)))
         toast.success(`Producto ${nuevoEstado ? "activado" : "inactivado"} correctamente.`)
       }
@@ -357,7 +391,7 @@ export default function ProductosPage() {
       // Recargar la lista de productos después de la eliminación
       const clienteId = Number.parseInt(filtroCliente, 10)
       const catalogoId = Number.parseInt(filtroCatalogo, 10)
-      await ejecutarBusquedaProductos(filtroNombre, clienteId, catalogoId)
+      await ejecutarBusquedaProductos(filtroNombre, clienteId, catalogoId, filtroEstatus)
     }
     setPageLoading(false)
   }
@@ -388,10 +422,6 @@ export default function ProductosPage() {
   }, [productos, paginaActual])
 
   const totalPaginas = Math.ceil(productos.length / resultadosPorPagina)
-
-  const filteredProductos = productos.filter((producto) =>
-    producto.ProductoNombre.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
 
   const formatCurrency = (amount: number | null) =>
     new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(amount || 0)
@@ -503,7 +533,7 @@ export default function ProductosPage() {
               </label>
               <Select name="ddlCliente" value={filtroCliente} onValueChange={handleClienteChange}>
                 <SelectTrigger id="ddlClientes">
-                  <SelectValue />
+                  <SelectValue placeholder="Selecciona un cliente" />
                 </SelectTrigger>
                 <SelectContent>
                   {clientes.map((c) => (
@@ -520,7 +550,7 @@ export default function ProductosPage() {
               </label>
               <Select name="ddlCatalogo" value={filtroCatalogo} onValueChange={setFiltroCatalogo}>
                 <SelectTrigger id="ddlCatalogo">
-                  <SelectValue />
+                  <SelectValue placeholder="Selecciona un catálogo" />
                 </SelectTrigger>
                 <SelectContent>
                   {catalogos.map((c) => (
@@ -535,12 +565,14 @@ export default function ProductosPage() {
               <label htmlFor="ddlEstatus" className="text-sm font-medium">
                 Estatus
               </label>
-              <Select name="ddlEstatus" value={} onValueChange={}>
+              <Select name="ddlEstatus" value={filtroEstatus} onValueChange={setFiltroEstatus}>
                 <SelectTrigger id="ddlEstatus">
-                  <SelectValue />
+                  <SelectValue placeholder="Selecciona un estatus" />
                 </SelectTrigger>
                 <SelectContent>
-                  
+                  <SelectItem value="-1">Todos</SelectItem>
+                  <SelectItem value="true">Activo</SelectItem>
+                  <SelectItem value="false">Inactivo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -572,7 +604,7 @@ export default function ProductosPage() {
         </CardContent>
       </Card>
 
-      {/* 4. Grid de Resultados */}
+      {/* 4. Grid de Resultados - Ahora con Tarjetas */}
       <Card>
         <CardHeader>
           <CardTitle>Resultados</CardTitle>
@@ -581,125 +613,83 @@ export default function ProductosPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <Table id="tblProductosResultados">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Producto</TableHead>
-                  <TableHead className="hidden md:table-cell">Cliente</TableHead>
-                  <TableHead className="hidden lg:table-cell">Catálogo</TableHead>
-                  <TableHead>Costo total</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isSearching ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center">
-                      <Loader2 className="mx-auto h-6 w-6 animate-spin" />
-                    </TableCell>
-                  </TableRow>
-                ) : filteredProductos.length > 0 ? (
-                  filteredProductos.map((p, index) => (
-                    <TableRow key={`${p.ProductoId}-${p.CatalogoId}-${index}`}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={p.ProductoImagenUrl || "/placeholder.svg?height=40&width=40"}
-                            alt={p.ProductoNombre}
-                            className="h-10 w-10 rounded-md object-cover"
-                          />
-                          <div>
-                            <div className="font-medium">{p.ProductoNombre}</div>
-                            <div className="text-sm text-muted-foreground hidden sm:block">{p.ProductoDescripcion}</div>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">{p.ClienteNombre}</TableCell>
-                      <TableCell className="hidden lg:table-cell">{p.CatalogoNombre}</TableCell>
-                      <TableCell>{formatCurrency(p.ProductoCosto)}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`px-2 py-1 text-xs rounded-full ${p.ProductoActivo ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+          {isSearching ? (
+            <div className="flex justify-center items-center h-48">
+              <Loader2 className="mx-auto h-8 w-8 animate-spin" />
+              <span className="ml-2 text-lg">Cargando productos...</span>
+            </div>
+          ) : productosPaginados.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {productosPaginados.map((p, index) => (
+                <Card
+                  key={`${p.ProductoId}-${p.CatalogoId}-${index}`}
+                  className="relative flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 group"
+                >
+                  <div className="relative w-full h-48 overflow-hidden">
+                    <Image
+                      src={p.ProductoImagenUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
+                      alt={p.ProductoNombre}
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded-t-lg transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute top-2 right-2">
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full font-semibold ${p.ProductoActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
+                      >
+                        {p.ProductoActivo ? "Activo" : "Inactivo"}
+                      </span>
+                    </div>
+                  </div>
+                  <CardContent className="flex flex-col flex-grow p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                      {p.ProductoNombre}
+                    </h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                      {p.ProductoDescripcion || "Sin descripción."}
+                    </p>
+                    <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
+                      <p className="text-xl font-bold text-green-600">{formatCurrency(p.ProductoCosto)}</p>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Ver Detalles"
+                          onClick={() => handleViewProductoDetails(p.ProductoId)}
+                          disabled={isDetailsLoading}
                         >
-                          {p.ProductoActivo ? "Activo" : "Inactivo"}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title="Ver Detalles"
-                            onClick={() => handleViewProductoDetails(p.ProductoId)}
-                            disabled={isDetailsLoading}
-                          >
-                            {isDetailsLoading ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
+                          {isDetailsLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Link href={`/productos/editar?getProductoId=${p.ProductoId}`} passHref>
+                          <Button variant="ghost" size="icon" title="Editar">
+                            <Edit className="h-4 w-4" />
                           </Button>
-                          <Link href={`/productos/editar?getProductoId=${p.ProductoId}`} passHref>
-                            <Button variant="ghost" size="icon" title="Editar">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title={p.ProductoActivo ? "Inactivar" : "Activar"}
-                            onClick={() => handleToggleStatusClickProducto(p.ProductoId, p.ProductoActivo)}
-                          >
-                            {p.ProductoActivo ? (
-                              <ToggleRight className="h-4 w-4 text-red-500" />
-                            ) : (
-                              <ToggleLeft className="h-4 w-4 text-green-500" />
-                            )}
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              {/* Botón de eliminar comentado como en el original */}
-                              {/*
-                              <Button
-                                variant="destructive"
-                                size="icon"
-                                title="Eliminar Producto"
-                                onClick={() => setProductoToDelete(p.ProductoId)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                              */}
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Esta acción desactivará el producto. No se eliminará permanentemente de la base de
-                                  datos, pero ya no estará visible en la aplicación.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleDeleteProducto}>Confirmar</AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center">
-                      No se encontraron resultados.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                        </Link>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title={p.ProductoActivo ? "Inactivar" : "Activar"}
+                          onClick={() => handleToggleStatusClickProducto(p.ProductoId, p.ProductoActivo)}
+                        >
+                          {p.ProductoActivo ? (
+                            <ToggleRight className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <ToggleLeft className="h-4 w-4 text-green-500" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">No se encontraron resultados.</div>
+          )}
           {totalPaginas > 1 && (
             <div className="flex items-center justify-center space-x-2 pt-4">
               <Button

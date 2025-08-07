@@ -1,209 +1,148 @@
-'use client'
+"use client"
 
-import { useEffect, useState, useTransition } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { useState, useEffect } from "react"
+import { insUsuario, obtenerUsuarios } from "@/app/actions/usuarios-actions" // Importación corregida
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useActionState } from "react"
 import { Loader2 } from 'lucide-react'
-import { insUsuario, obtenerUsuarios } from '@/app/actions/usuarios-actions' // Update the import path for insUsuario and obtenerUsuarios
+
+interface Usuario {
+  id: number
+  nombrecompleto: string
+  email: string
+  rolid: number
+  activo: boolean
+}
+
+const initialState = {
+  message: "",
+  success: false,
+  errors: undefined,
+}
 
 export default function UsuariosPage() {
-  const [nombrecompleto, setNombreCompleto] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [rolid, setRolid] = useState('')
-  const [isPending, startTransition] = useTransition()
+  const [state, formAction, isPending] = useActionState(
+    async (prevState: any, formData: FormData) => {
+      const nombrecompleto = formData.get("nombrecompleto") as string
+      const email = formData.get("email") as string
+      const password = formData.get("password") as string
+      const rolid = parseInt(formData.get("rolid") as string)
 
-  const [users, setUsers] = useState([])
+      // Llama a la Server Action con los argumentos correctos
+      const result = await insUsuario(nombrecompleto, email, password, rolid)
+
+      if (!result.success) {
+        return { message: result.error, success: false }
+      }
+      setUsuarios((prev) => (result.data ? [...prev, result.data] : prev))
+      return { message: "Usuario insertado correctamente!", success: true }
+    },
+    initialState,
+  )
+
+  const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const [showModal, setShowModal] = useState(false)
-  const [modalTitle, setModalTitle] = useState('')
-  const [modalMessage, setModalMessage] = useState('')
-  const [modalSuccess, setModalSuccess] = useState(false)
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      const result = await obtenerUsuarios()
-      if (result.success) {
-        setUsers(result.data)
+    const fetchUsuarios = async () => {
+      setLoading(true)
+      const { success, data, error } = await obtenerUsuarios()
+      if (success && data) {
+        setUsuarios(data)
       } else {
-        setError(result.error)
+        console.error("Error al cargar usuarios:", error)
       }
       setLoading(false)
     }
-    fetchUsers()
+    fetchUsuarios()
   }, [])
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    // Client-side validation
-    if (!nombrecompleto || !email || !password || !rolid) {
-      setModalTitle('Error de Validación')
-      setModalMessage('Por favor, completa todos los campos obligatorios (Nombre Completo, Email, Contraseña, Rol ID).')
-      setModalSuccess(false)
-      setShowModal(true)
-      return
-    }
-
-    if (password !== confirmPassword) {
-      setModalTitle('Error de Validación')
-      setModalMessage('Las contraseñas no coinciden. Por favor, verifica.')
-      setModalSuccess(false)
-      setShowModal(true)
-      return
-    }
-
-    if (isNaN(parseInt(rolid))) {
-      setModalTitle('Error de Validación')
-      setModalMessage('El Rol ID debe ser un número entero válido.')
-      setModalSuccess(false)
-      setShowModal(true)
-      return
-    }
-
-    startTransition(async () => {
-      const formData = new FormData()
-      formData.append('id', 4)
-      formData.append('nombrecompleto', nombrecompleto)
-      formData.append('email', email)
-      formData.append('password', password)
-      formData.append('rolid', rolid)
-      // Añadir valores por defecto para hotelid y activo, ya que la acción insUsuario los espera
-      formData.append('hotelid', '1') // Valor por defecto para pruebas
-      formData.append('activo', 'on') // Valor por defecto para pruebas (checkbox checked)
-
-      const result = await insUsuario(formData) // Pasar un estado inicial vacío y formData
-
-      if (result.success) {
-        setModalTitle('Éxito')
-        setModalMessage(result.message)
-        setModalSuccess(true)
-        // Clear form fields on success
-        setNombreCompleto('')
-        setEmail('')
-        setPassword('')
-        setConfirmPassword('')
-        setRolid('')
-      } else {
-        setModalTitle('Error')
-        setModalMessage(result.message || 'Ocurrió un error inesperado.')
-        setModalSuccess(false)
-      }
-      setShowModal(true)
-    })
-  }
-
-  if (loading) return <div>Cargando usuarios...</div>
-  if (error) return <div>Error: {error}</div>
-
   return (
-    <div className="flex min-h-[calc(100vh-theme(spacing.16))] flex-col items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Gestión de Usuarios</h1>
+
+      <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Crear Nuevo Usuario (Pruebas)</CardTitle>
+          <CardTitle>Insertar Nuevo Usuario</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="grid gap-4">
-            <div className="grid gap-2">
+          <form action={formAction} className="space-y-4">
+            <div>
               <Label htmlFor="nombrecompleto">Nombre Completo</Label>
-              <Input
-                id="nombrecompleto"
-                type="text"
-                placeholder="John Doe"
-                required
-                value={nombrecompleto}
-                onChange={(e) => setNombreCompleto(e.target.value)}
-              />
+              <Input id="nombrecompleto" name="nombrecompleto" type="text" required />
             </div>
-            <div className="grid gap-2">
+            <div>
               <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="john.doe@example.com"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <Input id="email" name="email" type="email" required />
             </div>
-            <div className="grid gap-2">
+            <div>
               <Label htmlFor="password">Contraseña</Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <Input id="password" name="password" type="password" required />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="confirm-password">Confirmar Contraseña</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
+            <div>
+              <Label htmlFor="rolid">Rol</Label>
+              <Select name="rolid" required>
+                <SelectTrigger id="rolid">
+                  <SelectValue placeholder="Selecciona un rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Administrador</SelectItem>
+                  <SelectItem value="2">Gerente</SelectItem>
+                  <SelectItem value="3">Empleado</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="rolid">Rol ID</Label>
-              <Input
-                id="rolid"
-                type="number" // Usar type="number" para restringir a números
-                placeholder="Ej: 1"
-                required
-                value={rolid}
-                onChange={(e) => setRolid(e.target.value)}
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={isPending}>
+            <Button type="submit" disabled={isPending}>
               {isPending ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Guardando...
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Insertando...
                 </>
               ) : (
-                'Guardar Usuario'
+                "Insertar Usuario"
               )}
             </Button>
+            {state?.message && (
+              <p className={`mt-2 text-sm ${state.success ? "text-green-600" : "text-red-600"}`}>
+                {state.message}
+              </p>
+            )}
           </form>
         </CardContent>
       </Card>
 
-      <div className="mt-8">
-        <h1 className="text-2xl font-bold mb-4">Lista de Usuarios</h1>
-        <ul className="list-disc list-inside">
-          {users.map((user: any) => (
-            <li key={user.id}>{user.nombre} - {user.email}</li>
-          ))}
-        </ul>
-      </div>
-
-      <AlertDialog open={showModal} onOpenChange={setShowModal}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className={modalSuccess ? 'text-green-600' : 'text-red-600'}>
-              {modalTitle}
-            </AlertDialogTitle>
-            <AlertDialogDescription>{modalMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogAction onClick={() => setShowModal(false)}>Cerrar</AlertDialogAction>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Card>
+        <CardHeader>
+          <CardTitle>Listado de Usuarios</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="flex justify-center items-center h-32">
+              <Loader2 className="h-8 w-8 animate-spin" />
+              <span className="ml-2">Cargando usuarios...</span>
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {usuarios.map((usuario) => (
+                <li key={usuario.id} className="border p-3 rounded-md flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">{usuario.nombrecompleto}</p>
+                    <p className="text-sm text-gray-600">{usuario.email}</p>
+                  </div>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${usuario.activo ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                  >
+                    {usuario.activo ? "Activo" : "Inactivo"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

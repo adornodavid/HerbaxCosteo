@@ -10,61 +10,60 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 export async function getProductoDetailsForModal(productoId: number) {
   try {
     const { data, error } = await supabaseAdmin
-      .from("productos") // Cambiado de 'platillos' a 'productos'
+      .from("productosxcatalogo")
       .select(
         `
-        id,
-        nombre as Producto,
-        descripcion,
-        propositoprincipal,
-        imgurl,
-        costo as CostoTotal,
-        productosxcatalogo (
+        productos (
           id,
-          precioventa,
-          margenutilidad,
-          catalogos (
+          nombre,
+          descripcion,
+          instruccionespreparacion,
+          propositoprincipal,
+          imgurl,
+          costo
+        ),
+        catalogos (
+          id,
+          nombre,
+          clientes (
             id,
-            nombre as Catalogo,
-            clientes (
-              id,
-              nombre as Cliente
-            )
+            nombre
           )
-        )
+        ),
+        precioventa,
+        margenutilidad
       `,
       )
-      .eq("id", productoId)
+      .eq("productoid", productoId)
 
     if (error) {
-      console.error("Error obteniendo detalles del producto para modal:", error)
+      console.error("Error fetching producto details for modal:", error)
       return { success: false, error: error.message }
     }
 
     if (!data || data.length === 0) {
-      return { success: false, error: "Producto no encontrado" }
+      return { success: true, data: [] }
     }
 
-    // Transformar los datos para el formato deseado en el modal
-    const transformedData = data.flatMap((producto: any) =>
-      producto.productosxcatalogo.map((pxc: any) => ({
-        id: producto.id,
-        Producto: producto.Producto,
-        descripcion: producto.descripcion,
-        propositoprincipal: producto.propositoprincipal,
-        imgurl: producto.imgurl,
-        CostoTotal: producto.CostoTotal,
-        precioventa: pxc.precioventa,
-        margenutilidad: pxc.margenutilidad,
-        Cliente: pxc.catalogos.clientes.Cliente,
-        Catalogo: pxc.catalogos.Catalogo,
-        PrecioSugerido: producto.CostoTotal * 2, // Ejemplo de precio sugerido
-      })),
-    )
+    const formattedData = data.map((item: any) => ({
+      id: item.productos.id,
+      Cliente: item.catalogos.clientes.nombre,
+      Catalogo: item.catalogos.nombre,
+      Producto: item.productos.nombre,
+      descripcion: item.productos.descripcion,
+      instruccionespreparacion: item.productos.instruccionespreparacion,
+      propositoprincipal: item.productos.propositoprincipal,
+      imgurl: item.productos.imgurl,
+      CostoElaboracion: item.productos.costo, // Asumiendo que 'costo' es el costo de elaboración
+      precioventa: item.precioventa,
+      margenutilidad: item.margenutilidad,
+      Costo: item.productos.costo, // Mantener 'Costo' para compatibilidad si es necesario
+      PrecioSugerido: item.productos.costo * 1.2, // Ejemplo de precio sugerido
+    }))
 
-    return { success: true, data: transformedData }
+    return { success: true, data: formattedData }
   } catch (error) {
-    console.error("Error en getProductoDetailsForModal:", error)
-    return { success: false, error: "Error interno del servidor" }
+    console.error("Unexpected error in getProductoDetailsForModal:", error)
+    return { success: false, error: "Internal server error" }
   }
 }

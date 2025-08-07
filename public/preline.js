@@ -1,11 +1,7 @@
-// Minimal Preline JS for auto-initialization to avoid SyntaxError
-// En una aplicación real, esto debería ser reemplazado con el script completo de Preline UI.
-if (typeof window !== 'undefined') {
-  window.HSStaticMethods = {
-    autoInit: () => {
-      // Placeholder para la lógica de auto-inicialización de Preline
-      // En un script real de Preline, esto contendría llamadas para inicializar componentes
-      console.log('Preline autoInit placeholder ejecutado.');
-    }
-  };
-}
+// Minimal valid preline.js content to prevent SyntaxError
+// In a real application, you would include the full Preline UI script here.
+window.HSStaticMethods = {
+  autoInit: function() {
+    // console.log('Preline UI autoInit called (minimal version)');
+  }
+};
