@@ -72,7 +72,7 @@ interface ProductoDetail {
   Producto: string
   descripcion: string
   instruccionespreparacion: string | null
-  tiempopreparacion: string | null
+  propositoprincipal: string | null
   imgurl: string | null
   CostoElaboracion: number
   precioventa: number | null
