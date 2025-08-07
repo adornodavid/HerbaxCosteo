@@ -68,16 +68,16 @@ export function AppSidebar() {
       ],
     },
     {
-      name: "Cocina",
+      name: "Productos",
       icon: Icons.Utensils,
       hasSubmenu: true,
       submenu: [
-        { name: "Recetas", href: "/platillos", icon: Icons.Utensils },
-        { name: "Sub-Recetas", href: "/recetas", icon: Icons.FileText },
+        { name: "Productos", href: "/platillos", icon: Icons.Utensils },
+        //{ name: "Sub-Recetas", href: "/recetas", icon: Icons.FileText },
       ],
     },
     {
-      name: "Menús",
+      name: "Catalogos",
       icon: Icons.Menu,
       hasSubmenu: true,
       submenu: [{ name: "Gestión de Menús", href: "/menus", icon: Icons.Menu }],
@@ -94,12 +94,12 @@ export function AppSidebar() {
     },
 
     {
-      name: "Gestión Hotelera",
+      name: "Gestión",
       icon: Icons.Hotel,
       hasSubmenu: true,
       submenu: [
-        { name: "Hoteles", href: "/hoteles", icon: Icons.Hotel },
-        { name: "Restaurantes", href: "/restaurantes", icon: Icons.Building },
+        { name: "Clientes", href: "/hoteles", icon: Icons.Hotel },
+        //{ name: "Catalogo", href: "/restaurantes", icon: Icons.Building },
       ],
     },
     
