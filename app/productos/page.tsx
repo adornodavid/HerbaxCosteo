@@ -187,7 +187,7 @@ export default function ProductosPage() {
         data: statsData,
         error: statsError,
         count,
-      } = await supabase.from("productos").select("costototal, tiempopreparacion", { count: "exact" })
+      } = await supabase.from("productos").select("costototal, propositoprincipal", { count: "exact" })
 
       if (!statsError && statsData && statsData.length > 0) {
         const costoTotal = statsData.reduce((sum, p) => sum + (p.costototal || 0), 0)
