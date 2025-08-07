@@ -130,7 +130,7 @@ export function AppSidebar() {
           <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
             <Icons.Utensils className="w-5 h-5 text-black" />
           </div>
-          <span className="font-bold text-lg">Sistema de Costeo Healthylab</span>
+          <span className="font-bold text-lg">Sistema de Costeo</span>
         </div>
       </div>
 
