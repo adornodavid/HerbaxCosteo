@@ -481,7 +481,7 @@ export default function ProductosPage() {
           <form
             id="frmProductosBuscar"
             name="frmProductosBuscar"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-9 gap-4 items-end"
             onSubmit={handleFormSubmit}
           >
             <div className="lg:col-span-2">
@@ -499,7 +499,7 @@ export default function ProductosPage() {
               />
             </div>
             <div>
-              <label htmlFor="ddlClientes" className="text-sm font-medium">
+              <label htmlFor="ddlClientes" className="text-sm font-medium lg:col-span-2">
                 Cliente
               </label>
               <Select name="ddlCliente" value={filtroCliente} onValueChange={handleClienteChange}>
@@ -516,7 +516,7 @@ export default function ProductosPage() {
               </Select>
             </div>
             <div>
-              <label htmlFor="ddlCatalogo" className="text-sm font-medium">
+              <label htmlFor="ddlCatalogo" className="text-sm font-medium lg:col-span-2">
                 Catálogo
               </label>
               <Select name="ddlCatalogo" value={filtroCatalogo} onValueChange={setFiltroCatalogo}>
