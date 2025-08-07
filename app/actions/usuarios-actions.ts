@@ -14,7 +14,7 @@ export async function insUsuario(formData: FormData) {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
   const rolid = parseInt(formData.get('rolid') as string); // Convertir a número
-  
+
   try {
     // Hashear la contraseña antes de insertarla
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -37,7 +37,7 @@ export async function insUsuario(formData: FormData) {
       return { success: false, message: `Error al insertar usuario: ${error.message}` }
     }
 
-    revalidatePath('/usuarios') // Revalidar la ruta de usuarios para mostrar el nuevo usuario
+    revalidatePath('/pruebas/usuarios') // Revalidar la ruta de usuarios para mostrar el nuevo usuario
     return { success: true, message: 'Usuario insertado exitosamente.' }
   } catch (error: any) {
     console.error('Error en insUsuario:', error.message)
