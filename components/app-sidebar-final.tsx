@@ -69,10 +69,10 @@ export function AppSidebar() {
     },
     {
       name: "Productos",
-      icon: Icons.Utensils,
+      icon: Icons.PillBottle,
       hasSubmenu: true,
       submenu: [
-        { name: "Productos", href: "/platillos", icon: Icons.Utensils },
+        { name: "Productos", href: "/platillos", icon: Icons.PillBottle },
         //{ name: "Sub-Recetas", href: "/recetas", icon: Icons.FileText },
       ],
     },
