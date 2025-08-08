@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import { getSession } from "@/app/actions/session-actions"
-import { Icons } from "@/components/icons" // Asumiendo que Icons están definidos aquí
+import { Icons } from "@/components/icons"
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -71,7 +71,7 @@ const navItems: NavItem[] = [
   {
     title: "Importar Datos",
     href: "/importar",
-    icon: Icons.fileUp, // Corregido de Icons.upload a Icons.fileUp
+    icon: Icons.fileUp,
   },
 ];
 
@@ -93,7 +93,7 @@ export function AppSidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const [sessionData, setSessionData] = useState<SessionData | null>(null)
-  const [openMenus, setOpenMenus] = useState<string[]>([]) // Estado para gestionar los menús colapsables abiertos
+  const [openMenus, setOpenMenus] = useState<string[]>([])
   const { attemptNavigation } = useNavigationGuard()
 
   useEffect(() => {
@@ -104,14 +104,12 @@ export function AppSidebar() {
     loadSession()
   }, [])
 
-  // Función para alternar los menús colapsables
   const toggleCollapsible = useCallback((title: string) => {
     setOpenMenus((prev) =>
       prev.includes(title) ? prev.filter((name) => name !== title) : [...prev, title]
     )
   }, [])
 
-  // Función para manejar los clics de navegación, utilizando el NavigationGuard
   const handleNavigationClick = useCallback(
     async (href: string) => {
       const canProceed = await attemptNavigation(href)
@@ -122,7 +120,6 @@ export function AppSidebar() {
     [attemptNavigation, router],
   )
 
-  // Abrir automáticamente los submenús si un elemento hijo es la ruta activa actual
   useEffect(() => {
     const currentPath = pathname;
     const menusToOpen: string[] = [];
@@ -137,28 +134,24 @@ export function AppSidebar() {
     if (menusToOpen.length > 0) {
       setOpenMenus(prev => [...new Set([...prev, ...menusToOpen])]);
     }
-  }, [pathname]); // Depende de pathname para reevaluar
+  }, [pathname]);
 
   return (
-    // La barra lateral se oculta en pantallas pequeñas y se muestra en md y superiores
     <div className="hidden md:flex flex-col h-full border-r bg-gray-100/40 dark:bg-gray-800/40 w-64">
-      {/* Encabezado de la barra lateral */}
       <div className="flex h-16 items-center border-b px-6">
         <Link className="flex items-center gap-2 font-semibold" href="/dashboard" onClick={(e) => {
-          e.preventDefault(); // Prevenir recarga completa de la página
+          e.preventDefault();
           handleNavigationClick("/dashboard");
         }}>
-          <Icons.layoutDashboard className="h-6 w-6" /> {/* Corregido de Icons.logo a Icons.layoutDashboard */}
+          <Icons.layoutDashboard className="h-6 w-6" />
           <span className="">AYBCosteo</span>
         </Link>
       </div>
 
-      {/* Contenido principal de navegación */}
       <div className="flex-1 overflow-auto py-2">
         <nav className="grid items-start px-4 text-sm font-medium">
           {navItems.map((item) => (
             item.submenu ? (
-              // Si el elemento tiene submenús, usa Collapsible
               <Collapsible
                 key={item.title}
                 open={openMenus.includes(item.title)}
@@ -184,7 +177,7 @@ export function AppSidebar() {
                       key={subItem.title}
                       href={subItem.href || "#"}
                       onClick={(e) => {
-                        e.preventDefault(); // Prevenir recarga completa de la página
+                        e.preventDefault();
                         handleNavigationClick(subItem.href || "#");
                       }}
                       className={cn(
@@ -198,12 +191,11 @@ export function AppSidebar() {
                 </CollapsibleContent>
               </Collapsible>
             ) : (
-              // Si el elemento no tiene submenús, es un enlace directo
               <Link
                 key={item.title}
                 href={item.href || "#"}
                 onClick={(e) => {
-                  e.preventDefault(); // Prevenir recarga completa de la página
+                  e.preventDefault();
                   handleNavigationClick(item.href || "#");
                 }}
                 className={cn(
@@ -219,7 +211,6 @@ export function AppSidebar() {
         </nav>
       </div>
 
-      {/* Pie de página de la barra lateral con menú de usuario */}
       <div className="mt-auto p-4 border-t">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

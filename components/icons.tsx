@@ -23,7 +23,7 @@ export const Icons = {
   ChevronRight,
   Plus,
   ListChecks,
-  FileUp, // Asegurado que FileUp está exportado
+  FileUp,
   TrendingUp,
   PieChart,
   FileBarChart,
@@ -32,7 +32,7 @@ export const Icons = {
   KeyRound,
   PillBottle,
   Pill,
-  ChevronUp, // Añadido ChevronUp
+  ChevronUp,
 }
 
 export type Icon = keyof typeof Icons
