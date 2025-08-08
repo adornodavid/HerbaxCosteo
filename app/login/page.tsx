@@ -1,5 +1,8 @@
 "use client"
 
+/* ==================================================
+  Imports
+================================================== */
 import { useState } from "react"
 import { procesarInicioSesion } from "@/app/actions/login-backend-actions"
 import { useRouter } from "next/navigation"
@@ -18,6 +21,9 @@ import {
 import { Icons } from "@/components/icons"
 import { Send, UserCheck } from "lucide-react"
 
+/* ==================================================
+  Principal, Pagina
+================================================== */
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
