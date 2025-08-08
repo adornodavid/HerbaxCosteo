@@ -123,7 +123,7 @@ export function AppSidebar() {
   ]
 
   return (
-    <div id="SideBar" className="w-64 h-screen bg-[#dfebed] text-black flex flex-col">
+    <div id="SideBar" className="w-64 h-200 bg-[#dfebed] text-black flex flex-col">
       {/* Logo */}
       <div className="p-4 border-b border-[#a1cbd4]">
         <div className="flex items-center space-x-3">
