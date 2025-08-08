@@ -42,6 +42,44 @@ export async function insUsuario(
   }
 }
 
+// Función para autenticar un usuario
+export async function selUsuarioLogin(formData: FormData) {
+  const email = formData.get('email') as string
+  const password = formData.get('password') as string
+
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+  try {
+    const { data: users, error: fetchError } = await supabase
+      .from('usuarios')
+      .select('id, email, password, activo')
+      .eq('email', email)
+      .single()
+
+    if (fetchError || !users) {
+      console.error('Error fetching user or user not found:', fetchError?.message || 'User not found')
+      return { success: false, message: 'Credenciales inválidas.' }
+    }
+
+    if (!users.activo) {
+      return { success: false, message: 'Usuario inactivo. Contacte al administrador.' }
+    }
+
+    // Comparar la contraseña ingresada con el hash almacenado
+    const passwordMatch = await bcrypt.compare(password, users.password)
+
+    if (!passwordMatch) {
+      return { success: false, message: 'Credenciales inválidas.' }
+    }
+
+    // Si las credenciales son correctas, puedes devolver información del usuario o un mensaje de éxito
+    return { success: true, message: 'Login exitoso.' }
+  } catch (error: any) {
+    console.error('Error en selUsuarioLogin:', error.message)
+    return { success: false, message: `Error en el servidor: ${error.message}` }
+  }
+}
+
 export async function obtenerUsuarios() {
   try {
     const { data, error } = await supabaseAdmin.from("usuarios").select("*")
