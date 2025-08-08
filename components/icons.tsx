@@ -11,7 +11,7 @@ export const Icons = {
   logOut: LogOut,
   layoutDashboard: LayoutDashboard,
   chevronDown: ChevronDown,
-  chevronUp: ChevronUp,Pill, PillBottle
+  chevronUp: ChevronUp, PillBottle
 };
 
 export type Icon = keyof typeof Icons;
