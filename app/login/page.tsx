@@ -120,17 +120,14 @@ export default function LoginPage() {
             <div className="bg-[#fffcf5] mb-8 rounded-lg">
               <div className="bg-[#fffcf5] flex items-center space-x-3 rounded-lg">
                 <div className="w-full h-12 rounded-lg flex items-center justify-center">
-             
-          {/*<Icons.Utensils className="w-8 h-8 text-black mr-4"/>*/}
-          <h1 className="text-3xl font-bold text-black"> Sistema de Costeo Healthylab</h1>
-          
+                  {/*<Icons.Utensils className="w-8 h-8 text-black mr-4"/>*/}
+                  <h1 className="text-3xl font-bold text-black"> Sistema de Costeo Healthylab</h1>
+                </div>
+              </div>
             </div>
-            
-          </div>
-        </div>
-          <h1></h1>
-          <h3></h3>
-          <h3></h3>
+            <h1></h1>
+            <h3></h3>
+            <h3></h3>
             <CardTitle className="text-2xl font-bold">Iniciar Sesión</CardTitle>
           </CardHeader>
           <CardContent>
