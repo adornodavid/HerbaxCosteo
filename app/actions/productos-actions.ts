@@ -1,71 +1,49 @@
+// Contenido asumido de app/actions/productos-actions.ts
+// Este archivo no se modifica en esta interacción, solo se asume su contenido.
 'use server'
 
-import { createClient } from '@/lib/supabase-server'
+import { createClient } from "@/lib/supabase-server"
 
-interface Producto {
-  id: number
-  nombre: string
-  costo: number
-  imagen_url: string
-}
-
-interface EstadisticasProductos {
-  totalProductos: number
-  costoPromedio: number
-  productosActivos: number
-}
-
-export async function buscarProductos(formData: FormData): Promise<Producto[]> {
+export async function getProductos(
+  nombre: string | null,
+  clienteId: number | null,
+  catalogoId: number | null,
+  page: number = 1,
+  pageSize: number = 10
+) {
   const supabase = createClient()
-  const nombre = formData.get('nombre') as string
-  const clienteId = formData.get('ddlClientes') as string
-  const catalogoId = formData.get('ddlCatalogo') as string
-
-  // Simulación de retardo de red
-  await new Promise((resolve) => setTimeout(resolve, 500))
-
-  // Datos de productos de ejemplo
-  const mockProductos: Producto[] = [
-    { id: 1, nombre: 'Producto A', costo: 15.50, imagen_url: '/placeholder.svg?height=100&width=100' },
-    { id: 2, nombre: 'Producto B', costo: 22.75, imagen_url: '/placeholder.svg?height=100&width=100' },
-    { id: 3, nombre: 'Producto C', costo: 8.99, imagen_url: '/placeholder.svg?height=100&width=100' },
-    { id: 4, nombre: 'Producto D', costo: 30.00, imagen_url: '/placeholder.svg?height=100&width=100' },
-    { id: 5, nombre: 'Producto E', costo: 12.20, imagen_url: '/placeholder.svg?height=100&width=100' },
-    { id: 6, nombre: 'Producto F', costo: 5.00, imagen_url: '/placeholder.svg?height=100&width=100' },
-    { id: 7, nombre: 'Producto G', costo: 45.10, imagen_url: '/placeholder.svg?height=100&width=100' },
-    { id: 8, nombre: 'Producto H', costo: 18.30, imagen_url: '/placeholder.svg?height=100&width=100' },
-  ]
-
-  let filteredProductos = mockProductos
+  let query = supabase.from('productos').select('*', { count: 'exact' })
 
   if (nombre) {
-    filteredProductos = filteredProductos.filter(p => p.nombre.toLowerCase().includes(nombre.toLowerCase()))
+    query = query.ilike('nombre', `%${nombre}%`)
+  }
+  if (clienteId) {
+    query = query.eq('cliente_id', clienteId)
+  }
+  if (catalogoId) {
+    query = query.eq('catalogo_id', catalogoId)
   }
 
-  // Aquí iría la lógica real de filtrado por cliente y catálogo con Supabase
-  // Por ahora, solo simulamos un filtro básico
-  if (clienteId && clienteId !== 'all') {
-    // Simular que solo algunos productos pertenecen a ciertos clientes/catálogos
-    // En un caso real, harías una consulta JOIN o un filtro más complejo en Supabase
-    filteredProductos = filteredProductos.filter(p => p.id % 2 === (parseInt(clienteId) % 2))
+  const startIndex = (page - 1) * pageSize
+  const endIndex = startIndex + pageSize - 1
+
+  const { data, error, count } = await query.range(startIndex, endIndex)
+
+  if (error) {
+    console.error('Error al obtener productos:', error)
+    return { data: [], count: 0, error }
   }
 
-  if (catalogoId && catalogoId !== 'all') {
-    filteredProductos = filteredProductos.filter(p => p.id % 3 === (parseInt(catalogoId) % 3))
-  }
-
-  return filteredProductos
+  return { data, count: count || 0, error: null }
 }
 
-export async function getEstadisticasProductos(): Promise<EstadisticasProductos> {
+export async function deleteProducto(id: number) {
   const supabase = createClient()
-  // Simulación de retardo de red
-  await new Promise((resolve) => setTimeout(resolve, 300))
+  const { error } = await supabase.from('productos').delete().eq('id', id)
 
-  // Datos de estadísticas de ejemplo
-  return {
-    totalProductos: 150,
-    costoPromedio: 25.30,
-    productosActivos: 120,
+  if (error) {
+    console.error('Error al eliminar producto:', error)
+    return { success: false, message: error.message }
   }
+  return { success: true, message: 'Producto eliminado correctamente' }
 }

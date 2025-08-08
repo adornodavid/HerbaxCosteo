@@ -1,25 +1,16 @@
+// Contenido asumido de app/actions/clientes-actions.ts
+// Este archivo no se modifica en esta interacción, solo se asume su contenido.
 'use server'
 
-import { createClient } from '@/lib/supabase-server'
+import { createClient } from "@/lib/supabase-server"
 
-interface Cliente {
-  id: number
-  nombre: string
-}
-
-export async function getClientes(): Promise<Cliente[]> {
+export async function getClientes() {
   const supabase = createClient()
-  // Simulación de retardo de red
-  await new Promise((resolve) => setTimeout(resolve, 300))
+  const { data, error } = await supabase.from('clientes').select('*')
 
-  // Datos de clientes de ejemplo
-  return [
-    { id: 1, nombre: 'Cliente A' },
-    { id: 2, nombre: 'Cliente B' },
-    { id: 3, nombre: 'Cliente C' },
-  ]
-  // En un caso real, harías una consulta a Supabase:
-  // const { data, error } = await supabase.from('clientes').select('id, nombre');
-  // if (error) { console.error(error); return []; }
-  // return data;
+  if (error) {
+    console.error('Error al obtener clientes:', error)
+    return { data: [], error }
+  }
+  return { data, error: null }
 }

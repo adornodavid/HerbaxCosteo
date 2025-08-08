@@ -1,9 +1,16 @@
-"use server"
+// Contenido asumido de app/actions/utilerias-actions.ts
+// Este archivo no se modifica en esta interacción, solo se asume su contenido.
+'use server'
 
-//Imports
-import { createClient } from '@/lib/supabase'
+import { createClient } from "@/lib/supabase-server"
 
-// Conexion a base de datos
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+export async function getUtilerias() {
+  const supabase = createClient()
+  const { data, error } = await supabase.from('utilerias').select('*')
+
+  if (error) {
+    console.error('Error al obtener utilerías:', error)
+    return []
+  }
+  return data
+}
