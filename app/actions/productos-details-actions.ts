@@ -1,6 +1,6 @@
 "use server"
 
-import { createClient } from "@supabase/supabase-js"
+import { createClient } from "@/lib/supabase-server";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -66,4 +66,15 @@ export async function getProductoDetailsForModal(productoId: number) {
     console.error("Unexpected error in getProductoDetailsForModal:", error)
     return { success: false, error: "Internal server error" }
   }
+}
+
+export async function getProductoDetails(id: number) {
+  const supabase = createClient();
+  const { data, error } = await supabase.from('Productos').select('*').eq('id', id).single();
+
+  if (error) {
+    console.error('Error al obtener detalles del producto:', error);
+    return null;
+  }
+  return data;
 }

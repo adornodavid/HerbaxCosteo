@@ -1,134 +1,54 @@
-"use server"
+import { createClient } from "@/lib/supabase-server";
 
-import { createClient } from "@supabase/supabase-js"
-import { revalidatePath } from "next/cache"
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
-
-export async function crearProducto(productoData: {
-  nombre: string
-  descripcion?: string | null
-  instruccionespreparacion?: string | null
-  tiempopreparacion?: string | null
-  costototal?: number | null
-  imgurl?: string | null
-  activo?: boolean
-}) {
-  try {
-    const { data, error } = await supabaseAdmin
-      .from("productos") // Cambiado de 'platillos' a 'productos'
-      .insert({
-        ...productoData,
-        fechacreacion: new Date().toISOString(),
-        fechaactualizacion: new Date().toISOString(),
-        activo: productoData.activo ?? true,
-      })
-      .select()
-      .single()
-
-    if (error) {
-      console.error("Error creando producto:", error)
-      return { success: false, error: error.message }
-    }
-
-    revalidatePath("/productos") // Cambiado de '/platillos' a '/productos'
-    return { success: true, data }
-  } catch (error) {
-    console.error("Error en crearProducto:", error)
-    return { success: false, error: "Error interno del servidor" }
-  }
-}
-
-export async function actualizarProducto(
-  id: number,
-  productoData: {
-    nombre?: string
-    descripcion?: string | null
-    instruccionespreparacion?: string | null
-    tiempopreparacion?: string | null
-    costototal?: number | null
-    imgurl?: string | null
-    activo?: boolean
-  },
+export async function getProductos(
+  nombre: string | null,
+  clienteId: number | null,
+  catalogoId: number | null
 ) {
-  try {
-    const { data, error } = await supabaseAdmin
-      .from("productos") // Cambiado de 'platillos' a 'productos'
-      .update({
-        ...productoData,
-        fechaactualizacion: new Date().toISOString(),
-      })
-      .eq("id", id)
-      .select()
-      .single()
+  const supabase = createClient();
+  let query = supabase.from('Productos').select('*');
 
-    if (error) {
-      console.error("Error actualizando producto:", error)
-      return { success: false, error: error.message }
-    }
-
-    revalidatePath("/productos") // Cambiado de '/platillos' a '/productos'
-    revalidatePath(`/productos/${id}`) // Cambiado de '/platillos/${id}' a '/productos/${id}'
-    return { success: true, data }
-  } catch (error) {
-    console.error("Error en actualizarProducto:", error)
-    return { success: false, error: "Error interno del servidor" }
+  if (nombre) {
+    query = query.ilike('Nombre', `%${nombre}%`);
   }
+  if (clienteId) {
+    // Asumiendo que hay una tabla de unión o una relación directa para filtrar por cliente
+    // Esto es un placeholder, la lógica real dependerá de tu esquema de DB
+    query = query.eq('ClienteId', clienteId); 
+  }
+  if (catalogoId) {
+    // Asumiendo que hay una tabla de unión o una relación directa para filtrar por catálogo
+    // Esto es un placeholder, la lógica real dependerá de tu esquema de DB
+    query = query.eq('CatalogoId', catalogoId);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error al obtener productos:', error);
+    return [];
+  }
+  return data;
 }
 
-export async function obtenerProductos() {
-  try {
-    const { data, error } = await supabaseAdmin
-      .from("productos") // Cambiado de 'platillos' a 'productos'
-      .select("*")
-      .eq("activo", true)
-      .order("fechacreacion", { ascending: false })
+export async function getClientes() {
+  const supabase = createClient();
+  const { data, error } = await supabase.from('Clientes').select('id, nombre'); // Asume una tabla Clientes
 
-    if (error) {
-      console.error("Error obteniendo productos:", error)
-      return { success: false, error: error.message }
-    }
-
-    return { success: true, data }
-  } catch (error) {
-    console.error("Error en obtenerProductos:", error)
-    return { success: false, error: "Error interno del servidor" }
+  if (error) {
+    console.error('Error al obtener clientes:', error);
+    return [];
   }
+  return data;
 }
 
-export async function obtenerProductoPorId(id: number) {
-  try {
-    const { data, error } = await supabaseAdmin
-      .from("productos") // Cambiado de 'platillos' a 'productos'
-      .select(`
-        *,
-        productos_ingredientes (
-          id,
-          cantidad,
-          ingredientes (
-            id,
-            nombre,
-            costo,
-            tipounidadmedida (
-              descripcion
-            )
-          )
-        )
-      `)
-      .eq("id", id)
-      .single()
+export async function getCatalogosByCliente(clienteId: number) {
+  const supabase = createClient();
+  const { data, error } = await supabase.from('Catalogos').select('id, nombre').eq('cliente_id', clienteId); // Asume una tabla Catalogos con cliente_id
 
-    if (error) {
-      console.error("Error obteniendo producto:", error)
-      return { success: false, error: error.message }
-    }
-
-    return { success: true, data }
-  } catch (error) {
-    console.error("Error en obtenerProductoPorId:", error)
-    return { success: false, error: "Error interno del servidor" }
+  if (error) {
+    console.error('Error al obtener catálogos por cliente:', error);
+    return [];
   }
+  return data;
 }

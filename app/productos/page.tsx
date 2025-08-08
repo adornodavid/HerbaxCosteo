@@ -1,17 +1,19 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context"
 import { supabase } from "@/lib/supabase"
 import { toast } from "sonner"
 import Image from "next/image"
+import { Icons } from "@/components/icons"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   AlertDialog,
@@ -35,6 +37,7 @@ import {
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { Eraser, Search, Eye, Edit, ToggleLeft, ToggleRight, Loader2, PlusCircle, RotateCcw } from 'lucide-react'
 import { getProductoDetailsForModal } from "@/app/actions/productos-details-actions" // Importar la nueva acción
+import { getProductos, getClientes, getCatalogosByCliente } from "@/app/actions/productos-actions"
 
 // --- Interfaces ---
 interface DropdownItem {
@@ -80,26 +83,43 @@ interface ProductoDetail {
   PrecioSugerido: number
 }
 
+interface Producto {
+  id: number
+  Nombre: string
+  Costo: number
+  ImagenUrl: string | null
+  // Añade otras propiedades si son necesarias
+}
+
+interface Cliente {
+  id: number
+  nombre: string
+}
+
+interface Catalogo {
+  id: number
+  nombre: string
+}
+
 // --- Componente Principal ---
 export default function ProductosPage() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
 
   // --- Estados ---
-  const [productos, setProductos] = useState<ProductoListado[]>([])
+  const [productos, setProductos] = useState<Producto[]>([])
   const [estadisticas, setEstadisticas] = useState<EstadisticasProductos>({
     totalProductos: 0,
     costoPromedio: 0,
     costoTotal: 0, // Inicializado a 0
     tiempoPromedio: "N/A",
   })
-  const [clientes, setClientes] = useState<DropdownItem[]>([])
-  const [catalogos, setCatalogos] = useState<DropdownItem[]>([])
+  const [clientes, setClientes] = useState<Cliente[]>([])
+  const [catalogos, setCatalogos] = useState<Catalogo[]>([])
   const [pageLoading, setPageLoading] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [productoToToggle, setProductoToToggle] = useState<{ id: number; activo: boolean } | null>(null)
-  const [searchTerm, setSearchTerm] = useState("") // Este estado no se usa en la búsqueda actual, pero se mantiene
   const [productoToDelete, setProductoToDelete] = useState<number | null>(null)
 
   // Estados para el modal de detalles
@@ -118,6 +138,11 @@ export default function ProductosPage() {
   const resultadosPorPagina = 20
 
   const esAdmin = useMemo(() => user && [1, 2, 3, 4].includes(user.RolId), [user])
+
+  const [nombreBusqueda, setNombreBusqueda] = useState<string>("")
+  const [clienteSeleccionado, setClienteSeleccionado] = useState<string>("")
+  const [catalogoSeleccionado, setCatalogoSeleccionado] = useState<string>("")
+  const [loading, setLoading] = useState(false)
 
   // --- Función de búsqueda SIN dependencias automáticas ---
   const ejecutarBusquedaProductos = async (nombre: string, clienteId: number, catalogoId: number, estatus: string) => {
@@ -194,7 +219,6 @@ export default function ProductosPage() {
       // Eliminar duplicados si un producto aparece varias veces debido a múltiples asociaciones
       const uniqueProducts = Array.from(new Map(flattenedData.map((item: ProductoListado) => [item.ProductoId, item])).values());
 
-
       setProductos(uniqueProducts)
       toast.success(`Búsqueda completada. Se encontraron ${uniqueProducts.length} resultados.`)
     } catch (error) {
@@ -230,7 +254,6 @@ export default function ProductosPage() {
       } else if (statsError) {
         console.error("Error cargando estadísticas:", statsError);
       }
-
 
       // Cargar clientes
       let clientesQuery = supabase.from("clientes").select("id, nombre").order("nombre")
@@ -415,6 +438,24 @@ export default function ProductosPage() {
     setIsDetailsLoading(false)
   }
 
+  const handleSearch = useCallback(async () => {
+    setLoading(true)
+    const data = await getProductos(
+      nombreBusqueda,
+      clienteSeleccionado ? parseInt(clienteSeleccionado) : null,
+      catalogoSeleccionado ? parseInt(catalogoSeleccionado) : null
+    )
+    setProductos(data)
+    setLoading(false)
+  }, [nombreBusqueda, clienteSeleccionado, catalogoSeleccionado])
+
+  const handleClear = useCallback(() => {
+    setNombreBusqueda("")
+    setClienteSeleccionado("")
+    setCatalogoSeleccionado("")
+    setProductos([])
+  }, [])
+
   // --- Paginación ---
   const productosPaginados = useMemo(() => {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
@@ -464,6 +505,67 @@ export default function ProductosPage() {
           </Button>
         </Link>
       </div>
+
+      {/* Sección de Búsqueda */}
+      <Card className="mb-6 shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-gray-700">Buscar Productos</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="nombre">Nombre</Label>
+            <Input
+              id="nombre"
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={nombreBusqueda}
+              onChange={(e) => setNombreBusqueda(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="ddlClientes">Cliente</Label>
+            <Select value={clienteSeleccionado} onValueChange={setClienteSeleccionado}>
+              <SelectTrigger id="ddlClientes">
+                <SelectValue placeholder="Selecciona un cliente" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Todos los Clientes</SelectItem>
+                {clientes.map((cliente) => (
+                  <SelectItem key={cliente.id} value={cliente.id.toString()}>
+                    {cliente.nombre}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="ddlCatalogo">Catálogo</Label>
+            <Select value={catalogoSeleccionado} onValueChange={setCatalogoSeleccionado} disabled={!clienteSeleccionado || loading}>
+              <SelectTrigger id="ddlCatalogo">
+                <SelectValue placeholder="Selecciona un catálogo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Todos los Catálogos</SelectItem>
+                {catalogos.map((catalogo) => (
+                  <SelectItem key={catalogo.id} value={catalogo.id.toString()}>
+                    {catalogo.nombre}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="md:col-span-3 flex justify-end gap-2 mt-4">
+            <Button onClick={handleSearch} disabled={loading}>
+              {loading ? <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" /> : <Icons.Search className="mr-2 h-4 w-4" />}
+              Buscar
+            </Button>
+            <Button variant="outline" onClick={handleClear} disabled={loading}>
+              <Icons.Eraser className="mr-2 h-4 w-4" />
+              Limpiar
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* 2. Estadísticas */}
       {/*<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -619,7 +721,7 @@ export default function ProductosPage() {
               <span className="ml-2 text-lg">Cargando productos...</span>
             </div>
           ) : productosPaginados.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {productosPaginados.map((p, index) => (
                 <Card
                   key={`${p.ProductoId}-${p.CatalogoId}-${index}`}

@@ -1,65 +1,46 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { insUsuario, obtenerUsuarios } from "@/app/actions/usuarios-actions" // Importación corregida
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useActionState } from "react"
-import { Loader2 } from 'lucide-react'
+import { useState, useEffect } from 'react';
+import { insUsuario, getUsuarios } from '@/app/actions/usuarios-actions'; // Importar desde el nuevo nombre
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface Usuario {
-  id: number
-  nombrecompleto: string
-  email: string
-  rolid: number
-  activo: boolean
-}
-
-const initialState = {
-  message: "",
-  success: false,
-  errors: undefined,
+  UsuarioId: number;
+  NombreCompleto: string;
+  Email: string;
+  RolId: number;
 }
 
 export default function UsuariosPage() {
-  const [state, formAction, isPending] = useActionState(
-    async (prevState: any, formData: FormData) => {
-      const nombrecompleto = formData.get("nombrecompleto") as string
-      const email = formData.get("email") as string
-      const password = formData.get("password") as string
-      const rolid = parseInt(formData.get("rolid") as string)
-
-      // Llama a la Server Action con los argumentos correctos
-      const result = await insUsuario(nombrecompleto, email, password, rolid)
-
-      if (!result.success) {
-        return { message: result.error, success: false }
-      }
-      setUsuarios((prev) => (result.data ? [...prev, result.data] : prev))
-      return { message: "Usuario insertado correctamente!", success: true }
-    },
-    initialState,
-  )
-
-  const [usuarios, setUsuarios] = useState<Usuario[]>([])
-  const [loading, setLoading] = useState(true)
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [formMessage, setFormMessage] = useState('');
 
   useEffect(() => {
-    const fetchUsuarios = async () => {
-      setLoading(true)
-      const { success, data, error } = await obtenerUsuarios()
-      if (success && data) {
-        setUsuarios(data)
-      } else {
-        console.error("Error al cargar usuarios:", error)
-      }
-      setLoading(false)
+    fetchUsuarios();
+  }, []);
+
+  const fetchUsuarios = async () => {
+    const data = await getUsuarios();
+    setUsuarios(data);
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+
+    // Asegúrate de que los nombres de los campos en el formulario coincidan con los esperados por la Server Action
+    const result = await insUsuario(formData); // Pasar directamente el FormData
+
+    if (result.success) {
+      setFormMessage(result.message);
+      fetchUsuarios(); // Recargar la lista de usuarios
+    } else {
+      setFormMessage(`Error: ${result.message}`);
     }
-    fetchUsuarios()
-  }, [])
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -67,10 +48,10 @@ export default function UsuariosPage() {
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Insertar Nuevo Usuario</CardTitle>
+          <CardTitle>Nuevo Usuario</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action={formAction} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="nombrecompleto">Nombre Completo</Label>
               <Input id="nombrecompleto" name="nombrecompleto" type="text" required />
@@ -84,32 +65,11 @@ export default function UsuariosPage() {
               <Input id="password" name="password" type="password" required />
             </div>
             <div>
-              <Label htmlFor="rolid">Rol</Label>
-              <Select name="rolid" required>
-                <SelectTrigger id="rolid">
-                  <SelectValue placeholder="Selecciona un rol" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Administrador</SelectItem>
-                  <SelectItem value="2">Gerente</SelectItem>
-                  <SelectItem value="3">Empleado</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="rolid">ID de Rol</Label>
+              <Input id="rolid" name="rolid" type="number" required />
             </div>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Insertando...
-                </>
-              ) : (
-                "Insertar Usuario"
-              )}
-            </Button>
-            {state?.message && (
-              <p className={`mt-2 text-sm ${state.success ? "text-green-600" : "text-red-600"}`}>
-                {state.message}
-              </p>
-            )}
+            <Button type="submit">Crear Usuario</Button>
+            {formMessage && <p className="mt-2 text-sm text-red-500">{formMessage}</p>}
           </form>
         </CardContent>
       </Card>
@@ -119,24 +79,18 @@ export default function UsuariosPage() {
           <CardTitle>Listado de Usuarios</CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="flex justify-center items-center h-32">
-              <Loader2 className="h-8 w-8 animate-spin" />
-              <span className="ml-2">Cargando usuarios...</span>
-            </div>
+          {usuarios.length === 0 ? (
+            <p>No hay usuarios registrados.</p>
           ) : (
             <ul className="space-y-2">
               {usuarios.map((usuario) => (
-                <li key={usuario.id} className="border p-3 rounded-md flex justify-between items-center">
+                <li key={usuario.UsuarioId} className="border p-3 rounded-md flex justify-between items-center">
                   <div>
-                    <p className="font-medium">{usuario.nombrecompleto}</p>
-                    <p className="text-sm text-gray-600">{usuario.email}</p>
+                    <p className="font-semibold">{usuario.NombreCompleto}</p>
+                    <p className="text-sm text-gray-600">{usuario.Email}</p>
+                    <p className="text-xs text-gray-500">Rol ID: {usuario.RolId}</p>
                   </div>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs ${usuario.activo ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
-                  >
-                    {usuario.activo ? "Activo" : "Inactivo"}
-                  </span>
+                  {/* Aquí podrías añadir botones de editar/eliminar */}
                 </li>
               ))}
             </ul>
@@ -144,5 +98,5 @@ export default function UsuariosPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
