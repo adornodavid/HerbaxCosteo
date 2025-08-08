@@ -148,7 +148,7 @@ export function AppSidebar() {
         </Link>
       </div>
       
-      <div className="p-4 border-b border-[#a1cbd4]">
+      <div className="border-b border-[#a1cbd4]">
       <div className="mt-auto p-4 border-t">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
