@@ -1,100 +1,148 @@
-// Contenido asumido de app/pruebas/usuarios/page.tsx
-// Este archivo no se modifica en esta interacción, solo se asume su contenido.
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { insUsuario } from '@/app/actions/usuarios-actions' // Ruta de importación actualizada
+import { useState, useEffect } from "react"
+import { insUsuario, obtenerUsuarios } from "@/app/actions/usuarios-actions" // Importación corregida
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useActionState } from "react"
+import { Loader2 } from 'lucide-react'
 
-export default function NuevoUsuarioPage() {
-  const [message, setMessage] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+interface Usuario {
+  id: number
+  nombrecompleto: string
+  email: string
+  rolid: number
+  activo: boolean
+}
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setIsSubmitting(true)
-    setMessage(null)
+const initialState = {
+  message: "",
+  success: false,
+  errors: undefined,
+}
 
-    const formData = new FormData(event.currentTarget)
-    
-    // La llamada a la función insUsuario se ha corregido para pasar solo el FormData
-    const result = await insUsuario(formData) 
+export default function UsuariosPage() {
+  const [state, formAction, isPending] = useActionState(
+    async (prevState: any, formData: FormData) => {
+      const nombrecompleto = formData.get("nombrecompleto") as string
+      const email = formData.get("email") as string
+      const password = formData.get("password") as string
+      const rolid = parseInt(formData.get("rolid") as string)
 
-    if (result.success) {
-      setMessage(result.message)
-      event.currentTarget.reset() // Limpiar el formulario
-    } else {
-      setMessage(`Error: ${result.message}`)
+      // Llama a la Server Action con los argumentos correctos
+      const result = await insUsuario(nombrecompleto, email, password, rolid)
+
+      if (!result.success) {
+        return { message: result.error, success: false }
+      }
+      setUsuarios((prev) => (result.data ? [...prev, result.data] : prev))
+      return { message: "Usuario insertado correctamente!", success: true }
+    },
+    initialState,
+  )
+
+  const [usuarios, setUsuarios] = useState<Usuario[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchUsuarios = async () => {
+      setLoading(true)
+      const { success, data, error } = await obtenerUsuarios()
+      if (success && data) {
+        setUsuarios(data)
+      } else {
+        console.error("Error al cargar usuarios:", error)
+      }
+      setLoading(false)
     }
-    setIsSubmitting(false)
-  }
+    fetchUsuarios()
+  }, [])
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Crear Nuevo Usuario</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="nombrecompleto" className="block text-sm font-medium text-gray-700">
-              Nombre Completo
-            </label>
-            <input
-              type="text"
-              id="nombrecompleto"
-              name="nombrecompleto"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label htmlFor="rolid" className="block text-sm font-medium text-gray-700">
-              ID de Rol
-            </label>
-            <input
-              type="number"
-              id="rolid"
-              name="rolid"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            {isSubmitting ? 'Creando...' : 'Crear Usuario'}
-          </button>
-        </form>
-        {message && (
-          <div className={`mt-4 text-center ${message.startsWith('Error') ? 'text-red-600' : 'text-green-600'}`}>
-            {message}
-          </div>
-        )}
-      </div>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Gestión de Usuarios</h1>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Insertar Nuevo Usuario</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form action={formAction} className="space-y-4">
+            <div>
+              <Label htmlFor="nombrecompleto">Nombre Completo</Label>
+              <Input id="nombrecompleto" name="nombrecompleto" type="text" required />
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" name="email" type="email" required />
+            </div>
+            <div>
+              <Label htmlFor="password">Contraseña</Label>
+              <Input id="password" name="password" type="password" required />
+            </div>
+            <div>
+              <Label htmlFor="rolid">Rol</Label>
+              <Select name="rolid" required>
+                <SelectTrigger id="rolid">
+                  <SelectValue placeholder="Selecciona un rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Administrador</SelectItem>
+                  <SelectItem value="2">Gerente</SelectItem>
+                  <SelectItem value="3">Empleado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Insertando...
+                </>
+              ) : (
+                "Insertar Usuario"
+              )}
+            </Button>
+            {state?.message && (
+              <p className={`mt-2 text-sm ${state.success ? "text-green-600" : "text-red-600"}`}>
+                {state.message}
+              </p>
+            )}
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Listado de Usuarios</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="flex justify-center items-center h-32">
+              <Loader2 className="h-8 w-8 animate-spin" />
+              <span className="ml-2">Cargando usuarios...</span>
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {usuarios.map((usuario) => (
+                <li key={usuario.id} className="border p-3 rounded-md flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">{usuario.nombrecompleto}</p>
+                    <p className="text-sm text-gray-600">{usuario.email}</p>
+                  </div>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${usuario.activo ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                  >
+                    {usuario.activo ? "Activo" : "Inactivo"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

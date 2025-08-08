@@ -1,340 +1,825 @@
-// Contenido asumido de app/productos/page.tsx
-// Este archivo no se modifica en esta interacción, solo se asume su contenido.
-'use client'
+"use client"
 
-import { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { getProductos, deleteProducto } from '@/app/actions/productos-actions'
-import { getClientes } from '@/app/actions/clientes-actions' // Asumiendo que tienes esta acción
-import { getCatalogosByCliente } from '@/app/actions/catalogos-actions' // Asumiendo que tienes esta acción
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Icons } from '@/components/icons'
-import Image from 'next/image'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import type React from "react"
+import { useState, useEffect, useMemo } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { useAuth } from "@/contexts/auth-context"
+import { supabase } from "@/lib/supabase"
+import { toast } from "sonner"
+import Image from "next/image"
 
-interface Producto {
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { Eraser, Search, Eye, Edit, ToggleLeft, ToggleRight, Loader2, PlusCircle, RotateCcw } from 'lucide-react'
+import { getProductoDetailsForModal } from "@/app/actions/productos-details-actions" // Importar la nueva acción
+
+// --- Interfaces ---
+interface DropdownItem {
   id: number
   nombre: string
-  costo: number
-  imagen_url: string | null
-  cliente_id: number
-  catalogo_id: number
 }
 
-interface Cliente {
+interface ProductoListado {
+  ProductoId: number
+  ProductoNombre: string
+  ProductoDescripcion: string
+  ProductoTiempo: string
+  ProductoCosto: number
+  ProductoActivo: boolean
+  ProductoImagenUrl: string | null
+  ClienteId: number
+  ClienteNombre: string
+  CatalogoId: number
+  CatalogoNombre: string
+}
+
+interface EstadisticasProductos {
+  totalProductos: number
+  costoPromedio: number
+  costoTotal: number // Cambiado de 'costo' a 'costoTotal' para mayor claridad
+  tiempoPromedio: string
+}
+
+// Nueva interfaz para los detalles del producto en el modal
+interface ProductoDetail {
   id: number
-  nombre: string
+  Cliente: string
+  Catalogo: string
+  Producto: string
+  descripcion: string
+  instruccionespreparacion: string | null
+  propositoprincipal: string | null
+  imgurl: string | null
+  CostoElaboracion: number
+  precioventa: number | null
+  margenutilidad: number | null
+  Costo: number
+  PrecioSugerido: number
 }
 
-interface Catalogo {
-  id: number
-  nombre: string
-}
-
+// --- Componente Principal ---
 export default function ProductosPage() {
   const router = useRouter()
-  const [productos, setProductos] = useState<Producto[]>([])
-  const [totalProductos, setTotalProductos] = useState(0)
-  const [nombreFilter, setNombreFilter] = useState<string>('')
-  const [clienteFilter, setClienteFilter] = useState<string>('')
-  const [catalogoFilter, setCatalogoFilter] = useState<string>('')
-  const [clientes, setClientes] = useState<Cliente[]>([])
-  const [catalogos, setCatalogos] = useState<Catalogo[]>([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const pageSize = 12 // Número de tarjetas por página
-  const [loading, setLoading] = useState(true)
-  const [deletingId, setDeletingId] = useState<number | null>(null)
+  const { user, isLoading: authLoading } = useAuth()
 
-  const fetchClientes = useCallback(async () => {
-    const { data, error } = await getClientes() // Asume que getClientes devuelve { data: Cliente[], error: any }
-    if (error) {
-      console.error('Error fetching clientes:', error)
-    } else {
-      setClientes(data || [])
-    }
-  }, [])
+  // --- Estados ---
+  const [productos, setProductos] = useState<ProductoListado[]>([])
+  const [estadisticas, setEstadisticas] = useState<EstadisticasProductos>({
+    totalProductos: 0,
+    costoPromedio: 0,
+    costoTotal: 0, // Inicializado a 0
+    tiempoPromedio: "N/A",
+  })
+  const [clientes, setClientes] = useState<DropdownItem[]>([])
+  const [catalogos, setCatalogos] = useState<DropdownItem[]>([])
+  const [pageLoading, setPageLoading] = useState(true)
+  const [isSearching, setIsSearching] = useState(false)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+  const [productoToToggle, setProductoToToggle] = useState<{ id: number; activo: boolean } | null>(null)
+  const [searchTerm, setSearchTerm] = useState("") // Este estado no se usa en la búsqueda actual, pero se mantiene
+  const [productoToDelete, setProductoToDelete] = useState<number | null>(null)
 
-  const fetchCatalogos = useCallback(async (clienteId: number | null) => {
-    if (clienteId) {
-      const { data, error } = await getCatalogosByCliente(clienteId) // Asume que getCatalogosByCliente devuelve { data: Catalogo[], error: any }
-      if (error) {
-        console.error('Error fetching catalogos:', error)
-      } else {
-        setCatalogos(data || [])
+  // Estados para el modal de detalles
+  const [showProductoDetailsModal, setShowProductoDetailsModal] = useState(false)
+  const [selectedProductoDetails, setSelectedProductoDetails] = useState<ProductoDetail[] | null>(null)
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false)
+
+  // Filtros
+  const [filtroNombre, setFiltroNombre] = useState("")
+  const [filtroCliente, setFiltroCliente] = useState("-1")
+  const [filtroCatalogo, setFiltroCatalogo] = useState("-1")
+  const [filtroEstatus, setFiltroEstatus] = useState("-1") // Nuevo filtro de estatus
+
+  // Paginación
+  const [paginaActual, setPaginaActual] = useState(1)
+  const resultadosPorPagina = 20
+
+  const esAdmin = useMemo(() => user && [1, 2, 3, 4].includes(user.RolId), [user])
+
+  // --- Función de búsqueda SIN dependencias automáticas ---
+  const ejecutarBusquedaProductos = async (nombre: string, clienteId: number, catalogoId: number, estatus: string) => {
+    if (!user) return
+    setIsSearching(true)
+    setPaginaActual(1)
+
+    try {
+      let query = supabase.from("productos").select(`
+          id, nombre, descripcion, propositoprincipal, costo, activo, imgurl,
+          productosxcatalogo!left(
+            catalogos!left(
+              id, nombre,
+              clientes!left(id, nombre)
+            )
+          )
+        `)
+
+      if (nombre) query = query.ilike("nombre", `%${nombre}%`) // Cambiado a ilike para búsqueda insensible a mayúsculas/minúsculas
+
+      if (clienteId !== -1) {
+        query = query.eq("productosxcatalogo.catalogos.clientes.id", clienteId)
       }
-    } else {
-      setCatalogos([])
-    }
-  }, [])
+      if (catalogoId !== -1) {
+        query = query.eq("productosxcatalogo.catalogos.id", catalogoId)
+      }
+      if (estatus !== "-1") {
+        query = query.eq("activo", estatus === "true")
+      }
 
-  const fetchProductosData = useCallback(async () => {
-    setLoading(true)
-    const clienteIdNum = clienteFilter ? parseInt(clienteFilter) : null
-    const catalogoIdNum = catalogoFilter ? parseInt(catalogoFilter) : null
+      const { data: queryData, error: queryError } = await query.order("nombre", { ascending: true })
 
-    const { data, count, error } = await getProductos(
-      nombreFilter,
-      clienteIdNum,
-      catalogoIdNum,
-      currentPage,
-      pageSize
-    )
+      if (queryError) {
+        console.error("Error en búsqueda:", queryError)
+        toast.error("Error al buscar productos.")
+        setProductos([])
+        return
+      }
 
-    if (error) {
-      console.error('Error fetching productos:', error)
+      // Transformar datos de la consulta para manejar productos sin asociación
+      const flattenedData = queryData.flatMap((p: any) => {
+        if (p.productosxcatalogo.length === 0) {
+          // Producto sin asociaciones, mostrarlo una vez
+          return {
+            ProductoId: p.id,
+            ProductoNombre: p.nombre,
+            ProductoDescripcion: p.descripcion,
+            ProductoTiempo: p.propositoprincipal,
+            ProductoCosto: p.costo,
+            ProductoActivo: p.activo,
+            ProductoImagenUrl: p.imgurl,
+            ClienteId: -1, // O algún valor que indique "N/A"
+            ClienteNombre: "N/A",
+            CatalogoId: -1, // O algún valor que indique "N/A"
+            CatalogoNombre: "N/A",
+          }
+        }
+        // Producto con asociaciones, aplanarlas
+        return p.productosxcatalogo.map((x: any) => ({
+          ProductoId: p.id,
+          ProductoNombre: p.nombre,
+          ProductoDescripcion: p.descripcion,
+          ProductoTiempo: p.propositoprincipal,
+          ProductoCosto: p.costo,
+          ProductoActivo: p.activo,
+          ProductoImagenUrl: p.imgurl,
+          ClienteId: x.catalogos?.clientes?.id || -1,
+          ClienteNombre: x.catalogos?.clientes?.nombre || "N/A",
+          CatalogoId: x.catalogos?.id || -1,
+          CatalogoNombre: x.catalogos?.nombre || "N/A",
+        }))
+      })
+
+      // Eliminar duplicados si un producto aparece varias veces debido a múltiples asociaciones
+      const uniqueProducts = Array.from(new Map(flattenedData.map((item: ProductoListado) => [item.ProductoId, item])).values());
+
+
+      setProductos(uniqueProducts)
+      toast.success(`Búsqueda completada. Se encontraron ${uniqueProducts.length} resultados.`)
+    } catch (error) {
+      console.error("Error inesperado al buscar productos:", error)
+      toast.error("Error inesperado al buscar productos")
       setProductos([])
-      setTotalProductos(0)
-    } else {
-      setProductos(data || [])
-      setTotalProductos(count || 0)
+    } finally {
+      setIsSearching(false)
     }
-    setLoading(false)
-  }, [nombreFilter, clienteFilter, catalogoFilter, currentPage, pageSize])
-
-  useEffect(() => {
-    fetchClientes()
-  }, [fetchClientes])
-
-  useEffect(() => {
-    const clienteIdNum = clienteFilter ? parseInt(clienteFilter) : null
-    fetchCatalogos(clienteIdNum)
-    setCatalogoFilter('') // Reset catalogo filter when cliente changes
-  }, [clienteFilter, fetchCatalogos])
-
-  useEffect(() => {
-    fetchProductosData()
-  }, [fetchProductosData])
-
-  const handleSearch = () => {
-    setCurrentPage(1) // Reset to first page on new search
-    fetchProductosData()
   }
 
-  const handleClear = () => {
-    setNombreFilter('')
-    setClienteFilter('')
-    setCatalogoFilter('')
-    setCurrentPage(1)
-  }
+  // --- Carga inicial de datos ---
+  const cargarDatosInicialesProductos = async () => {
+    if (!user) return
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-  }
+    try {
+      // Cargar estadísticas
+      const {
+        data: statsData,
+        error: statsError,
+        count,
+      } = await supabase.from("productos").select("costo, propositoprincipal", { count: "exact" })
 
-  const handleDelete = async (id: number) => {
-    setDeletingId(id)
-  }
-
-  const confirmDelete = async () => {
-    if (deletingId !== null) {
-      const result = await deleteProducto(deletingId)
-      if (result.success) {
-        fetchProductosData() // Refresh list
-      } else {
-        console.error('Failed to delete producto:', result.message)
+      if (!statsError && statsData) {
+        const costoTotal = statsData.reduce((sum, p) => sum + (p.costo || 0), 0)
+        const costoPromedio = count ? costoTotal / count : 0
+        setEstadisticas({
+          totalProductos: count || 0,
+          costoPromedio,
+          costoTotal,
+          tiempoPromedio: "25 min", // Esto es un valor fijo, considera calcularlo si es dinámico
+        })
+      } else if (statsError) {
+        console.error("Error cargando estadísticas:", statsError);
       }
-      setDeletingId(null)
+
+
+      // Cargar clientes
+      let clientesQuery = supabase.from("clientes").select("id, nombre").order("nombre")
+
+      const { data: clientesData, error: clientesError } = await clientesQuery
+
+      if (!clientesError) {
+        const clientesConTodos = [
+          { id: -1, nombre: "Todos" },
+          ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre })),
+        ]
+        setClientes(clientesConTodos)
+        setFiltroCliente("-1")
+      } else {
+        console.error("Error cargando clientes:", clientesError);
+      }
+
+      // Cargar catálogos iniciales (todos, sin filtro de cliente al inicio)
+      let catalogosQuery = supabase
+        .from("catalogos")
+        .select(`id, nombre`)
+        .eq("activo", true)
+        .order("nombre")
+
+      const { data: catalogosData, error: catalogosError } = await catalogosQuery
+
+      if (!catalogosError) {
+        const catalogosConTodos = [
+          { id: -1, nombre: "Todos" },
+          ...(catalogosData || []).map((m: any) => ({ id: m.id, nombre: m.nombre })),
+        ]
+        setCatalogos(catalogosConTodos)
+        setFiltroCatalogo("-1")
+      } else {
+        console.error("Error cargando catálogos iniciales:", catalogosError);
+      }
+
+      // Ejecutar búsqueda inicial con todos los filtros en -1
+      await ejecutarBusquedaProductos("", -1, -1, "-1")
+    } catch (error) {
+      console.error("Error al cargar datos iniciales:", error)
+      toast.error("Error al cargar datos iniciales")
+    } finally {
+      setPageLoading(false)
     }
   }
 
-  const totalPages = Math.ceil(totalProductos / pageSize)
+  // --- Carga Inicial y Seguridad ---
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user || user.RolId === 0) {
+        router.push("/login")
+        return
+      }
+
+      const inicializar = async () => {
+        setPageLoading(true)
+        await cargarDatosInicialesProductos()
+      }
+      inicializar()
+    }
+  }, [authLoading, user, router, esAdmin])
+
+  // --- Handlers de Eventos ---
+  const handleClienteChange = async (value: string) => {
+    setFiltroCliente(value)
+    setFiltroCatalogo("-1") // Resetear catálogo al cambiar cliente
+
+    try {
+      const clienteIdNum = Number.parseInt(value, 10)
+
+      let query = supabase
+        .from("catalogos")
+        .select(`id, nombre`)
+        .eq("activo", true)
+        .order("nombre")
+
+      if (clienteIdNum !== -1) {
+        query = query.eq("clienteid", clienteIdNum)
+      }
+
+      const { data, error } = await query
+
+      if (!error) {
+        const catalogosConTodos = [
+          { id: -1, nombre: "Todos" },
+          ...(data || []).map((c: any) => ({ id: c.id, nombre: c.nombre })),
+        ]
+        setCatalogos(catalogosConTodos)
+      } else {
+        console.error("Error al cargar catálogos por cliente:", error);
+      }
+    } catch (error) {
+      console.error("Error al cambiar cliente:", error)
+    }
+  }
+
+  // ESTE ES EL ÚNICO LUGAR DONDE SE EJECUTA LA BÚSQUEDA
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const clienteId = Number.parseInt(filtroCliente, 10)
+    const catalogoId = Number.parseInt(filtroCatalogo, 10)
+    ejecutarBusquedaProductos(filtroNombre, clienteId, catalogoId, filtroEstatus)
+  }
+
+  const clearProductosBusqueda = () => {
+    setFiltroNombre("")
+    setFiltroCliente("-1")
+    setFiltroCatalogo("-1")
+    setFiltroEstatus("-1") // Limpiar también el filtro de estatus
+    handleClienteChange("-1") // Resetear también los catálogos
+    toast.info("Filtros limpiados.")
+    // Volver a ejecutar la búsqueda con filtros limpios
+    ejecutarBusquedaProductos("", -1, -1, "-1")
+  }
+
+  const handleToggleStatusClickProducto = (id: number, activo: boolean) => {
+    setProductoToToggle({ id, activo })
+    setShowConfirmDialog(true)
+  }
+
+  const cambiarEstadoProducto = async () => {
+    if (!productoToToggle) return
+
+    try {
+      const { id, activo } = productoToToggle
+      const nuevoEstado = !activo
+      const { error } = await supabase.from("productos").update({ activo: nuevoEstado }).eq("id", id)
+
+      if (error) {
+        console.error("Error al cambiar estado:", error)
+        toast.error(`Error al cambiar estado del producto.`)
+      } else {
+        // Actualizar el estado local para reflejar el cambio sin recargar todo
+        setProductos((prev) => prev.map((p) => (p.ProductoId === id ? { ...p, ProductoActivo: nuevoEstado } : p)))
+        toast.success(`Producto ${nuevoEstado ? "activado" : "inactivado"} correctamente.`)
+      }
+    } catch (error) {
+      console.error("Error inesperado al cambiar estado:", error)
+      toast.error("Error inesperado al cambiar estado")
+    }
+
+    setShowConfirmDialog(false)
+    setProductoToToggle(null)
+  }
+
+  const handleDeleteProducto = async () => {
+    if (productoToDelete === null) return
+
+    setPageLoading(true)
+    const { error } = await supabase.from("productos").update({ activo: false }).eq("id", productoToDelete)
+
+    if (error) {
+      toast.error("Error al eliminar producto: " + error.message)
+    } else {
+      toast.success("Producto eliminado correctamente.")
+      setProductoToDelete(null)
+      // Recargar la lista de productos después de la eliminación
+      const clienteId = Number.parseInt(filtroCliente, 10)
+      const catalogoId = Number.parseInt(filtroCatalogo, 10)
+      await ejecutarBusquedaProductos(filtroNombre, clienteId, catalogoId, filtroEstatus)
+    }
+    setPageLoading(false)
+  }
+
+  // Handler para abrir el modal de detalles del producto
+  const handleViewProductoDetails = async (productoId: number) => {
+    setIsDetailsLoading(true)
+    setShowProductoDetailsModal(true)
+    setSelectedProductoDetails(null)
+
+    const { success, data, error } = await getProductoDetailsForModal(productoId)
+
+    console.log(`getProductoDetailsForModal - Success: ${success}, Error: ${error ? error : "No error"}`)
+
+    if (success && data) {
+      setSelectedProductoDetails(data)
+    } else {
+      toast.error(`Error al cargar detalles del producto: ${error}`)
+      setSelectedProductoDetails([])
+    }
+    setIsDetailsLoading(false)
+  }
+
+  // --- Paginación ---
+  const productosPaginados = useMemo(() => {
+    const indiceInicio = (paginaActual - 1) * resultadosPorPagina
+    return productos.slice(indiceInicio, indiceInicio + resultadosPorPagina)
+  }, [productos, paginaActual])
+
+  const totalPaginas = Math.ceil(productos.length / resultadosPorPagina)
+
+  const formatCurrency = (amount: number | null) =>
+    new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(amount || 0)
+
+  // --- Renderizado ---
+  if (pageLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="flex flex-col items-center justify-center p-8">
+            <div className="relative w-24 h-24 mb-4">
+              <Image
+                src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/gifCarga.gif"
+                alt="Cargando..."
+                width={300}
+                height={300}
+                unoptimized
+                className="absolute inset-0 animate-bounce-slow"
+              />
+            </div>
+            <p className="text-lg font-semibold text-gray-800"></p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="flex flex-col p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Gestión de Productos</h1>
+    <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
+      {/* 1. Título y Botón */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Productos</h1>
+          <p className="text-muted-foreground">Gestión completa de Productos</p>
+        </div>
+        <Link href="/productos/nuevo" passHref>
+          <Button id="btnProductoNuevo" name="btnProductoNuevo" className="bg-[#5d8f72] hover:bg-[#44785a] text-white">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Crear Nuevo Producto
+          </Button>
+        </Link>
+      </div>
 
-      {/* Sección de Filtros */}
-      <Card className="mb-6 shadow-sm">
+      {/* 2. Estadísticas */}
+      {/*<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total de Productos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{estadisticas.totalProductos}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Costo Promedio</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(estadisticas.costoPromedio)}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Costo Total</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(estadisticas.costoTotal)}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Tiempo Promedio Prep.</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{estadisticas.tiempoPromedio}</div>
+          </CardContent>
+        </Card>
+      </div>*/}
+
+      {/* 3. Filtros */}
+      <Card>
         <CardHeader>
-          <CardTitle className="text-xl font-semibold text-gray-700">Buscar Productos</CardTitle>
+          <CardTitle>Filtros de Búsqueda</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex flex-col">
-            <label htmlFor="nombre" className="text-sm font-medium text-gray-700 mb-1">Nombre</label>
-            <Input
-              id="nombre"
-              placeholder="Buscar por nombre"
-              value={nombreFilter}
-              onChange={(e) => setNombreFilter(e.target.value)}
-              className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="ddlClientes" className="text-sm font-medium text-gray-700 mb-1">Cliente</label>
-            <Select
-              name="Cliente"
-              value={clienteFilter}
-              onValueChange={setClienteFilter}
-            >
-              <SelectTrigger id="ddlClientes" className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                <SelectValue placeholder="Seleccionar Cliente" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">Todos los Clientes</SelectItem>
-                {clientes.map((cliente) => (
-                  <SelectItem key={cliente.id} value={cliente.id.toString()}>
-                    {cliente.nombre}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="ddlCatalogo" className="text-sm font-medium text-gray-700 mb-1">Catálogo</label>
-            <Select
-              name="Catalogo"
-              value={catalogoFilter}
-              onValueChange={setCatalogoFilter}
-              disabled={!clienteFilter || catalogos.length === 0}
-            >
-              <SelectTrigger id="ddlCatalogo" className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                <SelectValue placeholder="Seleccionar Catálogo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">Todos los Catálogos</SelectItem>
-                {catalogos.map((catalogo) => (
-                  <SelectItem key={catalogo.id} value={catalogo.id.toString()}>
-                    {catalogo.nombre}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="col-span-1 md:col-span-3 flex justify-end gap-3 mt-4">
-            <Button onClick={handleSearch} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow-sm">
-              <Icons.Search className="mr-2 h-4 w-4" /> Buscar
-            </Button>
-            <Button onClick={handleClear} variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-100 px-6 py-2 rounded-md shadow-sm">
-              <Icons.Eraser className="mr-2 h-4 w-4" /> Limpiar
-            </Button>
-          </div>
+        <CardContent>
+          <form
+            id="frmProductosBuscar"
+            name="frmProductosBuscar"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 gap-4 items-end"
+            onSubmit={handleFormSubmit}
+          >
+            <div className="lg:col-span-2">
+              <label htmlFor="txtProductoNombre" className="text-sm font-medium">
+                Nombre
+              </label>
+              <Input
+                id="txtProductoNombre"
+                name="txtProductoNombre"
+                type="text"
+                placeholder="Buscar por nombre..."
+                maxLength={150}
+                value={filtroNombre}
+                onChange={(e) => setFiltroNombre(e.target.value)}
+              />
+            </div>
+            <div className="lg:col-span-2">
+              <label htmlFor="ddlClientes" className="text-sm font-medium">
+                Cliente
+              </label>
+              <Select name="ddlCliente" value={filtroCliente} onValueChange={handleClienteChange}>
+                <SelectTrigger id="ddlClientes">
+                  <SelectValue placeholder="Selecciona un cliente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {clientes.map((c) => (
+                    <SelectItem key={c.id} value={c.id.toString()}>
+                      {c.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="lg:col-span-2">
+              <label htmlFor="ddlCatalogo" className="text-sm font-medium">
+                Catálogo
+              </label>
+              <Select name="ddlCatalogo" value={filtroCatalogo} onValueChange={setFiltroCatalogo}>
+                <SelectTrigger id="ddlCatalogo">
+                  <SelectValue placeholder="Selecciona un catálogo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {catalogos.map((c) => (
+                    <SelectItem key={c.id} value={c.id.toString()}>
+                      {c.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="lg:col-span-2">
+              <label htmlFor="ddlEstatus" className="text-sm font-medium">
+                Estatus
+              </label>
+              <Select name="ddlEstatus" value={filtroEstatus} onValueChange={setFiltroEstatus}>
+                <SelectTrigger id="ddlEstatus">
+                  <SelectValue placeholder="Selecciona un estatus" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="-1">Todos</SelectItem>
+                  <SelectItem value="true">Activo</SelectItem>
+                  <SelectItem value="false">Inactivo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-2 col-span-full md:col-span-2 lg:col-span-2 justify-end">
+              <Button
+                id="btnProductosLimpiar"
+                name="btnProductosLimpiar"
+                type="button"
+                variant="outline"
+                className="w-full md:w-auto bg-[#4a4a4a] text-white hover:bg-[#333333]"
+                style={{ fontSize: "12px" }}
+                onClick={clearProductosBusqueda}
+              >
+                <RotateCcw className="mr-2 h-3 w-3" /> Limpiar
+              </Button>
+              <Button
+                id="btnProductosBuscar"
+                name="btnProductosBuscar"
+                type="submit"
+                className="w-full md:w-auto bg-[#4a4a4a] text-white hover:bg-[#333333]"
+                style={{ fontSize: "12px" }}
+                disabled={isSearching}
+              >
+                {isSearching ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <Search className="mr-2 h-3 w-3" />}{" "}
+                Buscar
+              </Button>
+            </div>
+          </form>
         </CardContent>
       </Card>
 
-      {/* Sección de Acciones y Estadísticas */}
-      <div className="flex justify-between items-center mb-6">
-        <Button onClick={() => router.push('/productos/nuevo')} className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md shadow-sm">
-          <Icons.Plus className="mr-2 h-4 w-4" /> Crear Nuevo Producto
-        </Button>
-        <div className="text-sm text-gray-600">
-          Total de Productos: <span className="font-semibold">{totalProductos}</span>
-        </div>
-      </div>
-
-      {/* Sección de Resultados (Tarjetas) */}
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {Array.from({ length: pageSize }).map((_, index) => (
-            <Card key={index} className="animate-pulse shadow-sm">
-              <CardContent className="p-4 flex flex-col items-center">
-                <div className="w-24 h-24 bg-gray-200 rounded-full mb-4"></div>
-                <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                <div className="flex gap-2 mt-4">
-                  <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-                  <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : productos.length === 0 ? (
-        <div className="text-center text-gray-600 text-lg py-10">
-          No se encontraron productos con los filtros aplicados.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {productos.map((producto) => (
-            <Card key={producto.id} className="relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out group">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#528A94] to-[#a6d1cc] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <CardContent className="relative z-10 p-6 flex flex-col items-center text-center">
-                <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-md mb-4 transform group-hover:scale-105 transition-transform duration-300">
-                  <Image
-                    src={producto.imagen_url || '/placeholder.svg?height=128&width=128&query=product'}
-                    alt={producto.nombre}
-                    layout="fill"
-                    objectFit="cover"
-                    className="transition-all duration-300 group-hover:brightness-90"
-                  />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 group-hover:text-white transition-colors duration-300 mb-2 truncate w-full">
-                  {producto.nombre}
-                </h3>
-                <p className="text-2xl font-bold text-blue-600 group-hover:text-white transition-colors duration-300 mb-4">
-                  ${producto.costo.toFixed(2)}
-                </p>
-                <div className="flex gap-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full bg-white text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-all duration-200 shadow-sm"
-                    onClick={() => router.push(`/productos/${producto.id}/editar`)}
-                    title="Editar Producto"
-                  >
-                    <Icons.Edit className="h-5 w-5" />
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="rounded-full bg-white text-gray-700 hover:bg-gray-100 hover:text-red-600 transition-all duration-200 shadow-sm"
-                        onClick={() => setDeletingId(producto.id)}
-                        title="Eliminar Producto"
+      {/* 4. Grid de Resultados - Ahora con Tarjetas */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Resultados</CardTitle>
+          <CardDescription>
+            Mostrando {productosPaginados.length} de {productos.length} productos encontrados.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isSearching ? (
+            <div className="flex justify-center items-center h-48">
+              <Loader2 className="mx-auto h-8 w-8 animate-spin" />
+              <span className="ml-2 text-lg">Cargando productos...</span>
+            </div>
+          ) : productosPaginados.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+              {productosPaginados.map((p, index) => (
+                <Card
+                  key={`${p.ProductoId}-${p.CatalogoId}-${index}`}
+                  className="relative flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 group"
+                >
+                  <div className="relative w-full h-48 overflow-hidden">
+                    <Image
+                      src={p.ProductoImagenUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
+                      alt={p.ProductoNombre}
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded-t-lg transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute top-2 right-2">
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full font-semibold ${p.ProductoActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
                       >
-                        <Icons.Trash className="h-5 w-5" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    {deletingId === producto.id && (
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Esta acción no se puede deshacer. Esto eliminará permanentemente el producto
-                            y removerá sus datos de nuestros servidores.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel onClick={() => setDeletingId(null)}>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700 text-white">
-                            Eliminar
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    )}
-                  </AlertDialog>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                        {p.ProductoActivo ? "Activo" : "Inactivo"}
+                      </span>
+                    </div>
+                  </div>
+                  <CardContent className="flex flex-col flex-grow p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                      {p.ProductoNombre}
+                    </h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                      {p.ProductoDescripcion || "Sin descripción."}
+                    </p>
+                    <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
+                      <p className="text-xl font-bold text-green-600">{formatCurrency(p.ProductoCosto)}</p>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Ver Detalles"
+                          onClick={() => handleViewProductoDetails(p.ProductoId)}
+                          disabled={isDetailsLoading}
+                        >
+                          {isDetailsLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Link href={`/productos/editar?getProductoId=${p.ProductoId}`} passHref>
+                          <Button variant="ghost" size="icon" title="Editar">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title={p.ProductoActivo ? "Inactivar" : "Activar"}
+                          onClick={() => handleToggleStatusClickProducto(p.ProductoId, p.ProductoActivo)}
+                        >
+                          {p.ProductoActivo ? (
+                            <ToggleRight className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <ToggleLeft className="h-4 w-4 text-green-500" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">No se encontraron resultados.</div>
+          )}
+          {totalPaginas > 1 && (
+            <div className="flex items-center justify-center space-x-2 pt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPaginaActual((p) => Math.max(1, p - 1))}
+                disabled={paginaActual === 1}
+              >
+                Anterior
+              </Button>
+              <span className="text-sm">
+                Página {paginaActual} de {totalPaginas}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPaginaActual((p) => Math.min(totalPaginas, p + 1))}
+                disabled={paginaActual === totalPaginas}
+              >
+                Siguiente
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-      {/* Paginación */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center space-x-2 mt-8">
-          <Button
-            variant="outline"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Anterior
-          </Button>
-          <span className="text-gray-700">
-            Página {currentPage} de {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Siguiente
-          </Button>
-        </div>
-      )}
+      {/* Modal de Confirmación de Cambio de Estado */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Confirmar cambio de estado?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esto cambiará el estado del producto a '{productoToToggle?.activo ? "Inactivo" : "Activo"}'. ¿Deseas
+              continuar?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setProductoToToggle(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={cambiarEstadoProducto}>Confirmar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Modal de Detalles del Producto */}
+      <Dialog open={showProductoDetailsModal} onOpenChange={setShowProductoDetailsModal}>
+        <DialogContent className="max-w-4xl overflow-y-auto max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Detalles del Producto</DialogTitle>
+            <DialogDescription>Información detallada del producto seleccionado.</DialogDescription>
+          </DialogHeader>
+          {isDetailsLoading ? (
+            <div className="flex items-center justify-center h-48">
+              <Loader2 className="h-8 w-8 animate-spin" />
+              <span className="ml-2">Cargando detalles...</span>
+            </div>
+          ) : selectedProductoDetails && selectedProductoDetails.length > 0 ? (
+            <div className="grid gap-4 py-4">
+              {/* Mostrar información principal del producto una vez */}
+              <div className="flex flex-col md:flex-row items-center gap-4">
+                {selectedProductoDetails[0].imgurl && (
+                  <img
+                    src={selectedProductoDetails[0].imgurl || "/placeholder.svg"}
+                    alt={selectedProductoDetails[0].Producto}
+                    className="w-64 h-64 object-cover rounded-md"
+                  />
+                )}
+                <div className="grid gap-1">
+                  <h3 className="text-xl font-semibold">{selectedProductoDetails[0].Producto}</h3>
+                  <p className="text-muted-foreground">{selectedProductoDetails[0].descripcion}</p>
+                  {selectedProductoDetails[0].instruccionespreparacion && (
+                    <p className="mt-2 text-sm text-gray-600">
+                      <span className="text-base text-black-600 font-medium">Instrucciones:</span>{" "}
+                      {selectedProductoDetails[0].instruccionespreparacion}
+                    </p>
+                  )}
+                  {selectedProductoDetails[0].propositoprincipal && (
+                    <p className="mt-2 text-sm text-gray-600">
+                      <span className="text-base font-medium">Proposito Principal:</span>{" "}
+                      {selectedProductoDetails[0].propositoprincipal}
+                    </p>
+                  )}
+                  <p className="text-sm text-gray-600">
+                    <span className="text-base font-medium">Costo Total:</span>{" "}
+                    {formatCurrency(selectedProductoDetails[0].Costo)}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="text-base font-medium">Precio Mínimo:</span>{" "}
+                    {formatCurrency(selectedProductoDetails[0].PrecioSugerido)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Mostrar detalles específicos de cada asociación con catálogo */}
+              {selectedProductoDetails.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-lg font-semibold mb-2">Asociaciones con Catálogos:</h4>
+                  <div className="grid gap-3">
+                    {selectedProductoDetails.map((detail, idx) => (
+                      <Card key={idx} className="p-3">
+                        <p className="text-sm">
+                          <span className="font-medium">Cliente:</span> {detail.Cliente}
+                        </p>
+                        <p className="text-sm">
+                          <span className="font-medium">Catálogo:</span> {detail.Catalogo}
+                        </p>
+                        <p className="text-sm">
+                          <span className="font-medium">Precio de Venta:</span> {formatCurrency(detail.precioventa)}
+                        </p>
+                        <p className="text-sm">
+                          <span className="font-medium">Margen de Utilidad:</span>{" "}
+                          {detail.margenutilidad !== null ? `${detail.margenutilidad}` : "N/A"}
+                        </p>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">No se encontraron detalles para este producto.</div>
+          )}
+          <DialogFooter>
+            <DialogPrimitive.Close asChild>
+              <Button type="button" variant="secondary">
+                Cerrar
+              </Button>
+            </DialogPrimitive.Close>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

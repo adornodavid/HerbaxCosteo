@@ -1,22 +1,11 @@
 "use server"
 
-import { createClient } from "@/lib/supabase-server"
+import { createClient } from "@supabase/supabase-js"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
-
-export async function getProductoById(id: number) {
-  const supabase = createClient()
-  const { data, error } = await supabase.from('productos').select('*').eq('id', id).single()
-
-  if (error) {
-    console.error('Error al obtener producto por ID:', error)
-    return null
-  }
-  return data
-}
 
 export async function getProductoDetailsForModal(productoId: number) {
   try {
