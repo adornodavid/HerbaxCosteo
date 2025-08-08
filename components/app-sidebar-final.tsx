@@ -147,6 +147,8 @@ export function AppSidebar() {
           <span className="">AYBCosteo</span>
         </Link>
       </div>
+      
+      <div className="p-4 border-b border-[#a1cbd4]">
       <div className="mt-auto p-4 border-t">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -166,7 +168,8 @@ export function AppSidebar() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      
+      </div>
+
       <div className="flex-1 overflow-auto py-2">
         <nav className="grid items-start px-4 text-sm font-medium">
           {navItems.map((item) => (
