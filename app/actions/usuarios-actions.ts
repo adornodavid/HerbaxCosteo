@@ -9,40 +9,40 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
-export async function insUsuario(
-  nombrecompleto: string,
-  p_email: string,
-  password: string,
-  rolid: number,
-) {
-  try {
-    // Hash de la contraseña antes de insertarla
-    const hashedPassword = await bcrypt.hash(password, 10) // 10 es el costo del salt
+export async function insUsuario(formData: FormData) {
+  // Extraer los valores del FormData
+  const nombrecompleto = formData.get('nombrecompleto') as string;
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  const rolid = parseInt(formData.get('rolid') as string); // Convertir a número
 
-    const { data, error } = await supabaseAdmin
-      .from("usuarios")
-      .insert({
-        nombrecompleto: nombrecompleto,
-        email: p_email,
-        password: hashedPassword, // Guarda la contraseña hasheada
-        rolid: rolid,
-        activo: true,
-        fechacreacion: new Date().toISOString(),
-        fechaactualizacion: new Date().toISOString(),
-      })
+  try {
+    // Hashear la contraseña antes de insertarla
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    const { data, error } = await supabase
+      .from('usuarios')
+      .insert([
+        {
+          nombrecompleto: nombrecompleto,
+          email: email,
+          password: hashedPassword, // Guardar la contraseña hasheada
+          rolid: rolid,
+          activo: true, // Asumimos que el usuario está activo por defecto
+        },
+      ])
       .select()
-      .single()
 
     if (error) {
-      console.error("Error al insertar usuario:", error)
-      return { success: false, error: error.message }
+      console.error('Error inserting user:', error.message)
+      return { success: false, message: `Error al insertar usuario: ${error.message}` }
     }
 
-    revalidatePath("/pruebas/usuarios")
-    return { success: true, data }
-  } catch (error) {
-    console.error("Error en insUsuario:", error)
-    return { success: false, error: "Error interno del servidor" }
+    revalidatePath('/pruebas/usuarios') // Revalidar la ruta de usuarios para mostrar el nuevo usuario
+    return { success: true, message: 'Usuario insertado exitosamente.' }
+  } catch (error: any) {
+    console.error('Error en insUsuario:', error.message)
+    return { success: false, message: `Error en el servidor: ${error.message}` }
   }
 }
 
