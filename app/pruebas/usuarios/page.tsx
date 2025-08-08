@@ -1,100 +1,165 @@
-// Contenido asumido de app/pruebas/usuarios/page.tsx
-// Este archivo no se modifica en esta interacción, solo se asume su contenido.
 'use client'
 
-import { useState } from 'react'
-import { insUsuario } from '@/app/actions/usuarios-actions' // Ruta de importación actualizada
+import { useState, useEffect } from 'react'
+import { insUsuario, getUsuarios, deleteUsuario } from '@/app/actions/usuarios-actions'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-export default function NuevoUsuarioPage() {
-  const [message, setMessage] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+interface Usuario {
+  UsuarioId: number
+  NombreCompleto: string
+  Email: string
+  RolId: number
+  SesionActiva: boolean
+}
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setIsSubmitting(true)
-    setMessage(null)
+export default function UsuariosPage() {
+  const [usuarios, setUsuarios] = useState<Usuario[]>([])
+  const [nombreCompleto, setNombreCompleto] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [rolId, setRolId] = useState<string>('')
 
-    const formData = new FormData(event.currentTarget)
-    
-    // La llamada a la función insUsuario se ha corregido para pasar solo el FormData
-    const result = await insUsuario(formData) 
+  useEffect(() => {
+    fetchUsuarios()
+  }, [])
 
+  const fetchUsuarios = async () => {
+    const data = await getUsuarios()
+    setUsuarios(data as Usuario[])
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const formData = new FormData()
+    formData.append('nombrecompleto', nombreCompleto)
+    formData.append('email', email)
+    formData.append('password', password)
+    formData.append('rolid', rolId)
+
+    const result = await insUsuario(formData) // Corrected call
     if (result.success) {
-      setMessage(result.message)
-      event.currentTarget.reset() // Limpiar el formulario
+      alert(result.message)
+      setNombreCompleto('')
+      setEmail('')
+      setPassword('')
+      setRolId('')
+      fetchUsuarios()
     } else {
-      setMessage(`Error: ${result.message}`)
+      alert(`Error: ${result.message}`)
     }
-    setIsSubmitting(false)
+  }
+
+  const handleDelete = async (id: number) => {
+    if (confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
+      const result = await deleteUsuario(id)
+      if (result.success) {
+        alert(result.message)
+        fetchUsuarios()
+      } else {
+        alert(`Error: ${result.message}`)
+      }
+    }
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Crear Nuevo Usuario</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="nombrecompleto" className="block text-sm font-medium text-gray-700">
-              Nombre Completo
-            </label>
-            <input
-              type="text"
-              id="nombrecompleto"
-              name="nombrecompleto"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label htmlFor="rolid" className="block text-sm font-medium text-gray-700">
-              ID de Rol
-            </label>
-            <input
-              type="number"
-              id="rolid"
-              name="rolid"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            {isSubmitting ? 'Creando...' : 'Crear Usuario'}
-          </button>
-        </form>
-        {message && (
-          <div className={`mt-4 text-center ${message.startsWith('Error') ? 'text-red-600' : 'text-green-600'}`}>
-            {message}
-          </div>
-        )}
-      </div>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Gestión de Usuarios</h1>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Crear Nuevo Usuario</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="nombreCompleto">Nombre Completo</Label>
+              <Input
+                id="nombreCompleto"
+                type="text"
+                value={nombreCompleto}
+                onChange={(e) => setNombreCompleto(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="password">Contraseña</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="rolId">Rol</Label>
+              <Select value={rolId} onValueChange={setRolId} required>
+                <SelectTrigger id="rolId">
+                  <SelectValue placeholder="Selecciona un rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Administrador</SelectItem>
+                  <SelectItem value="2">Usuario</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="md:col-span-2">
+              <Button type="submit">Crear Usuario</Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Listado de Usuarios</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Nombre Completo</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Rol</TableHead>
+                <TableHead>Sesión Activa</TableHead>
+                <TableHead>Acciones</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {usuarios.map((usuario) => (
+                <TableRow key={usuario.UsuarioId}>
+                  <TableCell>{usuario.UsuarioId}</TableCell>
+                  <TableCell>{usuario.NombreCompleto}</TableCell>
+                  <TableCell>{usuario.Email}</TableCell>
+                  <TableCell>{usuario.RolId === 1 ? 'Administrador' : 'Usuario'}</TableCell>
+                  <TableCell>{usuario.SesionActiva ? 'Sí' : 'No'}</TableCell>
+                  <TableCell>
+                    <Button variant="destructive" onClick={() => handleDelete(usuario.UsuarioId)}>
+                      Eliminar
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   )
 }

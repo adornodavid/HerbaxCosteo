@@ -1,15 +1,24 @@
-// Contenido asumido de app/actions/utilerias-actions.ts
-// Este archivo no se modifica en esta interacción, solo se asume su contenido.
 'use server'
 
-import { createClient } from "@/lib/supabase-server"
+import { createClient } from '@/lib/supabase-server'
 
-export async function getUtilerias() {
+export async function getUnidadesMedida() {
   const supabase = createClient()
-  const { data, error } = await supabase.from('utilerias').select('*')
+  const { data, error } = await supabase.from('UnidadesMedida').select('*') // Asume que tienes una tabla de unidades de medida
 
   if (error) {
-    console.error('Error al obtener utilerías:', error)
+    console.error('Error al obtener unidades de medida:', error)
+    return []
+  }
+  return data
+}
+
+export async function getTiposProducto() {
+  const supabase = createClient()
+  const { data, error } = await supabase.from('TiposProducto').select('*') // Asume que tienes una tabla de tipos de producto
+
+  if (error) {
+    console.error('Error al obtener tipos de producto:', error)
     return []
   }
   return data

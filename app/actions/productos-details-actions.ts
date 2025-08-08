@@ -78,3 +78,14 @@ export async function getProductoDetailsForModal(productoId: number) {
     return { success: false, error: "Internal server error" }
   }
 }
+
+export async function getProductoDetails(id: number) {
+  const supabase = createClient()
+  const { data, error } = await supabase.from('Productos').select('*').eq('ProductoId', id).single()
+
+  if (error) {
+    console.error('Error al obtener detalles del producto:', error)
+    return null
+  }
+  return data
+}
