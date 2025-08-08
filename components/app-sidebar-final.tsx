@@ -1,13 +1,15 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import Link from "next/link" // Importar Link de next/link
 import { usePathname, useRouter } from "next/navigation"
+import Link from "next/link"
 import { getSession } from "@/app/actions/session-actions"
-import { Icons } from "@/components/icons"
+import { Icons } from "@/components/icons" // Asumiendo que Icons están definidos aquí
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useNavigationGuard } from "@/contexts/navigation-guard-context"
+import { cn } from "@/lib/utils"
 
 interface SessionData {
   UsuarioId: number
@@ -19,11 +21,79 @@ interface SessionData {
   SesionActiva: boolean
 }
 
+interface NavItem {
+  title: string
+  href?: string
+  icon: React.ElementType // Componente de icono de Lucide
+  submenu?: NavItem[]
+}
+
+// Definición de los elementos de navegación
+const navItems: NavItem[] = [
+  {
+    title: "Dashboard",
+    href: "/dashboard",
+    icon: Icons.home,
+  },
+  {
+    title: "Insumos",
+    icon: Icons.users,
+    submenu: [
+      { title: "Ingredientes", href: "/ingredientes" },
+      { title: "Categorías", href: "/categorias" },
+    ],
+  },
+  {
+    title: "Productos",
+    icon: Icons.package,
+    submenu: [
+      { title: "Platillos", href: "/platillos" },
+      { title: "Recetas", href: "/recetas" },
+      { title: "Menús", href: "/menus" },
+      { title: "Márgenes de Utilidad", href: "/margenesutilidad" },
+    ],
+  },
+  {
+    title: "Catálogos",
+    icon: Icons.fileText,
+    submenu: [
+      { title: "Hoteles", href: "/hoteles" },
+      { title: "Restaurantes", href: "/restaurantes" },
+      { title: "Usuarios", href: "/usuarios" },
+      { title: "Clientes", href: "/clientes" },
+    ],
+  },
+  {
+    title: "Análisis de Costos",
+    href: "/analisiscostos",
+    icon: Icons.barChart,
+  },
+  {
+    title: "Importar Datos",
+    href: "/importar",
+    icon: Icons.upload,
+  },
+];
+
+// Elementos para el menú desplegable del usuario
+const userMenuItems: NavItem[] = [
+  {
+    title: "Mi Perfil",
+    href: "/perfil",
+    icon: Icons.user,
+  },
+  {
+    title: "Cerrar Sesión",
+    href: "/logout",
+    icon: Icons.logOut,
+  },
+];
+
 export function AppSidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const [sessionData, setSessionData] = useState<SessionData | null>(null)
-  const [openMenus, setOpenMenus] = useState<string[]>([])
+  const [openMenus, setOpenMenus] = useState<string[]>([]) // Estado para gestionar los menús colapsables abiertos
   const { attemptNavigation } = useNavigationGuard()
 
   useEffect(() => {
@@ -34,22 +104,14 @@ export function AppSidebar() {
     loadSession()
   }, [])
 
-  // No necesitamos inicializar Preline aquí si usamos componentes de React para la navegación
-  // useEffect(() => {
-  //   if (typeof window !== 'undefined' && window.HSStaticMethods) {
-  //     window.HSStaticMethods.autoInit();
-  //     console.log("Preline UI initialized.");
-  //   } else {
-  //     console.log("HSStaticMethods no disponible, esperando...");
-  //   }
-  // }, []);
+  // Función para alternar los menús colapsables
+  const toggleCollapsible = useCallback((title: string) => {
+    setOpenMenus((prev) =>
+      prev.includes(title) ? prev.filter((name) => name !== title) : [...prev, title]
+    )
+  }, [])
 
-  const toggleMenu = (menuName: string) => {
-    setOpenMenus((prev) => (prev.includes(menuName) ? prev.filter((name) => name !== menuName) : [...prev, menuName]))
-  }
-
-  const isActive = (href: string) => pathname === href
-
+  // Función para manejar los clics de navegación, utilizando el NavigationGuard
   const handleNavigationClick = useCallback(
     async (href: string) => {
       const canProceed = await attemptNavigation(href)
@@ -60,149 +122,123 @@ export function AppSidebar() {
     [attemptNavigation, router],
   )
 
-  const menuItems = [
-    {
-      name: "Dashboard",
-      href: "/dashboard",
-      icon: Icons.LayoutDashboard,
-      hasSubmenu: false,
-    },
-    {
-      name: "Insumos",
-      icon: Icons.Pill,
-      hasSubmenu: true,
-      submenu: [
-        { name: "Ingredientes", href: "/ingredientes", icon: Icons.Pill },
-        { name: "Categorías", href: "/categorias", icon: Icons.Package },
-      ],
-    },
-    {
-      name: "Productos",
-      icon: Icons.PillBottle,
-      hasSubmenu: true,
-      submenu: [
-        { name: "Productos", href: "/productos", icon: Icons.PillBottle },
-        // { name: "Sub-Recetas", href: "/recetas", icon: Icons.FileText },
-      ],
-    },
-    {
-      name: "Catálogos",
-      icon: Icons.FileText,
-      hasSubmenu: true,
-      submenu: [{ name: "Gestión de Catálogos", href: "/menus", icon: Icons.FileText }],
-    },
-    {
-      name: "Reporte y Análisis",
-      icon: Icons.BarChart,
-      hasSubmenu: true,
-      submenu: [
-        { name: "Análisis de Costos", href: "/analisiscostos", icon: Icons.TrendingUp },
-        { name: "Márgenes de Utilidad", href: "/margenesutilidad", icon: Icons.PieChart },
-        // { name: "Reporte Comparativo", href: "/reportecomparativo", icon: Icons.FileBarChart },
-      ],
-    },
-    {
-      name: "Gestión",
-      icon: Icons.Hotel,
-      hasSubmenu: true,
-      submenu: [
-        { name: "Clientes", href: "/hoteles", icon: Icons.Hotel },
-        // { name: "Catálogo", href: "/restaurantes", icon: Icons.Building },
-      ],
-    },
-    /*
-    {
-      name: "Administración",
-      icon: Icons.Settings,
-      hasSubmenu: true,
-      submenu: [{ name: "Usuarios", href: "/usuarios", icon: Icons.Users }],
-    },
-    */
-    {
-      name: "Perfil",
-      icon: Icons.User,
-      hasSubmenu: true,
-      submenu: [
-        { name: "Mi Perfil", href: "/perfil", icon: Icons.User },
-        { name: "Cerrar Sesión", href: "/logout", icon: Icons.LogOut },
-      ],
-    },
-  ]
+  // Abrir automáticamente los submenús si un elemento hijo es la ruta activa actual
+  useEffect(() => {
+    const currentPath = pathname;
+    const menusToOpen: string[] = [];
+    navItems.forEach(item => {
+      if (item.submenu) {
+        const hasActiveSubitem = item.submenu.some(subItem => subItem.href && currentPath.startsWith(subItem.href));
+        if (hasActiveSubitem && !openMenus.includes(item.title)) {
+          menusToOpen.push(item.title);
+        }
+      }
+    });
+    if (menusToOpen.length > 0) {
+      setOpenMenus(prev => [...new Set([...prev, ...menusToOpen])]);
+    }
+  }, [pathname]); // Depende de pathname para reevaluar
 
   return (
-    <div className="w-64 h-screen bg-[#528A94] text-white flex flex-col shadow-xl">
-      {/* Logo */}
-      <div className="p-4 border-b border-[#a6d1cc] flex items-center justify-center">
-        <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-md">
-            <Icons.PillBottle className="w-6 h-6 text-[#528A94]" />
-          </div>
-          <span className="font-extrabold text-xl tracking-wide">HERBAX</span>
-        </div>
+    // La barra lateral se oculta en pantallas pequeñas y se muestra en md y superiores
+    <div className="hidden md:flex flex-col h-full border-r bg-gray-100/40 dark:bg-gray-800/40 w-64">
+      {/* Encabezado de la barra lateral */}
+      <div className="flex h-16 items-center border-b px-6">
+        <Link className="flex items-center gap-2 font-semibold" href="/dashboard" onClick={(e) => {
+          e.preventDefault(); // Prevenir recarga completa de la página
+          handleNavigationClick("/dashboard");
+        }}>
+          <Icons.logo className="h-6 w-6" /> {/* Asumiendo que Icons.logo existe */}
+          <span className="">AYBCosteo</span>
+        </Link>
       </div>
 
-      {/* Nombre del usuario */}
-      <div className="p-4 border-b border-[#a6d1cc] flex items-center space-x-2">
-        <Icons.User className="w-5 h-5 text-white" />
-        <span className="text-sm font-medium">{sessionData?.NombreCompleto || "Usuario"}</span>
-      </div>
-
-      {/* Navegación */}
-      <nav className="flex-1 overflow-y-auto py-2">
-        <div className="px-2 space-y-1">
-          {menuItems.map((item) => (
-            <div key={item.name}>
-              {!item.hasSubmenu ? (
-                <Link href={item.href!} passHref legacyBehavior>
+      {/* Contenido principal de navegación */}
+      <div className="flex-1 overflow-auto py-2">
+        <nav className="grid items-start px-4 text-sm font-medium">
+          {navItems.map((item) => (
+            item.submenu ? (
+              // Si el elemento tiene submenús, usa Collapsible
+              <Collapsible
+                key={item.title}
+                open={openMenus.includes(item.title)}
+                onOpenChange={() => toggleCollapsible(item.title)}
+                className="grid gap-1"
+              >
+                <CollapsibleTrigger asChild>
                   <Button
                     variant="ghost"
-                    className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 w-full justify-start
-                      ${isActive(item.href!) ? "bg-[#56706e] text-white shadow-inner" : "text-white hover:bg-[#56706e] hover:text-white"}
-                    `}
+                    className={cn(
+                      "w-full justify-start gap-3 px-3 py-2 rounded-lg transition-all",
+                      openMenus.includes(item.title) ? "bg-gray-200 dark:bg-gray-700" : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                    )}
                   >
-                    <item.icon className="w-5 h-5 text-white" />
-                    <span>{item.name}</span>
+                    <item.icon className="h-4 w-4" />
+                    {item.title}
+                    <Icons.chevronDown className={cn("ml-auto h-4 w-4 transition-transform", openMenus.includes(item.title) && "rotate-180")} />
                   </Button>
-                </Link>
-              ) : (
-                <Collapsible open={openMenus.includes(item.name)} onOpenChange={() => toggleMenu(item.name)}>
-                  <CollapsibleTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className={`w-full justify-start space-x-3 px-3 py-2 text-sm font-medium transition-all duration-200
-                        ${openMenus.includes(item.name) ? "bg-[#56706e] text-white shadow-inner" : "text-white hover:bg-[#56706e] hover:text-white"}
-                      `}
-                    >
-                      <item.icon className="w-5 h-5 text-white" />
-                      <span className="flex-1 text-left">{item.name}</span>
-                      {openMenus.includes(item.name) ? (
-                        <Icons.ChevronDown className="w-4 h-4 text-white transition-transform duration-200 rotate-180" />
-                      ) : (
-                        <Icons.ChevronRight className="w-4 h-4 text-white transition-transform duration-200" />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="grid gap-1 pl-8">
+                  {item.submenu.map((subItem) => (
+                    <Link
+                      key={subItem.title}
+                      href={subItem.href || "#"}
+                      onClick={(e) => {
+                        e.preventDefault(); // Prevenir recarga completa de la página
+                        handleNavigationClick(subItem.href || "#");
+                      }}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50",
+                        pathname.startsWith(subItem.href || "") && "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-50"
                       )}
-                    </Button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="ml-6 mt-1 space-y-1">
-                    {item.submenu?.map((subItem) => (
-                      <Link key={subItem.name} href={subItem.href} passHref legacyBehavior>
-                        <Button
-                          variant="ghost"
-                          className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 w-full justify-start
-                            ${isActive(subItem.href) ? "bg-[#56706e] text-white shadow-inner" : "text-white hover:bg-[#56706e] hover:text-white"}
-                          `}
-                        >
-                          <subItem.icon className="w-4 h-4 text-white" />
-                          <span>{subItem.name}</span>
-                        </Button>
-                      </Link>
-                    ))}
-                  </CollapsibleContent>
-                </Collapsible>
-              )}
-            </div>
+                    >
+                      {subItem.title}
+                    </Link>
+                  ))}
+                </CollapsibleContent>
+              </Collapsible>
+            ) : (
+              // Si el elemento no tiene submenús, es un enlace directo
+              <Link
+                key={item.title}
+                href={item.href || "#"}
+                onClick={(e) => {
+                  e.preventDefault(); // Prevenir recarga completa de la página
+                  handleNavigationClick(item.href || "#");
+                }}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50",
+                  pathname === item.href && "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-50"
+                )}
+              >
+                <item.icon className="h-4 w-4" />
+                {item.title}
+              </Link>
+            )
           ))}
-        </div>
-      </nav>
+        </nav>
+      </div>
+
+      {/* Pie de página de la barra lateral con menú de usuario */}
+      <div className="mt-auto p-4 border-t">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="w-full justify-start gap-2">
+              <img className="h-6 w-6 rounded-full" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/quimico.png" alt="Avatar" />
+              <span>{sessionData?.NombreCompleto || "Usuario"}</span>
+              <Icons.chevronUp className="ml-auto h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" align="start" className="w-[200px]">
+            {userMenuItems.map((item) => (
+              <DropdownMenuItem key={item.title} onClick={() => handleNavigationClick(item.href || "#")}>
+                {item.icon && <item.icon className="mr-2 h-4 w-4" />}
+                <span>{item.title}</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   )
 }
