@@ -28,7 +28,7 @@ interface SessionData {
 }
 
 export function AppSidebar() {
-  /*const pathname = usePathname()
+  const pathname = usePathname()
   const router = useRouter() // Inicializar useRouter
   const [sessionData, setSessionData] = useState<SessionData | null>(null)
   const [openMenus, setOpenMenus] = useState<string[]>([])
@@ -42,7 +42,7 @@ export function AppSidebar() {
     loadSession()
   }, [])
 
- */ // Inicialización de Preline UI
+  // Inicialización de Preline UI
   useEffect(() => {
     if (typeof window !== 'undefined' && window.HSStaticMethods) {
       window.HSStaticMethods.autoInit();
