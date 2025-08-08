@@ -42,7 +42,7 @@ export function AppSidebar() {
     loadSession()
   }, [])
 
-  // Inicialización de Preline UI
+ */ // Inicialización de Preline UI
   useEffect(() => {
     if (typeof window !== 'undefined' && window.HSStaticMethods) {
       window.HSStaticMethods.autoInit();
@@ -55,7 +55,7 @@ export function AppSidebar() {
   const toggleMenu = (menuName: string) => {
     setOpenMenus((prev) => (prev.includes(menuName) ? prev.filter((name) => name !== menuName) : [...prev, menuName]))
   }
-*/
+
   const isActive = (href: string) => pathname === href
 
   // Nueva función para manejar los clics de navegación
