@@ -45,7 +45,7 @@ const navItems: NavItem[] = [
   },
   {
     title: "Productos",
-    icon: Icons.package,
+    icon: Icons.PillBottle,
     submenu: [
       { title: "Platillos", href: "/platillos" },
       { title: "Recetas", href: "/recetas" },
