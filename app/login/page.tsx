@@ -82,9 +82,7 @@ export default function LoginPage() {
     }
   }
 
-  /* ==================================================
-    Render, HTML
-  ================================================== */
+  // Render, HTML
   return (
     <div className="min-h-screen relative overflow-hidden bg-[url('https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/1034899_6498.svg')] bg-cover bg-center">
       {/* Iconos de fondo */}
