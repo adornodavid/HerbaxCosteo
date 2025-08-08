@@ -25,12 +25,14 @@ import { Send, UserCheck } from "lucide-react"
   Principal, Pagina
 ================================================== */
 export default function LoginPage() {
+  // Gestion elementos auxiliares
   const [loading, setLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [modalMessage, setModalMessage] = useState("")
   const [shouldRedirect, setShouldRedirect] = useState(false)
   const router = useRouter()
 
+  // Gestion  Modal
   const showModalMessage = (message: string, redirect = false) => {
     setModalMessage(message)
     setShowModal(true)
@@ -44,6 +46,7 @@ export default function LoginPage() {
     }
   }
 
+  // Validacion de campos en form
   const validateLogin = async () => {
     const txtCorreo = document.getElementById("txtCorreo") as HTMLInputElement
     const txtPassword = document.getElementById("txtPassword") as HTMLInputElement
