@@ -118,8 +118,8 @@ export default function LoginPage() {
         <Card className="bg-[#fffcf5]/90 w-full max-w-md z-20 shadow-2xl">
           <CardHeader className="text-center">
             <div className="bg-[#fffcf5] mb-8 rounded-lg">
-          <div className="bg-[#fffcf5] flex items-center space-x-3 rounded-lg">
-            <div className="w-full h-12 rounded-lg flex items-center justify-center">
+              <div className="bg-[#fffcf5] flex items-center space-x-3 rounded-lg">
+                <div className="w-full h-12 rounded-lg flex items-center justify-center">
              
           {/*<Icons.Utensils className="w-8 h-8 text-black mr-4"/>*/}
           <h1 className="text-3xl font-bold text-black"> Sistema de Costeo Healthylab</h1>
