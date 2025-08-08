@@ -152,7 +152,7 @@ export default function DashboardPage() {
           <div className="flex flex-col items-center justify-center p-8">
             <div className="relative w-24 h-24 mb-4">
             <Image
-              src="https://nxtrsibnomdqmzcrwedc.supabase.co/storage/v1/object/public/imagenes/AnimationGif/CargarPage.gif"
+              src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/cargar.gif"
               alt="Procesando..."
               width={300} // Ajusta el tamaño según sea necesario
               height={300} // Ajusta el tamaño según sea necesario
