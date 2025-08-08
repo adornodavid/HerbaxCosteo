@@ -1,14 +1,18 @@
 "use server"
 
+//Imports
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
 
+//Conexion a la base de datos: Supabase
 // Helper para crear el cliente Supabase con cookies
 function createServerSupabaseClientWrapper(cookieStore: ReturnType<typeof cookies>) {
   return createServerComponentClient({ cookies: () => cookieStore })
 }
 
+//Funciones
+//Funcion: selClientesXFiltro / obtenerClientesFiltrados
 export async function obtenerClientesFiltrados(nombre = "", page = 1, limit = 20) {
   const supabase = createServerSupabaseClientWrapper(cookies())
   const offset = (page - 1) * limit
@@ -48,6 +52,7 @@ export async function obtenerClientesFiltrados(nombre = "", page = 1, limit = 20
   }
 }
 
+//Funcion: selClientesTotal / obtenerTotalClientes
 export async function obtenerTotalClientes() {
   const supabase = createServerSupabaseClientWrapper(cookies())
   try {
