@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { insUsuario, obtenerUsuarios } from "@/app/actions/usuarios-actions" // Importación corregida
+import { useState, useEffect, useRef } from "react" // Importar useRef
+import { insUsuario, obtenerUsuarios, insUsuario2 } from "@/app/actions/usuarios-actions" // Importar insUsuario2
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -46,6 +46,14 @@ export default function UsuariosPage() {
 
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [loading, setLoading] = useState(true)
+  const [manualInsertMessage, setManualInsertMessage] = useState<string | null>(null)
+  const [manualInsertLoading, setManualInsertLoading] = useState(false)
+
+  // Refs para acceder a los valores de los inputs
+  const nombrecompletoRef = useRef<HTMLInputElement>(null)
+  const emailRef = useRef<HTMLInputElement>(null)
+  const passwordRef = useRef<HTMLInputElement>(null)
+  const rolidRef = useRef<HTMLSelectElement>(null) // Para el Select
 
   useEffect(() => {
     const fetchUsuarios = async () => {
@@ -61,6 +69,60 @@ export default function UsuariosPage() {
     fetchUsuarios()
   }, [])
 
+  const handleManualInsert = async () => {
+    setManualInsertLoading(true)
+    setManualInsertMessage(null)
+
+    const nombrecompleto = nombrecompletoRef.current?.value
+    const email = emailRef.current?.value
+    const password = passwordRef.current?.value
+    const rolid = parseInt(rolidRef.current?.value || "0") // Obtener valor del select
+
+    // Validaciones básicas (similares a las del formulario con 'required')
+    if (!nombrecompleto || !email || !password || !rolid) {
+      setManualInsertMessage("Todos los campos son obligatorios.")
+      setManualInsertLoading(false)
+      return
+    }
+
+    if (!email.includes('@') || !email.includes('.')) {
+      setManualInsertMessage("Por favor, introduce un email válido.")
+      setManualInsertLoading(false)
+      return
+    }
+
+    if (password.length < 6) { // Ejemplo de validación de contraseña
+      setManualInsertMessage("La contraseña debe tener al menos 6 caracteres.")
+      setManualInsertLoading(false)
+      return
+    }
+
+    try {
+      const result = await insUsuario2(nombrecompleto, email, password, rolid, true) // activo: true
+
+      if (result.success) {
+        setManualInsertMessage("Usuario insertado correctamente con insUsuario2!")
+        // Opcional: Limpiar los campos después de la inserción manual
+        if (nombrecompletoRef.current) nombrecompletoRef.current.value = ""
+        if (emailRef.current) emailRef.current.value = ""
+        if (passwordRef.current) passwordRef.current.value = ""
+        if (rolidRef.current) rolidRef.current.value = "" // Limpiar el select
+        // Refrescar la lista de usuarios
+        const { success: fetchSuccess, data: fetchedUsers } = await obtenerUsuarios()
+        if (fetchSuccess && fetchedUsers) {
+          setUsuarios(fetchedUsers)
+        }
+      } else {
+        setManualInsertMessage(`Error al insertar con insUsuario2: ${result.error}`)
+      }
+    } catch (error) {
+      console.error("Error en handleManualInsert:", error)
+      setManualInsertMessage("Error interno del servidor al insertar usuario.")
+    } finally {
+      setManualInsertLoading(false)
+    }
+  }
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Gestión de Usuarios</h1>
@@ -73,20 +135,20 @@ export default function UsuariosPage() {
           <form action={formAction} className="space-y-4">
             <div>
               <Label htmlFor="nombrecompleto">Nombre Completo</Label>
-              <Input id="nombrecompleto" name="nombrecompleto" type="text" required />
+              <Input id="nombrecompleto" name="nombrecompleto" type="text" required ref={nombrecompletoRef} />
             </div>
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" required />
+              <Input id="email" name="email" type="email" required ref={emailRef} />
             </div>
             <div>
               <Label htmlFor="password">Contraseña</Label>
-              <Input id="password" name="password" type="password" required />
+              <Input id="password" name="password" type="password" required ref={passwordRef} />
             </div>
             <div>
               <Label htmlFor="rolid">Rol</Label>
-              <Select name="rolid" required>
-                <SelectTrigger id="rolid">
+              <Select name="rolid" required onValueChange={(value) => { if (rolidRef.current) rolidRef.current.value = value }}>
+                <SelectTrigger id="rolid" ref={rolidRef as any}> {/* Cast para useRef en SelectTrigger */}
                   <SelectValue placeholder="Selecciona un rol" />
                 </SelectTrigger>
                 <SelectContent>
@@ -102,7 +164,7 @@ export default function UsuariosPage() {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Insertando...
                 </>
               ) : (
-                "Insertar Usuario"
+                "Insertar Usuario (Form Action)"
               )}
             </Button>
             {state?.message && (
@@ -111,6 +173,24 @@ export default function UsuariosPage() {
               </p>
             )}
           </form>
+
+          {/* NUEVO BOTÓN DE INSERCIÓN MANUAL */}
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <Button onClick={handleManualInsert} disabled={manualInsertLoading}>
+              {manualInsertLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Insertando (Manual)...
+                </>
+              ) : (
+                "Insertar Usuario (Manual)"
+              )}
+            </Button>
+            {manualInsertMessage && (
+              <p className={`mt-2 text-sm ${manualInsertMessage.startsWith("Error") ? "text-red-600" : "text-green-600"}`}>
+                {manualInsertMessage}
+              </p>
+            )}
+          </div>
         </CardContent>
       </Card>
 

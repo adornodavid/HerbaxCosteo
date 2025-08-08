@@ -2,6 +2,7 @@
 
 import { createClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
+import bcrypt from 'bcryptjs' // Asegúrate de que bcryptjs esté instalado: npm install bcryptjs
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -15,12 +16,15 @@ export async function insUsuario(
   rolid: number,
 ) {
   try {
+    // Hash de la contraseña antes de insertarla
+    const hashedPassword = await bcrypt.hash(password, 10) // 10 es el costo del salt
+
     const { data, error } = await supabaseAdmin
       .from("usuarios")
       .insert({
         nombrecompleto: nombrecompleto,
         email: p_email,
-        password: password,
+        password: hashedPassword, // Guarda la contraseña hasheada
         rolid: rolid,
         activo: true,
         fechacreacion: new Date().toISOString(),
@@ -38,6 +42,45 @@ export async function insUsuario(
     return { success: true, data }
   } catch (error) {
     console.error("Error en insUsuario:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// NUEVA FUNCIÓN: insUsuario2
+export async function insUsuario2(
+  nombrecompleto: string,
+  email: string,
+  password: string,
+  rolid: number,
+  activo: boolean, // Recibe 'activo' directamente
+) {
+  try {
+    // Hash de la contraseña antes de insertarla
+    const hashedPassword = await bcrypt.hash(password, 10) // 10 es el costo del salt
+
+    const { data, error } = await supabaseAdmin
+      .from("usuarios")
+      .insert({
+        nombrecompleto: nombrecompleto,
+        email: email,
+        password: hashedPassword, // Guarda la contraseña hasheada
+        rolid: rolid,
+        activo: activo, // Usa el valor de 'activo' recibido
+        fechacreacion: new Date().toISOString(),
+        fechaactualizacion: new Date().toISOString(),
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error al insertar usuario con insUsuario2:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/pruebas/usuarios")
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en insUsuario2:", error)
     return { success: false, error: "Error interno del servidor" }
   }
 }
