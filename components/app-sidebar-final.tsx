@@ -123,11 +123,11 @@ export function AppSidebar() {
   ]
 
   return (
-    <div id="SideBar" className="w-64 h-screen bg-[#d9fcfa] text-black flex flex-col">
+    <div id="SideBar" className="w-64 h-screen bg-[#dfebed] text-black flex flex-col">
       {/* Logo */}
       <div className="p-4 border-b border-[#a1cbd4]">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
+          <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
             <Icons.PillBottle className="w-5 h-5 text-black" />
           </div>
           <span className="font-bold text-lg">Sistema de Costeo</span>
@@ -156,7 +156,7 @@ export function AppSidebar() {
                     isActive(item.href!) ? "bg-[#56706e] text-black" : "text-black hover:bg-[#56706e] hover:text-black"
                   }`}
                 >
-                  <item.icon className="w-5 h-5 text-white" />
+                  <item.icon className="w-5 h-5 text-black" />
                   <span>{item.name}</span>
                 </button>
               ) : (
@@ -164,14 +164,14 @@ export function AppSidebar() {
                   <CollapsibleTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="w-full justify-start space-x-3 px-3 py-2 text-sm font-medium text-white hover:bg-[#56706e] hover:text-white"
+                      className="w-full justify-start space-x-3 px-3 py-2 text-sm font-medium text-black hover:bg-[#56706e] hover:text-black"
                     >
-                      <item.icon className="w-5 h-5 text-white" />
+                      <item.icon className="w-5 h-5 text-black" />
                       <span className="flex-1 text-left">{item.name}</span>
                       {openMenus.includes(item.name) ? (
-                        <Icons.ChevronDown className="w-4 h-4 text-white" />
+                        <Icons.ChevronDown className="w-4 h-4 text-black" />
                       ) : (
-                        <Icons.ChevronRight className="w-4 h-4 text-white" />
+                        <Icons.ChevronRight className="w-4 h-4 text-black" />
                       )}
                     </Button>
                   </CollapsibleTrigger>
@@ -183,11 +183,11 @@ export function AppSidebar() {
                         onClick={() => handleNavigationClick(subItem.href)}
                         className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm transition-colors w-full ${
                           isActive(subItem.href)
-                            ? "bg-[#56706e] text-white"
-                            : "text-white hover:bg-[#56706e] hover:text-white"
+                            ? "bg-[#56706e] text-black"
+                            : "text-black hover:bg-[#56706e] hover:text-black"
                         }`}
                       >
-                        <subItem.icon className="w-4 h-4 text-white" />
+                        <subItem.icon className="w-4 h-4 text-black" />
                         <span>{subItem.name}</span>
                       </button>
                     ))}
