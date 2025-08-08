@@ -55,7 +55,7 @@ export function AppSidebar() {
   const toggleMenu = (menuName: string) => {
     setOpenMenus((prev) => (prev.includes(menuName) ? prev.filter((name) => name !== menuName) : [...prev, menuName]))
   }
-
+*/
   const isActive = (href: string) => pathname === href
 
   // Nueva función para manejar los clics de navegación
@@ -67,7 +67,7 @@ export function AppSidebar() {
       }
     },
     [attemptNavigation, router],
-  )*/
+  )
 
   return (
     <div id="hs-sidebar-header" className="hs-overlay [--auto-close:lg] lg:block lg:translate-x-0 lg:end-auto lg:bottom-0 w-64 hs-overlay-open:translate-x-0-translate-x-full transition-all duration-300 transform h-full hidden top-0 start-0 bottom-0 z-60 bg-white border-e border-gray-200" role="dialog" tabIndex="-1" aria-label="Sidebar" >
