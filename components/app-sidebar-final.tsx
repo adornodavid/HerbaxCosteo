@@ -98,7 +98,7 @@ export function AppSidebar() {
       icon: Icons.Hotel,
       hasSubmenu: true,
       submenu: [
-        { name: "Clientes", href: "/hoteles", icon: Icons.Hotel },
+        { name: "Clientes", href: "/clientes", icon: Icons.Hotel },
         //{ name: "Catalogo", href: "/restaurantes", icon: Icons.Building },
       ],
     },
