@@ -16,7 +16,7 @@ function createServerSupabaseClientWrapper(cookieStore: ReturnType<typeof cookie
 
 /* ==================================================
   Funciones
-  ----------
+  --------------------
   * Inserts
     - insCliente
   * Selects
