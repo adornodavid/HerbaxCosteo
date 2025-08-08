@@ -1,38 +1,17 @@
-import { LayoutDashboard, Hotel, Building, Salad, Package, Utensils, FileText, DollarSign, Menu, BarChart, History, Scale, Settings, Users, Shield, Key, User, LogOut, ChevronDown, ChevronRight, Plus, ListChecks, FileUp, TrendingUp, PieChart, FileBarChart, Home, Lock, KeyRound, PillBottleIcon as PillBottle, Pill, ChevronUp } from 'lucide-react'
+import { Home, Users, Package, FileText, BarChart, FileUp, User, LogOut, LayoutDashboard, ChevronDown, ChevronUp } from 'lucide-react';
 
 export const Icons = {
-  LayoutDashboard,
-  Hotel,
-  Building,
-  Salad,
-  Package,
-  Utensils,
-  FileText,
-  DollarSign,
-  Menu,
-  BarChart,
-  History,
-  Scale,
-  Settings,
-  Users,
-  Shield,
-  Key,
-  User,
-  LogOut,
-  ChevronDown,
-  ChevronRight,
-  Plus,
-  ListChecks,
-  FileUp,
-  TrendingUp,
-  PieChart,
-  FileBarChart,
-  Home,
-  Lock,
-  KeyRound,
-  PillBottle,
-  Pill,
-  ChevronUp,
-}
+  home: Home,
+  users: Users,
+  package: Package,
+  fileText: FileText,
+  barChart: BarChart,
+  fileUp: FileUp,
+  user: User,
+  logOut: LogOut,
+  layoutDashboard: LayoutDashboard,
+  chevronDown: ChevronDown,
+  chevronUp: ChevronUp,
+};
 
-export type Icon = keyof typeof Icons
+export type Icon = keyof typeof Icons;
