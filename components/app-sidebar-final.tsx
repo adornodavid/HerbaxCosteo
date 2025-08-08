@@ -171,7 +171,7 @@ export function AppSidebar() {
       </div>
 
       <div className="flex-1 overflow-auto py-2">
-        <nav className="grid items-start px-4 text-sm font-medium">
+        <nav className="grid items-start px-4 gap-3 text-sm font-medium">
           {navItems.map((item) => (
             item.submenu ? (
               <Collapsible
