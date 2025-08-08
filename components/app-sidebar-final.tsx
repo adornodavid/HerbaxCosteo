@@ -123,11 +123,11 @@ export function AppSidebar() {
   ]
 
   return (
-    <div id="SideBar" className="w-64 h-screen bg-[#4a728a] text-white flex flex-col">
+    <div id="SideBar" className="w-64 h-screen bg-[#d9fcfa] text-black flex flex-col">
       {/* Logo */}
       <div className="p-4 border-b border-[#a1cbd4]">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
+          <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
             <Icons.PillBottle className="w-5 h-5 text-black" />
           </div>
           <span className="font-bold text-lg">Sistema de Costeo</span>
@@ -137,7 +137,7 @@ export function AppSidebar() {
       {/* Nombre del usuario */}
       <div className="p-4 border-b border-[#a1cbd4]">
         <div className="flex items-center space-x-2">
-          <Icons.User className="w-5 h-5 text-white" />
+          <Icons.User className="w-5 h-5 text-black" />
           <span className="text-sm font-medium">{sessionData?.NombreCompleto || "Usuario"}</span>
         </div>
       </div>
@@ -153,7 +153,7 @@ export function AppSidebar() {
                 <button
                   onClick={() => handleNavigationClick(item.href!)}
                   className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors w-full ${
-                    isActive(item.href!) ? "bg-[#56706e] text-white" : "text-white hover:bg-[#56706e] hover:text-white"
+                    isActive(item.href!) ? "bg-[#56706e] text-black" : "text-black hover:bg-[#56706e] hover:text-black"
                   }`}
                 >
                   <item.icon className="w-5 h-5 text-white" />
