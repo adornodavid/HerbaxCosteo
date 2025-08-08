@@ -147,7 +147,26 @@ export function AppSidebar() {
           <span className="">AYBCosteo</span>
         </Link>
       </div>
-
+      <div className="mt-auto p-4 border-t">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="w-full justify-start gap-2">
+              <img className="h-6 w-6 rounded-full" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/quimico.png" alt="Avatar" />
+              <span>{sessionData?.NombreCompleto || "Usuario"}</span>
+              <Icons.chevronUp className="ml-auto h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" align="start" className="w-[200px]">
+            {userMenuItems.map((item) => (
+              <DropdownMenuItem key={item.title} onClick={() => handleNavigationClick(item.href || "#")}>
+                {item.icon && <item.icon className="mr-2 h-4 w-4" />}
+                <span>{item.title}</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      
       <div className="flex-1 overflow-auto py-2">
         <nav className="grid items-start px-4 text-sm font-medium">
           {navItems.map((item) => (
@@ -211,25 +230,7 @@ export function AppSidebar() {
         </nav>
       </div>
 
-      <div className="mt-auto p-4 border-t">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <img className="h-6 w-6 rounded-full" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/quimico.png" alt="Avatar" />
-              <span>{sessionData?.NombreCompleto || "Usuario"}</span>
-              <Icons.chevronUp className="ml-auto h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="top" align="start" className="w-[200px]">
-            {userMenuItems.map((item) => (
-              <DropdownMenuItem key={item.title} onClick={() => handleNavigationClick(item.href || "#")}>
-                {item.icon && <item.icon className="mr-2 h-4 w-4" />}
-                <span>{item.title}</span>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      
     </div>
   )
 }
