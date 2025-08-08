@@ -258,6 +258,3 @@ export async function buscarIngredientes(filtros: {
     return { success: true, data: [], count: 0 }
   }
 }
-
-// Este archivo fue dejado vacío intencionalmente para futuras implementaciones.
-// Contendrá acciones relacionadas con ingredientes.
