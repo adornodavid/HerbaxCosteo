@@ -114,7 +114,6 @@ export default function LoginPage() {
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
         {/* Logo */}
        
-
         {/* Formulario */}
         <Card className="bg-[#fffcf5]/90 w-full max-w-md z-20 shadow-2xl">
           <CardHeader className="text-center">
