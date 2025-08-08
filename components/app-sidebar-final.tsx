@@ -153,7 +153,7 @@ export function AppSidebar() {
                 <button
                   onClick={() => handleNavigationClick(item.href!)}
                   className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors w-full ${
-                    isActive(item.href!) ? "bg-[#56706e] text-black" : "text-black hover:bg-[#56706e] hover:text-black"
+                    isActive(item.href!) ? "bg-[#81acb5] text-black" : "text-black hover:bg-[#81acb5] hover:text-black"
                   }`}
                 >
                   <item.icon className="w-5 h-5 text-black" />
@@ -164,7 +164,7 @@ export function AppSidebar() {
                   <CollapsibleTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="w-full justify-start space-x-3 px-3 py-2 text-sm font-medium text-black hover:bg-[#56706e] hover:text-black"
+                      className="w-full justify-start space-x-3 px-3 py-2 text-sm font-medium text-black hover:bg-[#81acb5] hover:text-black"
                     >
                       <item.icon className="w-5 h-5 text-black" />
                       <span className="flex-1 text-left">{item.name}</span>
@@ -183,8 +183,8 @@ export function AppSidebar() {
                         onClick={() => handleNavigationClick(subItem.href)}
                         className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm transition-colors w-full ${
                           isActive(subItem.href)
-                            ? "bg-[#56706e] text-black"
-                            : "text-black hover:bg-[#56706e] hover:text-black"
+                            ? "bg-[#81acb5] text-black"
+                            : "text-black hover:bg-[#81acb5] hover:text-black"
                         }`}
                       >
                         <subItem.icon className="w-4 h-4 text-black" />
