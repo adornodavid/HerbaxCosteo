@@ -1,36 +1,4 @@
-import {
-  LayoutDashboard,
-  Hotel,
-  Building,
-  Salad,
-  Package,
-  Utensils,
-  FileText,
-  DollarSign,
-  Menu,
-  BarChart,
-  History,
-  Scale,
-  Settings,
-  Users,
-  Shield,
-  Key,
-  User,
-  LogOut,
-  ChevronDown,
-  ChevronRight,
-  Plus,
-  ListChecks,
-  FileUp,
-  TrendingUp,
-  PieChart,
-  FileBarChart,
-  Home,
-  Lock,
-  KeyRound,
-  PillBottle,
-  Pill,
-} from "lucide-react"
+import { LayoutDashboard, Hotel, Building, Salad, Package, Utensils, FileText, DollarSign, Menu, BarChart, History, Scale, Settings, Users, Shield, Key, User, LogOut, ChevronDown, ChevronRight, Plus, ListChecks, FileUp, TrendingUp, PieChart, FileBarChart, Home, Lock, KeyRound, PillBottleIcon as PillBottle, Pill, ChevronUp } from 'lucide-react'
 
 export const Icons = {
   LayoutDashboard,
@@ -55,7 +23,7 @@ export const Icons = {
   ChevronRight,
   Plus,
   ListChecks,
-  FileUp,
+  FileUp, // Asegurado que FileUp está exportado
   TrendingUp,
   PieChart,
   FileBarChart,
@@ -64,6 +32,7 @@ export const Icons = {
   KeyRound,
   PillBottle,
   Pill,
+  ChevronUp, // Añadido ChevronUp
 }
 
 export type Icon = keyof typeof Icons

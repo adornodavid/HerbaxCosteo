@@ -71,7 +71,7 @@ const navItems: NavItem[] = [
   {
     title: "Importar Datos",
     href: "/importar",
-    icon: Icons.upload,
+    icon: Icons.fileUp, // Corregido de Icons.upload a Icons.fileUp
   },
 ];
 
@@ -148,7 +148,7 @@ export function AppSidebar() {
           e.preventDefault(); // Prevenir recarga completa de la página
           handleNavigationClick("/dashboard");
         }}>
-          <Icons.logo className="h-6 w-6" /> {/* Asumiendo que Icons.logo existe */}
+          <Icons.layoutDashboard className="h-6 w-6" /> {/* Corregido de Icons.logo a Icons.layoutDashboard */}
           <span className="">AYBCosteo</span>
         </Link>
       </div>
