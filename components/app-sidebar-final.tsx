@@ -137,7 +137,7 @@ export function AppSidebar() {
   }, [pathname]);
 
   return (
-    <div className="hidden md:flex flex-col h-full border-r bg-[#82bdcf] dark:bg-[#82bdcf] w-64">
+    <div className="hidden md:flex flex-col h-100 border-r bg-[#82bdcf] dark:bg-[#82bdcf] w-64">
       <div className="flex h-16 items-center border-b px-6">
         <Link className="flex items-center gap-2 font-semibold" href="/dashboard" onClick={(e) => {
           e.preventDefault();
