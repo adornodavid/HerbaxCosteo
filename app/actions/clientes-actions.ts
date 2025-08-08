@@ -1,17 +1,22 @@
 "use server"
-
-//Imports
+/* ==================================================
+  - Imports
+================================================== */
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
 
-//Conexion a la base de datos: Supabase
+/* ==================================================
+  - Conexion a la base de datos: Supabase
+================================================== */
 // Helper para crear el cliente Supabase con cookies
 function createServerSupabaseClientWrapper(cookieStore: ReturnType<typeof cookies>) {
   return createServerComponentClient({ cookies: () => cookieStore })
 }
 
-//Funciones
+/* ==================================================
+  - Funciones
+================================================== */
 //Funcion: selClientesXFiltro / obtenerClientesFiltrados
 export async function obtenerClientesFiltrados(nombre = "", page = 1, limit = 20) {
   const supabase = createServerSupabaseClientWrapper(cookies())
