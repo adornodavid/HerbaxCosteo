@@ -57,7 +57,7 @@ export function AppSidebar() {
       icon: Icons.LayoutDashboard,
       hasSubmenu: false,
     },
-    
+
     {
       name: "Insumos",
       icon: Icons.Pill,
@@ -102,7 +102,7 @@ export function AppSidebar() {
         //{ name: "Catalogo", href: "/restaurantes", icon: Icons.Building },
       ],
     },
-    
+
     /*
     {
       name: "Administración",
@@ -123,72 +123,98 @@ export function AppSidebar() {
   ]
 
   return (
-    <div id="SideBar" className="w-64 h-200 bg-[#dfebed] text-black flex flex-col">
+    <div
+      id="SideBar"
+      className="w-64 h-screen bg-gradient-to-br from-slate-900/90 via-blue-900/80 to-indigo-900/90 backdrop-blur-xl border-r border-white/10 text-white flex flex-col relative overflow-hidden"
+    >
+      {/* Glass overlay effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 pointer-events-none" />
+
+      {/* Animated background particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-400/10 rounded-full blur-xl animate-pulse" />
+        <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-indigo-400/10 rounded-full blur-xl animate-pulse delay-1000" />
+      </div>
+
       {/* Logo */}
-      <div className="p-4 border-b border-[#a1cbd4]">
+      <div className="relative p-6 border-b border-white/10 backdrop-blur-sm">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
-            <Icons.PillBottle className="w-5 h-5 text-black" />
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20 shadow-lg">
+            <Icons.PillBottle className="w-6 h-6 text-blue-300" />
           </div>
-          <span className="font-bold text-lg">Sistema de Costeo</span>
+          <span className="font-bold text-lg bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+            Sistema de Costeo
+          </span>
         </div>
       </div>
 
       {/* Nombre del usuario */}
-      <div className="p-4 border-b border-[#a1cbd4]">
-        <div className="flex items-center space-x-2">
-          <Icons.User className="w-5 h-5 text-black" />
-          <span className="text-sm font-medium">{sessionData?.NombreCompleto || "Usuario"}</span>
+      <div className="relative p-4 border-b border-white/10 backdrop-blur-sm">
+        <div className="flex items-center space-x-3 bg-white/5 rounded-2xl p-3 border border-white/10">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-400/30 to-indigo-500/30 rounded-full flex items-center justify-center">
+            <Icons.User className="w-4 h-4 text-blue-200" />
+          </div>
+          <span className="text-sm font-medium text-blue-100">{sessionData?.NombreCompleto || "Usuario"}</span>
         </div>
       </div>
 
       {/* Navegación */}
-      <nav className="flex-1 overflow-y-auto">
-      
-        <div className="p-2 space-y-1">
+      <nav className="relative flex-1 overflow-y-auto">
+        <div className="p-3 space-y-2">
           {menuItems.map((item) => (
             <div key={item.name}>
               {!item.hasSubmenu ? (
-                // Usar un botón y el handler para interceptar la navegación
                 <button
                   onClick={() => handleNavigationClick(item.href!)}
-                  className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors w-full ${
-                    isActive(item.href!) ? "bg-[#81acb5] text-black" : "text-black hover:bg-[#81acb5] hover:text-black"
+                  className={`group flex items-center space-x-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-300 w-full relative overflow-hidden ${
+                    isActive(item.href!)
+                      ? "bg-gradient-to-r from-blue-500/30 to-indigo-500/30 text-white border border-blue-400/30 shadow-lg shadow-blue-500/20"
+                      : "text-blue-100 hover:bg-white/10 hover:border-white/20 border border-transparent backdrop-blur-sm"
                   }`}
                 >
-                  <item.icon className="w-5 h-5 text-black" />
-                  <span>{item.name}</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <item.icon
+                    className={`w-5 h-5 relative z-10 transition-colors duration-300 ${
+                      isActive(item.href!) ? "text-blue-300" : "text-blue-200 group-hover:text-white"
+                    }`}
+                  />
+                  <span className="relative z-10">{item.name}</span>
                 </button>
               ) : (
                 <Collapsible open={openMenus.includes(item.name)} onOpenChange={() => toggleMenu(item.name)}>
                   <CollapsibleTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="w-full justify-start space-x-3 px-3 py-2 text-sm font-medium text-black hover:bg-[#81acb5] hover:text-black"
+                      className="group w-full justify-start space-x-3 px-4 py-3 text-sm font-medium text-blue-100 hover:bg-white/10 hover:text-white rounded-2xl border border-transparent hover:border-white/20 backdrop-blur-sm transition-all duration-300 relative overflow-hidden"
                     >
-                      <item.icon className="w-5 h-5 text-black" />
-                      <span className="flex-1 text-left">{item.name}</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <item.icon className="w-5 h-5 text-blue-200 group-hover:text-white transition-colors duration-300 relative z-10" />
+                      <span className="flex-1 text-left relative z-10">{item.name}</span>
                       {openMenus.includes(item.name) ? (
-                        <Icons.ChevronDown className="w-4 h-4 text-black" />
+                        <Icons.ChevronDown className="w-4 h-4 text-blue-200 group-hover:text-white transition-all duration-300 relative z-10" />
                       ) : (
-                        <Icons.ChevronRight className="w-4 h-4 text-black" />
+                        <Icons.ChevronRight className="w-4 h-4 text-blue-200 group-hover:text-white transition-all duration-300 relative z-10" />
                       )}
                     </Button>
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="ml-6 mt-1 space-y-1">
+                  <CollapsibleContent className="ml-4 mt-2 space-y-1">
                     {item.submenu?.map((subItem) => (
-                      // Usar un botón y el handler para interceptar la navegación
                       <button
                         key={subItem.name}
                         onClick={() => handleNavigationClick(subItem.href)}
-                        className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm transition-colors w-full ${
+                        className={`group flex items-center space-x-3 px-4 py-2.5 rounded-xl text-sm transition-all duration-300 w-full relative overflow-hidden ${
                           isActive(subItem.href)
-                            ? "bg-[#81acb5] text-black"
-                            : "text-black hover:bg-[#81acb5] hover:text-black"
+                            ? "bg-gradient-to-r from-blue-500/20 to-indigo-500/20 text-white border border-blue-400/20 shadow-md"
+                            : "text-blue-200 hover:bg-white/5 hover:text-white border border-transparent hover:border-white/10"
                         }`}
                       >
-                        <subItem.icon className="w-4 h-4 text-black" />
-                        <span>{subItem.name}</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <subItem.icon
+                          className={`w-4 h-4 relative z-10 transition-colors duration-300 ${
+                            isActive(subItem.href) ? "text-blue-300" : "text-blue-300 group-hover:text-white"
+                          }`}
+                        />
+                        <span className="relative z-10">{subItem.name}</span>
                       </button>
                     ))}
                   </CollapsibleContent>
@@ -196,7 +222,7 @@ export function AppSidebar() {
               )}
             </div>
           ))}
-          </div>
+        </div>
       </nav>
     </div>
   )
