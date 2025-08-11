@@ -17,14 +17,16 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 /* ==================================================
   Funciones
   --------------------
-  * Inserts
-    - insUsuario
-  * Selects
-    - selXXXXX
-  * Updates
-    - updXXXXX
-  * Deletes
-    - delXXXXX
+	* INSERTS
+		- insXXXXX
+	* SELECTS
+		- selXXXXX
+	* UPDATES
+		- updXXXXX
+	* DELETES
+		- delXXXXX
+	* SPECIALS
+		- xxxXXXXX
 ================================================== */
 //  Función: insUsuario
 export async function insUsuario(formData: FormData) {

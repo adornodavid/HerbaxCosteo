@@ -15,12 +15,14 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 /* ==================================================
   Funciones
   --------------------
-  * Inserts
-    - insXXXXX
-  * Selects
-    - selXXXXX
-  * Updates
-    - updXXXXX
-  * Deletes
-    - delXXXXX
+	* INSERTS
+		- insXXXXX
+	* SELECTS
+		- selXXXXX
+	* UPDATES
+		- updXXXXX
+	* DELETES
+		- delXXXXX
+	* SPECIALS
+		- xxxXXXXX
 ================================================== */
