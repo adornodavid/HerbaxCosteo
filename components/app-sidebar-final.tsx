@@ -109,7 +109,7 @@ export function AppSidebar() {
   return (
     <div
       id="SideBar"
-      className="w-64 h-screen bg-[#F3F6F9] backdrop-blur-2xl border-r border-white/20 text-slate-800 flex flex-col relative shadow-2xl shadow-black/10"
+      className="w-64 h-200 bg-[#F3F6F9] backdrop-blur-2xl border-r border-white/20 text-slate-800 flex flex-col relative shadow-2xl shadow-black/10"
       style={{
         background: "linear-gradient(135deg",
         boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2), 0 20px 40px rgba(0,0,0,0.1)",
