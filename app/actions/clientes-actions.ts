@@ -32,7 +32,17 @@ function createServerSupabaseClientWrapper(cookieStore: ReturnType<typeof cookie
     - estatusActivoCliente / actCliente
     - listaDesplegableClientes / ddlClientes
 ================================================== */
-//Funcion: selClientesXFiltro / obtenerClientesFiltrados
+//Función: crearCliente: funcion para crear un cliente
+
+//Función: obtenerClientes: funcion para obtener todos los ingredientes
+
+
+//Función: obtenerClientesPorFiltros: funcion para obtener todos los ingredientes por el filtrado
+
+
+//Función: obtenerClientePorId: funcion para obtener el ingrediente por Id del ingrediente
+
+//Funcion: obtenerClientesFiltrados
 export async function obtenerClientesFiltrados(nombre = "", page = 1, limit = 20) {
   const supabase = createServerSupabaseClientWrapper(cookies())
   const offset = (page - 1) * limit
@@ -72,7 +82,7 @@ export async function obtenerClientesFiltrados(nombre = "", page = 1, limit = 20
   }
 }
 
-//Funcion: selClientesTotal / obtenerTotalClientes
+//Funcion: obtenerTotalClientes
 export async function obtenerTotalClientes() {
   const supabase = createServerSupabaseClientWrapper(cookies())
   try {
