@@ -80,7 +80,7 @@ export function AppSidebar() {
       name: "Catalogos",
       icon: Icons.FileText,
       hasSubmenu: true,
-      submenu: [{ name: "Gestión de Catalogos", href: "/menus", icon: Icons.FileText }],
+      submenu: [{ name: "Gestión de Catalogos", href: "/catalogos", icon: Icons.FileText }],
     },
     {
       name: "Reporte y Análisis",
