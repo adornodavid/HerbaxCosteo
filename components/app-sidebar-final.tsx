@@ -159,7 +159,7 @@ export function AppSidebar() {
               {!item.hasSubmenu ? (
                 <button
                   onClick={() => handleNavigationClick(item.href!)}
-                  className={`group flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 w-full relative ${
+                  className={`group flex items-center space-x-3 px-4 py-3 rounded-xs text-sm font-medium transition-all duration-300 w-full relative ${
                     isActive(item.href!)
                       ? "bg-white/25 text-slate-800 border border-white/30 shadow-lg"
                       : "text-slate-600 hover:bg-white/15 hover:text-slate-800 border border-transparent hover:border-white/20"
