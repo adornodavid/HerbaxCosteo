@@ -367,6 +367,7 @@ export default function FormulasPage() {
     })
   }
 
+  //Función: handleConfirmedToggle: función para confirmar el cambiar el estatus de activo de la formula
   const handleConfirmedToggle = async () => {
     setConfirmDialog({ ...confirmDialog, open: false })
 
@@ -395,10 +396,12 @@ export default function FormulasPage() {
     }
   }
 
+  //Función: btnFormulaNuevo: función para dirigir a la creacion de una formula
   const btnFormulaNuevo = () => {
     router.push("/formulas/nuevo")
   }
 
+  //Función: handleViewFormulaDetails: función para ver la informacion de una formula en un modal
   const handleViewFormulaDetails = async (formulaId: number) => {
     setLoadingDetails(true)
     setDetailsError(null)
