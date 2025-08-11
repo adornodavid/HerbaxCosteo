@@ -38,7 +38,6 @@ interface Cliente {
 interface Formula {
   folio: number
   formula: string
-  notaspreparacion: string
   costo: number
   cliente: string
   activo: boolean
@@ -47,7 +46,6 @@ interface Formula {
 interface FormulaDetalle {
   id: number
   nombre: string
-  notaspreparacion: string
   costo: number
   activo: boolean
   fechacreacion: string
