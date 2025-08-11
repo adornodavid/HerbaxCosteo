@@ -18,7 +18,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import Image from "next/image"
-import { obtenerFormulas, obtenerFormulasPorFiltros } from "@/app/actions/formulas-actions"
+import { obtenerFormulas, obtenerFormulasPorFiltros, estatusActivoFormula } from "@/app/actions/formulas-actions"
 
 interface SessionData {
   UsuarioId: string | null
@@ -312,15 +312,19 @@ export default function FormulasPage() {
     if (!confirmacion) return
 
     try {
-      const { error } = await supabase.from("formulas").update({ activo: !estadoActual }).eq("id", folio)
+      const resultado = await estatusActivoFormula(folio, estadoActual)
 
-      if (error) throw error
+      if (!resultado.success) {
+        throw new Error(resultado.error)
+      }
 
-      toast.success(`Fórmula ${estadoActual ? "inactivada" : "activada"} correctamente`)
+      const nuevoEstado = resultado.nuevoEstado ? "ACTIVA" : "INACTIVA"
+      alert(`Fórmula con folio ${folio} ha cambiado su estado a: ${nuevoEstado}`)
+
       btnFormulaBuscar() // Recargar la lista con los filtros actuales
     } catch (error) {
       console.error("Error cambiando estado:", error)
-      toast.error("Error al cambiar el estado de la fórmula")
+      alert("Error al cambiar el estado de la fórmula")
     }
   }
 

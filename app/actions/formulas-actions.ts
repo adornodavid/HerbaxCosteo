@@ -179,7 +179,26 @@ export async function obtenerFormulasPorFiltros(nombre = "", clienteId = "", act
 
 // Función: estatusActivoFormula: función para cambiar el estatus de una formula por Id de la formula
 export async function estatusActivoFormula(folio: number, estadoActual: boolean) {
-  
+  try {
+    const nuevoEstado = !estadoActual
+
+    const { data, error } = await supabase.from("formulas").update({ activo: nuevoEstado }).eq("id", folio).select()
+
+    if (error) {
+      console.error("Error al cambiar estado de fórmula:", error)
+      return { success: false, error: error.message }
+    }
+
+    return {
+      success: true,
+      data: data[0],
+      nuevoEstado,
+      message: `Fórmula ${nuevoEstado ? "activada" : "inactivada"} correctamente`,
+    }
+  } catch (error: any) {
+    console.error("Error en estatusActivoFormula:", error)
+    return { success: false, error: error.message }
+  }
 }
 
 //Función: listaDesplegableFormulas: funcion para obtener todas las formulas para el input dropdownlist
