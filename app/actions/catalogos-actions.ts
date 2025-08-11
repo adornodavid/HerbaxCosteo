@@ -93,7 +93,7 @@ export async function obtenerCatalogosFiltrados(
   }
 }
 
-//Función: xxxXXXXX
+//Función: selClientesDDL / obtenerClientesParaDropdown: función para obtener el listado para un dropdownlist
 export async function obtenerClientesParaDropdown() {
   const supabase = createClient()
 
@@ -122,6 +122,7 @@ export async function obtenerClientesParaDropdown() {
   }
 }
 
+//Función: selCatalogoXId / obtenerDetalleCatalogo: Función para obtener a detalle un catalogo pot Id
 export async function obtenerDetalleCatalogo(catalogoId: string) {
   const supabase = createClient()
 
