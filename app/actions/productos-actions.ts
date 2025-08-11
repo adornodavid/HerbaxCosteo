@@ -65,7 +65,7 @@ export async function crearProducto(productoData: {
   }
 }
 
-//Función: updProducto / actualizarProducto: función para actualizar un producto
+//Función: actualizarProducto: función para actualizar un producto
 export async function actualizarProducto(
   id: number,
   productoData: {
@@ -103,7 +103,7 @@ export async function actualizarProducto(
   }
 }
 
-//Función: selProductos / obtenerProductos: función para obtener el listado de productos
+//Función: obtenerProductos: función para obtener el listado de productos
 export async function obtenerProductos() {
   try {
     const { data, error } = await supabaseAdmin
@@ -124,7 +124,7 @@ export async function obtenerProductos() {
   }
 }
 
-//Función: selProductoXId / obtenerProductoPorId: función para obtener un producto especifico por id
+//Función: obtenerProductoPorId: función para obtener un producto especifico por id
 export async function obtenerProductoPorId(id: number) {
   try {
     const { data, error } = await supabaseAdmin
