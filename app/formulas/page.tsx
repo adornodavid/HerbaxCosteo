@@ -220,7 +220,7 @@ export default function FormulasPage() {
         formula: formula.Nombre,
         costo: formula.Costo || 0,
         notaspreparacion: formula.NotasPreparacion || "",
-        cliente: "N/A", // Will be populated when client relationship is added to obtenerFormulas
+        cliente: formula.Cliente, // Will be populated when client relationship is added to obtenerFormulas
         activo: formula.Activo,
       }))
 
