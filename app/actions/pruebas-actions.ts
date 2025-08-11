@@ -14,6 +14,21 @@ import { Database } from '@/lib/types-sistema-costeo'
 type UsuarioTabla = Database['public']['Tables']['usuarios']['Row']
 type UsuarioFuncion = Database['public']['Tables']['usuarios']['Row']
 
+/* ==================================================
+  Funciones
+  --------------------
+	* INSERTS
+		- insXXXXX
+	* SELECTS
+		- selXXXXX
+	* UPDATES
+		- updXXXXX
+	* DELETES
+		- delXXXXX
+	* SPECIALS
+		- xxxXXXXX
+================================================== */
+
 export async function fetchUsersFromTableServer(): Promise<{ data: UsuarioTabla[] | null; error: string | null }> {
   const supabase = createClient()
   try {
