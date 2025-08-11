@@ -146,8 +146,8 @@ export function AppSidebar() {
               boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3)",
             }}
           >
-            <img className="shrink-0 size-5 rounded-full" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/quimico.png" alt="Avatar" />
-            {/*<Icons.User className="w-4 h-4 text-slate-600" />*/}
+            <img className="shrink-0 size-5 rounded-full" src="https://images.unsplash.com/photo-1734122415415-88cb1d7d5dc0?q=80&w=320&h=320&auto=format&fit=facearea&facepad=3&ixlib=rb-4.0.3&ixid=M3wxMjA3fDBMHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Avatar" />
+            <Icons.User className="w-4 h-4 text-slate-600" />
           </div>
           <span className="text-sm font-medium text-slate-700">{sessionData?.NombreCompleto || "Usuario"}</span>
         </div>
