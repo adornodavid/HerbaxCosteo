@@ -93,8 +93,10 @@ export async function crearFormula(formData: {
 
 //Función: crearFormulaEtapa2: funcion para crear una formula paando a la etapa 2 donde estan las relacion con los materiales
 export async function crearFormulaEtapa2() {
-  
+  //agregar elementos/ingredientes
 }
+
+
 
 //Función: obtenerFormulas: funcion para obtener todas las formulas
 export async function obtenerFormulas(page = 1, limit = 20) {
