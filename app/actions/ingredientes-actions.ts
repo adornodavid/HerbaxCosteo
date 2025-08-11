@@ -12,17 +12,17 @@ import { createClient } from '@/lib/supabase'
 /* ==================================================
   Funciones
   --------------------
-	* CREATES/CREAR/INSERTS
+	* CREATES-CREAR (INSERTS)
     - crearIngrediente / insIngrediente
-  * READS/OBTENER/SELECTS
+  * READS-OBTENER (SELECTS)
     - obtenerIngredientes / selIngredientes
     - obtenerIngredientesPorFiltros / selIngredientesXFiltros
     - obtenerIngredientePorId / selIngredienteXId
-  * UPDATES/ACTUALIZAR/UPDATES
+  * UPDATES-ACTUALIZAR (UPDATES)
     - actualizaIngrediente / updIngrediente
-  * DELETES/ELIMINAR/DELETES
+  * DELETES-ELIMINAR (DELETES)
     - eliminaIngrediente / delIngrediente
-  * SPECIALS/ESPECIALES/
+  * SPECIALS-ESPECIALES ()
     - estatusActivoIngrediente / actIngrediente
     - listaDesplegableIngredientes / ddlIngredientes
 ================================================== */
