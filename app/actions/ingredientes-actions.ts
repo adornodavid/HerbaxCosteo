@@ -23,3 +23,4 @@ import { createClient } from '@/lib/supabase'
 	* SPECIALS
 		- xxxXXXXX
 ================================================== */
+//Función: xxxXXXXX
