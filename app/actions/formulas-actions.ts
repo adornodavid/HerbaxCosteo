@@ -130,4 +130,4 @@ export async function obtenerFormulasPorFiltros(nombre = "", clienteId = "", act
 //Función: listaDesplegableFormulas: funcion para obtener todas lss formulas para el input dropdownlist
 
 
-//Función: - estadisticasFormulasTotales / statsFormlasTotales
+//Función:estadisticasFormulasTotales / statsFormlasTotales
