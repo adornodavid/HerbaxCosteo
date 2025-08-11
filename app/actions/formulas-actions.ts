@@ -179,6 +179,7 @@ export async function obtenerFormulasPorFiltros(nombre = "", clienteId = "", act
 
 // Función: estatusActivoFormula: función para cambiar el estatus de una formula por Id de la formula
 
+
 //Función: listaDesplegableFormulas: funcion para obtener todas las formulas para el input dropdownlist
 
 //Función: estadisticasFormulasTotales: Función estadística para conocer el total de formulas registradas en la base de datos
