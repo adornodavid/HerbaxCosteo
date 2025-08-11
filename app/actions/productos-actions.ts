@@ -27,6 +27,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 	* SPECIALS
 		- xxxXXXXX
 ================================================== */
+//Función: insProducto / crearProducto: función para crear un producto
 export async function crearProducto(productoData: {
   nombre: string
   descripcion?: string | null
