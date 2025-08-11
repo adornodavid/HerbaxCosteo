@@ -119,10 +119,10 @@ export function AppSidebar() {
 
       <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-white/30 to-transparent" />
 
-      <div className="relative p-6 border-b border-white/15">
+      <div className="relative p-4 border-b border-white/15">
         <div className="flex items-center space-x-3">
           <div
-            className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30 shadow-lg"
+            className="w-12 h-12 bg-[#c5dedb] backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30 shadow-lg"
             style={{
               boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 12px rgba(0,0,0,0.1)",
             }}
