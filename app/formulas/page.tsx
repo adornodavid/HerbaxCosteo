@@ -18,7 +18,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import Image from "next/image"
-import { obtenerFormulas } from "@/app/actions/formulas-actions"
+import { obtenerFormulas, obtenerFormulasPorFiltros } from "@/app/actions/formulas-actions"
 
 interface SessionData {
   UsuarioId: string | null
@@ -237,95 +237,30 @@ export default function FormulasPage() {
     try {
       setSearching(true)
 
-      if (!sesion) return
+      // Preparar parámetros para la función
+      const nombre = txtFormulaNombre.trim()
+      const clienteId = ddlClientes !== "-1" ? ddlClientes : ""
+      const activo = ddlEstatusFormula === "true"
 
-      const rolId = Number.parseInt(sesion.RolId?.toString() || "0", 10)
-      const hotelIdSesion = Number.parseInt(sesion.HotelId?.toString() || "0", 10)
+      // Llamar a la función obtenerFormulasPorFiltros
+      const result = await obtenerFormulasPorFiltros(nombre, clienteId, activo, currentPage, itemsPerPage)
 
-      let auxHotelid: number
-      if (![1, 2, 3, 4].includes(rolId)) {
-        auxHotelid = hotelIdSesion
-      } else {
-        auxHotelid = -1
+      if (result.error) {
+        throw new Error(result.error)
       }
 
-      // Determinar el ID de cliente a filtrar para la búsqueda
-      const clienteFilterId = ddlClientes !== "-1" ? Number.parseInt(ddlClientes, 10) : auxHotelid
-
-      let query = supabase
-        .from("formulas")
-        .select(`
-          id,
-          nombre,
-          costo,
-          notaspreparacion,
-          activo,
-          ingredientesxformula!inner (
-            ingredientes!inner (
-              clientes!inner (
-                id, nombre
-              )
-            )
-          )
-        `)
-        .eq("activo", ddlEstatusFormula === "true")
-
-      // Filtro por nombre
-      if (txtFormulaNombre.trim()) {
-        query = query.ilike("nombre", `%${txtFormulaNombre.trim()}%`)
-      }
-
-      // Filtro por cliente
-      if (clienteFilterId !== -1) {
-        query = query.eq("ingredientesxformula.ingredientes.clientes.id", clienteFilterId)
-      }
-
-      const { data, error } = await query
-        .order("nombre", { ascending: true })
-        .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1)
-
-      if (error) throw error
-
-      const formulasFormateadas = (data || []).map((formula: any) => ({
-        folio: formula.id,
-        formula: formula.nombre,
-        costo: formula.costo || 0,
-        notaspreparacion: formula.notaspreparacion || 0,
-        cliente: formula.ingredientesxformula?.[0]?.ingredientes?.clientes?.nombre || "N/A",
-        activo: formula.activo,
+      // Mapear los datos al formato esperado por el componente
+      const formulasFormateadas = (result.data || []).map((formula: any) => ({
+        folio: formula.Folio,
+        formula: formula.Nombre,
+        costo: formula.Costo || 0,
+        notaspreparacion: formula.NotasPreparacion || 0,
+        cliente: "N/A", // Temporal hasta que se agregue la relación
+        activo: formula.Activo,
       }))
 
       setFormulas(formulasFormateadas)
-
-      // Calcular total de páginas para la búsqueda
-      let countQuery = supabase
-        .from("formulas")
-        .select(
-          `
-          id,
-          activo,
-          ingredientesxformula!inner (
-            ingredientes!inner (
-              clientes!inner (
-                id
-              )
-            )
-          )
-        `,
-          { count: "exact", head: true },
-        )
-        .eq("activo", ddlEstatusFormula === "true")
-
-      if (txtFormulaNombre.trim()) {
-        countQuery = countQuery.ilike("nombre", `%${txtFormulaNombre.trim()}%`)
-      }
-
-      if (clienteFilterId !== -1) {
-        countQuery = countQuery.eq("ingredientesxformula.ingredientes.clientes.id", clienteFilterId)
-      }
-
-      const { count: totalCount } = await countQuery
-      setTotalPages(Math.ceil((totalCount || 0) / itemsPerPage))
+      setTotalPages(Math.ceil((result.totalCount || 0) / itemsPerPage))
 
       // Simular animación de 0.5 segundos
       setTimeout(() => {
@@ -338,12 +273,36 @@ export default function FormulasPage() {
     }
   }
 
-  const clearFormulasBusqueda = () => {
-    setTxtFormulaNombre("")
-    setDdlClientes("-1") // Restablecer a "Todos"
-    setDdlEstatusFormula("true") // Restablecer a "Activo"
-    setCurrentPage(1)
-    cargarFormulasIniciales() // Recargar con filtros por defecto
+  const clearFormulasBusqueda = async () => {
+    try {
+      setTxtFormulaNombre("")
+      setDdlClientes("-1") // Restablecer a "Todos"
+      setDdlEstatusFormula("true") // Restablecer a "Activo"
+      setCurrentPage(1)
+
+      // Usar obtenerFormulas en lugar de cargarFormulasIniciales
+      const result = await obtenerFormulas(1, itemsPerPage)
+
+      if (result.error) {
+        throw new Error(result.error)
+      }
+
+      // Mapear los datos al formato esperado por el componente
+      const formulasFormateadas = (result.data || []).map((formula: any) => ({
+        folio: formula.Folio,
+        formula: formula.Nombre,
+        costo: formula.Costo || 0,
+        notaspreparacion: formula.NotasPreparacion || 0,
+        cliente: "N/A", // Temporal hasta que se agregue la relación
+        activo: formula.Activo,
+      }))
+
+      setFormulas(formulasFormateadas)
+      setTotalPages(Math.ceil((result.totalCount || 0) / itemsPerPage))
+    } catch (error) {
+      console.error("Error al limpiar filtros:", error)
+      setError("Error al limpiar filtros. Por favor, intente de nuevo.")
+    }
   }
 
   const toggleEstadoFormula = async (folio: number, estadoActual: boolean) => {
