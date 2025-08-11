@@ -1,5 +1,8 @@
 "use server"
 
+/* ==================================================
+  Imports
+================================================== */
 import { createClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
 import bcrypt from 'bcryptjs' // Asegúrate de que bcryptjs esté instalado: npm install bcryptjs
