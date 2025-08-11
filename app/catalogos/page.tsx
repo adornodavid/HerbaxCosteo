@@ -293,7 +293,7 @@ export default function CatalogosPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {/*<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Catálogos</CardTitle>
@@ -304,7 +304,7 @@ export default function CatalogosPage() {
             <p className="text-xs text-gray-500">Catálogos registrados en el sistema</p>
           </CardContent>
         </Card>
-      </div>
+      </div>*/}
 
       <Card className="mb-6">
         <CardHeader>
