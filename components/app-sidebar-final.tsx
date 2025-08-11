@@ -135,7 +135,7 @@ export function AppSidebar() {
 
       <div className="relative p-4 border-b border-white/15">
         <div
-          className="flex items-center space-x-3 bg-white/15 backdrop-blur-sm rounded-sm p-3 border border-white/25 shadow-lg"
+          className="flex items-center space-x-3 bg-white/15 backdrop-blur-sm rounded-sm p-2 border border-white/25 shadow-lg"
           style={{
             boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.08)",
           }}
@@ -146,6 +146,7 @@ export function AppSidebar() {
               boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3)",
             }}
           >
+            <img className="shrink-0 size-5 rounded-full" src="https://images.unsplash.com/photo-1734122415415-88cb1d7d5dc0?q=80&w=320&h=320&auto=format&fit=facearea&facepad=3&ixlib=rb-4.0.3&ixid=M3wxMjA3fDBMHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Avatar" />
             <Icons.User className="w-4 h-4 text-slate-600" />
           </div>
           <span className="text-sm font-medium text-slate-700">{sessionData?.NombreCompleto || "Usuario"}</span>
