@@ -885,3 +885,29 @@ export interface UsuarioHotel {
   usuario_nombre?: string
   hotel_nombre?: string
 }
+
+export interface Hotel {
+  id: number
+  nombre: string
+  direccion?: string | null
+  email?: string | null
+  telefono?: string | null
+  activo: boolean
+  created_at: string
+  updated_at?: string | null
+}
+
+export interface IngredienteReceta {
+  id: number
+  ingrediente_id: number
+  platillo_id: number
+  cantidad: number
+  created_at: string
+  updated_at?: string | null
+}
+
+export interface UnidadMedidaDropdown {
+  id: number
+  nombre: string
+  abreviatura?: string | null
+}

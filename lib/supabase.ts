@@ -1,5 +1,6 @@
 import { createClientComponentClient, createServerComponentClient } from "@supabase/auth-helpers-nextjs" // Importar createServerComponentClient
 import type { Database } from "@/lib/types-sistema-costeo" // Asegúrate de que esta ruta sea correcta
+import { cookies } from "next/headers"
 
 // Define the database schema types
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
@@ -49,8 +50,56 @@ export type Enums<PublicEnumNameOrOptions extends keyof PublicSchema["Enums"] | 
 // Client-side Supabase client
 export const createClient = () => createClientComponentClient<Database>()
 
+// Server-side Supabase client wrapper
+export const createServerSupabaseClientWrapper = () => {
+  return createServerComponentClient<Database>({ cookies })
+}
+
 // Instancia principal de Supabase (para uso en cliente)
 export const supabase = createClient()
 
 // Exportación por defecto
 export default supabase
+
+// Additional type exports
+export interface Platillo {
+  id: number
+  nombre: string
+  descripcion?: string | null
+  imagen_url?: string | null
+  activo: boolean
+  created_at: string
+  updated_at?: string | null
+}
+
+export interface Hotel {
+  id: number
+  nombre: string
+  direccion?: string | null
+  email?: string | null
+  telefono?: string | null
+  activo: boolean
+  created_at: string
+  updated_at?: string | null
+}
+
+export interface Restaurante {
+  id: number
+  nombre: string
+  direccion?: string | null
+  email?: string | null
+  telefono?: string | null
+  hotel_id?: number | null
+  imagen_url?: string | null
+  activo: boolean
+  created_at: string
+  updated_at?: string | null
+}
+
+export interface PlatilloXMenu {
+  id: number
+  menu_id: number
+  platillo_id: number
+  created_at: string
+  updated_at?: string | null
+}
