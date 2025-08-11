@@ -122,12 +122,12 @@ export function AppSidebar() {
       <div className="relative p-4 border-b border-white/15">
         <div className="flex items-center space-x-3">
           <div
-            className="w-12 h-12 bg-[#c5dedb] backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30 shadow-lg"
+            className="w-12 h-12 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30 shadow-lg"
             style={{
               boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 12px rgba(0,0,0,0.1)",
             }}
           >
-            <img className="shrink-0 size-15 rounded-full" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/suplementos.png" alt="Avatar2" />
+            <img className="shrink-0 size-15 rounded-full" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/suplementos-removebg-preview.png" alt="Avatar2" />
             {/*<Icons.PillBottle className="w-6 h-6 text-slate-700" />*/}
           </div>
           <span className="font-semibold text-lg text-slate-700">Sistema de Costeo</span>
