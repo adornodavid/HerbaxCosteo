@@ -44,6 +44,7 @@ function createSupabaseServerClient() {
 	* SPECIALS
 		- xxxXXXXX
 ================================================== */
+//Función: obtenerResumenesDashboard
 export async function obtenerResumenesDashboard() {
   try {
     const supabase = createSupabaseServerClient()
