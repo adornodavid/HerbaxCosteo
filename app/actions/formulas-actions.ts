@@ -36,9 +36,20 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
   const offset = (page - 1) * limit
   try {
     let supabaseQuery = supabase
-      .from("formulas") // Cambiado de 'hoteles' a 'clientes'
-      .select("id, nombre, direccion, imgurl, activo, cantidad, unidadmedidaid, fechacreacion", { count: "exact" })
-      .order("nombre", { ascending: true })
+      .from("formulas")
+        .select(`
+          id,
+          nombre,
+          costo,
+          activo,
+          ingredientesxformula!inner (
+            ingredientes!inner (
+              clientes!inner (
+                id, nombre
+              )
+            )
+          )
+        `)
 
     const { data: queryData, error: queryError, count } = await supabaseQuery.range(offset, offset + limit - 1)
 
