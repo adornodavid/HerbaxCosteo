@@ -57,7 +57,7 @@ export async function obtenerFormulas(page = 1, limit = 20) {
         cantidad,
         unidadmedidaid,
         fechacreacion,
-        ingredientesxformulas!inner(
+        ingredientesxformula!inner(
           ingredienteid,
           ingredientes!inner(
             clienteid,
