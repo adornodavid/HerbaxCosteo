@@ -103,10 +103,28 @@ export async function obtenerFormulasPorFiltros(nombre = "", clienteId = "", act
   const offset = (page - 1) * limit
   try {
     let supabaseQuery = supabase
-      .from("formulas") // Cambiado de 'hoteles' a 'clientes'
-      .select("id, nombre, notaspreparacion, costo, imgurl, activo, cantidad, unidadmedidaid, fechacreacion", {
-        count: "exact",
-      })
+      .from("formulas")
+      .select(`
+        id,
+        nombre,
+        notaspreparacion,
+        costo,
+        imgurl,
+        activo,
+        cantidad,
+        unidadmedidaid,
+        fechacreacion,
+        ingredientesxformula!inner(
+          ingredienteid,
+          ingredientes!inner(
+            clienteid,
+            clientes!inner(
+              nombre
+            )
+          )
+        )
+      `)
+      .range(offset, offset + limit - 1)
       .order("nombre", { ascending: true })
 
     // Solo aplicar filtro de nombre si tiene valor (no está vacío)
@@ -114,8 +132,8 @@ export async function obtenerFormulasPorFiltros(nombre = "", clienteId = "", act
       supabaseQuery = supabaseQuery.ilike("nombre", `%${nombre}%`)
     }
 
-    if (clienteId && clienteId.trim() !== "") {
-      supabaseQuery = supabaseQuery.eq("ingredientesxformulas.ingredientes.clienteid", clienteId)
+    if (clienteId && clienteId !== 0) {
+      supabaseQuery = supabaseQuery.eq("ingredientesxformula.ingredientes.clienteid", clienteId)
     }
 
     if (activo !== undefined) {
