@@ -36,20 +36,9 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
   const offset = (page - 1) * limit
   try {
     let supabaseQuery = supabase
-      .from("formulas")
-        .select(`
-          id,
-          nombre,
-          costo,
-          activo,
-          ingredientesxformula!inner (
-            ingredientes!inner (
-              clientes!inner (
-                id, nombre
-              )
-            )
-          )
-        `)
+      .from("formulas") // Cambiado de 'hoteles' a 'clientes'
+      .select("id, nombre, direccion, imgurl, activo, cantidad, unidadmedidaid, fechacreacion", { count: "exact" })
+      .order("nombre", { ascending: true })
 
     const { data: queryData, error: queryError, count } = await supabaseQuery.range(offset, offset + limit - 1)
 
@@ -84,20 +73,8 @@ export async function obtenerFormulasPorFiltros(nombre = "", clienteId = "", act
   const offset = (page - 1) * limit
   try {
     let supabaseQuery = supabase
-      .from("formulas")
-        .select(`
-          id,
-          nombre,
-          costo,
-          activo,
-          ingredientesxformula!inner (
-            ingredientes!inner (
-              clientes!inner (
-                id, nombre
-              )
-            )
-          )
-        `)
+      .from("formulas") // Cambiado de 'hoteles' a 'clientes'
+      .select("id, nombre, direccion, imgurl, activo, cantidad, unidadmedidaid, fechacreacion", { count: "exact" })
       .order("nombre", { ascending: true })
 
     // Solo aplicar filtro de nombre si tiene valor (no está vacío)
