@@ -27,6 +27,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
   * SPECIALS-ESPECIALES ()
     - estatusActivoFormula / actFormula
     - listaDesplegableFormulas / ddlFormulas
+    - estadisticasFormulasTotales / statsFormlasTotales
 ================================================== */
 //Función: crearFormula: funcion para crear una formula
 
@@ -127,3 +128,6 @@ export async function obtenerFormulasPorFiltros(nombre = "", clienteId = "", act
 
 
 //Función: listaDesplegableFormulas: funcion para obtener todas lss formulas para el input dropdownlist
+
+
+//Función: - estadisticasFormulasTotales / statsFormlasTotales
