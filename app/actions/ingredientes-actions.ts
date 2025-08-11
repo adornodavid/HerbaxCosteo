@@ -26,4 +26,13 @@ import { createClient } from '@/lib/supabase'
     - estatusActivoIngrediente / actIngrediente
     - listaDesplegableIngredientes / ddlIngredientes
 ================================================== */
-//Función: xxxXXXXX
+//Función: crearIngrediente: funcion para crear un ingrediente
+
+
+//Función: obtenerIngredientes: funcion para obtener todos los ingredientes
+
+
+//Función: obtenerIngredientesPorFiltros: funcion para obtener todos los ingredientes por el filtrado
+
+
+//Función: obtenerIngredientePorId: funcion para obtener el ingrediente por Id
