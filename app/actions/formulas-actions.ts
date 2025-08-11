@@ -141,9 +141,9 @@ export async function obtenerFormulasPorFiltros(nombre = "", clienteId = "", act
         Cantidad: formula.cantidad,
         UnidadMedidaId: formula.unidadmedidaid,
         FechaCreacion: formula.fechacreacion,
-        IngredienteId: formula.ingredientesxformulas?.[0]?.ingredienteid,
-        ClienteId: formula.ingredientesxformulas?.[0]?.ingredientes?.clienteid,
-        Cliente: formula.ingredientesxformulas?.[0]?.ingredientes?.clientes?.nombre || "N/A",
+        IngredienteId: formula.ingredientesxformula?.[0]?.ingredienteid,
+        ClienteId: formula.ingredientesxformula?.[0]?.ingredientes?.clienteid,
+        Cliente: formula.ingredientesxformula?.[0]?.ingredientes?.clientes?.nombre || "N/A",
       })) || []
 
     return { data: mappedData, error: null, totalCount: count || 0 }
