@@ -37,7 +37,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
   try {
     let supabaseQuery = supabase
       .from("formulas") // Cambiado de 'hoteles' a 'clientes'
-      .select("id, nombre, direccion, imgurl, activo, cantidad, unidadmedidaid, fechacreacion", { count: "exact" })
+      .select("id, nombre, notaspreparacion, imgurl, activo, cantidad, unidadmedidaid, fechacreacion", { count: "exact" })
       .order("nombre", { ascending: true })
 
     const { data: queryData, error: queryError, count } = await supabaseQuery.range(offset, offset + limit - 1)
@@ -74,7 +74,7 @@ export async function obtenerFormulasPorFiltros(nombre = "", clienteId = "", act
   try {
     let supabaseQuery = supabase
       .from("formulas") // Cambiado de 'hoteles' a 'clientes'
-      .select("id, nombre, direccion, imgurl, activo, cantidad, unidadmedidaid, fechacreacion", { count: "exact" })
+      .select("id, nombre, notaspreparacion, imgurl, activo, cantidad, unidadmedidaid, fechacreacion", { count: "exact" })
       .order("nombre", { ascending: true })
 
     // Solo aplicar filtro de nombre si tiene valor (no está vacío)
