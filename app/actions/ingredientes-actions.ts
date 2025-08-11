@@ -12,15 +12,18 @@ import { createClient } from '@/lib/supabase'
 /* ==================================================
   Funciones
   --------------------
-	* INSERTS
-		- insXXXXX
-	* SELECTS
-		- selXXXXX
-	* UPDATES
-		- updXXXXX
-	* DELETES
-		- delXXXXX
-	* SPECIALS
-		- xxxXXXXX
+	* CREATES/CREAR/INSERTS
+    - insIngrediente
+  * READS/OBTENER/SELECTS
+    - selIngredientes
+    - selIngredientesXFiltros
+    - selIngredienteXId
+  * UPDATES/ACTUALIZAR/UPDATES
+    - updIngrediente
+  * DELETES/ELIMINAR/DELETES
+    - delIngrediente
+  * SPECIALS/ESPECIALES/
+    - actIngrediente
+    - ddlIngredientes
 ================================================== */
 //Función: xxxXXXXX
