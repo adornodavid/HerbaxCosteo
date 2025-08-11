@@ -180,7 +180,7 @@ export function AppSidebar() {
                   <CollapsibleTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="group w-full justify-start space-x-3 px-4 py-3 text-sm shadow-2xl font-medium text-slate-600 hover:bg-white/15 hover:text-slate-800 rounded-xl border border-transparent hover:border-white/20 transition-all duration-300"
+                      className="group w-full justify-start space-x-3 px-4 py-3 text-sm shadow-lg font-medium text-slate-600 hover:bg-white/15 hover:text-slate-800 rounded-xl border border-transparent hover:border-white/20 transition-all duration-300"
                     >
                       <item.icon className="w-5 h-5 transition-colors duration-300" />
                       <span className="flex-1 text-left">{item.name}</span>
