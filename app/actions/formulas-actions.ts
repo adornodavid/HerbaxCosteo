@@ -240,6 +240,7 @@ export async function obtenerFormulasPorFiltros(nombre = "", clienteId = "", act
 
 //Función: obtenerFormulaPorId: funcion para obtener la formula por Id de la formula
 
+
 //Función: actualizarFormula: funcion para actualizar la información de una formula por Id de la formula
 
 //Función: eliminarFormula: funcion para eliminar la información de una formula por Id de la formula
