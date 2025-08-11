@@ -28,7 +28,12 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import Image from "next/image"
-import { obtenerFormulas, obtenerFormulasPorFiltros, estatusActivoFormula } from "@/app/actions/formulas-actions"
+import {
+  obtenerFormulas,
+  obtenerFormulasPorFiltros,
+  estatusActivoFormula,
+  estadisticasFormulasTotales,
+} from "@/app/actions/formulas-actions"
 
 /* ==================================================
   Interfaces, tipados, clases
@@ -241,9 +246,9 @@ export default function FormulasPage() {
   //Función: cargarEstadisticas: función para cargar las estadisticas de totales
   const cargarEstadisticas = async () => {
     try {
-      const { count, error } = await supabase.from("formulas").select("*", { count: "exact", head: true })
+      const { count, error } = await estadisticasFormulasTotales()
 
-      if (error) throw error
+      if (error) throw new Error(error)
 
       setTotalFormulas(count || 0)
     } catch (error) {

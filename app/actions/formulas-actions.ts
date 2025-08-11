@@ -205,5 +205,20 @@ export async function estatusActivoFormula(folio: number, estadoActual: boolean)
 
 //Función: estadisticasFormulasTotales: Función estadística para conocer el total de formulas registradas en la base de datos
 export async function estadisticasFormulasTotales() {
+  try {
+    const { count, error } = await supabase
+      .from("formulas")
+      .select("id", { count: "exact", head: true })
+      .eq("activo", true)
 
+    if (error) {
+      console.error("Error al obtener estadísticas de fórmulas:", error)
+      return { count: 0, error: error.message }
+    }
+
+    return { count: count || 0, error: null }
+  } catch (error: any) {
+    console.error("Error en estadisticasFormulasTotales:", error)
+    return { count: 0, error: error.message }
+  }
 }
