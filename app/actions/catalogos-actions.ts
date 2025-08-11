@@ -22,6 +22,7 @@ import { createClient } from "@/lib/supabase"
 	* SPECIALS
 		- xxxXXXXX
 ================================================== */
+//Función: selCatalogosXFiltros / obtenerCatalogosFiltrados: funcio que ejecuta el bloque de busqueda en la pagina de listado
 export async function obtenerCatalogosFiltrados(
   nombre = "",
   clienteId = "-1",
@@ -92,6 +93,7 @@ export async function obtenerCatalogosFiltrados(
   }
 }
 
+//Función: xxxXXXXX
 export async function obtenerClientesParaDropdown() {
   const supabase = createClient()
 
