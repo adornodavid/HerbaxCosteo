@@ -62,6 +62,7 @@ export async function crearProducto(productoData: {
   }
 }
 
+//Función: updProducto / actualizarProducto: función para actualizar un producto
 export async function actualizarProducto(
   id: number,
   productoData: {
@@ -99,6 +100,7 @@ export async function actualizarProducto(
   }
 }
 
+//Función: selProductos / obtenerProductos: función para obtener el listado de productos
 export async function obtenerProductos() {
   try {
     const { data, error } = await supabaseAdmin
