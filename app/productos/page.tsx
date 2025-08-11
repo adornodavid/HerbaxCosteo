@@ -502,8 +502,8 @@ export default function ProductosPage() {
       </div>*/}
 
       {/* 3. Filtros */}
-      <div className="border bg-card text-card-foreground shadow">
-      <Card >
+     
+      <Card className="border bg-card text-card-foreground shadow">
         <CardHeader>
           <CardTitle>Filtros de Búsqueda</CardTitle>
         </CardHeader>
@@ -604,7 +604,7 @@ export default function ProductosPage() {
           </form>
         </CardContent>
       </Card>
-    </div>
+    
       {/* 4. Grid de Resultados - Ahora con Tarjetas */}
       <Card>
         <CardHeader>
