@@ -220,7 +220,7 @@ export default function FormulasPage() {
         formula: formula.Nombre,
         costo: formula.Costo || 0,
         notaspreparacion: formula.NotasPreparacion || "",
-        cliente: formula.Cliente || "N/A", // Will be populated when client relationship is added to obtenerFormulas
+        cliente: formula.Cliente || "N/A",
         activo: formula.Activo,
       }))
 
@@ -255,7 +255,7 @@ export default function FormulasPage() {
         formula: formula.Nombre,
         costo: formula.Costo || 0,
         notaspreparacion: formula.NotasPreparacion || 0,
-        cliente: formula.Cliente || "N/A", // Temporal hasta que se agregue la relación
+        cliente: formula.Cliente || "N/A",
         activo: formula.Activo,
       }))
 
@@ -293,7 +293,7 @@ export default function FormulasPage() {
         formula: formula.Nombre,
         costo: formula.Costo || 0,
         notaspreparacion: formula.NotasPreparacion || 0,
-        cliente: formula.Cliente, // Temporal hasta que se agregue la relación
+        cliente: formula.Cliente,
         activo: formula.Activo,
       }))
 
