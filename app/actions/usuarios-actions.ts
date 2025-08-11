@@ -26,6 +26,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
   * Deletes
     - delXXXXX
 ================================================== */
+//  Función: insUsuario
 export async function insUsuario(formData: FormData) {
   // Extraer los valores del FormData
   const nombrecompleto = formData.get('nombrecompleto') as string;
