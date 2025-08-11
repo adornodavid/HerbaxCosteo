@@ -135,7 +135,7 @@ export function AppSidebar() {
 
       <div className="relative p-4 border-b border-white/15">
         <div
-          className="flex items-center space-x-3 bg-white/15 backdrop-blur-sm rounded-2xl p-3 border border-white/25 shadow-lg"
+          className="flex items-center space-x-3 bg-white/15 backdrop-blur-sm rounded-sm p-3 border border-white/25 shadow-lg"
           style={{
             boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.08)",
           }}
