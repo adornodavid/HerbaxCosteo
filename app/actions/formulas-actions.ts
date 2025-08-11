@@ -30,9 +30,66 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
     - estadisticasFormulasTotales / statsFormlasTotales
 ================================================== */
 //Función: crearFormula: funcion para crear una formula
-export async function crearFormula() {
+export async function crearFormula(formData: {
+  nombre: string
+  notaspreparacion: string
+  costo: number
+  activo: boolean
+  cantidad: number
+  unidadmedidaid: number
+  imagen?: File
+}) {
+  try {
+    let imgUrl = ""
 
+    if (formData.imagen) {
+      const fileName = `formula_${Date.now()}_${formData.imagen.name}`
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("imagenes")
+        .upload(fileName, formData.imagen)
+
+      if (uploadError) {
+        console.error("Error al subir imagen:", uploadError)
+        return { success: false, error: "Error al subir la imagen" }
+      }
+
+      // Obtener URL pública de la imagen
+      const { data: urlData } = supabase.storage.from("imagenes").getPublicUrl(fileName)
+
+      imgUrl = urlData.publicUrl
+    }
+
+    const { data, error } = await supabase
+      .from("formulas")
+      .insert({
+        nombre: formData.nombre,
+        notaspreparacion: formData.notaspreparacion,
+        costo: formData.costo,
+        activo: formData.activo,
+        cantidad: formData.cantidad,
+        unidadmedidaid: formData.unidadmedidaid,
+        imgurl: imgUrl,
+        fechacreacion: new Date().toISOString(),
+      })
+      .select()
+
+    if (error) {
+      console.error("Error al crear fórmula:", error)
+      return { success: false, error: error.message }
+    }
+
+    return {
+      success: true,
+      data: data[0],
+      message: "Fórmula creada exitosamente",
+    }
+  } catch (error: any) {
+    console.error("Error en crearFormula:", error)
+    return { success: false, error: error.message }
+  }
 }
+
 //Función: obtenerFormulas: funcion para obtener todas las formulas
 export async function obtenerFormulas(page = 1, limit = 20) {
   const offset = (page - 1) * limit
