@@ -70,7 +70,10 @@ export function AppSidebar() {
       name: "Productos",
       icon: Icons.PillBottle,
       hasSubmenu: true,
-      submenu: [{ name: "Productos", href: "/productos", icon: Icons.PillBottle }],
+      submenu: [{ name: "Productos", href: "/productos", icon: Icons.PillBottle },
+                { name: "Productos", href: "/formulas", icon: Icons.PillBottle }
+                ],
+      
     },
     {
       name: "Catalogos",
