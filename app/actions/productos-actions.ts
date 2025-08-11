@@ -16,16 +16,19 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 /* ==================================================
   Funciones
   --------------------
-	* INSERTS
-		- insXXXXX
-	* SELECTS
-		- selXXXXX
-	* UPDATES
-		- updXXXXX
-	* DELETES
-		- delXXXXX
-	* SPECIALS
-		- xxxXXXXX
+	* CREATES-CREAR (INSERTS)
+    - crearProducto / insProducto
+  * READS-OBTENER (SELECTS)
+    - obtenerProductos / selProductos
+    - obtenerProductosPorFiltros / selProductosXFiltros
+    - obtenerProductoPorId / selProductoXId
+  * UPDATES-ACTUALIZAR (UPDATES)
+    - actualizarProducto / updProducto
+  * DELETES-ELIMINAR (DELETES)
+    - eliminarProducto / delProducto
+  * SPECIALS-ESPECIALES ()
+    - estatusActivoProducto / actProducto
+    - listaDesplegableProductos / ddlProductos
 ================================================== */
 //Función: insProducto / crearProducto: función para crear un producto
 export async function crearProducto(productoData: {
