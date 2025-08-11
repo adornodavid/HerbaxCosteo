@@ -13,7 +13,14 @@ import { getSession } from "@/app/actions/session-actions"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
@@ -101,6 +108,22 @@ export default function FormulasPage() {
   const [selectedFormulaDetails, setSelectedFormulaDetails] = useState<FormulaCompleta | null>(null)
   const [loadingDetails, setLoadingDetails] = useState(false)
   const [detailsError, setDetailsError] = useState<string | null>(null)
+
+  // Estados para los modales de confirmación y mensajes
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    folio: 0,
+    estadoActual: false,
+    accion: "",
+  })
+  const [successDialog, setSuccessDialog] = useState({
+    open: false,
+    message: "",
+  })
+  const [errorDialog, setErrorDialog] = useState({
+    open: false,
+    message: "",
+  })
 
   // Cargar sesión al montar el componente
   useEffect(() => {
@@ -307,24 +330,41 @@ export default function FormulasPage() {
 
   const toggleEstadoFormula = async (folio: number, estadoActual: boolean) => {
     const accion = estadoActual ? "inactivar" : "activar"
-    const confirmacion = window.confirm(`¿Está seguro que desea ${accion} esta fórmula?`)
 
-    if (!confirmacion) return
+    // Show confirmation dialog instead of window.confirm
+    setConfirmDialog({
+      open: true,
+      folio,
+      estadoActual,
+      accion,
+    })
+  }
+
+  const handleConfirmedToggle = async () => {
+    setConfirmDialog({ ...confirmDialog, open: false })
 
     try {
-      const resultado = await estatusActivoFormula(folio, estadoActual)
+      const resultado = await estatusActivoFormula(confirmDialog.folio, confirmDialog.estadoActual)
 
       if (!resultado.success) {
         throw new Error(resultado.error)
       }
 
       const nuevoEstado = resultado.nuevoEstado ? "ACTIVA" : "INACTIVA"
-      alert(`Fórmula con folio ${folio} ha cambiado su estado a: ${nuevoEstado}`)
+      // Show success dialog instead of alert
+      setSuccessDialog({
+        open: true,
+        message: `Fórmula con folio ${confirmDialog.folio} ha cambiado su estado a: ${nuevoEstado}`,
+      })
 
       btnFormulaBuscar() // Recargar la lista con los filtros actuales
     } catch (error) {
       console.error("Error cambiando estado:", error)
-      alert("Error al cambiar el estado de la fórmula")
+      // Show error dialog instead of alert
+      setErrorDialog({
+        open: true,
+        message: "Error al cambiar el estado de la fórmula",
+      })
     }
   }
 
@@ -390,7 +430,7 @@ export default function FormulasPage() {
   }
 
   return (
-    <div className="container-fluid mx-auto p-6">
+    <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -747,6 +787,48 @@ export default function FormulasPage() {
               <p className="text-muted-foreground">No se encontraron detalles para esta fórmula.</p>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Acción</DialogTitle>
+            <DialogDescription>¿Está seguro que desea {confirmDialog.accion} esta fórmula?</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}>
+              Cancelar
+            </Button>
+            <Button onClick={handleConfirmedToggle}>Confirmar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Dialog */}
+      <Dialog open={successDialog.open} onOpenChange={(open) => setSuccessDialog({ ...successDialog, open })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Éxito</DialogTitle>
+            <DialogDescription>{successDialog.message}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setSuccessDialog({ ...successDialog, open: false })}>Aceptar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Error Dialog */}
+      <Dialog open={errorDialog.open} onOpenChange={(open) => setErrorDialog({ ...errorDialog, open })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Error</DialogTitle>
+            <DialogDescription>{errorDialog.message}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setErrorDialog({ ...errorDialog, open: false })}>Aceptar</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
