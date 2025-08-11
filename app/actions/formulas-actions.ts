@@ -16,6 +16,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
   --------------------
 	* CREATES-CREAR (INSERTS)
     - crearFormula / insFormula
+    - crearFormulaEtapa2 / insFormulaEtapa2
   * READS-OBTENER (SELECTS)
     - obtenerFormulas / selFormulas
     - obtenerFormulasPorFiltros / selFormulasXFiltros
@@ -88,6 +89,11 @@ export async function crearFormula(formData: {
     console.error("Error en crearFormula:", error)
     return { success: false, error: error.message }
   }
+}
+
+//Función: crearFormulaEtapa2: funcion para crear una formula paando a la etapa 2 donde estan las relacion con los materiales
+export async function crearFormulaEtapa2() {
+  
 }
 
 //Función: obtenerFormulas: funcion para obtener todas las formulas
