@@ -255,7 +255,7 @@ export default function FormulasPage() {
         formula: formula.Nombre,
         costo: formula.Costo || 0,
         notaspreparacion: formula.NotasPreparacion || 0,
-        cliente: formula.cliente || "N/A", // Temporal hasta que se agregue la relación
+        cliente: formula.Cliente || "N/A", // Temporal hasta que se agregue la relación
         activo: formula.Activo,
       }))
 
