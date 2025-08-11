@@ -60,6 +60,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
         Cantidad: formula.cantidad,
         UnidadMedidaId: formula.unidadmedidaid,
         FechaCreacion: formula.fechacreacion,
+        Cliente: formula.cliente,
       })) || []
 
     return { data: mappedData, error: null, totalCount: count || 0 }
