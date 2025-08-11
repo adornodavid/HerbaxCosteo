@@ -32,7 +32,7 @@ function createServerSupabaseClientWrapper(cookieStore: ReturnType<typeof cookie
     - estatusActivoCliente / actCliente
     - listaDesplegableClientes / ddlClientes
 ================================================== */
-//Funcion: obtenerClientesFiltrados
+//Funcion: selClientesXFiltro / obtenerClientesFiltrados
 export async function obtenerClientesFiltrados(nombre = "", page = 1, limit = 20) {
   const supabase = createServerSupabaseClientWrapper(cookies())
   const offset = (page - 1) * limit
