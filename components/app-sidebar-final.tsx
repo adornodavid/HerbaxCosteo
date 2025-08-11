@@ -133,9 +133,9 @@ export function AppSidebar() {
         </div>
       </div>
 
-      <div className="relative p-4 border-b border-white/15 rounded-xs">
+      <div className="relative p-4 border-b border-white/15">
         <div
-          className="flex items-center space-x-3 bg-white/15 backdrop-blur-sm rounded-xs p-3 border border-white/25 shadow-lg"
+          className="flex items-center space-x-3 bg-white/15 backdrop-blur-sm rounded-2xl p-3 border border-white/25 shadow-lg"
           style={{
             boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.08)",
           }}
@@ -180,7 +180,7 @@ export function AppSidebar() {
                   <CollapsibleTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="group w-full justify-start space-x-3 px-4 py-3 text-sm shadow-lg font-medium text-slate-600 hover:bg-white/15 hover:text-slate-800 rounded-xl border border-transparent hover:border-white/20 transition-all duration-300"
+                      className="group w-full justify-start space-x-3 px-4 py-3 text-sm shadow-2xl font-medium text-slate-600 hover:bg-white/15 hover:text-slate-800 rounded-xl border border-transparent hover:border-white/20 transition-all duration-300"
                     >
                       <item.icon className="w-5 h-5 transition-colors duration-300" />
                       <span className="flex-1 text-left">{item.name}</span>

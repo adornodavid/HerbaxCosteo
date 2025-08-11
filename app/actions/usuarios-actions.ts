@@ -15,19 +15,19 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
 /* ==================================================
-  Funciones
-  --------------------
-	* INSERTS
-		- insXXXXX
-	* SELECTS
-		- selXXXXX
-	* UPDATES
-		- updXXXXX
-	* DELETES
-		- delXXXXX
-	* SPECIALS
-		- xxxXXXXX
-================================================== */
+	  Funciones
+	  --------------------
+		* CREATES/CREAR/INSERTS
+			- insXXXXX
+		* READS/OBTENER/SELECTS
+			- selXXXXX
+		* UPDATES/ACTUALIZAR/UPDATES
+			- updXXXXX
+		* DELETES/ELIMINAR/DELETES
+			- delXXXXX
+		* SPECIALS/ESPECIALES
+			- xxxXXXXX
+	================================================== */
 //  Función: insUsuario
 export async function insUsuario(formData: FormData) {
   // Extraer los valores del FormData
