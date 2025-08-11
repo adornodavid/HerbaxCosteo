@@ -1,5 +1,8 @@
 "use client"
 
+/* ==================================================
+  Imports
+================================================== */
 import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -27,6 +30,9 @@ import { AspectRatio } from "@/components/ui/aspect-ratio"
 import Image from "next/image"
 import { obtenerFormulas, obtenerFormulasPorFiltros, estatusActivoFormula } from "@/app/actions/formulas-actions"
 
+/* ==================================================
+  Imports
+================================================== */
 interface SessionData {
   UsuarioId: string | null
   Email: string | null
