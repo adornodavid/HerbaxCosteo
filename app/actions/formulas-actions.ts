@@ -204,3 +204,5 @@ export async function estatusActivoFormula(folio: number, estadoActual: boolean)
 //Función: listaDesplegableFormulas: funcion para obtener todas las formulas para el input dropdownlist
 
 //Función: estadisticasFormulasTotales: Función estadística para conocer el total de formulas registradas en la base de datos
+export async function estatusActivoFormula(folio: number, estadoActual: boolean) {
+}
