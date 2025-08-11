@@ -31,7 +31,7 @@ import Image from "next/image"
 import { obtenerFormulas, obtenerFormulasPorFiltros, estatusActivoFormula } from "@/app/actions/formulas-actions"
 
 /* ==================================================
-  Imports
+  Interfaces, tipados, clases
 ================================================== */
 interface SessionData {
   UsuarioId: string | null
