@@ -28,7 +28,7 @@ type UsuarioFuncion = Database['public']['Tables']['usuarios']['Row']
 	* SPECIALS
 		- xxxXXXXX
 ================================================== */
-
+//Función: fetchUsersFromTableServer
 export async function fetchUsersFromTableServer(): Promise<{ data: UsuarioTabla[] | null; error: string | null }> {
   const supabase = createClient()
   try {
@@ -44,6 +44,7 @@ export async function fetchUsersFromTableServer(): Promise<{ data: UsuarioTabla[
   }
 }
 
+//Función: fetchUsersFromFunctionServer
 export async function fetchUsersFromFunctionServer(usuario: string): Promise<{ data: UsuarioFuncion[] | null; error: string | null }> {
   const supabase = createClient()
   try {
@@ -59,6 +60,7 @@ export async function fetchUsersFromFunctionServer(usuario: string): Promise<{ d
   }
 }
 
+//Función: performInsertServer
 export async function performInsertServer(): Promise<{ status: string }> {
   const supabase = createClient()
   try {
