@@ -6,9 +6,11 @@
 import { createClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
 
+/* ==================================================
+  Conexion a la base de datos: Supabase
+================================================== */
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
 export async function crearProducto(productoData: {
