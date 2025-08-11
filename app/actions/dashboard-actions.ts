@@ -30,6 +30,20 @@ function createSupabaseServerClient() {
   })
 }
 
+/* ==================================================
+  Funciones
+  --------------------
+	* INSERTS
+		- insXXXXX
+	* SELECTS
+		- selXXXXX
+	* UPDATES
+		- updXXXXX
+	* DELETES
+		- delXXXXX
+	* SPECIALS
+		- xxxXXXXX
+================================================== */
 export async function obtenerResumenesDashboard() {
   try {
     const supabase = createSupabaseServerClient()
