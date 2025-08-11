@@ -14,6 +14,18 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
+/* ==================================================
+  Funciones
+  --------------------
+  * Inserts
+    - insUsuario
+  * Selects
+    - selXXXXX
+  * Updates
+    - updXXXXX
+  * Deletes
+    - delXXXXX
+================================================== */
 export async function insUsuario(formData: FormData) {
   // Extraer los valores del FormData
   const nombrecompleto = formData.get('nombrecompleto') as string;
