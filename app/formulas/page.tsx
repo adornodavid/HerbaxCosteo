@@ -225,7 +225,6 @@ export default function FormulasPage() {
           id,
           nombre,
           costo,
-          notaspreparacion,
           activo,
           ingredientesxformula!inner (
             ingredientes!inner (
@@ -252,7 +251,6 @@ export default function FormulasPage() {
         folio: formula.id,
         formula: formula.nombre,
         costo: formula.costo || 0,
-        notaspreparacion: formula.notaspreparacion || 0,
         cliente: formula.ingredientesxformula?.[0]?.ingredientes?.clientes?.nombre || "N/A",
         activo: formula.activo,
       }))
@@ -317,7 +315,6 @@ export default function FormulasPage() {
           id,
           nombre,
           costo,
-          notaspreparacion,
           activo,
           ingredientesxformula!inner (
             ingredientes!inner (
@@ -349,7 +346,6 @@ export default function FormulasPage() {
         folio: formula.id,
         formula: formula.nombre,
         costo: formula.costo || 0,
-        notaspreparacion: formula.notaspreparacion || 0,
         cliente: formula.ingredientesxformula?.[0]?.ingredientes?.clientes?.nombre || "N/A",
         activo: formula.activo,
       }))
@@ -622,7 +618,6 @@ export default function FormulasPage() {
                 <TableRow>
                   <TableHead>Folio</TableHead>
                   <TableHead>Fórmula</TableHead>
-                  <TableHead>Notas Preparacion</TableHead>
                   <TableHead>Costo</TableHead>
                   <TableHead>Cliente</TableHead>
                   <TableHead>Acciones</TableHead>
@@ -633,7 +628,6 @@ export default function FormulasPage() {
                   <TableRow key={formula.folio}>
                     <TableCell>{formula.folio}</TableCell>
                     <TableCell>{formula.formula}</TableCell>
-                    <TableCell>{formula.notaspreparacion}</TableCell>
                     <TableCell>${formula.costo.toFixed(2)}</TableCell>
                     <TableCell>{formula.cliente}</TableCell>
                     <TableCell>
@@ -758,12 +752,12 @@ export default function FormulasPage() {
                       <div className="font-medium">Fecha de Creación:</div>
                       <div>{new Date(selectedFormulaDetails.formula.fechacreacion).toLocaleDateString()}</div>
                     </div>
-                   <div className="mt-4">
+                    {/*<div className="mt-4">
                       <h3 className="font-semibold text-md mb-2">Notas de Preparación:</h3>
                       <p className="text-sm text-muted-foreground">
                         {selectedFormulaDetails.formula.notaspreparacion || "No hay notas de preparación."}
                       </p>
-                    </div>
+                    </div>*/}
                   </CardContent>
                 </Card>
 

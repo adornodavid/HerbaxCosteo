@@ -36,8 +36,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
   const offset = (page - 1) * limit
   try {
     let supabaseQuery = supabase
-      .from("clientes") // Cambiado de 'hoteles' a 'clientes'
-      .select("id, nombre, direccion, imgurl, activo", { count: "exact" }) // Ajustado para columnas de clientes
+      .from("formulas") // Cambiado de 'hoteles' a 'clientes'
+      .select("id, nombre, direccion, imgurl, activo, cantidad, unidadmedidaid, fechacreacion", { count: "exact" })
       .order("nombre", { ascending: true })
 
     const { data: queryData, error: queryError, count } = await supabaseQuery.range(offset, offset + limit - 1)
@@ -49,12 +49,16 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Mapear los datos para que coincidan con el tipo ClienteResult
     const mappedData =
-      queryData?.map((cliente) => ({
-        Folio: cliente.id,
-        Nombre: cliente.nombre,
-        Direccion: cliente.direccion,
-        ImgUrl: cliente.imgurl,
-        Estatus: cliente.activo,
+      queryData?.map((formula) => ({
+        Folio: formula.id,
+        Nombre: formula.nombre,
+        NotasPreparacion: formula.notaspreparacion,
+        Costo: formula.costo,
+        Imagen: formula.imagen,
+        Activo: formula.activo,
+        Cantidad: formula.cantidad,
+        UnidadMedidaId: formula.unidadmedidaid,
+        FechaCreacion: formula.fechacreacion,
       })) || []
 
     return { data: mappedData, error: null, totalCount: count || 0 }
@@ -65,8 +69,49 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 }
 
 //Función: obtenerFormulasPorFiltros: funcion para obtener todss lss formulas por el filtrado
-export async function obtenerFormulasPorFiltros(nombre = "", clienteNombre = "", actvio = true, page = 1, limit = 20){
+export async function obtenerFormulasPorFiltros(nombre = "", clienteId = "", actvio = true, page = 1, limit = 20){
   const offset = (page - 1) * limit
+  try {
+    let supabaseQuery = supabase
+      .from("formulas") // Cambiado de 'hoteles' a 'clientes'
+      .select("id, nombre, direccion, imgurl, activo, cantidad, unidadmedidaid, fechacreacion", { count: "exact" })
+      .order("nombre", { ascending: true })
+
+    // Solo aplicar filtro de nombre si tiene valor (no está vacío)
+    if (nombre && nombre.trim() !== "") {
+      supabaseQuery = supabaseQuery.ilike("nombre", `%${nombre}%`)
+    }
+
+    if (nombre && nombre.trim() !== "") {
+      supabaseQuery = supabaseQuery.ilike("nombre", `%${nombre}%`)
+    }
+    
+    const { data: queryData, error: queryError, count } = await supabaseQuery.range(offset, offset + limit - 1)
+
+    if (queryError) {
+      console.error("Error al obtener formulas:", queryError)
+      return { data: null, error: queryError.message, totalCount: 0 }
+    }
+
+    // Mapear los datos para que coincidan con el tipo ClienteResult
+    const mappedData =
+      queryData?.map((formula) => ({
+        Folio: formula.id,
+        Nombre: formula.nombre,
+        NotasPreparacion: formula.notaspreparacion,
+        Costo: formula.costo,
+        Imagen: formula.imagen,
+        Activo: formula.activo,
+        Cantidad: formula.cantidad,
+        UnidadMedidaId: formula.unidadmedidaid,
+        FechaCreacion: formula.fechacreacion,
+      })) || []
+
+    return { data: mappedData, error: null, totalCount: count || 0 }
+  } catch (error: any) {
+    console.error("Error en obtenerFormulas:", error)
+    return { data: null, error: error.message, totalCount: 0 }
+  }
 }
 
 //Función: obtenerFormulaPorId: funcion para obtener la formula por Id de la formula
