@@ -205,4 +205,5 @@ export async function estatusActivoFormula(folio: number, estadoActual: boolean)
 
 //Función: estadisticasFormulasTotales: Función estadística para conocer el total de formulas registradas en la base de datos
 export async function estatusActivoFormula(folio: number, estadoActual: boolean) {
+
 }
