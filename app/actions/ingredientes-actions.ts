@@ -23,7 +23,7 @@ import { createClient } from '@/lib/supabase'
   * DELETES/ELIMINAR/DELETES
     - eliminaIngrediente / delIngrediente
   * SPECIALS/ESPECIALES/
-    - activoIngrediente / actIngrediente
+    - estatusActivoIngrediente / actIngrediente
     - listaDesplegableIngredientes / ddlIngredientes
 ================================================== */
 //Función: xxxXXXXX
