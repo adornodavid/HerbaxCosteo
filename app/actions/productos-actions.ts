@@ -30,7 +30,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
     - estatusActivoProducto / actProducto
     - listaDesplegableProductos / ddlProductos
 ================================================== */
-//Función: insProducto / crearProducto: función para crear un producto
+//Función: crearProducto: función para crear un producto
 export async function crearProducto(productoData: {
   nombre: string
   descripcion?: string | null
