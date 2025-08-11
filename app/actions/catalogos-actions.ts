@@ -3,6 +3,11 @@
 ================================================== */
 import { createClient } from "@/lib/supabase"
 
+/* ==================================================
+  Conexion a la base de datos: Supabase
+================================================== */
+
+
 export async function obtenerCatalogosFiltrados(
   nombre = "",
   clienteId = "-1",
