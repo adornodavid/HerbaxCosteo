@@ -66,7 +66,7 @@ export async function insUsuario(formData: FormData) {
   }
 }
 
-// NUEVA FUNCIÓN: insUsuario2
+//Función: insUsuario2
 export async function insUsuario2(
   nombrecompleto: string,
   email: string,
@@ -105,7 +105,7 @@ export async function insUsuario2(
   }
 }
 
-// Función para autenticar un usuario
+//Función: selUsuarioLogin: Función para autenticar un usuario
 export async function selUsuarioLogin(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
@@ -143,6 +143,7 @@ export async function selUsuarioLogin(formData: FormData) {
   }
 }
 
+//Función: obtenerUsuarios
 export async function obtenerUsuarios() {
   try {
     const { data, error } = await supabaseAdmin.from("usuarios").select("*")
