@@ -1,6 +1,8 @@
 "use server"
 
-//Imports
+/* ==================================================
+  Imports
+================================================== */
 import { createClient } from '@/lib/supabase'
 
 // Conexion a base de datos
