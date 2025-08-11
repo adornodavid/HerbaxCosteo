@@ -86,9 +86,9 @@ export async function obtenerFormulas(page = 1, limit = 20) {
         Cantidad: formula.cantidad,
         UnidadMedidaId: formula.unidadmedidaid,
         FechaCreacion: formula.fechacreacion,
-        IngredienteId: formula.ingredientesxformulas?.[0]?.ingredienteid,
-        ClienteId: formula.ingredientesxformulas?.[0]?.ingredientes?.clienteid,
-        Cliente: formula.ingredientesxformulas?.[0]?.ingredientes?.clientes?.nombre || "N/A",
+        IngredienteId: formula.ingredientesxformula?.[0]?.ingredienteid,
+        ClienteId: formula.ingredientesxformula?.[0]?.ingredientes?.clienteid,
+        Cliente: formula.ingredientesxformula?.[0]?.ingredientes?.clientes?.nombre || "N/A",
       })) || []
 
     return { data: mappedData, error: null, totalCount: rawData?.length || 0 }
