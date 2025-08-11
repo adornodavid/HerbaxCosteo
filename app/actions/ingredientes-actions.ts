@@ -42,6 +42,3 @@ import { createClient } from '@/lib/supabase'
 
 
 //Función: eliminarIngrediente: funcion para eliminar la información de un ingrediente por Id del ingrediente
-
-
-// Función: estatusActivoIngrediente: función para cambiar el estatus de un ingrediente por Id del ingrediente
