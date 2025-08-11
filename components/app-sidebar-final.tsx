@@ -128,7 +128,7 @@ export function AppSidebar() {
             }}
           >
             <img className="shrink-0 size-5 rounded-full" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/suplementos.png" alt="Avatar2" />
-            <Icons.PillBottle className="w-6 h-6 text-slate-700" />
+            {/*<Icons.PillBottle className="w-6 h-6 text-slate-700" />*/}
           </div>
           <span className="font-semibold text-lg text-slate-700">Sistema de Costeo</span>
         </div>
