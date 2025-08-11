@@ -243,7 +243,9 @@ export async function obtenerFormulasPorFiltros(nombre = "", clienteId = "", act
 
 //Función: actualizarFormula: funcion para actualizar la información de una formula por Id de la formula
 
+
 //Función: eliminarFormula: funcion para eliminar la información de una formula por Id de la formula
+
 
 // Función: estatusActivoFormula: función para cambiar el estatus de una formula por Id de la formula
 export async function estatusActivoFormula(folio: number, estadoActual: boolean) {
