@@ -18,7 +18,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 	  Funciones
 	  --------------------
 		* CREATES/CREAR/INSERTS
-			- insXXXXX
+			- crearUsuario / insUsuario
 		* READS/OBTENER/SELECTS
 			- selXXXXX
 		* UPDATES/ACTUALIZAR/UPDATES
