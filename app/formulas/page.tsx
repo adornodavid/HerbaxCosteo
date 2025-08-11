@@ -154,6 +154,9 @@ export default function FormulasPage() {
     }
   }, [sesion])
 
+  /* ==================================================
+    Validaciones con session
+  ================================================== */
   const cargarSesion = async () => {
     try {
       const datosSession = await getSession()
@@ -178,6 +181,10 @@ export default function FormulasPage() {
     }
   }
 
+  /* ==================================================
+    Funciones
+  ================================================== */
+  //Función: cargarClientes: función para cargar el dropdownlist de clientes
   const cargarClientes = async () => {
     try {
       if (!sesion) return
@@ -231,6 +238,7 @@ export default function FormulasPage() {
     }
   }
 
+  //Función: cargarEstadisticas: función para cargar las estadisticas de totales
   const cargarEstadisticas = async () => {
     try {
       const { count, error } = await supabase.from("formulas").select("*", { count: "exact", head: true })
@@ -243,6 +251,7 @@ export default function FormulasPage() {
     }
   }
 
+  //Función: cargarFormulasIniciales: función para cargar el listado de formulas iniciales
   const cargarFormulasIniciales = useCallback(async () => {
     try {
       if (!sesion) return
@@ -271,6 +280,7 @@ export default function FormulasPage() {
     }
   }, [sesion, currentPage, ddlEstatusFormula])
 
+  //Función: btnFormulaBuscar: función para cargar el listado de formulas de acuerdo a la busqueda
   const btnFormulaBuscar = async () => {
     try {
       setSearching(true)
@@ -311,6 +321,7 @@ export default function FormulasPage() {
     }
   }
 
+  //Función: clearFormulasBusqueda: función para cargar el listado de formulas de acuerdo a limpieza de filtros, busqueda inicial de carga de pagina
   const clearFormulasBusqueda = async () => {
     try {
       setTxtFormulaNombre("")
@@ -343,6 +354,7 @@ export default function FormulasPage() {
     }
   }
 
+  //Función: toggleEstadoFormula: función para cambiar el estatus de activo de la formula
   const toggleEstadoFormula = async (folio: number, estadoActual: boolean) => {
     const accion = estadoActual ? "inactivar" : "activar"
 
