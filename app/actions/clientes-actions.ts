@@ -18,15 +18,19 @@ function createServerSupabaseClientWrapper(cookieStore: ReturnType<typeof cookie
 /* ==================================================
   Funciones
   --------------------
-  * Inserts
-    - insCliente
-  * Selects
-    - selClientesXFiltro / obtenerClientesFiltrados
-    - selClientesTotal / obtenerTotalClientes
-  * Updates
-    - updCliente
-  * Deletes
-    - delCliente
+  * CREATES-CREAR (INSERTS)
+    - crearCliente / insCliente
+  * READS-OBTENER (SELECTS)
+    - obtenerClientes / selClientes
+    - obtenerClientesPorFiltros / selClientesXFiltros
+    - obtenerClientePorId / selClienteXId
+  * UPDATES-ACTUALIZAR (UPDATES)
+    - actualizarCliente / updCliente
+  * DELETES-ELIMINAR (DELETES)
+    - eliminarCliente / delCliente
+  * SPECIALS-ESPECIALES ()
+    - estatusActivoCliente / actCliente
+    - listaDesplegableClientes / ddlClientes
 ================================================== */
 //Funcion: selClientesXFiltro / obtenerClientesFiltrados
 export async function obtenerClientesFiltrados(nombre = "", page = 1, limit = 20) {
