@@ -18,7 +18,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import Image from "next/image"
-// import { getFormulaDetails } from "@/app/actions/formulas-actions"
+import { obtenerFormulas } from "@/app/actions/formulas-actions"
 
 interface SessionData {
   UsuarioId: string | null
@@ -209,82 +209,23 @@ export default function FormulasPage() {
     try {
       if (!sesion) return
 
-      const rolId = Number.parseInt(sesion.RolId?.toString() || "0", 10)
-      const hotelIdSesion = Number.parseInt(sesion.HotelId?.toString() || "0", 10)
+      const { data, error, totalCount } = await obtenerFormulas(currentPage, itemsPerPage)
 
-      let auxHotelid: number
-      if (![1, 2, 3, 4].includes(rolId)) {
-        auxHotelid = hotelIdSesion
-      } else {
-        auxHotelid = -1
+      if (error) {
+        throw new Error(error)
       }
-
-      let query = supabase
-        .from("formulas")
-        .select(`
-          id,
-          nombre,
-          costo,
-          notaspreparacion,
-          activo,
-          ingredientesxformula!inner (
-            ingredientes!inner (
-              clientes!inner (
-                id, nombre
-              )
-            )
-          )
-        `)
-        .eq("activo", ddlEstatusFormula === "true")
-
-      // Aplicar filtro de cliente si auxHotelid no es -1
-      if (auxHotelid !== -1) {
-        query = query.eq("ingredientesxformula.ingredientes.clientes.id", auxHotelid)
-      }
-
-      const { data, error } = await query
-        .order("nombre", { ascending: true })
-        .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1)
-
-      if (error) throw error
 
       const formulasFormateadas = (data || []).map((formula: any) => ({
-        folio: formula.id,
-        formula: formula.nombre,
-        costo: formula.costo || 0,
-        notaspreparacion: formula.notaspreparacion || 0,
-        cliente: formula.ingredientesxformula?.[0]?.ingredientes?.clientes?.nombre || "N/A",
-        activo: formula.activo,
+        folio: formula.Folio,
+        formula: formula.Nombre,
+        costo: formula.Costo || 0,
+        notaspreparacion: formula.NotasPreparacion || "",
+        cliente: "N/A", // Will be populated when client relationship is added to obtenerFormulas
+        activo: formula.Activo,
       }))
 
       setFormulas(formulasFormateadas)
-
-      // Calcular total de páginas
-      // Para el conteo, necesitamos una consulta similar pero solo para el count
-      let countQuery = supabase
-        .from("formulas")
-        .select(
-          `
-          id,
-          activo,
-          ingredientesxformula!inner (
-            ingredientes!inner (
-              clientes!inner (
-                id
-              )
-            )
-          )
-        `,
-          { count: "exact", head: true },
-        )
-        .eq("activo", ddlEstatusFormula === "true")
-
-      if (auxHotelid !== -1) {
-        countQuery = countQuery.eq("ingredientesxformula.ingredientes.clientes.id", auxHotelid)
-      }
-
-      const { count: totalCount } = await countQuery
-      setTotalPages(Math.ceil((totalCount || 0) / itemsPerPage))
+      setTotalPages(Math.ceil(totalCount / itemsPerPage))
     } catch (error) {
       console.error("Error cargando fórmulas iniciales:", error)
       setError("Error al cargar las fórmulas. Por favor, intente de nuevo.")
@@ -758,7 +699,7 @@ export default function FormulasPage() {
                       <div className="font-medium">Fecha de Creación:</div>
                       <div>{new Date(selectedFormulaDetails.formula.fechacreacion).toLocaleDateString()}</div>
                     </div>
-                   <div className="mt-4">
+                    <div className="mt-4">
                       <h3 className="font-semibold text-md mb-2">Notas de Preparación:</h3>
                       <p className="text-sm text-muted-foreground">
                         {selectedFormulaDetails.formula.notaspreparacion || "No hay notas de preparación."}
