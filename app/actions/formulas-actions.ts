@@ -9,7 +9,7 @@ import { createClient } from '@/lib/supabase'
 ================================================== */
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 /* ==================================================
   Funciones
@@ -34,7 +34,34 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 //Función: obtenerFormulas: funcion para obtener todas las formulas
  export async function obtenerFormulas(page = 1, limit = 20){
   const offset = (page - 1) * limit
-  
+  try {
+    let supabaseQuery = supabase
+      .from("clientes") // Cambiado de 'hoteles' a 'clientes'
+      .select("id, nombre, direccion, imgurl, activo", { count: "exact" }) // Ajustado para columnas de clientes
+      .order("nombre", { ascending: true })
+
+    const { data: queryData, error: queryError, count } = await supabaseQuery.range(offset, offset + limit - 1)
+
+    if (queryError) {
+      console.error("Error al obtener formulas:", queryError)
+      return { data: null, error: queryError.message, totalCount: 0 }
+    }
+
+    // Mapear los datos para que coincidan con el tipo ClienteResult
+    const mappedData =
+      queryData?.map((cliente) => ({
+        Folio: cliente.id,
+        Nombre: cliente.nombre,
+        Direccion: cliente.direccion,
+        ImgUrl: cliente.imgurl,
+        Estatus: cliente.activo,
+      })) || []
+
+    return { data: mappedData, error: null, totalCount: count || 0 }
+  } catch (error: any) {
+    console.error("Error en obtenerFormulas:", error)
+    return { data: null, error: error.message, totalCount: 0 }
+  }
 }
 
 //Función: obtenerFormulasPorFiltros: funcion para obtener todss lss formulas por el filtrado
