@@ -6,6 +6,11 @@
 import { createClient } from '@/lib/supabase'
 import { Database } from '@/lib/types-sistema-costeo'
 
+/* ==================================================
+  Conexion a la base de datos: Supabase
+================================================== */
+
+
 type UsuarioTabla = Database['public']['Tables']['usuarios']['Row']
 type UsuarioFuncion = Database['public']['Tables']['usuarios']['Row']
 
