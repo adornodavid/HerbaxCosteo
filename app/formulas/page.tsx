@@ -85,9 +85,15 @@ interface FormulaCompleta {
   error?: string
 }
 
+/* ==================================================
+  Principal - pagina
+================================================== */
 export default function FormulasPage() {
   const router = useRouter()
 
+  /* ==================================================
+    Estaods
+  ================================================== */
   // Estados de sesión y carga
   const [sesion, setSesion] = useState<SessionData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -131,6 +137,9 @@ export default function FormulasPage() {
     message: "",
   })
 
+  /* ==================================================
+    Al cargar la pagina
+  ================================================== */
   // Cargar sesión al montar el componente
   useEffect(() => {
     cargarSesion()
