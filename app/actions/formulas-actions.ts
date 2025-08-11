@@ -30,7 +30,9 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
     - estadisticasFormulasTotales / statsFormlasTotales
 ================================================== */
 //Función: crearFormula: funcion para crear una formula
+export async function crearFormula() {
 
+}
 //Función: obtenerFormulas: funcion para obtener todas las formulas
 export async function obtenerFormulas(page = 1, limit = 20) {
   const offset = (page - 1) * limit
