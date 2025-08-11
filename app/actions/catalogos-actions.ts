@@ -8,6 +8,20 @@ import { createClient } from "@/lib/supabase"
 ================================================== */
 
 
+/* ==================================================
+  Funciones
+  --------------------
+	* INSERTS
+		- insXXXXX
+	* SELECTS
+		- selXXXXX
+	* UPDATES
+		- updXXXXX
+	* DELETES
+		- delXXXXX
+	* SPECIALS
+		- xxxXXXXX
+================================================== */
 export async function obtenerCatalogosFiltrados(
   nombre = "",
   clienteId = "-1",
