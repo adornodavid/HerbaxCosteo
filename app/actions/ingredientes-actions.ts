@@ -35,4 +35,7 @@ import { createClient } from '@/lib/supabase'
 //Función: obtenerIngredientesPorFiltros: funcion para obtener todos los ingredientes por el filtrado
 
 
-//Función: obtenerIngredientePorId: funcion para obtener el ingrediente por Id
+//Función: obtenerIngredientePorId: funcion para obtener el ingrediente por Id del ingrediente
+
+
+//Función: obtenerIngredientePorId: funcion para obtener el ingrediente por Id del ingrediente
