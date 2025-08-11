@@ -502,7 +502,7 @@ export default function ProductosPage() {
       </div>*/}
 
       {/* 3. Filtros */}
-      <Card>
+      <Card className="border bg-card text-card-foreground shadow">
         <CardHeader>
           <CardTitle>Filtros de Búsqueda</CardTitle>
         </CardHeader>
