@@ -1,12 +1,12 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { usePathname, useRouter } from "next/navigation" // Importar useRouter
+import { usePathname, useRouter } from "next/navigation"
 import { getSession } from "@/app/actions/session-actions"
 import { Icons } from "@/components/icons"
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { useNavigationGuard } from "@/contexts/navigation-guard-context" // Importar el hook del contexto
+import { useNavigationGuard } from "@/contexts/navigation-guard-context"
 
 interface SessionData {
   UsuarioId: number
@@ -20,10 +20,10 @@ interface SessionData {
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const router = useRouter() // Inicializar useRouter
+  const router = useRouter()
   const [sessionData, setSessionData] = useState<SessionData | null>(null)
   const [openMenus, setOpenMenus] = useState<string[]>([])
-  const { attemptNavigation } = useNavigationGuard() // Obtener attemptNavigation del contexto
+  const { attemptNavigation } = useNavigationGuard()
 
   useEffect(() => {
     const loadSession = async () => {
@@ -39,7 +39,6 @@ export function AppSidebar() {
 
   const isActive = (href: string) => pathname === href
 
-  // Nueva función para manejar los clics de navegación
   const handleNavigationClick = useCallback(
     async (href: string) => {
       const canProceed = await attemptNavigation(href)
@@ -71,10 +70,7 @@ export function AppSidebar() {
       name: "Productos",
       icon: Icons.PillBottle,
       hasSubmenu: true,
-      submenu: [
-        { name: "Productos", href: "/productos", icon: Icons.PillBottle },
-        //{ name: "Sub-Recetas", href: "/recetas", icon: Icons.FileText },
-      ],
+      submenu: [{ name: "Productos", href: "/productos", icon: Icons.PillBottle }],
     },
     {
       name: "Catalogos",
@@ -89,7 +85,6 @@ export function AppSidebar() {
       submenu: [
         { name: "Análisis de Costos", href: "/analisiscostos", icon: Icons.TrendingUp },
         { name: "Márgenes de Utilidad", href: "/margenesutilidad", icon: Icons.PieChart },
-        //{ name: "Reporte Comparativo", href: "/reportecomparativo", icon: Icons.FileBarChart },
       ],
     },
 
@@ -97,20 +92,9 @@ export function AppSidebar() {
       name: "Gestión",
       icon: Icons.Hotel,
       hasSubmenu: true,
-      submenu: [
-        { name: "Clientes", href: "/clientes", icon: Icons.Hotel },
-        //{ name: "Catalogo", href: "/restaurantes", icon: Icons.Building },
-      ],
+      submenu: [{ name: "Clientes", href: "/clientes", icon: Icons.Hotel }],
     },
 
-    /*
-    {
-      name: "Administración",
-      icon: Icons.Settings,
-      hasSubmenu: true,
-      submenu: [{ name: "Usuarios", href: "/usuarios", icon: Icons.Users }],
-    },
-    */
     {
       name: "Perfil",
       icon: Icons.User,
@@ -125,75 +109,85 @@ export function AppSidebar() {
   return (
     <div
       id="SideBar"
-      className="w-64 h-screen bg-gradient-to-br from-slate-900/90 via-blue-900/80 to-indigo-900/90 backdrop-blur-xl border-r border-white/10 text-white flex flex-col relative overflow-hidden"
+      className="w-64 h-screen bg-white/10 backdrop-blur-2xl border-r border-white/20 text-slate-800 flex flex-col relative shadow-2xl shadow-black/10"
+      style={{
+        background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2), 0 20px 40px rgba(0,0,0,0.1)",
+      }}
     >
-      {/* Glass overlay effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5 pointer-events-none rounded-r-3xl" />
 
-      {/* Animated background particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-400/10 rounded-full blur-xl animate-pulse" />
-        <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-indigo-400/10 rounded-full blur-xl animate-pulse delay-1000" />
-      </div>
+      <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-white/30 to-transparent" />
 
-      {/* Logo */}
-      <div className="relative p-6 border-b border-white/10 backdrop-blur-sm">
+      <div className="relative p-6 border-b border-white/15">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20 shadow-lg">
-            <Icons.PillBottle className="w-6 h-6 text-blue-300" />
+          <div
+            className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30 shadow-lg"
+            style={{
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 12px rgba(0,0,0,0.1)",
+            }}
+          >
+            <Icons.PillBottle className="w-6 h-6 text-slate-700" />
           </div>
-          <span className="font-bold text-lg bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-            Sistema de Costeo
-          </span>
+          <span className="font-semibold text-lg text-slate-700">Sistema de Costeo</span>
         </div>
       </div>
 
-      {/* Nombre del usuario */}
-      <div className="relative p-4 border-b border-white/10 backdrop-blur-sm">
-        <div className="flex items-center space-x-3 bg-white/5 rounded-2xl p-3 border border-white/10">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-400/30 to-indigo-500/30 rounded-full flex items-center justify-center">
-            <Icons.User className="w-4 h-4 text-blue-200" />
+      <div className="relative p-4 border-b border-white/15">
+        <div
+          className="flex items-center space-x-3 bg-white/15 backdrop-blur-sm rounded-2xl p-3 border border-white/25 shadow-lg"
+          style={{
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.08)",
+          }}
+        >
+          <div
+            className="w-8 h-8 bg-white/25 rounded-full flex items-center justify-center border border-white/30"
+            style={{
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3)",
+            }}
+          >
+            <Icons.User className="w-4 h-4 text-slate-600" />
           </div>
-          <span className="text-sm font-medium text-blue-100">{sessionData?.NombreCompleto || "Usuario"}</span>
+          <span className="text-sm font-medium text-slate-700">{sessionData?.NombreCompleto || "Usuario"}</span>
         </div>
       </div>
 
-      {/* Navegación */}
       <nav className="relative flex-1 overflow-y-auto">
-        <div className="p-3 space-y-2">
+        <div className="p-4 space-y-2">
           {menuItems.map((item) => (
             <div key={item.name}>
               {!item.hasSubmenu ? (
                 <button
                   onClick={() => handleNavigationClick(item.href!)}
-                  className={`group flex items-center space-x-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-300 w-full relative overflow-hidden ${
+                  className={`group flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 w-full relative ${
                     isActive(item.href!)
-                      ? "bg-gradient-to-r from-blue-500/30 to-indigo-500/30 text-white border border-blue-400/30 shadow-lg shadow-blue-500/20"
-                      : "text-blue-100 hover:bg-white/10 hover:border-white/20 border border-transparent backdrop-blur-sm"
+                      ? "bg-white/25 text-slate-800 border border-white/30 shadow-lg"
+                      : "text-slate-600 hover:bg-white/15 hover:text-slate-800 border border-transparent hover:border-white/20"
                   }`}
+                  style={
+                    isActive(item.href!)
+                      ? {
+                          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 12px rgba(0,0,0,0.1)",
+                        }
+                      : {}
+                  }
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <item.icon
-                    className={`w-5 h-5 relative z-10 transition-colors duration-300 ${
-                      isActive(item.href!) ? "text-blue-300" : "text-blue-200 group-hover:text-white"
-                    }`}
-                  />
-                  <span className="relative z-10">{item.name}</span>
+                  <item.icon className="w-5 h-5 transition-colors duration-300" />
+                  <span>{item.name}</span>
                 </button>
               ) : (
                 <Collapsible open={openMenus.includes(item.name)} onOpenChange={() => toggleMenu(item.name)}>
                   <CollapsibleTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="group w-full justify-start space-x-3 px-4 py-3 text-sm font-medium text-blue-100 hover:bg-white/10 hover:text-white rounded-2xl border border-transparent hover:border-white/20 backdrop-blur-sm transition-all duration-300 relative overflow-hidden"
+                      className="group w-full justify-start space-x-3 px-4 py-3 text-sm font-medium text-slate-600 hover:bg-white/15 hover:text-slate-800 rounded-xl border border-transparent hover:border-white/20 transition-all duration-300"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      <item.icon className="w-5 h-5 text-blue-200 group-hover:text-white transition-colors duration-300 relative z-10" />
-                      <span className="flex-1 text-left relative z-10">{item.name}</span>
+                      <item.icon className="w-5 h-5 transition-colors duration-300" />
+                      <span className="flex-1 text-left">{item.name}</span>
                       {openMenus.includes(item.name) ? (
-                        <Icons.ChevronDown className="w-4 h-4 text-blue-200 group-hover:text-white transition-all duration-300 relative z-10" />
+                        <Icons.ChevronDown className="w-4 h-4 transition-all duration-300" />
                       ) : (
-                        <Icons.ChevronRight className="w-4 h-4 text-blue-200 group-hover:text-white transition-all duration-300 relative z-10" />
+                        <Icons.ChevronRight className="w-4 h-4 transition-all duration-300" />
                       )}
                     </Button>
                   </CollapsibleTrigger>
@@ -202,19 +196,21 @@ export function AppSidebar() {
                       <button
                         key={subItem.name}
                         onClick={() => handleNavigationClick(subItem.href)}
-                        className={`group flex items-center space-x-3 px-4 py-2.5 rounded-xl text-sm transition-all duration-300 w-full relative overflow-hidden ${
+                        className={`group flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm transition-all duration-300 w-full ${
                           isActive(subItem.href)
-                            ? "bg-gradient-to-r from-blue-500/20 to-indigo-500/20 text-white border border-blue-400/20 shadow-md"
-                            : "text-blue-200 hover:bg-white/5 hover:text-white border border-transparent hover:border-white/10"
+                            ? "bg-white/20 text-slate-800 border border-white/25 shadow-md"
+                            : "text-slate-500 hover:bg-white/10 hover:text-slate-700 border border-transparent hover:border-white/15"
                         }`}
+                        style={
+                          isActive(subItem.href)
+                            ? {
+                                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.08)",
+                              }
+                            : {}
+                        }
                       >
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        <subItem.icon
-                          className={`w-4 h-4 relative z-10 transition-colors duration-300 ${
-                            isActive(subItem.href) ? "text-blue-300" : "text-blue-300 group-hover:text-white"
-                          }`}
-                        />
-                        <span className="relative z-10">{subItem.name}</span>
+                        <subItem.icon className="w-4 h-4 transition-colors duration-300" />
+                        <span>{subItem.name}</span>
                       </button>
                     ))}
                   </CollapsibleContent>
