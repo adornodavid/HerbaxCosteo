@@ -32,7 +32,9 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
 
 //Función: obtenerFormulas: funcion para obtener todas las formulas
- 
+ export async function obtenerFormulas(page = 1, limit = 20){
+
+}
 
 //Función: obtenerFormulasPorFiltros: funcion para obtener todss lss formulas por el filtrado
 export async function obtenerFormulasPorFiltros(nombre = "", clienteNombre = "", actvio = true, page = 1, limit = 20){
