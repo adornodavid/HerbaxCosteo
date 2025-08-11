@@ -19,9 +19,9 @@ import { createClient } from '@/lib/supabase'
     - obtenerIngredientesPorFiltros / selIngredientesXFiltros
     - obtenerIngredientePorId / selIngredienteXId
   * UPDATES-ACTUALIZAR (UPDATES)
-    - actualizaIngrediente / updIngrediente
+    - actualizarIngrediente / updIngrediente
   * DELETES-ELIMINAR (DELETES)
-    - eliminaIngrediente / delIngrediente
+    - eliminarIngrediente / delIngrediente
   * SPECIALS-ESPECIALES ()
     - estatusActivoIngrediente / actIngrediente
     - listaDesplegableIngredientes / ddlIngredientes
@@ -38,4 +38,7 @@ import { createClient } from '@/lib/supabase'
 //Función: obtenerIngredientePorId: funcion para obtener el ingrediente por Id del ingrediente
 
 
-//Función: obtenerIngredientePorId: funcion para obtener el ingrediente por Id del ingrediente
+//Función: actualizaIngrediente: funcion para actualizar la información de un ingrediente por Id del ingrediente
+
+
+//Función: eliminarIngrediente: funcion para eliminar la información de un ingrediente por Id del ingrediente
