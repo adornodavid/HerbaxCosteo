@@ -178,7 +178,9 @@ export async function obtenerFormulasPorFiltros(nombre = "", clienteId = "", act
 //Función: eliminarFormula: funcion para eliminar la información de una formula por Id de la formula
 
 // Función: estatusActivoFormula: función para cambiar el estatus de una formula por Id de la formula
-
+export async function estatusActivoFormula(folio: number, estadoActual: boolean) {
+  
+}
 
 //Función: listaDesplegableFormulas: funcion para obtener todas las formulas para el input dropdownlist
 
