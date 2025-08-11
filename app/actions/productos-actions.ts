@@ -121,6 +121,7 @@ export async function obtenerProductos() {
   }
 }
 
+//Función: selProductoXId / obtenerProductoPorId: función para obtener un producto especifico por id
 export async function obtenerProductoPorId(id: number) {
   try {
     const { data, error } = await supabaseAdmin
