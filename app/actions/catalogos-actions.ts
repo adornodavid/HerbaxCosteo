@@ -1,3 +1,6 @@
+/* ==================================================
+  Imports
+================================================== */
 import { createClient } from "@/lib/supabase"
 
 export async function obtenerCatalogosFiltrados(
