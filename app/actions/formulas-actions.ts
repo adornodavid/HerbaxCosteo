@@ -66,10 +66,10 @@ export async function crearFormula(formData: {
       .insert({
         nombre: formData.nombre,
         notaspreparacion: formData.notaspreparacion,
-        costo: formData.costo,
+        costo: null,
         activo: formData.activo,
-        cantidad: formData.cantidad,
-        unidadmedidaid: formData.unidadmedidaid,
+        cantidad: null,
+        unidadmedidaid: null,
         imgurl: imgUrl,
         fechacreacion: new Date().toISOString(),
       })
