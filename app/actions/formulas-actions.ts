@@ -766,6 +766,37 @@ export async function verificarIngredienteDuplicado(formulaId: number, ingredien
 //Función: eliminarRegistroIncompleto: función para eliminar registros incompletos cuando el usuario sale del proceso
 export async function eliminarRegistroIncompleto(formulaId: number) {
   try {
+    const { data: formulaData, error: formulaQueryError } = await supabase
+      .from("formulas")
+      .select("imgurl")
+      .eq("id", formulaId)
+      .single()
+
+    if (formulaQueryError) {
+      console.error("Error al obtener datos de fórmula:", formulaQueryError)
+      return { success: false, error: formulaQueryError.message }
+    }
+
+    if (formulaData?.imgurl) {
+      try {
+        // Extraer el nombre del archivo de la URL
+        const url = new URL(formulaData.imgurl)
+        const pathSegments = url.pathname.split("/")
+        const fileName = pathSegments[pathSegments.length - 1]
+
+        // Eliminar la imagen del bucket
+        const { error: deleteImageError } = await supabase.storage.from("herbax").remove([fileName])
+
+        if (deleteImageError) {
+          console.error("Error al eliminar imagen:", deleteImageError)
+          // No retornamos error aquí para que continúe con la eliminación de registros
+        }
+      } catch (imageError) {
+        console.error("Error al procesar eliminación de imagen:", imageError)
+        // Continuar con la eliminación de registros aunque falle la imagen
+      }
+    }
+
     // Primero eliminar los ingredientes asociados a la fórmula
     const { error: ingredientesError } = await supabase.from("ingredientesxformula").delete().eq("formulaid", formulaId)
 
