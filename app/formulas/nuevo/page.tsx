@@ -50,9 +50,9 @@ export default function NuevaFormulaPage() {
   const [imagePreview, setImagePreview] = useState<string>("")
 
   const steps = [
-    { number: 1, title: "Información Básica", description: "Datos generales de la fórmula" },
-    { number: 2, title: "Agregar Elementos", description: "Ingredientes y componentes" },
-    { number: 3, title: "Resumen y Confirmación", description: "Verificar información" },
+    { number: 1, title: "Información Básica", description: "Datos de fórmula" },
+    { number: 2, title: "Agregar Elementos", description: "Carga Ingredientes" },
+    { number: 3, title: "Resumen y Confirmación", description: "Resumen información" },
     { number: 4, title: "Finalización", description: "Proceso completado" },
   ]
 
@@ -389,11 +389,11 @@ export default function NuevaFormulaPage() {
           </div>
 
           {/* Step indicators */}
-          <div className="flex items-center justify-between mt-6">
+          <div className="flex items-center justify-between mt-3">
             {steps.map((step, index) => (
               <div key={step.number} className="flex flex-col items-center">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                     currentStep >= step.number
                       ? "bg-gradient-to-br from-sky-400 to-cyan-500 text-white shadow-lg backdrop-blur-sm border border-sky-300/30"
                       : "bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 backdrop-blur-sm border border-slate-200/60"
