@@ -50,10 +50,10 @@ export default function NuevaFormulaPage() {
   const [imagePreview, setImagePreview] = useState<string>("")
 
   const steps = [
-    { number: 1, title: "Información Básica", description: "Datos de fórmula" },
-    { number: 2, title: "Agregar Elementos", description: "Carga Ingredientes" },
-    { number: 3, title: "Resumen y Confirmación", description: "Resumen información" },
-    { number: 4, title: "Finalización", description: "Proceso completado" },
+    { number: 1, title: "Información Básica" },
+    { number: 2, title: "Agregar Elementos"},
+    { number: 3, title: "Resumen y Confirmación"},
+    { number: 4, title: "Finalización" },
   ]
 
   const handleInputChange = (field: keyof FormData, value: any) => {
