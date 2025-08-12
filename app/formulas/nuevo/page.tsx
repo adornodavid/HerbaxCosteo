@@ -476,8 +476,8 @@ export default function NuevaFormulaPage() {
           <Label htmlFor="cliente" className="text-slate-700 font-medium">
             Cliente *
           </Label>
-          <Select className="flex h-10 w-64 items-center justify-between rounded-md border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20" value={selectedClienteId} onValueChange={setSelectedClienteId}>
-            <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
+          <Select  value={selectedClienteId} onValueChange={setSelectedClienteId}>
+            <SelectTrigger className="w-64 bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
               <SelectValue placeholder="Selecciona un cliente" />
             </SelectTrigger>
             <SelectContent>
