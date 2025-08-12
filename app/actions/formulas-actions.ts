@@ -488,7 +488,7 @@ export async function obtenerIngredientesPorCliente(clienteId: number, cantidad:
       return { data: null, error: error.message }
     }
 
-    return { data, error: null }
+    return { data, CostoTotal, error: null }
   } catch (error: any) {
     console.error("Error en obtenerIngredientesPorCliente:", error)
     return { data: null, error: error.message }
