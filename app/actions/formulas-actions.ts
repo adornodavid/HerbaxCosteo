@@ -495,7 +495,7 @@ export async function obtenerIngredientesPorCliente(clienteId: number) {
 export async function obtenerUnidadesMedida() {
   try {
     const { data, error } = await supabase
-      .from("tipounidadesmedida")
+      .from("unidadesmedida")
       .select("id, descripcion")
       .order("descripcion", { ascending: true })
 
