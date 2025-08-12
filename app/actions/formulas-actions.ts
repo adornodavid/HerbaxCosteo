@@ -52,7 +52,7 @@ export async function crearFormula(formData: {
       const fileName = `formula_${Date.now()}_${formData.imagen.name}`
 
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("imagenes")
+        .from("herbax")
         .upload(fileName, formData.imagen)
 
       if (uploadError) {
@@ -61,7 +61,7 @@ export async function crearFormula(formData: {
       }
 
       // Obtener URL pública de la imagen
-      const { data: urlData } = supabase.storage.from("imagenes").getPublicUrl(fileName)
+      const { data: urlData } = supabase.storage.from("herbax").getPublicUrl(fileName)
 
       imgUrl = urlData.publicUrl
     }
