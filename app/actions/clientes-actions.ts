@@ -82,8 +82,7 @@ export async function obtenerClientesFiltrados(nombre = "", page = 1, limit = 20
 export async function obtenerTotalClientes() {
   const supabase = createServerSupabaseClientWrapper(cookies())
   try {
-    const { count, error } = await supabase.from("clientes").select("*", { count: "exact", head: true }) // Cambiado de 'hoteles' a 'clientes'
-
+    const { count, error } = await supabase.from("clientes").select("*", { count: "exact", head: true }) 
     if (error) {
       console.error("Error al obtener total de clientes:", error)
       return { total: 0, error: error.message }
