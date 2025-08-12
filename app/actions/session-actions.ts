@@ -23,9 +23,10 @@ export interface SessionData {
   --------------------
 	* 
     - getSession
-    - getUserSessionData
-    - getSessionCookies
     - clearSession
+
+    - getUserSessionData
+    - getSessionCookies    
     - validateSession
     - setSessionCookies
 ================================================== */
