@@ -319,10 +319,10 @@ export default function NuevaFormulaPage() {
         const result = await crearFormula({
           nombre: formData.nombre,
           notaspreparacion: formData.notaspreparacion,
-          costo: 0, // Will be calculated later
+          costo: null, // Will be calculated later
           activo: formData.activo,
-          cantidad: 0, // Will be set in step 2
-          unidadmedidaid: 1, // Will be set in step 2
+          cantidad: null, // Will be set in step 2
+          unidadmedidaid: null, // Will be set in step 2
           imagen: formData.imagen,
         })
 
