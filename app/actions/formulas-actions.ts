@@ -34,6 +34,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
   * DELETES-ELIMINAR (DELETES)
     - eliminarFormula / delFormula
     - eliminarIngredienteFormula***
+    - eliminarRegistroIncompleto***
   * SPECIALS-ESPECIALES ()
     - estadisticasFormulasTotales / statsFormlasTotales
     - verificarIngredienteDuplicado
@@ -759,5 +760,34 @@ export async function verificarIngredienteDuplicado(formulaId: number, ingredien
   } catch (error: any) {
     console.error("Error en verificarIngredienteDuplicado:", error)
     return { exists: false, error: error.message }
+  }
+}
+
+//Función: eliminarRegistroIncompleto: función para eliminar registros incompletos cuando el usuario sale del proceso
+export async function eliminarRegistroIncompleto(formulaId: number) {
+  try {
+    // Primero eliminar los ingredientes asociados a la fórmula
+    const { error: ingredientesError } = await supabase.from("ingredientesxformula").delete().eq("formulaid", formulaId)
+
+    if (ingredientesError) {
+      console.error("Error al eliminar ingredientes de fórmula:", ingredientesError)
+      return { success: false, error: ingredientesError.message }
+    }
+
+    // Luego eliminar la fórmula
+    const { error: formulaError } = await supabase.from("formulas").delete().eq("id", formulaId)
+
+    if (formulaError) {
+      console.error("Error al eliminar fórmula:", formulaError)
+      return { success: false, error: formulaError.message }
+    }
+
+    return {
+      success: true,
+      message: "Registro incompleto eliminado exitosamente",
+    }
+  } catch (error: any) {
+    console.error("Error en eliminarRegistroIncompleto:", error)
+    return { success: false, error: error.message }
   }
 }

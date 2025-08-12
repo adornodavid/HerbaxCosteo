@@ -22,6 +22,7 @@ import {
   eliminarIngredienteFormula,
   getIngredientDetails, // Added import for moved function
   obtenerIngredientesFormula, // Added import for missing function
+  eliminarRegistroIncompleto,
 } from "@/app/actions/formulas-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 import { getSession } from "@/app/actions/session-actions"
@@ -109,6 +110,12 @@ export default function NuevaFormulaPage() {
   const [selIngredienteUnidad, setSelIngredienteUnidad] = useState("")
   const [selIngredienteCosto, setSelIngredienteCosto] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // New states for validation modals
+  const [showExitConfirmModal, setShowExitConfirmModal] = useState(false)
+  const [showValidationModal, setShowValidationModal] = useState(false)
+  const [validationMessage, setValidationMessage] = useState("")
+  const [isExiting, setIsExiting] = useState(false)
 
   const steps = [
     { number: 1, title: "Información Básica" },
@@ -365,6 +372,11 @@ export default function NuevaFormulaPage() {
       } finally {
         setIsLoading(false)
       }
+    } else if (currentStep === 2) {
+      if (!validateStep2()) {
+        return
+      }
+      setCurrentStep(currentStep + 1)
     } else if (currentStep < 4) {
       setCurrentStep(currentStep + 1)
     }
@@ -885,8 +897,82 @@ export default function NuevaFormulaPage() {
     }
   }, [showSuccessModal])
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (currentStep >= 2 && formulaId && !isExiting) {
+        e.preventDefault()
+        e.returnValue = ""
+        setShowExitConfirmModal(true)
+        return ""
+      }
+    }
+
+    const handleRouteChange = () => {
+      if (currentStep >= 2 && formulaId && !isExiting) {
+        setShowExitConfirmModal(true)
+        return false
+      }
+      return true
+    }
+
+    if (currentStep >= 2 && formulaId) {
+      window.addEventListener("beforeunload", handleBeforeUnload)
+
+      // For Next.js router navigation
+      const originalPush = router.push
+      router.push = (...args) => {
+        if (handleRouteChange()) {
+          return originalPush.apply(router, args)
+        }
+        return Promise.resolve(true)
+      }
+    }
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [currentStep, formulaId, isExiting, router])
+
+  const validateStep2 = () => {
+    // Check if at least 2 ingredients are added
+    if (ingredientesAgregados.length < 2) {
+      setValidationMessage("Debes agregar al menos 2 ingredientes a la fórmula")
+      setShowValidationModal(true)
+      return false
+    }
+
+    // Check if cantidad is greater than 0
+    if (!formData.cantidad || formData.cantidad <= 0) {
+      setValidationMessage("Debes ingresar una cantidad mayor a 0")
+      setShowValidationModal(true)
+      return false
+    }
+
+    // Check if unidad de medida is selected
+    if (!formData.unidadmedidaid || formData.unidadmedidaid <= 0) {
+      setValidationMessage("Debes seleccionar una unidad de medida")
+      setShowValidationModal(true)
+      return false
+    }
+
+    return true
+  }
+
+  const handleConfirmExit = async () => {
+    if (formulaId) {
+      setIsExiting(true)
+      await eliminarRegistroIncompleto(formulaId)
+    }
+    setShowExitConfirmModal(false)
+    router.push("/formulas")
+  }
+
+  const handleCancelExit = () => {
+    setShowExitConfirmModal(false)
+  }
+
   return (
-    <div className="container mx-auto py-6 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4">
       {/* Header */}
       <div className="mb-5">
         <div className="flex items-center gap-4 mb-2">
@@ -967,7 +1053,7 @@ export default function NuevaFormulaPage() {
           <Button
             variant="outline"
             onClick={handlePrevStep}
-            disabled={currentStep < 3 }
+            disabled={currentStep < 3}
             className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-slate-200/60 hover:border-sky-400 hover:bg-sky-50/50"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -1020,7 +1106,7 @@ export default function NuevaFormulaPage() {
                         style={{ animationDelay: "0s" }}
                       ></div>
                       <div
-                        className="absolute bottom-4 right-2 w-1 h-1 bg-white rounded-full animate-bounce"
+                        className="absolute bottom-4 right-6 w-1 h-1 bg-white rounded-full animate-bounce"
                         style={{ animationDelay: "0.5s" }}
                       ></div>
                       <div
@@ -1113,6 +1199,40 @@ export default function NuevaFormulaPage() {
             <DialogTitle className="text-red-600">Error</DialogTitle>
             <DialogDescription>{errorMessage}</DialogDescription>
           </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      {/* Exit Confirmation Modal */}
+      <Dialog open={showExitConfirmModal} onOpenChange={setShowExitConfirmModal}>
+        <DialogContent className="bg-white/95 backdrop-blur-sm border-slate-200/60">
+          <DialogHeader>
+            <DialogTitle className="text-slate-800">¿Salir del registro?</DialogTitle>
+            <DialogDescription className="text-slate-600">
+              Si sales del registro de fórmula, todos los datos ingresados se perderán y el registro será eliminado.
+              ¿Realmente deseas salir?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={handleCancelExit}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmExit} className="bg-red-500 hover:bg-red-600">
+              Sí, salir
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Validation Modal */}
+      <Dialog open={showValidationModal} onOpenChange={setShowValidationModal}>
+        <DialogContent className="bg-white/95 backdrop-blur-sm border-slate-200/60">
+          <DialogHeader>
+            <DialogTitle className="text-slate-800">Información faltante</DialogTitle>
+            <DialogDescription className="text-slate-600">{validationMessage}</DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end mt-4">
+            <Button onClick={() => setShowValidationModal(false)}>Entendido</Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
