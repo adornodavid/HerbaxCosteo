@@ -124,7 +124,7 @@ export default function NuevaFormulaPage() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Left side - Form inputs */}
       <div className="lg:col-span-2 space-y-6">
-        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-4 shadow-sm">
           <div className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="nombre" className="text-slate-700 font-medium">
@@ -158,7 +158,7 @@ export default function NuevaFormulaPage() {
 
       {/* Right side - Image upload and preview */}
       <div className="lg:col-span-1">
-        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm h-full">
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-4 shadow-sm h-full">
           <div className="space-y-4">
             <Label className="text-slate-700 font-medium">Imagen de la Fórmula</Label>
 
