@@ -356,7 +356,7 @@ export default function NuevaFormulaPage() {
   return (
     <div className="container mx-auto py-6 px-4">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-5">
         <div className="flex items-center gap-4 mb-4">
           <Button
             variant="ghost"
@@ -373,7 +373,7 @@ export default function NuevaFormulaPage() {
         <p className="text-gray-600 mt-2">Crea una nueva fórmula siguiendo los pasos del asistente</p>
       </div>
 
-      <div className="mb-8">
+      <div className="mb-3">
         <div className="relative">
           {/* Progress bar background */}
           <div className="w-full h-3 bg-gradient-to-r from-slate-200/60 to-slate-300/60 rounded-full backdrop-blur-sm border border-slate-200/40 shadow-inner">
