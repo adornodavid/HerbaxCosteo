@@ -120,7 +120,7 @@ export default function NuevaFormulaPage() {
     const loadInitialData = async () => {
       try {
         const [clientesResult, unidadesResult] = await Promise.all([
-          listaDesplegableClientes(-1, ""),
+          listaDesplegableClientes("-1", ""),
           obtenerUnidadesMedida(),
         ])
 
