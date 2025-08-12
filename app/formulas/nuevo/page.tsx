@@ -607,8 +607,7 @@ export default function NuevaFormulaPage() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-            <div>
+              <div>
               <Label htmlFor="txtCostoIngrediente">Costo Ingrediente</Label>
               <Input
                 id="txtCostoIngrediente"
@@ -618,6 +617,8 @@ export default function NuevaFormulaPage() {
                 className="bg-white/80 backdrop-blur-sm border-slate-200/60"
               />
             </div>
+            </div>
+            
             <div className="flex justify-end">
               <Button
                 id="btnAgregarIngrediente"
