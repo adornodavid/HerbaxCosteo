@@ -345,7 +345,7 @@ export async function actualizarFormula(
       const fileName = `formula_${Date.now()}_${updateData.imagen.name}`
 
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("imagenes")
+        .from("herbax")
         .upload(fileName, updateData.imagen)
 
       if (uploadError) {
