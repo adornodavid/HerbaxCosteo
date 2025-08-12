@@ -100,7 +100,7 @@ export async function crearFormulaEtapa2(
   formulaId: number,
   ingredienteId: number,
   cantidad: number,
-  unidadmedidaid: number,
+
 ) {
   try {
     const { data, error } = await supabase
@@ -109,7 +109,6 @@ export async function crearFormulaEtapa2(
         formulaid: formulaId,
         ingredienteid: ingredienteId,
         cantidad: cantidad,
-        unidadmedidaid: unidadmedidaid,
       })
       .select()
 
