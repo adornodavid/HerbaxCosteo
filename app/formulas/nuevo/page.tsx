@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,8 +12,17 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { CheckCircle, Upload, ArrowLeft, ArrowRight, FileImage } from "lucide-react"
-import { crearFormula } from "@/app/actions/formulas-actions"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { CheckCircle, Upload, ArrowLeft, ArrowRight, FileImage, Loader2 } from "lucide-react"
+import {
+  crearFormula,
+  crearFormulaEtapa2,
+  obtenerClientes,
+  obtenerIngredientesPorCliente,
+  obtenerUnidadesMedida,
+  obtenerIngredientesFormula,
+  eliminarIngredienteFormula,
+} from "@/app/actions/formulas-actions"
 
 interface FormData {
   nombre: string
@@ -23,6 +32,32 @@ interface FormData {
   cantidad: number
   unidadmedidaid: number
   imagen?: File
+}
+
+interface Cliente {
+  id: number
+  nombre: string
+}
+
+interface Ingrediente {
+  id: number
+  codigo: string
+  nombre: string
+  costo: number
+  clienteid: number
+}
+
+interface UnidadMedida {
+  id: number
+  descripcion: string
+}
+
+interface IngredienteAgregado {
+  id: number
+  nombre: string
+  cantidad: number
+  unidad: string
+  ingredientecostoparcial: number
 }
 
 export default function NuevaFormulaPage() {
@@ -35,6 +70,7 @@ export default function NuevaFormulaPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [showErrorModal, setShowErrorModal] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
+  const [formulaId, setFormulaId] = useState<number | null>(null)
 
   // Estados para los datos del formulario
   const [formData, setFormData] = useState<FormData>({
@@ -49,12 +85,116 @@ export default function NuevaFormulaPage() {
 
   const [imagePreview, setImagePreview] = useState<string>("")
 
+  const [clientes, setClientes] = useState<Cliente[]>([])
+  const [selectedClienteId, setSelectedClienteId] = useState("")
+  const [ingredientes, setIngredientes] = useState<Ingrediente[]>([])
+  const [unidades, setUnidades] = useState<UnidadMedida[]>([])
+  const [ingredientesAgregados, setIngredientesAgregados] = useState<IngredienteAgregado[]>([])
+
+  // Estados para el formulario de ingredientes
+  const [ingredienteSearchTerm, setIngredienteSearchTerm] = useState("")
+  const [filteredIngredientes, setFilteredIngredientes] = useState<Ingrediente[]>([])
+  const [showIngredienteDropdown, setShowIngredienteDropdown] = useState(false)
+  const [selIngredienteId, setSelIngredienteId] = useState("")
+  const [selIngredienteCantidad, setSelIngredienteCantidad] = useState("")
+  const [selIngredienteUnidad, setSelIngredienteUnidad] = useState("")
+  const [selIngredienteCosto, setSelIngredienteCosto] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const steps = [
     { number: 1, title: "Información Básica" },
-    { number: 2, title: "Agregar Elementos"},
-    { number: 3, title: "Resumen y Confirmación"},
+    { number: 2, title: "Agregar Elementos" },
+    { number: 3, title: "Resumen y Confirmación" },
     { number: 4, title: "Finalización" },
   ]
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const [clientesResult, unidadesResult] = await Promise.all([obtenerClientes(), obtenerUnidadesMedida()])
+
+        if (clientesResult.data) {
+          setClientes(clientesResult.data)
+        }
+
+        if (unidadesResult.data) {
+          setUnidades(unidadesResult.data)
+        }
+      } catch (error) {
+        console.error("Error loading initial data:", error)
+      }
+    }
+
+    loadInitialData()
+  }, [])
+
+  useEffect(() => {
+    const loadIngredientes = async () => {
+      if (selectedClienteId) {
+        try {
+          const result = await obtenerIngredientesPorCliente(Number(selectedClienteId))
+          if (result.data) {
+            setIngredientes(result.data)
+          }
+        } catch (error) {
+          console.error("Error loading ingredients:", error)
+        }
+      } else {
+        setIngredientes([])
+      }
+    }
+
+    loadIngredientes()
+  }, [selectedClienteId])
+
+  useEffect(() => {
+    if (ingredienteSearchTerm.length >= 2) {
+      const filtered = ingredientes.filter(
+        (ing) =>
+          ing.codigo.toLowerCase().includes(ingredienteSearchTerm.toLowerCase()) ||
+          ing.nombre.toLowerCase().includes(ingredienteSearchTerm.toLowerCase()),
+      )
+      setFilteredIngredientes(filtered)
+      setShowIngredienteDropdown(filtered.length > 0)
+    } else {
+      setFilteredIngredientes([])
+      setShowIngredienteDropdown(false)
+    }
+  }, [ingredienteSearchTerm, ingredientes])
+
+  useEffect(() => {
+    if (selIngredienteId) {
+      const selectedIng = ingredientes.find((i) => i.id.toString() === selIngredienteId)
+      if (selectedIng) {
+        setSelIngredienteCosto(selectedIng.costo.toString())
+      }
+    } else {
+      setSelIngredienteCosto("")
+    }
+  }, [selIngredienteId, ingredientes])
+
+  useEffect(() => {
+    if (!selIngredienteId) {
+      setIngredienteSearchTerm("")
+    }
+  }, [selIngredienteId])
+
+  useEffect(() => {
+    const loadIngredientesFormula = async () => {
+      if (formulaId) {
+        try {
+          const result = await obtenerIngredientesFormula(formulaId)
+          if (result.data) {
+            setIngredientesAgregados(result.data)
+          }
+        } catch (error) {
+          console.error("Error loading formula ingredients:", error)
+        }
+      }
+    }
+
+    loadIngredientesFormula()
+  }, [formulaId])
 
   const handleInputChange = (field: keyof FormData, value: any) => {
     setFormData((prev) => ({
@@ -81,14 +221,122 @@ export default function NuevaFormulaPage() {
     return formData.nombre.trim() !== ""
   }
 
-  const handleNextStep = () => {
-    if (currentStep === 1 && !validateStep1()) {
-      setErrorMessage("Por favor completa el nombre de la fórmula")
+  const handleIngredienteSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value
+    setIngredienteSearchTerm(term)
+    const selectedIng = ingredientes.find((i) => i.id.toString() === selIngredienteId)
+    if (selIngredienteId && selectedIng && term !== `${selectedIng.codigo} - ${selectedIng.nombre}`) {
+      setSelIngredienteId("")
+    }
+  }
+
+  const handleSelectIngredienteFromDropdown = (ing: Ingrediente) => {
+    setSelIngredienteId(ing.id.toString())
+    setIngredienteSearchTerm(`${ing.codigo} - ${ing.nombre}`)
+    setShowIngredienteDropdown(false)
+  }
+
+  const handleAgregarIngrediente = async () => {
+    if (!formulaId) {
+      setErrorMessage("Error: No se ha creado la fórmula base")
       setShowErrorModal(true)
       return
     }
 
-    if (currentStep < 4) {
+    if (!selIngredienteId || !selIngredienteCantidad || !selIngredienteUnidad) {
+      setErrorMessage("Favor de llenar la información faltante del ingrediente.")
+      setShowErrorModal(true)
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const result = await crearFormulaEtapa2(
+        formulaId,
+        Number(selIngredienteId),
+        Number(selIngredienteCantidad),
+        Number(selIngredienteUnidad),
+      )
+
+      if (result.success) {
+        // Reload ingredients list
+        const ingredientesResult = await obtenerIngredientesFormula(formulaId)
+        if (ingredientesResult.data) {
+          setIngredientesAgregados(ingredientesResult.data)
+        }
+
+        // Clear inputs
+        setSelIngredienteId("")
+        setSelIngredienteCantidad("")
+        setSelIngredienteUnidad("")
+        setSelIngredienteCosto("")
+      } else {
+        setErrorMessage(result.error || "No se pudo agregar el ingrediente.")
+        setShowErrorModal(true)
+      }
+    } catch (error) {
+      setErrorMessage("Error inesperado al agregar ingrediente")
+      setShowErrorModal(true)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleEliminarIngrediente = async (ingredienteFormulaId: number) => {
+    try {
+      const result = await eliminarIngredienteFormula(ingredienteFormulaId)
+
+      if (result.success && formulaId) {
+        // Reload ingredients list
+        const ingredientesResult = await obtenerIngredientesFormula(formulaId)
+        if (ingredientesResult.data) {
+          setIngredientesAgregados(ingredientesResult.data)
+        }
+      } else {
+        setErrorMessage(result.error || "No se pudo eliminar el ingrediente.")
+        setShowErrorModal(true)
+      }
+    } catch (error) {
+      setErrorMessage("Error inesperado al eliminar ingrediente")
+      setShowErrorModal(true)
+    }
+  }
+
+  const handleNextStep = async () => {
+    if (currentStep === 1) {
+      if (!validateStep1()) {
+        setErrorMessage("Por favor completa el nombre de la fórmula")
+        setShowErrorModal(true)
+        return
+      }
+
+      // Create formula before going to step 2
+      setIsLoading(true)
+      try {
+        const result = await crearFormula({
+          nombre: formData.nombre,
+          notaspreparacion: formData.notaspreparacion,
+          costo: 0, // Will be calculated later
+          activo: formData.activo,
+          cantidad: 0, // Will be set in step 2
+          unidadmedidaid: 1, // Will be set in step 2
+          imagen: formData.imagen,
+        })
+
+        if (result.success && result.data) {
+          setFormulaId(result.data.id)
+          setCurrentStep(2)
+        } else {
+          setErrorMessage(result.error || "Error al crear la fórmula")
+          setShowErrorModal(true)
+        }
+      } catch (error) {
+        setErrorMessage("Error inesperado al crear la fórmula")
+        setShowErrorModal(true)
+      } finally {
+        setIsLoading(false)
+      }
+    } else if (currentStep < 4) {
       setCurrentStep(currentStep + 1)
     }
   }
@@ -103,17 +351,11 @@ export default function NuevaFormulaPage() {
     setIsLoading(true)
 
     try {
-      const result = await crearFormula(formData)
-
-      if (result.success) {
-        setCurrentStep(4)
-        setShowSuccessModal(true)
-      } else {
-        setErrorMessage(result.error || "Error al crear la fórmula")
-        setShowErrorModal(true)
-      }
+      // Formula is already created, just show success
+      setCurrentStep(4)
+      setShowSuccessModal(true)
     } catch (error) {
-      setErrorMessage("Error inesperado al crear la fórmula")
+      setErrorMessage("Error inesperado")
       setShowErrorModal(true)
     } finally {
       setIsLoading(false)
@@ -224,26 +466,33 @@ export default function NuevaFormulaPage() {
 
   const renderStep2 = () => (
     <div className="space-y-6">
+      {/* Client Selection */}
       <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
-        <h3 className="text-lg font-medium text-slate-800 mb-6">Detalles de Cantidad y Costo</h3>
+        <h3 className="text-lg font-medium text-slate-800 mb-6">Seleccionar Cliente</h3>
+        <div className="space-y-2">
+          <Label htmlFor="cliente" className="text-slate-700 font-medium">
+            Cliente *
+          </Label>
+          <Select value={selectedClienteId} onValueChange={setSelectedClienteId}>
+            <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
+              <SelectValue placeholder="Selecciona un cliente" />
+            </SelectTrigger>
+            <SelectContent>
+              {clientes.map((cliente) => (
+                <SelectItem key={cliente.id} value={cliente.id.toString()}>
+                  {cliente.nombre}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Cantidad y Unidad de Medida */}
+      <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
+        <h3 className="text-lg font-medium text-slate-800 mb-6">Detalles de Cantidad</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="costo" className="text-slate-700 font-medium">
-              Costo *
-            </Label>
-            <Input
-              id="costo"
-              type="number"
-              step="0.01"
-              min="0"
-              value={formData.costo}
-              onChange={(e) => handleInputChange("costo", Number.parseFloat(e.target.value) || 0)}
-              placeholder="0.00"
-              className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
-            />
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="cantidad" className="text-slate-700 font-medium">
               Cantidad *
@@ -259,7 +508,7 @@ export default function NuevaFormulaPage() {
             />
           </div>
 
-          <div className="space-y-2 md:col-span-2">
+          <div className="space-y-2">
             <Label htmlFor="unidadmedida" className="text-slate-700 font-medium">
               Unidad de Medida
             </Label>
@@ -271,21 +520,153 @@ export default function NuevaFormulaPage() {
                 <SelectValue placeholder="Selecciona unidad" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">Gramos</SelectItem>
-                <SelectItem value="2">Kilogramos</SelectItem>
-                <SelectItem value="3">Litros</SelectItem>
-                <SelectItem value="4">Mililitros</SelectItem>
-                <SelectItem value="5">Piezas</SelectItem>
+                {unidades.map((unidad) => (
+                  <SelectItem key={unidad.id} value={unidad.id.toString()}>
+                    {unidad.descripcion}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
         </div>
       </div>
 
-      <div className="text-center py-8">
-        <h4 className="text-lg font-medium text-slate-700 mb-2">Agregar Ingredientes</h4>
-        <p className="text-slate-500">Esta funcionalidad se implementará en la siguiente fase del desarrollo.</p>
-      </div>
+      {/* Agregar Ingredientes */}
+      {selectedClienteId && (
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
+          <h3 className="text-lg font-medium text-slate-800 mb-6">Agregar Ingredientes</h3>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+              <div className="md:col-span-2 relative">
+                <Label htmlFor="txtIngredienteSearch">Ingrediente</Label>
+                <Input
+                  id="txtIngredienteSearch"
+                  name="txtIngredienteSearch"
+                  value={ingredienteSearchTerm}
+                  onChange={handleIngredienteSearchChange}
+                  onFocus={() =>
+                    ingredienteSearchTerm.length >= 2 &&
+                    filteredIngredientes.length > 0 &&
+                    setShowIngredienteDropdown(true)
+                  }
+                  onBlur={() => setTimeout(() => setShowIngredienteDropdown(false), 100)}
+                  placeholder="Buscar por código o nombre..."
+                  autoComplete="off"
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                />
+                {showIngredienteDropdown && filteredIngredientes.length > 0 && (
+                  <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto mt-1">
+                    {filteredIngredientes.map((ing) => (
+                      <div
+                        key={ing.id}
+                        className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                        onMouseDown={() => handleSelectIngredienteFromDropdown(ing)}
+                      >
+                        {ing.codigo} - {ing.nombre}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="txtCantidadIngrediente">Cantidad</Label>
+                <Input
+                  id="txtCantidadIngrediente"
+                  name="txtCantidadIngrediente"
+                  type="number"
+                  value={selIngredienteCantidad}
+                  onChange={(e) => setSelIngredienteCantidad(e.target.value)}
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                />
+              </div>
+              <div>
+                <Label htmlFor="ddlUnidadMedida">Unidad</Label>
+                <Select
+                  value={selIngredienteUnidad}
+                  onValueChange={setSelIngredienteUnidad}
+                  disabled={!selIngredienteId || unidades.length === 0}
+                >
+                  <SelectTrigger
+                    id="ddlUnidadMedida"
+                    name="ddlUnidadMedida"
+                    className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                  >
+                    <SelectValue placeholder="Seleccione..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {unidades.map((u) => (
+                      <SelectItem key={u.id} value={u.id.toString()}>
+                        {u.descripcion}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="txtCostoIngrediente">Costo Ingrediente</Label>
+              <Input
+                id="txtCostoIngrediente"
+                name="txtCostoIngrediente"
+                value={selIngredienteCosto}
+                disabled
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60"
+              />
+            </div>
+            <div className="flex justify-end">
+              <Button
+                id="btnAgregarIngrediente"
+                name="btnAgregarIngrediente"
+                onClick={handleAgregarIngrediente}
+                disabled={isSubmitting}
+                className="bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600"
+              >
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Agregar Ingrediente
+              </Button>
+            </div>
+
+            {/* Tabla de ingredientes agregados */}
+            {ingredientesAgregados.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-md font-medium text-slate-800 mb-4">Ingredientes Agregados</h4>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nombre</TableHead>
+                      <TableHead>Cantidad</TableHead>
+                      <TableHead>Unidad</TableHead>
+                      <TableHead className="text-right">Costo Parcial</TableHead>
+                      <TableHead>Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {ingredientesAgregados.map((i) => (
+                      <TableRow key={i.id}>
+                        <TableCell>{i.nombre}</TableCell>
+                        <TableCell>{i.cantidad}</TableCell>
+                        <TableCell>{i.unidad}</TableCell>
+                        <TableCell className="text-right">${i.ingredientecostoparcial.toFixed(2)}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleEliminarIngrediente(i.id)}
+                            disabled={isSubmitting}
+                          >
+                            Eliminar
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 
@@ -301,11 +682,6 @@ export default function NuevaFormulaPage() {
           </div>
 
           <div>
-            <Label className="text-sm font-medium text-gray-500">Costo</Label>
-            <p className="text-sm">${formData.costo.toFixed(2)}</p>
-          </div>
-
-          <div>
             <Label className="text-sm font-medium text-gray-500">Cantidad</Label>
             <p className="text-sm">{formData.cantidad}</p>
           </div>
@@ -313,6 +689,11 @@ export default function NuevaFormulaPage() {
           <div>
             <Label className="text-sm font-medium text-gray-500">Estado</Label>
             <Badge variant={formData.activo ? "default" : "secondary"}>{formData.activo ? "Activo" : "Inactivo"}</Badge>
+          </div>
+
+          <div>
+            <Label className="text-sm font-medium text-gray-500">Ingredientes Agregados</Label>
+            <p className="text-sm">{ingredientesAgregados.length} ingredientes</p>
           </div>
         </div>
 
@@ -449,14 +830,15 @@ export default function NuevaFormulaPage() {
                 disabled={isLoading}
                 className="flex items-center gap-2 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 shadow-lg"
               >
-                {isLoading ? "Creando..." : "Crear Fórmula"}
+                {isLoading ? "Finalizando..." : "Finalizar Fórmula"}
               </Button>
             ) : (
               <Button
                 onClick={handleNextStep}
+                disabled={isLoading}
                 className="flex items-center gap-2 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 shadow-lg"
               >
-                Siguiente
+                {isLoading ? "Procesando..." : "Siguiente"}
                 <ArrowRight className="h-4 w-4" />
               </Button>
             )}
