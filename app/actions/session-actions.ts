@@ -61,16 +61,7 @@ export async function getSession(): Promise<SessionData | null> {
   }
 }
 
-//Función: getUserSessionData: función que devuelve la sessionData
-export async function getUserSessionData(): Promise<SessionData | null> {
-  return await getSession()
-}
-
-//Función: getSessionCookies: función que devuelve las cookies
-export async function getSessionCookies(): Promise<SessionData | null> {
-  return await getSession()
-}
-
+// Función: clearSession: función para limpiar las cookies de la sesion creada
 export async function clearSession(): Promise<void> {
   const cookieStore = cookies()
 
@@ -81,6 +72,17 @@ export async function clearSession(): Promise<void> {
   cookieStore.delete("RolId")
   cookieStore.delete("Permisos")
   cookieStore.delete("SesionActiva")
+}
+
+/*
+//Función: getUserSessionData: función que devuelve la sessionData
+export async function getUserSessionData(): Promise<SessionData | null> {
+  return await getSession()
+}
+
+//Función: getSessionCookies: función que devuelve las cookies
+export async function getSessionCookies(): Promise<SessionData | null> {
+  return await getSession()
 }
 
 export async function validateSession(): Promise<boolean> {
@@ -107,6 +109,7 @@ export async function setSessionCookies(sessionData: SessionData): Promise<void>
   cookieStore.set("Permisos", sessionData.Permisos, cookieOptions)
   cookieStore.set("SesionActiva", sessionData.SesionActiva.toString(), cookieOptions)
 }
+*/
 
 // Nueva función para obtener variables de sesión (alias de getSession)
 export const obtenerVariablesSesion = getSession
