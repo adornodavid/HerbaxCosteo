@@ -56,7 +56,7 @@ export async function crearFormula(formData: {
       const fileName = `formula_${Date.now()}_${formData.imagen.name}`
 
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("herbax/formulas")
+        .from("herbax")
         .upload(fileName, formData.imagen)
 
       if (uploadError) {
@@ -65,7 +65,7 @@ export async function crearFormula(formData: {
       }
 
       // Obtener URL pública de la imagen
-      const { data: urlData } = supabase.storage.from("herbax/formulas").getPublicUrl(fileName)
+      const { data: urlData } = supabase.storage.from("herbax").getPublicUrl(fileName)
 
       imgUrl = urlData.publicUrl
     }
@@ -785,7 +785,7 @@ export async function eliminarRegistroIncompleto(formulaId: number) {
         const fileName = pathSegments[pathSegments.length - 1]
         console.log(fileName)
         // Eliminar la imagen del bucket
-        const { error: deleteImageError } = await supabase.storage.from("herbax/formulas").remove([fileName])
+        const { error: deleteImageError } = await supabase.storage.from("herbax").remove([fileName])
 
         if (deleteImageError) {
           console.error("Error al eliminar imagen:", deleteImageError)
