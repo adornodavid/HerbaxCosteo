@@ -541,11 +541,11 @@ export default function NuevaFormulaPage() {
       */}
       {/* Agregar Ingredientes */}
       {selectedClienteId && (
-        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-6 shadow-sm">
           <h3 className="text-lg font-medium text-slate-800 mb-6">Agregar Ingredientes</h3>
 
           <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
               <div className="md:col-span-2 relative">
                 <Label htmlFor="txtIngredienteSearch">Ingrediente</Label>
                 <Input
