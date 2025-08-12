@@ -530,14 +530,14 @@ export default function NuevaFormulaPage() {
       </div>
 
       {/* Cantidad y Unidad de Medida */}
-      <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
+      {/*<div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
         <h3 className="text-lg font-medium text-slate-800 mb-6">Detalles de Cantidad</h3>
 
         
 
           
       </div>
-
+      */}
       {/* Agregar Ingredientes */}
       {selectedClienteId && (
         <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
