@@ -78,12 +78,12 @@ export default function NuevaFormulaPage() {
   }
 
   const validateStep1 = () => {
-    return formData.nombre.trim() !== "" && formData.costo > 0 && formData.cantidad > 0
+    return formData.nombre.trim() !== ""
   }
 
   const handleNextStep = () => {
     if (currentStep === 1 && !validateStep1()) {
-      setErrorMessage("Por favor completa todos los campos obligatorios")
+      setErrorMessage("Por favor completa el nombre de la fórmula")
       setShowErrorModal(true)
       return
     }
@@ -121,113 +121,170 @@ export default function NuevaFormulaPage() {
   }
 
   const renderStep1 = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="nombre">Nombre de la Fórmula *</Label>
-          <Input
-            id="nombre"
-            value={formData.nombre}
-            onChange={(e) => handleInputChange("nombre", e.target.value)}
-            placeholder="Ingresa el nombre de la fórmula"
-          />
-        </div>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Left side - Form inputs */}
+      <div className="lg:col-span-2 space-y-6">
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="nombre" className="text-slate-700 font-medium">
+                Nombre de la Fórmula *
+              </Label>
+              <Input
+                id="nombre"
+                value={formData.nombre}
+                onChange={(e) => handleInputChange("nombre", e.target.value)}
+                placeholder="Ingresa el nombre de la fórmula"
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+              />
+            </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="costo">Costo *</Label>
-          <Input
-            id="costo"
-            type="number"
-            step="0.01"
-            min="0"
-            value={formData.costo}
-            onChange={(e) => handleInputChange("costo", Number.parseFloat(e.target.value) || 0)}
-            placeholder="0.00"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="cantidad">Cantidad *</Label>
-          <Input
-            id="cantidad"
-            type="number"
-            min="0"
-            value={formData.cantidad}
-            onChange={(e) => handleInputChange("cantidad", Number.parseInt(e.target.value) || 0)}
-            placeholder="0"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="unidadmedida">Unidad de Medida</Label>
-          <Select
-            value={formData.unidadmedidaid.toString()}
-            onValueChange={(value) => handleInputChange("unidadmedidaid", Number.parseInt(value))}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecciona unidad" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">Gramos</SelectItem>
-              <SelectItem value="2">Kilogramos</SelectItem>
-              <SelectItem value="3">Litros</SelectItem>
-              <SelectItem value="4">Mililitros</SelectItem>
-              <SelectItem value="5">Piezas</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="notaspreparacion">Notas de Preparación</Label>
-        <Textarea
-          id="notaspreparacion"
-          value={formData.notaspreparacion}
-          onChange={(e) => handleInputChange("notaspreparacion", e.target.value)}
-          placeholder="Instrucciones de preparación..."
-          rows={4}
-        />
-      </div>
-
-      <div className="space-y-4">
-        <Label>Imagen de la Fórmula</Label>
-        <div className="flex items-center gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2"
-          >
-            <Upload className="h-4 w-4" />
-            Subir Imagen
-          </Button>
-          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-          {formData.imagen && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <FileImage className="h-3 w-3" />
-              {formData.imagen.name}
-            </Badge>
-          )}
-        </div>
-
-        {imagePreview && (
-          <div className="mt-4">
-            <img
-              src={imagePreview || "/placeholder.svg"}
-              alt="Preview"
-              className="w-32 h-32 object-cover rounded-lg border"
-            />
+            <div className="space-y-2">
+              <Label htmlFor="notaspreparacion" className="text-slate-700 font-medium">
+                Notas de Preparación
+              </Label>
+              <Textarea
+                id="notaspreparacion"
+                value={formData.notaspreparacion}
+                onChange={(e) => handleInputChange("notaspreparacion", e.target.value)}
+                placeholder="Instrucciones de preparación..."
+                rows={4}
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+              />
+            </div>
           </div>
-        )}
+        </div>
+      </div>
+
+      {/* Right side - Image upload and preview */}
+      <div className="lg:col-span-1">
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm h-full">
+          <div className="space-y-4">
+            <Label className="text-slate-700 font-medium">Imagen de la Fórmula</Label>
+
+            {/* Image preview area */}
+            <div className="relative">
+              {imagePreview ? (
+                <div className="relative group">
+                  <img
+                    src={imagePreview || "/placeholder.svg"}
+                    alt="Preview"
+                    className="w-full h-48 object-cover rounded-xl border-2 border-slate-200/60 shadow-sm"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl flex items-center justify-center">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-white/90 hover:bg-white text-slate-700"
+                    >
+                      Cambiar imagen
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className="w-full h-48 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-sky-400 hover:bg-sky-50/50 transition-colors duration-200"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="h-8 w-8 text-slate-400 mb-2" />
+                  <p className="text-sm text-slate-500 text-center">
+                    Haz clic para subir
+                    <br />
+                    una imagen
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full flex items-center gap-2 bg-white/80 backdrop-blur-sm border-slate-200/60 hover:border-sky-400 hover:bg-sky-50/50"
+            >
+              <Upload className="h-4 w-4" />
+              {formData.imagen ? "Cambiar Imagen" : "Subir Imagen"}
+            </Button>
+
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+
+            {formData.imagen && (
+              <Badge variant="secondary" className="flex items-center gap-1 w-fit">
+                <FileImage className="h-3 w-3" />
+                {formData.imagen.name}
+              </Badge>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )
 
   const renderStep2 = () => (
     <div className="space-y-6">
-      <div className="text-center py-12">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Agregar Ingredientes</h3>
-        <p className="text-gray-500">Esta funcionalidad se implementará en la siguiente fase del desarrollo.</p>
+      <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
+        <h3 className="text-lg font-medium text-slate-800 mb-6">Detalles de Cantidad y Costo</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="costo" className="text-slate-700 font-medium">
+              Costo *
+            </Label>
+            <Input
+              id="costo"
+              type="number"
+              step="0.01"
+              min="0"
+              value={formData.costo}
+              onChange={(e) => handleInputChange("costo", Number.parseFloat(e.target.value) || 0)}
+              placeholder="0.00"
+              className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="cantidad" className="text-slate-700 font-medium">
+              Cantidad *
+            </Label>
+            <Input
+              id="cantidad"
+              type="number"
+              min="0"
+              value={formData.cantidad}
+              onChange={(e) => handleInputChange("cantidad", Number.parseInt(e.target.value) || 0)}
+              placeholder="0"
+              className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+            />
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="unidadmedida" className="text-slate-700 font-medium">
+              Unidad de Medida
+            </Label>
+            <Select
+              value={formData.unidadmedidaid.toString()}
+              onValueChange={(value) => handleInputChange("unidadmedidaid", Number.parseInt(value))}
+            >
+              <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
+                <SelectValue placeholder="Selecciona unidad" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">Gramos</SelectItem>
+                <SelectItem value="2">Kilogramos</SelectItem>
+                <SelectItem value="3">Litros</SelectItem>
+                <SelectItem value="4">Mililitros</SelectItem>
+                <SelectItem value="5">Piezas</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
+      <div className="text-center py-8">
+        <h4 className="text-lg font-medium text-slate-700 mb-2">Agregar Ingredientes</h4>
+        <p className="text-slate-500">Esta funcionalidad se implementará en la siguiente fase del desarrollo.</p>
       </div>
     </div>
   )
@@ -316,37 +373,55 @@ export default function NuevaFormulaPage() {
         <p className="text-gray-600 mt-2">Crea una nueva fórmula siguiendo los pasos del asistente</p>
       </div>
 
-      {/* Progress Steps */}
       <div className="mb-8">
-        <div className="flex items-center justify-between">
-          {steps.map((step, index) => (
-            <div key={step.number} className="flex items-center">
-              <div className="flex flex-col items-center">
+        <div className="relative">
+          {/* Progress bar background */}
+          <div className="w-full h-3 bg-gradient-to-r from-slate-200/60 to-slate-300/60 rounded-full backdrop-blur-sm border border-slate-200/40 shadow-inner">
+            {/* Progress bar fill with liquid-glass effect */}
+            <div
+              className="h-full bg-gradient-to-r from-sky-400 via-sky-500 to-cyan-400 rounded-full shadow-lg backdrop-blur-sm border border-sky-300/30 transition-all duration-700 ease-out relative overflow-hidden"
+              style={{ width: `${(currentStep / steps.length) * 100}%` }}
+            >
+              {/* Liquid glass shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+              <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent"></div>
+            </div>
+          </div>
+
+          {/* Step indicators */}
+          <div className="flex items-center justify-between mt-6">
+            {steps.map((step, index) => (
+              <div key={step.number} className="flex flex-col items-center">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
-                    currentStep >= step.number ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-600"
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
+                    currentStep >= step.number
+                      ? "bg-gradient-to-br from-sky-400 to-cyan-500 text-white shadow-lg backdrop-blur-sm border border-sky-300/30"
+                      : "bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 backdrop-blur-sm border border-slate-200/60"
                   }`}
                 >
                   {step.number}
                 </div>
                 <div className="mt-2 text-center">
-                  <p className="text-sm font-medium">{step.title}</p>
-                  <p className="text-xs text-gray-500">{step.description}</p>
+                  <p
+                    className={`text-sm font-medium ${currentStep >= step.number ? "text-sky-700" : "text-slate-600"}`}
+                  >
+                    {step.title}
+                  </p>
+                  <p className="text-xs text-slate-500">{step.description}</p>
                 </div>
               </div>
-              {index < steps.length - 1 && <div className="flex-1 h-px bg-gray-200 mx-4 mt-5" />}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Form Content */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{steps[currentStep - 1].title}</CardTitle>
-          <CardDescription>{steps[currentStep - 1].description}</CardDescription>
+      <Card className="bg-white/80 backdrop-blur-sm border-slate-200/60 shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-slate-50/80 to-slate-100/50 backdrop-blur-sm">
+          <CardTitle className="text-slate-800">{steps[currentStep - 1].title}</CardTitle>
+          <CardDescription className="text-slate-600">{steps[currentStep - 1].description}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           {currentStep === 1 && renderStep1()}
           {currentStep === 2 && renderStep2()}
           {currentStep === 3 && renderStep3()}
@@ -361,7 +436,7 @@ export default function NuevaFormulaPage() {
             variant="outline"
             onClick={handlePrevStep}
             disabled={currentStep === 1}
-            className="flex items-center gap-2 bg-transparent"
+            className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-slate-200/60 hover:border-sky-400 hover:bg-sky-50/50"
           >
             <ArrowLeft className="h-4 w-4" />
             Anterior
@@ -369,11 +444,18 @@ export default function NuevaFormulaPage() {
 
           <div className="flex gap-2">
             {currentStep === 3 ? (
-              <Button onClick={handleSubmit} disabled={isLoading} className="flex items-center gap-2">
+              <Button
+                onClick={handleSubmit}
+                disabled={isLoading}
+                className="flex items-center gap-2 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 shadow-lg"
+              >
                 {isLoading ? "Creando..." : "Crear Fórmula"}
               </Button>
             ) : (
-              <Button onClick={handleNextStep} className="flex items-center gap-2">
+              <Button
+                onClick={handleNextStep}
+                className="flex items-center gap-2 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 shadow-lg"
+              >
                 Siguiente
                 <ArrowRight className="h-4 w-4" />
               </Button>
