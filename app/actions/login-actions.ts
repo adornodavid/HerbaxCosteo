@@ -38,7 +38,7 @@ export async function procesarInicioSesion(email: string, password: string): Pro
     // Paso 2: Obtener datos del usuario
     const { data: userData, error: userError } = await supabase
       .from("usuarios")
-      .select("id, email, nombrecompleto, hotelid, rolid")
+      .select("id, email, nombrecompleto, clienteid, rolid")
       .eq("email", email)
       .single()
 
@@ -69,7 +69,7 @@ export async function procesarInicioSesion(email: string, password: string): Pro
       UsuarioId: userData.id,
       Email: userData.email,
       NombreCompleto: userData.nombrecompleto || "",
-      HotelId: userData.hotelid || 0,
+      ClienteId: userData.clienteid || 0,
       RolId: userData.rolid || 0,
       Permisos: permisosString,
       SesionActiva: true,
