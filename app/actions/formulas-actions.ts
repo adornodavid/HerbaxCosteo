@@ -547,7 +547,7 @@ export async function obtenerIngredientesFormula(formulaId: number) {
         id: item.id,
         nombre: item.ingredientes.nombre,
         cantidad: item.cantidad,
-        unidad: item.unidadesmedida.descripcion,
+        unidad: item.tipounidadesmedida.descripcion,
         ingredientecostoparcial: item.ingredientes.costo * item.cantidad,
       })) || []
 
