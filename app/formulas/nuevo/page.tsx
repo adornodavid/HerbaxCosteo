@@ -862,6 +862,18 @@ export default function NuevaFormulaPage() {
     fetchIngredientDetails()
   }, [selIngredienteId])
 
+  useEffect(() => {
+    if (showSuccessModal) {
+      const timer = setTimeout(() => {
+        setShowSuccessModal(false)
+        // Redirect to formulas list
+        window.location.href = "/formulas"
+      }, 4000) // 4 seconds
+
+      return () => clearTimeout(timer)
+    }
+  }, [showSuccessModal])
+
   return (
     <div className="container mx-auto py-6 px-4">
       {/* Header */}
@@ -1011,61 +1023,74 @@ export default function NuevaFormulaPage() {
                     <div className="w-6 h-2 bg-sky-200 border-2 border-sky-300 border-b-0 rounded-t-lg mx-auto -mt-1"></div>
                   </div>
                 </div>
+
+                {/* Particles around flask */}
+                <div className="absolute inset-0">
+                  <div
+                    className="absolute top-4 left-4 w-1 h-1 bg-emerald-400 rounded-full animate-ping"
+                    style={{ animationDelay: "0s" }}
+                  ></div>
+                  <div
+                    className="absolute top-8 right-6 w-1 h-1 bg-sky-400 rounded-full animate-ping"
+                    style={{ animationDelay: "0.7s" }}
+                  ></div>
+                  <div
+                    className="absolute bottom-8 left-6 w-1 h-1 bg-purple-400 rounded-full animate-ping"
+                    style={{ animationDelay: "1.4s" }}
+                  ></div>
+                  <div
+                    className="absolute bottom-4 right-4 w-1 h-1 bg-yellow-400 rounded-full animate-ping"
+                    style={{ animationDelay: "2.1s" }}
+                  ></div>
+                </div>
               </div>
 
-              {/* Particles around flask */}
-              <div className="absolute inset-0">
-                <div
-                  className="absolute top-4 left-4 w-1 h-1 bg-emerald-400 rounded-full animate-ping"
-                  style={{ animationDelay: "0s" }}
-                ></div>
-                <div
-                  className="absolute top-8 right-6 w-1 h-1 bg-sky-400 rounded-full animate-ping"
-                  style={{ animationDelay: "0.7s" }}
-                ></div>
-                <div
-                  className="absolute bottom-8 left-6 w-1 h-1 bg-purple-400 rounded-full animate-ping"
-                  style={{ animationDelay: "1.4s" }}
-                ></div>
-                <div
-                  className="absolute bottom-4 right-4 w-1 h-1 bg-yellow-400 rounded-full animate-ping"
-                  style={{ animationDelay: "2.1s" }}
-                ></div>
+              {/* Loading text with laboratory style animation */}
+              <div className="space-y-4">
+                <h3 className="text-2xl font-bold text-gray-900 animate-pulse">
+                  Creando Fórmula
+                  <span className="inline-flex ml-1">
+                    <span className="animate-bounce" style={{ animationDelay: "0s" }}>
+                      .
+                    </span>
+                    <span className="animate-bounce" style={{ animationDelay: "0.2s" }}>
+                      .
+                    </span>
+                    <span className="animate-bounce" style={{ animationDelay: "0.4s" }}>
+                      .
+                    </span>
+                  </span>
+                </h3>
+
+                {/* Loading progress bar */}
+                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-400 via-sky-400 to-purple-400 rounded-full animate-pulse"
+                    style={{
+                      width: "100%",
+                      animation: "progressFill 4s ease-in-out forwards",
+                    }}
+                  ></div>
+                </div>
+
+                <p className="text-gray-600 animate-pulse">
+                  Procesando ingredientes y calculando fórmula en el laboratorio...
+                </p>
               </div>
             </div>
 
-            <div className="space-y-3">
-              <div className="w-16 h-16 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto animate-bounce">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-
-              <h3 className="text-2xl font-bold text-gray-900">¡Fórmula Creada!</h3>
-              <p className="text-gray-600">
-                Tu fórmula <span className="font-semibold text-emerald-600">{formData.nombre}</span> ha sido registrada
-                exitosamente en el laboratorio.
-              </p>
-              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-                <p className="text-sm text-emerald-700">
-                  <span className="font-medium">Costo total:</span> ${costoTotal.toFixed(2)}
-                </p>
-                <p className="text-sm text-emerald-700">
-                  <span className="font-medium">Ingredientes:</span> {ingredientesAgregados.length}
-                </p>
-              </div>
-            </div>
-
-            <Button
-              onClick={() => {
-                setShowSuccessModal(false)
-                // Redirect to formulas list or reset form
-                window.location.href = "/formulas"
-              }}
-              className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
-            >
-              Ir a Fórmulas
-            </Button>
+            {/* Custom CSS animations */}
+            <style jsx>{`
+              @keyframes liquidFill {
+                0% { height: 40%; }
+                100% { height: 80%; }
+              }
+              
+              @keyframes progressFill {
+                0% { width: 0%; }
+                100% { width: 100%; }
+              }
+            `}</style>
           </div>
         </div>
       )}
