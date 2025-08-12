@@ -818,7 +818,7 @@ export default function NuevaFormulaPage() {
           <CardTitle className="text-slate-800">{steps[currentStep - 1].title}</CardTitle>
           <CardDescription className="text-slate-600">{steps[currentStep - 1].description}</CardDescription>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-4">
           {currentStep === 1 && renderStep1()}
           {currentStep === 2 && renderStep2()}
           {currentStep === 3 && renderStep3()}
