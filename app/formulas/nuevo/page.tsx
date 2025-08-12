@@ -967,7 +967,7 @@ export default function NuevaFormulaPage() {
           <Button
             variant="outline"
             onClick={handlePrevStep}
-            disabled={currentStep === 1}
+            disabled={currentStep === 1 && currentStep === 2}
             className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-slate-200/60 hover:border-sky-400 hover:bg-sky-50/50"
           >
             <ArrowLeft className="h-4 w-4" />
