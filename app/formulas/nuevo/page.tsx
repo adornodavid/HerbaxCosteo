@@ -24,6 +24,7 @@ import {
   obtenerIngredientesFormula, // Added import for missing function
 } from "@/app/actions/formulas-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
+import { getSession } from "@/app/actions/session-actions"
 
 interface FormData {
   nombre: string
@@ -119,8 +120,15 @@ export default function NuevaFormulaPage() {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
+        const session = await getSession()
+        let clienteIdParam = "-1"
+
+        if (session && session.RolId && ![1, 2, 3].includes(session.RolId)) {
+          clienteIdParam = session.ClienteId.toString()
+        }
+
         const [clientesResult, unidadesResult] = await Promise.all([
-          listaDesplegableClientes("-1", ""),
+          listaDesplegableClientes(clienteIdParam, ""),
           obtenerUnidadesMedida(),
         ])
 
