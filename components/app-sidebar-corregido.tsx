@@ -30,7 +30,7 @@ import {
   Key,
   RefreshCw,
 } from "lucide-react"
-import { logout } from "@/app/actions/login-backend-actions"
+import { logout } from "@/app/actions/login-actions"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"

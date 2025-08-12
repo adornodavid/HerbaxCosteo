@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useAuth } from "@/contexts/auth-context"
-import { logout } from "@/app/actions/login-backend-actions"
+import { logout } from "@/app/actions/login-actions"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
