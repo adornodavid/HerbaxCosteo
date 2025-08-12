@@ -481,6 +481,8 @@ export async function obtenerIngredientesPorCliente(clienteId: number) {
       .eq("activo", true)
       .order("nombre", { ascending: true })
 
+      const CostoTotal = costo *
+
     if (error) {
       console.error("Error al obtener ingredientes:", error)
       return { data: null, error: error.message }

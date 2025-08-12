@@ -137,7 +137,7 @@ export default function NuevaFormulaPage() {
     const loadIngredientes = async () => {
       if (selectedClienteId) {
         try {
-          const result = await obtenerIngredientesPorCliente(Number(selectedClienteId))
+          const result = await obtenerIngredientesPorCliente(Number(selectedClienteId), Number(selIngredienteCantidad))
           if (result.data) {
             setIngredientes(result.data)
           }
