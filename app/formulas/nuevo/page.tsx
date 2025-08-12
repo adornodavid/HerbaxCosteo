@@ -475,7 +475,7 @@ export default function NuevaFormulaPage() {
         <h3 className="col-span-2 text-lg font-medium text-slate-800 mb-4">Seleccionar Cliente</h3>
         <h3 className="col-span-2 text-lg font-medium text-slate-800 mb-4">Detalles de Porcion</h3>
       </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="space-y-2 mb-4 col-span-2">
           <Label htmlFor="cliente" className="text-slate-700 font-medium">
             Cliente *
