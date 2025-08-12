@@ -23,6 +23,11 @@ export interface SessionData {
   --------------------
 	* 
     - getSession
+    - getUserSessionData
+    - getSessionCookies
+    - clearSession
+    - validateSession
+    - setSessionCookies
 ================================================== */
 // Función: getSession: función para obtener las cookies de la sesion creada
 export async function getSession(): Promise<SessionData | null> {
