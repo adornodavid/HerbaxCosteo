@@ -516,7 +516,6 @@ export default function NuevaFormulaPage() {
               Unidad de Medida
             </Label>
             <Select
-              disabled
               value={formData.unidadmedidaid.toString()}
               onValueChange={(value) => handleInputChange("unidadmedidaid", Number.parseInt(value))}
             >
@@ -589,7 +588,7 @@ export default function NuevaFormulaPage() {
                 <Select
                   value={selIngredienteUnidad}
                   onValueChange={setSelIngredienteUnidad}
-                  disabled={!selIngredienteId || unidades.length === 0}
+                  disabled
                 >
                   <SelectTrigger
                     id="ddlUnidadMedida"
