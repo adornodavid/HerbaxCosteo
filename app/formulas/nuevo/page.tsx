@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -27,6 +27,7 @@ import {
 } from "@/app/actions/formulas-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 import { getSession } from "@/app/actions/session-actions"
+import { useNavigationGuard } from "@/contexts/navigation-guard-context"
 
 interface FormData {
   nombre: string
@@ -72,6 +73,7 @@ interface IngredienteAgregado {
 export default function NuevaFormulaPage() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { setGuard } = useNavigationGuard()
 
   // Estados para el formulario por etapas
   const [currentStep, setCurrentStep] = useState(1)
@@ -116,7 +118,8 @@ export default function NuevaFormulaPage() {
   const [showExitConfirmModal, setShowExitConfirmModal] = useState(false)
   const [showValidationModal, setShowValidationModal] = useState(false)
   const [validationMessage, setValidationMessage] = useState("")
-  const [isExiting, setIsExiting] = useState(false)
+  const [nextPath, setNextPath] = useState("")
+  const resolveNavigationRef = useRef<((value: boolean) => void) | null>(null)
 
   const [showDuplicateModal, setShowDuplicateModal] = useState(false)
   const [duplicateMessage, setDuplicateMessage] = useState("")
@@ -916,51 +919,65 @@ export default function NuevaFormulaPage() {
     }
   }, [showSuccessModal])
 
+  const handleLeavePage = useCallback(
+    async (confirm: boolean) => {
+      setShowExitConfirmModal(false)
+      if (confirm) {
+        if (formulaId) {
+          await eliminarRegistroIncompleto(formulaId)
+        }
+        resolveNavigationRef.current?.(true) // Allow navigation
+      } else {
+        resolveNavigationRef.current?.(false) // Cancel navigation
+      }
+      resolveNavigationRef.current = null
+    },
+    [formulaId],
+  )
+
+  const checkLeaveAndConfirm = useCallback(
+    async (targetPath: string): Promise<boolean> => {
+      if (currentStep >= 2 && formulaId) {
+        return new Promise<boolean>((resolve) => {
+          resolveNavigationRef.current = resolve
+          setShowExitConfirmModal(true)
+          setNextPath(targetPath)
+        })
+      }
+      return true // Allow navigation if not in protected state
+    },
+    [currentStep, formulaId],
+  )
+
+  useEffect(() => {
+    if (currentStep >= 2 && formulaId) {
+      setGuard(checkLeaveAndConfirm)
+    } else {
+      setGuard(null)
+    }
+
+    return () => {
+      setGuard(null)
+    }
+  }, [currentStep, formulaId, setGuard, checkLeaveAndConfirm])
+
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (currentStep >= 2 && formulaId && !isExiting) {
+      if (currentStep >= 2 && formulaId) {
         e.preventDefault()
         e.returnValue = ""
-        setShowExitConfirmModal(true)
         return ""
       }
     }
 
     if (currentStep >= 2 && formulaId) {
       window.addEventListener("beforeunload", handleBeforeUnload)
-
-
-      // For Next.js router navigation - capture destination URL
-      const originalPush = router.push
-      router.push = (...args) => {
-        if (currentStep >= 2 && formulaId && !isExiting) {
-          // Capture the destination URL
-          const destination = typeof args[0] === "string" ? args[0] : args[0].pathname || args[0].href
-          setPendingNavigation(destination)
-          setShowExitConfirmModal(true)
-          return Promise.resolve(true)
-        }
-        return originalPush.apply(router, args)
-      }
-
-      // Also intercept router.replace
-      const originalReplace = router.replace
-      router.replace = (...args) => {
-        if (currentStep >= 2 && formulaId && !isExiting) {
-          // Capture the destination URL
-          const destination = typeof args[0] === "string" ? args[0] : args[0].pathname || args[0].href
-          setPendingNavigation(destination)
-          setShowExitConfirmModal(true)
-          return Promise.resolve(true)
-        }
-        return originalReplace.apply(router, args)
-      }
     }
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload)
     }
-  }, [currentStep, formulaId, isExiting, router])
+  }, [currentStep, formulaId])
 
   const validateStep2 = () => {
     // Check if at least 2 ingredients are added
@@ -985,28 +1002,6 @@ export default function NuevaFormulaPage() {
     }
 
     return true
-  }
-
-  const handleConfirmExit = async () => {
-    if (formulaId) {
-      setIsExiting(true)
-      await eliminarRegistroIncompleto(formulaId)
-    }
-   
-     
-    //console.log(pendingNavigation)
-    // Navigate to intended destination or default to formulas page
-    if (pendingNavigation) {
-      router.push(pendingNavigation)
-      setPendingNavigation(null)
-    } else {
-      router.push("/formulas")
-    }
-    setShowExitConfirmModal(false)
-  }
-
-  const handleCancelExit = () => {
-    setShowExitConfirmModal(false)
   }
 
   return (
@@ -1266,10 +1261,10 @@ export default function NuevaFormulaPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={handleCancelExit}>
+            <Button variant="outline" onClick={() => handleLeavePage(false)}>
               Cancelar
             </Button>
-            <Button variant="destructive" onClick={handleConfirmExit} className="bg-red-500 hover:bg-red-600">
+            <Button variant="destructive" onClick={() => handleLeavePage(true)} className="bg-red-500 hover:bg-red-600">
               Sí, salir
             </Button>
           </div>
