@@ -195,7 +195,7 @@ export default function FormulasPage() {
       if (!sesion) return
 
       const rolId = Number.parseInt(sesion.RolId?.toString() || "0", 10)
-      const hotelIdSesion = Number.parseInt(sesion.HotelId?.toString() || "0", 10)
+      const hotelIdSesion = Number.parseInt(sesion.ClienteId?.toString() || "0", 10)
 
       let auxHotelid: number
       if (![1, 2, 3, 4].includes(rolId)) {
