@@ -5,6 +5,9 @@
 ================================================== */
 import { cookies } from "next/headers"
 
+/* ==================================================
+  Interfaces, clases, objetos
+================================================== */
 export interface SessionData {
   UsuarioId: number
   Email: string
