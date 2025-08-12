@@ -997,7 +997,7 @@ export default function NuevaFormulaPage() {
     //console.log(pendingNavigation)
     // Navigate to intended destination or default to formulas page
     //f (pendingNavigation) {
-      router.push(pendingNavigation)
+      router.push("/formulas")
       //console.log("sec",pendingNavigation)
       // setPendingNavigation(null)
     //} else {
