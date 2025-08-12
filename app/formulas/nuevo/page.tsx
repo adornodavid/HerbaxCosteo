@@ -259,7 +259,7 @@ export default function NuevaFormulaPage() {
 
     setIsSubmitting(true)
     try {
-      const result = await crearFormulaEtapa2(formulaId, Number(selIngredienteId), Number(selIngredienteCantidad))
+      const result = await crearFormulaEtapa2(formulaId, Number(selIngredienteId), Number(selIngredienteCantidad), Number(selIngredienteCosto))
 
       if (result.success) {
         // Reload ingredients list
