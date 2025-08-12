@@ -105,7 +105,7 @@ export async function crearFormulaEtapa2(formulaId: number, ingredienteId: numbe
         formulaid: formulaId,
         ingredienteid: ingredienteId,
         cantidad: cantidad,
-        ingredientecostoparcial: ingredientecostoparcial,
+        ingredientecostoparcial: formData.ingredientecostoparcial,
       })
       .select()
 
