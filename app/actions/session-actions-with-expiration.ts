@@ -44,7 +44,7 @@ export async function crearSesionConExpiracion(userData: {
     httpOnly: true,
     secure: true,
   })
-  cookies().set("HotelId", userData.HotelId.toString(), { expires: expirationTime, httpOnly: true, secure: true })
+  cookies().set("ClienteId", userData.ClienteId.toString(), { expires: expirationTime, httpOnly: true, secure: true })
   cookies().set("RolId", userData.RolId.toString(), { expires: expirationTime, httpOnly: true, secure: true })
   cookies().set("Permisos", JSON.stringify(userData.Permisos), {
     expires: expirationTime,
@@ -63,7 +63,7 @@ export async function obtenerVariablesSesion(): Promise<SessionData> {
     const UsuarioId = cookieStore.get("UsuarioId")?.value || null
     const Email = cookieStore.get("Email")?.value || null
     const NombreCompleto = cookieStore.get("NombreCompleto")?.value || null
-    const HotelId = Number(cookieStore.get("HotelId")?.value) || null
+    const ClienteId = Number(cookieStore.get("ClienteId")?.value) || null
     const RolId = Number(cookieStore.get("RolId")?.value) || null
     const SesionActiva = cookieStore.get("SesionActiva")?.value === "true"
     const ExpiresAt = cookieStore.get("ExpiresAt")?.value || null
@@ -99,7 +99,7 @@ export async function obtenerVariablesSesion(): Promise<SessionData> {
           UsuarioId: null,
           Email: null,
           NombreCompleto: null,
-          HotelId: null,
+          ClienteId: null,
           RolId: null,
           Permisos: null,
           SesionActiva: false,
@@ -112,7 +112,7 @@ export async function obtenerVariablesSesion(): Promise<SessionData> {
       UsuarioId,
       Email,
       NombreCompleto,
-      HotelId,
+      ClienteId,
       RolId,
       Permisos,
       SesionActiva: SesionActiva && !sessionExpired,
@@ -124,7 +124,7 @@ export async function obtenerVariablesSesion(): Promise<SessionData> {
       UsuarioId: null,
       Email: null,
       NombreCompleto: null,
-      HotelId: null,
+      ClienteId: null,
       RolId: null,
       Permisos: null,
       SesionActiva: null,
@@ -138,7 +138,7 @@ export async function cerrarSesion() {
   cookies().delete("UsuarioId")
   cookies().delete("Email")
   cookies().delete("NombreCompleto")
-  cookies().delete("HotelId")
+  cookies().delete("ClienteId")
   cookies().delete("RolId")
   cookies().delete("Permisos")
   cookies().delete("SesionActiva")
@@ -184,7 +184,7 @@ export async function renovarSesion(): Promise<boolean> {
   if (sessionData.UsuarioId) cookieStore.set("UsuarioId", sessionData.UsuarioId.toString(), cookieOptions)
   if (sessionData.Email) cookieStore.set("Email", sessionData.Email, cookieOptions)
   if (sessionData.NombreCompleto) cookieStore.set("NombreCompleto", sessionData.NombreCompleto, cookieOptions)
-  if (sessionData.HotelId !== null) cookieStore.set("HotelId", sessionData.HotelId.toString(), cookieOptions)
+  if (sessionData.ClienteId !== null) cookieStore.set("ClienteId", sessionData.ClienteId.toString(), cookieOptions)
   if (sessionData.RolId !== null) cookieStore.set("RolId", sessionData.RolId.toString(), cookieOptions)
   if (sessionData.Permisos) cookieStore.set("Permisos", JSON.stringify(sessionData.Permisos), cookieOptions)
   if (sessionData.SesionActiva !== null)
