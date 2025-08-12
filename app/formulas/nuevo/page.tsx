@@ -993,7 +993,7 @@ export default function NuevaFormulaPage() {
       await eliminarRegistroIncompleto(formulaId)
     }
    
-
+     setShowExitConfirmModal(false)
     //console.log(pendingNavigation)
     // Navigate to intended destination or default to formulas page
     if (pendingNavigation) {
@@ -1003,7 +1003,7 @@ export default function NuevaFormulaPage() {
     } else {
       router.push("/formulas")
     }
-     setShowExitConfirmModal(false)
+    
   }
 
   const handleCancelExit = () => {
