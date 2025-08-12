@@ -17,13 +17,13 @@ import { CheckCircle, Upload, ArrowLeft, ArrowRight, FileImage, Loader2 } from "
 import {
   crearFormula,
   crearFormulaEtapa2,
-  obtenerClientes,
   obtenerIngredientesPorCliente,
   obtenerUnidadesMedida,
-  obtenerIngredientesFormula,
   eliminarIngredienteFormula,
   getIngredientDetails, // Added import for moved function
+  obtenerIngredientesFormula, // Added import for missing function
 } from "@/app/actions/formulas-actions"
+import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 
 interface FormData {
   nombre: string
@@ -119,7 +119,10 @@ export default function NuevaFormulaPage() {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const [clientesResult, unidadesResult] = await Promise.all([obtenerClientes(), obtenerUnidadesMedida()])
+        const [clientesResult, unidadesResult] = await Promise.all([
+          listaDesplegableClientes(-1, ""),
+          obtenerUnidadesMedida(),
+        ])
 
         if (clientesResult.data) {
           setClientes(clientesResult.data)
