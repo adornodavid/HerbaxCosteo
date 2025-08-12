@@ -357,7 +357,7 @@ export default function NuevaFormulaPage() {
     <div className="container mx-auto py-6 px-4">
       {/* Header */}
       <div className="mb-5">
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex items-center gap-4 mb-2">
           <Button
             variant="ghost"
             size="sm"
