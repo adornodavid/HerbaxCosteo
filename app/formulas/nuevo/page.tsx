@@ -14,7 +14,6 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { CheckCircle, Upload, ArrowLeft, ArrowRight, FileImage, Loader2 } from "lucide-react"
-import { supabase } from "@/lib/supabase"
 import {
   crearFormula,
   crearFormulaEtapa2,
@@ -23,6 +22,7 @@ import {
   obtenerUnidadesMedida,
   obtenerIngredientesFormula,
   eliminarIngredienteFormula,
+  getIngredientDetails, // Added import for moved function
 } from "@/app/actions/formulas-actions"
 
 interface FormData {
@@ -585,11 +585,7 @@ export default function NuevaFormulaPage() {
               </div>
               <div>
                 <Label htmlFor="ddlUnidadMedida">Unidad</Label>
-                <Select
-                  value={selIngredienteUnidad}
-                  onValueChange={setSelIngredienteUnidad}
-                  disabled
-                >
+                <Select value={selIngredienteUnidad} onValueChange={setSelIngredienteUnidad} disabled>
                   <SelectTrigger
                     id="ddlUnidadMedida"
                     name="ddlUnidadMedida"
@@ -737,34 +733,18 @@ export default function NuevaFormulaPage() {
     </div>
   )
 
-  const getIngredientDetails = async (ingredienteId: number) => {
-    try {
-      const { data, error } = await supabase
-        .from("ingredientes")
-        .select(`
-          id,
-          nombre,
-          costo,
-          tipounidadesmedida!inner(
-            id,
-            descripcion
-          )
-        `)
-        .eq("id", ingredienteId)
-        .single()
-
-      if (error) {
-        console.error("Error getting ingredient details:", error)
-        return
+  const fetchIngredientDetails = async () => {
+    if (selIngredienteId) {
+      const result = await getIngredientDetails(Number.parseInt(selIngredienteId))
+      if (result.success && result.unidadMedidaId) {
+        setSelIngredienteUnidad(result.unidadMedidaId.toString())
       }
-
-      if (data && data.tipounidadesmedida) {
-        setSelIngredienteUnidad(data.tipounidadesmedida.id.toString())
-      }
-    } catch (error) {
-      console.error("Error in getIngredientDetails:", error)
     }
   }
+
+  useEffect(() => {
+    fetchIngredientDetails()
+  }, [selIngredienteId])
 
   return (
     <div className="container mx-auto py-6 px-4">

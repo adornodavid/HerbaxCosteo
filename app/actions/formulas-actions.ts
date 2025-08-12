@@ -25,6 +25,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
     - obtenerUnidadesMedida
     - obtenerIngredientesFormula
     - obtenerClientes
+    - getIngredientDetails
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarFormula / updFormula
     - estatusActivoFormula / actFormula
@@ -590,5 +591,38 @@ export async function obtenerClientes() {
   } catch (error: any) {
     console.error("Error en obtenerClientes:", error)
     return { data: null, error: error.message }
+  }
+}
+
+//Función: getIngredientDetails: funcion para obtener detalles de un ingrediente por Id
+export async function getIngredientDetails(ingredienteId: number) {
+  try {
+    const { data, error } = await supabase
+      .from("ingredientes")
+      .select(`
+        id,
+        nombre,
+        costo,
+        tipounidadesmedida!inner(
+          id,
+          descripcion
+        )
+      `)
+      .eq("id", ingredienteId)
+      .single()
+
+    if (error) {
+      console.error("Error getting ingredient details:", error)
+      return { success: false, error: error.message }
+    }
+
+    return {
+      success: true,
+      data: data,
+      unidadMedidaId: data.tipounidadesmedida?.id || null,
+    }
+  } catch (error: any) {
+    console.error("Error in getIngredientDetails:", error)
+    return { success: false, error: error.message }
   }
 }
