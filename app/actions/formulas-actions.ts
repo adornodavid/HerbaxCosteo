@@ -65,7 +65,7 @@ export async function crearFormula(formData: {
       }
 
       // Obtener URL pública de la imagen
-      const { data: urlData } = supabase.storage.from("herbax").getPublicUrl(fileName)
+      const { data: urlData } = supabase.storage.from("herbax/formulas").getPublicUrl(fileName)
 
       imgUrl = urlData.publicUrl
     }
