@@ -26,14 +26,17 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
     - obtenerIngredientesFormula***
     - obtenerClientes***
     - getIngredientDetails***
+    - obtenerFormulaCompleta
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarFormula / updFormula
     - estatusActivoFormula / actFormula
+    - actualizarFormulaEtapa1
   * DELETES-ELIMINAR (DELETES)
     - eliminarFormula / delFormula
     - eliminarIngredienteFormula***
   * SPECIALS-ESPECIALES ()
     - estadisticasFormulasTotales / statsFormlasTotales
+    - verificarIngredienteDuplicado
 ================================================== */
 //Función: crearFormula: funcion para crear una formula
 export async function crearFormula(formData: {
@@ -97,9 +100,13 @@ export async function crearFormula(formData: {
 }
 
 //Función: crearFormulaEtapa2: funcion para crear una formula pasando a la etapa 2 donde están las relaciones con los materiales
-export async function crearFormulaEtapa2(formulaId: number, ingredienteId: number, cantidad: number, ingredientecostoparcial: number ) {
+export async function crearFormulaEtapa2(
+  formulaId: number,
+  ingredienteId: number,
+  cantidad: number,
+  ingredientecostoparcial: number,
+) {
   try {
-
     const CostoTotalParcial = ingredientecostoparcial * cantidad
 
     const { data, error } = await supabase
@@ -484,7 +491,7 @@ export async function obtenerIngredientesPorCliente(clienteId: number, cantidad:
       .eq("activo", true)
       .order("nombre", { ascending: true })
 
-      const CostoTotal = data.costo * cantidad
+    const CostoTotal = data.costo * cantidad
 
     if (error) {
       console.error("Error al obtener ingredientes:", error)
@@ -631,5 +638,126 @@ export async function getIngredientDetails(ingredienteId: number) {
   } catch (error: any) {
     console.error("Error in getIngredientDetails:", error)
     return { success: false, error: error.message }
+  }
+}
+
+//Función: obtenerFormulaCompleta: función para obtener todos los datos de una fórmula para edición
+export async function obtenerFormulaCompleta(formulaId: number) {
+  try {
+    const { data, error } = await supabase
+      .from("formulas")
+      .select(`
+        id,
+        nombre,
+        notaspreparacion,
+        costo,
+        imgurl,
+        activo,
+        cantidad,
+        unidadmedidaid,
+        fechacreacion,
+        ingredientesxformula(
+          id,
+          ingredienteid,
+          cantidad,
+          ingredientecostoparcial,
+          ingredientes(
+            id,
+            nombre,
+            costo,
+            clienteid,
+            tipounidadesmedida(
+              id,
+              descripcion
+            )
+          )
+        )
+      `)
+      .eq("id", formulaId)
+      .single()
+
+    if (error) {
+      console.error("Error al obtener fórmula completa:", error)
+      return { data: null, error: error.message }
+    }
+
+    return { data, error: null }
+  } catch (error: any) {
+    console.error("Error en obtenerFormulaCompleta:", error)
+    return { data: null, error: error.message }
+  }
+}
+
+//Función: actualizarFormulaEtapa1: función para actualizar información básica de la fórmula
+export async function actualizarFormulaEtapa1(
+  formulaId: number,
+  formData: {
+    nombre: string
+    notaspreparacion: string
+    cantidad: number
+    unidadmedidaid: number
+    imagen?: File
+  },
+) {
+  try {
+    const updateData: any = {
+      nombre: formData.nombre,
+      notaspreparacion: formData.notaspreparacion,
+      cantidad: formData.cantidad,
+      unidadmedidaid: formData.unidadmedidaid,
+    }
+
+    if (formData.imagen) {
+      const fileName = `formula_${Date.now()}_${formData.imagen.name}`
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("herbax")
+        .upload(fileName, formData.imagen)
+
+      if (uploadError) {
+        console.error("Error al subir imagen:", uploadError)
+        return { success: false, error: "Error al subir la imagen" }
+      }
+
+      const { data: urlData } = supabase.storage.from("herbax").getPublicUrl(fileName)
+      updateData.imgurl = urlData.publicUrl
+    }
+
+    const { data, error } = await supabase.from("formulas").update(updateData).eq("id", formulaId).select()
+
+    if (error) {
+      console.error("Error al actualizar fórmula etapa 1:", error)
+      return { success: false, error: error.message }
+    }
+
+    return {
+      success: true,
+      data: data[0],
+      message: "Información básica actualizada exitosamente",
+    }
+  } catch (error: any) {
+    console.error("Error en actualizarFormulaEtapa1:", error)
+    return { success: false, error: error.message }
+  }
+}
+
+//Función: verificarIngredienteDuplicado: función para verificar si un ingrediente ya está en la fórmula
+export async function verificarIngredienteDuplicado(formulaId: number, ingredienteId: number) {
+  try {
+    const { data, error } = await supabase
+      .from("ingredientesxformula")
+      .select("id")
+      .eq("formulaid", formulaId)
+      .eq("ingredienteid", ingredienteId)
+
+    if (error) {
+      console.error("Error al verificar ingrediente duplicado:", error)
+      return { exists: false, error: error.message }
+    }
+
+    return { exists: data && data.length > 0, error: null }
+  } catch (error: any) {
+    console.error("Error en verificarIngredienteDuplicado:", error)
+    return { exists: false, error: error.message }
   }
 }

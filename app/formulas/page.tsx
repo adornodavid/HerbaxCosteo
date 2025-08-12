@@ -615,7 +615,7 @@ export default function FormulasPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => router.push(`/formulas/${formula.folio}/editar`)}
+                          onClick={() => router.push(`/formulas/editar?getFormulaId=${formula.folio}`)}
                         >
                           <Edit className="h-3 w-3" />
                         </Button>
