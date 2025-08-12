@@ -727,7 +727,7 @@ export default function NuevaFormulaPage() {
   const renderStep3 = () => (
     <div className="space-y-8">
       <div className="text-center">
-        <h3 className="text-2xl font-bold bg-gradient-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent mb-2">
+        <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-50/80 to-slate-100/50 backdrop-blur-sm">
           Resumen de la Fórmula
         </h3>
         <p className="text-gray-600">Revisa toda la información antes de finalizar</p>
@@ -926,24 +926,33 @@ export default function NuevaFormulaPage() {
       }
     }
 
-    const handleRouteChange = () => {
-      if (currentStep >= 2 && formulaId && !isExiting) {
-        setShowExitConfirmModal(true)
-        return false
-      }
-      return true
-    }
-
     if (currentStep >= 2 && formulaId) {
       window.addEventListener("beforeunload", handleBeforeUnload)
 
-      // For Next.js router navigation
+      // For Next.js router navigation - capture destination URL
       const originalPush = router.push
       router.push = (...args) => {
-        if (handleRouteChange()) {
-          return originalPush.apply(router, args)
+        if (currentStep >= 2 && formulaId && !isExiting) {
+          // Capture the destination URL
+          const destination = typeof args[0] === "string" ? args[0] : args[0].pathname || args[0].href
+          setPendingNavigation(destination)
+          setShowExitConfirmModal(true)
+          return Promise.resolve(true)
         }
-        return Promise.resolve(true)
+        return originalPush.apply(router, args)
+      }
+
+      // Also intercept router.replace
+      const originalReplace = router.replace
+      router.replace = (...args) => {
+        if (currentStep >= 2 && formulaId && !isExiting) {
+          // Capture the destination URL
+          const destination = typeof args[0] === "string" ? args[0] : args[0].pathname || args[0].href
+          setPendingNavigation(destination)
+          setShowExitConfirmModal(true)
+          return Promise.resolve(true)
+        }
+        return originalReplace.apply(router, args)
       }
     }
 
