@@ -98,5 +98,10 @@ export async function obtenerTotalClientes() {
   }
 }
 
+// Función: listaDesplegableClientes: función que se utiliza para los dropdownlist y puede contener id y / o nombre
+export async function listaDesplegableClientes(id = "-1", nombre = "") {
+
+}
+
 // Nota: Las funciones de crear, actualizar y eliminar no fueron solicitadas para clientes-actions.ts,
 // pero si las necesitas en el futuro, se adaptarían de manera similar a las de hoteles-actions.ts.
