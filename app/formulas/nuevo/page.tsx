@@ -502,18 +502,9 @@ export default function NuevaFormulaPage() {
               value={formData.cantidad}
               onChange={(e) => handleInputChange("cantidad", Number.parseInt(e.target.value) || 0)}
               placeholder="0"
-              className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+              className="w-32 bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
             />
           </div>
-          
-      </div>
-
-      {/* Cantidad y Unidad de Medida */}
-      <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
-        <h3 className="text-lg font-medium text-slate-800 mb-6">Detalles de Cantidad</h3>
-
-        
-
           <div className="space-y-2">
             <Label htmlFor="unidadmedida" className="text-slate-700 font-medium">
               Unidad de Medida
@@ -535,6 +526,16 @@ export default function NuevaFormulaPage() {
             </Select>
           </div>
         </div>
+
+      </div>
+
+      {/* Cantidad y Unidad de Medida */}
+      <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
+        <h3 className="text-lg font-medium text-slate-800 mb-6">Detalles de Cantidad</h3>
+
+        
+
+          
       </div>
 
       {/* Agregar Ingredientes */}
