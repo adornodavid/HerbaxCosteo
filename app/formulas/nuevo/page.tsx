@@ -929,6 +929,7 @@ export default function NuevaFormulaPage() {
     if (currentStep >= 2 && formulaId) {
       window.addEventListener("beforeunload", handleBeforeUnload)
 
+
       // For Next.js router navigation - capture destination URL
       const originalPush = router.push
       router.push = (...args) => {
