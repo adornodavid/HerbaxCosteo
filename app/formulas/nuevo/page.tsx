@@ -33,6 +33,7 @@ interface FormData {
   cantidad: number
   unidadmedidaid: number
   imagen?: File
+  clienteId: number
 }
 
 interface Cliente {
@@ -86,14 +87,16 @@ export default function NuevaFormulaPage() {
     cantidad: 0,
     unidadmedidaid: 1,
     imagen: undefined,
+    clienteId: 0,
   })
 
   const [imagePreview, setImagePreview] = useState<string>("")
+  const [costoTotal, setCostoTotal] = useState(0)
 
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [selectedClienteId, setSelectedClienteId] = useState("")
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([])
-  const [unidades, setUnidades] = useState<UnidadMedida[]>([])
+  const [unidadesMedida, setUnidadesMedida] = useState<UnidadMedida[]>([])
   const [ingredientesAgregados, setIngredientesAgregados] = useState<IngredienteAgregado[]>([])
 
   // Estados para el formulario de ingredientes
@@ -123,7 +126,7 @@ export default function NuevaFormulaPage() {
         }
 
         if (unidadesResult.data) {
-          setUnidades(unidadesResult.data)
+          setUnidadesMedida(unidadesResult.data)
         }
       } catch (error) {
         console.error("Error loading initial data:", error)
@@ -204,6 +207,13 @@ export default function NuevaFormulaPage() {
     loadIngredientesFormula()
   }, [formulaId])
 
+  useEffect(() => {
+    const total = ingredientesAgregados.reduce((sum, ingrediente) => {
+      return sum + (Number.parseFloat(ingrediente.ingredientecostoparcial) || 0)
+    }, 0)
+    setCostoTotal(total)
+  }, [ingredientesAgregados])
+
   const handleInputChange = (field: keyof FormData, value: any) => {
     setFormData((prev) => ({
       ...prev,
@@ -259,7 +269,12 @@ export default function NuevaFormulaPage() {
 
     setIsSubmitting(true)
     try {
-      const result = await crearFormulaEtapa2(formulaId, Number(selIngredienteId), Number(selIngredienteCantidad), Number(selIngredienteCosto))
+      const result = await crearFormulaEtapa2(
+        formulaId,
+        Number(selIngredienteId),
+        Number(selIngredienteCantidad),
+        Number(selIngredienteCosto),
+      )
 
       if (result.success) {
         // Reload ingredients list
@@ -471,30 +486,29 @@ export default function NuevaFormulaPage() {
     <div className="space-y-6">
       {/* Client Selection */}
       <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-6 shadow-sm">
-      <div className="grid grid-cols-1 md:grid-cols-4">
-        <h3 className="col-span-2 text-lg font-medium text-slate-800 mb-4">Seleccionar Cliente</h3>
-        <h3 className="col-span-2 text-lg font-medium text-slate-800 mb-4">Detalles de Porcion</h3>
-      </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="space-y-2 mb-4 col-span-2">
-          <Label htmlFor="cliente" className="text-slate-700 font-medium">
-            Cliente *
-          </Label>
-          <Select  value={selectedClienteId} onValueChange={setSelectedClienteId}>
-            <SelectTrigger className="w-64 bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
-              <SelectValue placeholder="Selecciona un cliente" />
-            </SelectTrigger>
-            <SelectContent>
-              {clientes.map((cliente) => (
-                <SelectItem key={cliente.id} value={cliente.id.toString()}>
-                  {cliente.nombre}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="grid grid-cols-1 md:grid-cols-4">
+          <h3 className="col-span-2 text-lg font-medium text-slate-800 mb-4">Seleccionar Cliente</h3>
+          <h3 className="col-span-2 text-lg font-medium text-slate-800 mb-4">Detalles de Porcion</h3>
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="space-y-2 mb-4 col-span-2">
+            <Label htmlFor="cliente" className="text-slate-700 font-medium">
+              Cliente *
+            </Label>
+            <Select value={selectedClienteId} onValueChange={setSelectedClienteId}>
+              <SelectTrigger className="w-64 bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
+                <SelectValue placeholder="Selecciona un cliente" />
+              </SelectTrigger>
+              <SelectContent>
+                {clientes.map((cliente) => (
+                  <SelectItem key={cliente.id} value={cliente.id.toString()}>
+                    {cliente.nombre}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        
           <div className="space-y-2">
             <Label htmlFor="cantidad" className="text-slate-700 font-medium">
               Cantidad *
@@ -521,7 +535,7 @@ export default function NuevaFormulaPage() {
                 <SelectValue placeholder="Selecciona unidad" />
               </SelectTrigger>
               <SelectContent>
-                {unidades.map((unidad) => (
+                {unidadesMedida.map((unidad) => (
                   <SelectItem key={unidad.id} value={unidad.id.toString()}>
                     {unidad.descripcion}
                   </SelectItem>
@@ -530,18 +544,8 @@ export default function NuevaFormulaPage() {
             </Select>
           </div>
         </div>
-
       </div>
 
-      {/* Cantidad y Unidad de Medida */}
-      {/*<div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
-        <h3 className="text-lg font-medium text-slate-800 mb-6">Detalles de Cantidad</h3>
-
-        
-
-          
-      </div>
-      */}
       {/* Agregar Ingredientes */}
       {selectedClienteId && (
         <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-6 shadow-sm">
@@ -602,7 +606,7 @@ export default function NuevaFormulaPage() {
                     <SelectValue placeholder="Seleccione..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {unidades.map((u) => (
+                    {unidadesMedida.map((u) => (
                       <SelectItem key={u.id} value={u.id.toString()}>
                         {u.descripcion}
                       </SelectItem>
@@ -611,17 +615,17 @@ export default function NuevaFormulaPage() {
                 </Select>
               </div>
               <div>
-              <Label htmlFor="txtCostoIngrediente">Costo Ingrediente</Label>
-              <Input
-                id="txtCostoIngrediente"
-                name="txtCostoIngrediente"
-                value={selIngredienteCosto}
-                disabled
-                className="bg-white/80 backdrop-blur-sm border-slate-200/60"
-              />
+                <Label htmlFor="txtCostoIngrediente">Costo Ingrediente</Label>
+                <Input
+                  id="txtCostoIngrediente"
+                  name="txtCostoIngrediente"
+                  value={selIngredienteCosto}
+                  disabled
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60"
+                />
+              </div>
             </div>
-            </div>
-            
+
             <div className="flex justify-end">
               <Button
                 id="btnAgregarIngrediente"
@@ -679,50 +683,153 @@ export default function NuevaFormulaPage() {
   )
 
   const renderStep3 = () => (
-    <div className="space-y-6">
-      <h3 className="text-lg font-medium mb-4">Resumen de la Fórmula</h3>
+    <div className="space-y-8">
+      <div className="text-center">
+        <h3 className="text-2xl font-bold bg-gradient-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent mb-2">
+          Resumen de la Fórmula
+        </h3>
+        <p className="text-gray-600">Revisa toda la información antes de finalizar</p>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <div>
-            <Label className="text-sm font-medium text-gray-500">Nombre</Label>
-            <p className="text-sm">{formData.nombre}</p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Información Básica */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-gradient-to-br from-white to-sky-50 rounded-xl p-6 border border-sky-100 shadow-sm">
+            <h4 className="text-lg font-semibold text-sky-800 mb-4 flex items-center gap-2">
+              <div className="w-2 h-2 bg-sky-500 rounded-full"></div>
+              Información Básica
+            </h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Nombre de la Fórmula</Label>
+                <p className="text-base font-medium text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {formData.nombre}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Cliente</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {clientes.find((c) => c.id === Number.parseInt(selectedClienteId))?.nombre || "No seleccionado"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Cantidad</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {formData.cantidad}{" "}
+                  {unidadesMedida.find((u) => u.id === Number.parseInt(formData.unidadmedidaid))?.descripcion || ""}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Estado</Label>
+                <Badge
+                  variant={formData.activo ? "default" : "secondary"}
+                  className="bg-white border px-3 py-2 text-base"
+                >
+                  {formData.activo ? "Activo" : "Inactivo"}
+                </Badge>
+              </div>
+            </div>
+
+            {formData.notaspreparacion && (
+              <div className="mt-4 space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Notas de Preparación</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border min-h-[60px]">
+                  {formData.notaspreparacion}
+                </p>
+              </div>
+            )}
           </div>
 
-          <div>
-            <Label className="text-sm font-medium text-gray-500">Cantidad</Label>
-            <p className="text-sm">{formData.cantidad}</p>
-          </div>
+          {/* Ingredientes */}
+          <div className="bg-gradient-to-br from-white to-emerald-50 rounded-xl p-6 border border-emerald-100 shadow-sm">
+            <h4 className="text-lg font-semibold text-emerald-800 mb-4 flex items-center gap-2">
+              <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+              Ingredientes ({ingredientesAgregados.length})
+            </h4>
 
-          <div>
-            <Label className="text-sm font-medium text-gray-500">Estado</Label>
-            <Badge variant={formData.activo ? "default" : "secondary"}>{formData.activo ? "Activo" : "Inactivo"}</Badge>
-          </div>
+            {ingredientesAgregados.length > 0 ? (
+              <div className="space-y-3">
+                {ingredientesAgregados.map((ingrediente, index) => (
+                  <div
+                    key={index}
+                    className="bg-white rounded-lg p-4 border border-emerald-100 hover:shadow-md transition-shadow"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                      <div>
+                        <Label className="text-xs font-medium text-gray-500">Ingrediente</Label>
+                        <p className="text-sm font-medium text-gray-900">{ingrediente.nombre}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-500">Cantidad</Label>
+                        <p className="text-sm text-gray-900">{ingrediente.cantidad}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-500">Unidad</Label>
+                        <p className="text-sm text-gray-900">{ingrediente.unidad}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-500">Costo</Label>
+                        <p className="text-sm font-semibold text-emerald-600">
+                          ${Number.parseFloat(ingrediente.ingredientecostoparcial.toString()).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
 
-          <div>
-            <Label className="text-sm font-medium text-gray-500">Ingredientes Agregados</Label>
-            <p className="text-sm">{ingredientesAgregados.length} ingredientes</p>
+                {/* Costo Total */}
+                <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg p-4 text-white">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-semibold">Costo Total de la Fórmula:</span>
+                    <span className="text-2xl font-bold">${costoTotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-8">No se han agregado ingredientes</p>
+            )}
           </div>
         </div>
 
-        <div className="space-y-4">
-          {imagePreview && (
-            <div>
-              <Label className="text-sm font-medium text-gray-500">Imagen</Label>
-              <img
-                src={imagePreview || "/placeholder.svg"}
-                alt="Preview"
-                className="w-32 h-32 object-cover rounded-lg border mt-2"
-              />
-            </div>
-          )}
+        {/* Imagen */}
+        <div className="lg:col-span-1">
+          <div className="bg-gradient-to-br from-white to-purple-50 rounded-xl p-6 border border-purple-100 shadow-sm h-fit">
+            <h4 className="text-lg font-semibold text-purple-800 mb-4 flex items-center gap-2">
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              Imagen de la Fórmula
+            </h4>
 
-          {formData.notaspreparacion && (
-            <div>
-              <Label className="text-sm font-medium text-gray-500">Notas de Preparación</Label>
-              <p className="text-sm">{formData.notaspreparacion}</p>
-            </div>
-          )}
+            {imagePreview ? (
+              <div className="space-y-3">
+                <img
+                  src={imagePreview || "/placeholder.svg"}
+                  alt="Preview de la fórmula"
+                  className="w-full h-48 object-cover rounded-lg border border-purple-200 shadow-sm"
+                />
+                <p className="text-sm text-gray-600 text-center">Imagen cargada correctamente</p>
+              </div>
+            ) : (
+              <div className="w-full h-48 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-gray-500">Sin imagen</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -868,17 +975,100 @@ export default function NuevaFormulaPage() {
       )}
 
       {/* Success Modal */}
-      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
-              ¡Éxito!
-            </DialogTitle>
-            <DialogDescription>La fórmula ha sido creada exitosamente.</DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div className="text-center space-y-6">
+              {/* Laboratory Animation */}
+              <div className="relative mx-auto w-32 h-32">
+                {/* Flask */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative">
+                    {/* Flask body */}
+                    <div className="w-16 h-20 bg-gradient-to-b from-transparent via-sky-100 to-sky-200 rounded-b-full border-2 border-sky-300 relative overflow-hidden">
+                      {/* Liquid animation */}
+                      <div
+                        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-emerald-400 to-emerald-300 rounded-b-full animate-pulse"
+                        style={{ height: "60%", animation: "liquidFill 2s ease-in-out infinite alternate" }}
+                      ></div>
+                      {/* Bubbles */}
+                      <div
+                        className="absolute bottom-2 left-2 w-1 h-1 bg-white rounded-full animate-bounce"
+                        style={{ animationDelay: "0s" }}
+                      ></div>
+                      <div
+                        className="absolute bottom-4 right-2 w-1 h-1 bg-white rounded-full animate-bounce"
+                        style={{ animationDelay: "0.5s" }}
+                      ></div>
+                      <div
+                        className="absolute bottom-6 left-3 w-0.5 h-0.5 bg-white rounded-full animate-bounce"
+                        style={{ animationDelay: "1s" }}
+                      ></div>
+                    </div>
+                    {/* Flask neck */}
+                    <div className="w-4 h-6 bg-gradient-to-b from-sky-200 to-sky-100 border-2 border-sky-300 border-b-0 mx-auto -mt-1"></div>
+                    {/* Flask mouth */}
+                    <div className="w-6 h-2 bg-sky-200 border-2 border-sky-300 border-b-0 rounded-t-lg mx-auto -mt-1"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Particles around flask */}
+              <div className="absolute inset-0">
+                <div
+                  className="absolute top-4 left-4 w-1 h-1 bg-emerald-400 rounded-full animate-ping"
+                  style={{ animationDelay: "0s" }}
+                ></div>
+                <div
+                  className="absolute top-8 right-6 w-1 h-1 bg-sky-400 rounded-full animate-ping"
+                  style={{ animationDelay: "0.7s" }}
+                ></div>
+                <div
+                  className="absolute bottom-8 left-6 w-1 h-1 bg-purple-400 rounded-full animate-ping"
+                  style={{ animationDelay: "1.4s" }}
+                ></div>
+                <div
+                  className="absolute bottom-4 right-4 w-1 h-1 bg-yellow-400 rounded-full animate-ping"
+                  style={{ animationDelay: "2.1s" }}
+                ></div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="w-16 h-16 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto animate-bounce">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+
+              <h3 className="text-2xl font-bold text-gray-900">¡Fórmula Creada!</h3>
+              <p className="text-gray-600">
+                Tu fórmula <span className="font-semibold text-emerald-600">{formData.nombre}</span> ha sido registrada
+                exitosamente en el laboratorio.
+              </p>
+              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                <p className="text-sm text-emerald-700">
+                  <span className="font-medium">Costo total:</span> ${costoTotal.toFixed(2)}
+                </p>
+                <p className="text-sm text-emerald-700">
+                  <span className="font-medium">Ingredientes:</span> {ingredientesAgregados.length}
+                </p>
+              </div>
+            </div>
+
+            <Button
+              onClick={() => {
+                setShowSuccessModal(false)
+                // Redirect to formulas list or reset form
+                window.location.href = "/formulas"
+              }}
+              className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
+            >
+              Ir a Fórmulas
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Error Modal */}
       <Dialog open={showErrorModal} onOpenChange={setShowErrorModal}>
