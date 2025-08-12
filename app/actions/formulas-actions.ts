@@ -21,17 +21,17 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
     - obtenerFormulas / selFormulas
     - obtenerFormulasPorFiltros / selFormulasXFiltros
     - obtenerFormulaPorId / selFormulaXId
-    - obtenerIngredientesPorCliente
-    - obtenerUnidadesMedida
-    - obtenerIngredientesFormula
-    - obtenerClientes
-    - getIngredientDetails
+    - obtenerIngredientesPorCliente***
+    - obtenerUnidadesMedida***
+    - obtenerIngredientesFormula***
+    - obtenerClientes***
+    - getIngredientDetails***
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarFormula / updFormula
     - estatusActivoFormula / actFormula
   * DELETES-ELIMINAR (DELETES)
     - eliminarFormula / delFormula
-    - eliminarIngredienteFormula
+    - eliminarIngredienteFormula***
   * SPECIALS-ESPECIALES ()
     - estadisticasFormulasTotales / statsFormlasTotales
 ================================================== */
