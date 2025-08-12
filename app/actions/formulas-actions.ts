@@ -56,7 +56,7 @@ export async function crearFormula(formData: {
       const fileName = `formula_${Date.now()}_${formData.imagen.name}`
 
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("herbax")
+        .from("herbax/formulas")
         .upload(fileName, formData.imagen)
 
       if (uploadError) {
