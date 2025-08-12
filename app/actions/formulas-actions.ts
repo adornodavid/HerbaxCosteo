@@ -501,7 +501,6 @@ export async function obtenerUnidadesMedida() {
     const { data, error } = await supabase
       .from("tipounidadesmedida")
       .select("id, descripcion")
-      .eq("activo", true)
       .order("descripcion", { ascending: true })
 
     if (error) {
