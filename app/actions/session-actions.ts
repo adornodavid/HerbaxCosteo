@@ -12,12 +12,19 @@ export interface SessionData {
   UsuarioId: number
   Email: string
   NombreCompleto: string
-  HotelId: number
+  ClienteId: number
   RolId: number
   Permisos: string
   SesionActiva: boolean
 }
 
+/* ==================================================
+  Funciones
+  --------------------
+	* 
+    - getSession
+================================================== */
+// Función: getSession: función para obtener las cookies de la sesion creada
 export async function getSession(): Promise<SessionData | null> {
   try {
     const cookieStore = cookies()
@@ -25,7 +32,7 @@ export async function getSession(): Promise<SessionData | null> {
     const usuarioId = cookieStore.get("UsuarioId")?.value
     const email = cookieStore.get("Email")?.value
     const nombreCompleto = cookieStore.get("NombreCompleto")?.value
-    const hotelId = cookieStore.get("HotelId")?.value
+    const clienteId = cookieStore.get("ClienteId")?.value
     const rolId = cookieStore.get("RolId")?.value
     const permisos = cookieStore.get("Permisos")?.value
     const sesionActiva = cookieStore.get("SesionActiva")?.value
@@ -38,7 +45,7 @@ export async function getSession(): Promise<SessionData | null> {
       UsuarioId: Number.parseInt(usuarioId),
       Email: email,
       NombreCompleto: nombreCompleto || "",
-      HotelId: Number.parseInt(hotelId || "0"),
+      ClienteId: Number.parseInt(clienteId || "0"),
       RolId: Number.parseInt(rolId || "0"),
       Permisos: permisos || "",
       SesionActiva: sesionActiva === "true",
@@ -63,7 +70,7 @@ export async function clearSession(): Promise<void> {
   cookieStore.delete("UsuarioId")
   cookieStore.delete("Email")
   cookieStore.delete("NombreCompleto")
-  cookieStore.delete("HotelId")
+  cookieStore.delete("ClienteId")
   cookieStore.delete("RolId")
   cookieStore.delete("Permisos")
   cookieStore.delete("SesionActiva")
@@ -88,7 +95,7 @@ export async function setSessionCookies(sessionData: SessionData): Promise<void>
   cookieStore.set("UsuarioId", sessionData.UsuarioId.toString(), cookieOptions)
   cookieStore.set("Email", sessionData.Email, cookieOptions)
   cookieStore.set("NombreCompleto", sessionData.NombreCompleto, cookieOptions)
-  cookieStore.set("HotelId", sessionData.HotelId.toString(), cookieOptions)
+  cookieStore.set("ClienteId", sessionData.ClienteId.toString(), cookieOptions)
   cookieStore.set("RolId", sessionData.RolId.toString(), cookieOptions)
   cookieStore.set("Permisos", sessionData.Permisos, cookieOptions)
   cookieStore.set("SesionActiva", sessionData.SesionActiva.toString(), cookieOptions)
