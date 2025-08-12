@@ -528,7 +528,7 @@ export async function obtenerIngredientesFormula(formulaId: number) {
           nombre,
           costo
         ),
-        tipounidadesmedida!inner(
+        unidadmedidaid:tipounidadesmedida!inner(
           id,
           descripcion
         )
