@@ -489,11 +489,6 @@ export default function NuevaFormulaPage() {
             </SelectContent>
           </Select>
         </div>
-      </div>
-
-      {/* Cantidad y Unidad de Medida */}
-      <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
-        <h3 className="text-lg font-medium text-slate-800 mb-6">Detalles de Cantidad</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
@@ -510,6 +505,14 @@ export default function NuevaFormulaPage() {
               className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
             />
           </div>
+          
+      </div>
+
+      {/* Cantidad y Unidad de Medida */}
+      <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-sm">
+        <h3 className="text-lg font-medium text-slate-800 mb-6">Detalles de Cantidad</h3>
+
+        
 
           <div className="space-y-2">
             <Label htmlFor="unidadmedida" className="text-slate-700 font-medium">
