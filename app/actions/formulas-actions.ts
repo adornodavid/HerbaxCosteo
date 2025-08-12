@@ -785,7 +785,7 @@ export async function eliminarRegistroIncompleto(formulaId: number) {
         const fileName = pathSegments[pathSegments.length - 1]
 
         // Eliminar la imagen del bucket
-        const { error: deleteImageError } = await supabase.storage.from("herbax").remove([fileName])
+        const { error: deleteImageError } = await supabase.storage.from("herbax/formulas").remove([fileName])
 
         if (deleteImageError) {
           console.error("Error al eliminar imagen:", deleteImageError)
