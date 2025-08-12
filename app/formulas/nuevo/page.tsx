@@ -471,7 +471,7 @@ export default function NuevaFormulaPage() {
     <div className="space-y-6">
       {/* Client Selection */}
       <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-6 shadow-sm">
-        <h3 className="text-lg font-medium text-slate-800 mb-6">Seleccionar Cliente</h3>
+        <h3 className="text-lg font-medium text-slate-800 mb-4">Seleccionar Cliente</h3>
         <div className="space-y-2">
           <Label htmlFor="cliente" className="text-slate-700 font-medium">
             Cliente *
