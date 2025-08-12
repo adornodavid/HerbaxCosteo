@@ -96,12 +96,7 @@ export async function crearFormula(formData: {
 }
 
 //Función: crearFormulaEtapa2: funcion para crear una formula pasando a la etapa 2 donde están las relaciones con los materiales
-export async function crearFormulaEtapa2(
-  formulaId: number,
-  ingredienteId: number,
-  cantidad: number,
-
-) {
+export async function crearFormulaEtapa2(formulaId: number, ingredienteId: number, cantidad: number) {
   try {
     const { data, error } = await supabase
       .from("ingredientesxformula")
@@ -526,11 +521,11 @@ export async function obtenerIngredientesFormula(formulaId: number) {
         ingredientes!inner(
           id,
           nombre,
-          costo
-        ),
-        tipounidadesmedida!inner(
-          id,
-          descripcion
+          costo,
+          tipounidadesmedida!inner(
+            id,
+            descripcion
+          )
         )
       `)
       .eq("formulaid", formulaId)
@@ -546,7 +541,7 @@ export async function obtenerIngredientesFormula(formulaId: number) {
         id: item.id,
         nombre: item.ingredientes.nombre,
         cantidad: item.cantidad,
-        unidad: item.tipounidadesmedida.descripcion,
+        unidad: item.ingredientes.tipounidadesmedida.descripcion,
         ingredientecostoparcial: item.ingredientes.costo * item.cantidad,
       })) || []
 

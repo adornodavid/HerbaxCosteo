@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { CheckCircle, Upload, ArrowLeft, ArrowRight, FileImage, Loader2 } from "lucide-react"
+import { supabase } from "@/lib/supabase"
 import {
   crearFormula,
   crearFormulaEtapa2,
@@ -45,6 +46,10 @@ interface Ingrediente {
   nombre: string
   costo: number
   clienteid: number
+  tipounidadesmedida: {
+    id: number
+    descripcion: string
+  }
 }
 
 interface UnidadMedida {
@@ -167,9 +172,12 @@ export default function NuevaFormulaPage() {
       const selectedIng = ingredientes.find((i) => i.id.toString() === selIngredienteId)
       if (selectedIng) {
         setSelIngredienteCosto(selectedIng.costo.toString())
+        // Get ingredient details including unit of measure
+        getIngredientDetails(selectedIng.id)
       }
     } else {
       setSelIngredienteCosto("")
+      setSelIngredienteUnidad("")
     }
   }, [selIngredienteId, ingredientes])
 
@@ -251,11 +259,7 @@ export default function NuevaFormulaPage() {
 
     setIsSubmitting(true)
     try {
-      const result = await crearFormulaEtapa2(
-        formulaId,
-        Number(selIngredienteId),
-        Number(selIngredienteCantidad),
-      )
+      const result = await crearFormulaEtapa2(formulaId, Number(selIngredienteId), Number(selIngredienteCantidad))
 
       if (result.success) {
         // Reload ingredients list
@@ -426,7 +430,7 @@ export default function NuevaFormulaPage() {
                 </div>
               ) : (
                 <div
-                  className="w-full h-48 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-sky-400 hover:bg-sky-50/50 transition-colors duration-200"
+                  className="w-full h-48 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-sky-400 hover:bg-sky-50/50"
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <Upload className="h-8 w-8 text-slate-400 mb-2" />
@@ -732,6 +736,35 @@ export default function NuevaFormulaPage() {
       </div>
     </div>
   )
+
+  const getIngredientDetails = async (ingredienteId: number) => {
+    try {
+      const { data, error } = await supabase
+        .from("ingredientes")
+        .select(`
+          id,
+          nombre,
+          costo,
+          tipounidadesmedida!inner(
+            id,
+            descripcion
+          )
+        `)
+        .eq("id", ingredienteId)
+        .single()
+
+      if (error) {
+        console.error("Error getting ingredient details:", error)
+        return
+      }
+
+      if (data && data.tipounidadesmedida) {
+        setSelIngredienteUnidad(data.tipounidadesmedida.id.toString())
+      }
+    } catch (error) {
+      console.error("Error in getIngredientDetails:", error)
+    }
+  }
 
   return (
     <div className="container mx-auto py-6 px-4">
