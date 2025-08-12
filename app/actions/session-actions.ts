@@ -62,6 +62,27 @@ export async function getSession(): Promise<SessionData | null> {
   }
 }
 
+// Función: setSessionCookies: función para definir variables de sesion
+export async function setSessionCookies(sessionData: SessionData): Promise<void> {
+  const cookieStore = cookies()
+
+  // Configurar cookies con duración de 20 días
+  const cookieOptions = {
+    maxAge: 20 * 24 * 60 * 60, // 20 días en segundos
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+  }
+
+  cookieStore.set("UsuarioId", sessionData.UsuarioId.toString(), cookieOptions)
+  cookieStore.set("Email", sessionData.Email, cookieOptions)
+  cookieStore.set("NombreCompleto", sessionData.NombreCompleto, cookieOptions)
+  cookieStore.set("ClienteId", sessionData.ClienteId.toString(), cookieOptions)
+  cookieStore.set("RolId", sessionData.RolId.toString(), cookieOptions)
+  cookieStore.set("Permisos", sessionData.Permisos, cookieOptions)
+  cookieStore.set("SesionActiva", sessionData.SesionActiva.toString(), cookieOptions)
+}
+
 // Función: clearSession: función para limpiar las cookies de la sesion creada
 export async function clearSession(): Promise<void> {
   const cookieStore = cookies()
@@ -89,26 +110,6 @@ export async function getSessionCookies(): Promise<SessionData | null> {
 export async function validateSession(): Promise<boolean> {
   const session = await getSession()
   return session !== null && session.SesionActiva === true
-}
-
-export async function setSessionCookies(sessionData: SessionData): Promise<void> {
-  const cookieStore = cookies()
-
-  // Configurar cookies con duración de 20 días
-  const cookieOptions = {
-    maxAge: 20 * 24 * 60 * 60, // 20 días en segundos
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-  }
-
-  cookieStore.set("UsuarioId", sessionData.UsuarioId.toString(), cookieOptions)
-  cookieStore.set("Email", sessionData.Email, cookieOptions)
-  cookieStore.set("NombreCompleto", sessionData.NombreCompleto, cookieOptions)
-  cookieStore.set("ClienteId", sessionData.ClienteId.toString(), cookieOptions)
-  cookieStore.set("RolId", sessionData.RolId.toString(), cookieOptions)
-  cookieStore.set("Permisos", sessionData.Permisos, cookieOptions)
-  cookieStore.set("SesionActiva", sessionData.SesionActiva.toString(), cookieOptions)
 }
 */
 
