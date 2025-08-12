@@ -14,7 +14,7 @@ export default function LogoutPage() {
         "UsuarioId",
         "Email",
         "NombreCompleto",
-        "HotelId",
+        "ClienteId",
         "RolId",
         "Permisos",
         "SesionActiva",
