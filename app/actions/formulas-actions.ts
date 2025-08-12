@@ -720,7 +720,7 @@ export async function actualizarFormulaEtapa1(
         return { success: false, error: "Error al subir la imagen" }
       }
 
-      const { data: urlData } = supabase.storage.from("herbax").getPublicUrl(fileName)
+      const { data: urlData } = supabase.storage.from("herbax/formulas").getPublicUrl(fileName)
       updateData.imgurl = urlData.publicUrl
     }
 
