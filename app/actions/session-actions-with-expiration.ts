@@ -12,7 +12,7 @@ export interface SessionData {
   UsuarioId: string | null
   Email: string | null
   NombreCompleto: string | null
-  HotelId: number | null
+  ClienteId: number | null
   RolId: number | null
   Permisos: string[] | null
   SesionActiva: boolean | null
@@ -30,7 +30,7 @@ export async function crearSesionConExpiracion(userData: {
   UsuarioId: string
   Email: string
   NombreCompleto: string
-  HotelId: number
+  ClienteId: number
   RolId: number
   Permisos: string[]
 }) {
