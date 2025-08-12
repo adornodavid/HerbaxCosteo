@@ -56,10 +56,12 @@ export async function getSession(): Promise<SessionData | null> {
   }
 }
 
+//Función: getUserSessionData: función que devuelve la sessionData
 export async function getUserSessionData(): Promise<SessionData | null> {
   return await getSession()
 }
 
+//Función: getSessionCookies: función que devuelve las cookies
 export async function getSessionCookies(): Promise<SessionData | null> {
   return await getSession()
 }
