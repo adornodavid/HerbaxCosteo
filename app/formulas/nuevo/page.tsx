@@ -984,6 +984,7 @@ export default function NuevaFormulaPage() {
     }
     setShowExitConfirmModal(false)
 
+    console.log(pendingNavigation)
     // Navigate to intended destination or default to formulas page
     if (pendingNavigation) {
       router.push(pendingNavigation)
