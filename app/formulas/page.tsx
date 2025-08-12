@@ -13,7 +13,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, BookOpen, Search, RotateCcw, Eye, Edit, Power, PowerOff, AlertCircle, X } from "lucide-react"
 import { getSession } from "@/app/actions/session-actions"
-import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import {
@@ -34,6 +33,7 @@ import {
   estatusActivoFormula,
   estadisticasFormulasTotales,
 } from "@/app/actions/formulas-actions"
+import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 
 /* ==================================================
   Interfaces, tipados, clases
@@ -207,28 +207,20 @@ export default function FormulasPage() {
       let fetchedClientes: Cliente[] = []
       let defaultSelectedValue = "-1" // Valor por defecto para el ddl
 
+      const clienteId = auxHotelid === -1 ? "-1" : auxHotelid.toString()
+      const nombreCliente = ""
+
+      const { data: clientesData, error } = await listaDesplegableClientes(clienteId, nombreCliente)
+
+      if (error) throw new Error(error)
+
       if (auxHotelid === -1) {
-        // Si auxHotelid es -1, obtener todos los clientes y agregar "Todos"
-        const { data, error } = await supabase
-          .from("clientes")
-          .select("id, nombre")
-          .order("nombre", { ascending: true })
-
-        if (error) throw error
-
-        fetchedClientes = [{ id: -1, nombre: "Todos" }, ...(data || [])]
+        // Si auxHotelid es -1, agregar "Todos" al inicio
+        fetchedClientes = [{ id: -1, nombre: "Todos" }, ...(clientesData || [])]
         defaultSelectedValue = "-1" // Seleccionar "Todos"
       } else {
-        // Si auxHotelid tiene un valor específico, filtrar por ese cliente
-        const { data, error } = await supabase
-          .from("clientes")
-          .select("id, nombre")
-          .eq("id", auxHotelid)
-          .order("nombre", { ascending: true })
-
-        if (error) throw error
-
-        fetchedClientes = data || []
+        // Si auxHotelid tiene un valor específico, usar los datos filtrados
+        fetchedClientes = clientesData || []
         // Si se encontró el cliente, seleccionarlo, de lo contrario, volver a "Todos"
         defaultSelectedValue = fetchedClientes.length > 0 ? auxHotelid.toString() : "-1"
       }
@@ -308,7 +300,7 @@ export default function FormulasPage() {
         formula: formula.Nombre,
         costo: formula.Costo || 0,
         notaspreparacion: formula.NotasPreparacion || 0,
-        cliente: formula.Cliente || "N/A",
+        cliente: formula.Cliente,
         activo: formula.Activo,
       }))
 
