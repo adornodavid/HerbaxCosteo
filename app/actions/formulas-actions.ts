@@ -99,13 +99,16 @@ export async function crearFormula(formData: {
 //Función: crearFormulaEtapa2: funcion para crear una formula pasando a la etapa 2 donde están las relaciones con los materiales
 export async function crearFormulaEtapa2(formulaId: number, ingredienteId: number, cantidad: number, ingredientecostoparcial: number ) {
   try {
+
+    const CostoTotalParcial = ingredientecostoparcial * cantidad
+
     const { data, error } = await supabase
       .from("ingredientesxformula")
       .insert({
         formulaid: formulaId,
         ingredienteid: ingredienteId,
         cantidad: cantidad,
-        ingredientecostoparcial: ingredientecostoparcial,
+        ingredientecostoparcial: CostoTotalParcial,
         fechacreacion: new Date().toISOString(),
       })
       .select()
