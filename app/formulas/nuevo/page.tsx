@@ -255,7 +255,6 @@ export default function NuevaFormulaPage() {
         formulaId,
         Number(selIngredienteId),
         Number(selIngredienteCantidad),
-        Number(selIngredienteUnidad),
       )
 
       if (result.success) {
