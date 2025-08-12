@@ -23,6 +23,7 @@ import {
   getIngredientDetails, // Added import for moved function
   obtenerIngredientesFormula, // Added import for missing function
   eliminarRegistroIncompleto,
+  verificarIngredienteDuplicado,
 } from "@/app/actions/formulas-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 import { getSession } from "@/app/actions/session-actions"
@@ -116,6 +117,11 @@ export default function NuevaFormulaPage() {
   const [showValidationModal, setShowValidationModal] = useState(false)
   const [validationMessage, setValidationMessage] = useState("")
   const [isExiting, setIsExiting] = useState(false)
+
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false)
+  const [duplicateMessage, setDuplicateMessage] = useState("")
+
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null)
 
   const steps = [
     { number: 1, title: "Información Básica" },
@@ -287,6 +293,18 @@ export default function NuevaFormulaPage() {
 
     setIsSubmitting(true)
     try {
+      // Check for duplicate ingredient
+      const duplicateCheck = await verificarIngredienteDuplicado(Number(formulaId), Number(selIngredienteId))
+
+      if (duplicateCheck.exists) {
+        const ingredienteNombre =
+          ingredientes.find((i) => i.id.toString() === selIngredienteId)?.nombre || "Ingrediente"
+        setDuplicateMessage(`El ingrediente "${ingredienteNombre}" ya está agregado a esta fórmula.`)
+        setShowDuplicateModal(true)
+        setIsSubmitting(false)
+        return
+      }
+
       const result = await crearFormulaEtapa2(
         formulaId,
         Number(selIngredienteId),
@@ -306,6 +324,7 @@ export default function NuevaFormulaPage() {
         setSelIngredienteCantidad("")
         setSelIngredienteUnidad("")
         setSelIngredienteCosto("")
+        setIngredienteSearchTerm("")
       } else {
         setErrorMessage(result.error || "No se pudo agregar el ingrediente.")
         setShowErrorModal(true)
@@ -964,7 +983,14 @@ export default function NuevaFormulaPage() {
       await eliminarRegistroIncompleto(formulaId)
     }
     setShowExitConfirmModal(false)
-    router.push("/formulas")
+
+    // Navigate to intended destination or default to formulas page
+    if (pendingNavigation) {
+      router.push(pendingNavigation)
+      setPendingNavigation(null)
+    } else {
+      router.push("/formulas")
+    }
   }
 
   const handleCancelExit = () => {
@@ -1199,6 +1225,21 @@ export default function NuevaFormulaPage() {
             <DialogTitle className="text-red-600">Error</DialogTitle>
             <DialogDescription>{errorMessage}</DialogDescription>
           </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      {/* Duplicate Ingredient Modal */}
+      <Dialog open={showDuplicateModal} onOpenChange={setShowDuplicateModal}>
+        <DialogContent className="bg-white/95 backdrop-blur-sm border-slate-200/60">
+          <DialogHeader>
+            <DialogTitle className="text-amber-600">Ingrediente Duplicado</DialogTitle>
+            <DialogDescription className="text-slate-600">{duplicateMessage}</DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end mt-4">
+            <Button onClick={() => setShowDuplicateModal(false)} className="bg-sky-500 hover:bg-sky-600">
+              Entendido
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
