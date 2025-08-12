@@ -106,6 +106,7 @@ export async function crearFormulaEtapa2(formulaId: number, ingredienteId: numbe
         ingredienteid: ingredienteId,
         cantidad: cantidad,
         ingredientecostoparcial: formData.ingredientecostoparcial,
+        fechacreacion: new Date().toISOString(),
       })
       .select()
 
