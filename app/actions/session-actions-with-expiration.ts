@@ -1,6 +1,12 @@
+/* ==================================================
+  Imports
+================================================== */
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 
+/* ==================================================
+  Interfaces, clases, objetos
+================================================== */
 // Define la estructura de los datos de sesión
 export interface SessionData {
   UsuarioId: string | null
@@ -13,6 +19,12 @@ export interface SessionData {
   ExpiresAt: string | null
 }
 
+/* ==================================================
+  Funciones
+  --------------------
+	* 
+    - crearSesionConExpiracion
+================================================== */
 // Función para crear una sesión con expiración
 export async function crearSesionConExpiracion(userData: {
   UsuarioId: string
