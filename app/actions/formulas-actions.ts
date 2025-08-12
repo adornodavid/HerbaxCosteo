@@ -472,7 +472,7 @@ export async function estadisticasFormulasTotales() {
 }
 
 //Función: obtenerIngredientesPorCliente: funcion para obtener ingredientes por cliente
-export async function obtenerIngredientesPorCliente(clienteId: number) {
+export async function obtenerIngredientesPorCliente(clienteId: number, cantidad: number) {
   try {
     const { data, error } = await supabase
       .from("ingredientes")
@@ -481,7 +481,7 @@ export async function obtenerIngredientesPorCliente(clienteId: number) {
       .eq("activo", true)
       .order("nombre", { ascending: true })
 
-      const CostoTotal = costo *
+      const CostoTotal = costo * cantidad
 
     if (error) {
       console.error("Error al obtener ingredientes:", error)
