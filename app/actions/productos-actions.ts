@@ -723,7 +723,7 @@ export async function actualizarProductoEtapa1(productoId: number, formData: For
       vidaanaquelmeses: Number.parseInt(formData.get("vidaanaquelmeses") as string),
       activo: formData.get("activo") === "true",
       zonaid: Number.parseInt(formData.get("zonaid") as string) || null,
-      fechaactualizacion: new Date().toISOString(),
+      //fechaactualizacion: new Date().toISOString(),
     }
 
     // Only update image URL if a new image was uploaded
