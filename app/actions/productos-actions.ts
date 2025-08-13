@@ -300,6 +300,7 @@ export async function obtenerCatalogosPorCliente(clienteId: number) {
   }
 }
 
+
 // Función: obtenerUnidadMedidaFormula: función para obtener la unidad de medida de una fórmula
 export async function obtenerUnidadMedidaFormula(formulaId: number) {
   try {
@@ -307,7 +308,7 @@ export async function obtenerUnidadMedidaFormula(formulaId: number) {
       .from("formulas")
       .select(`
         unidadmedidaid,
-        tipounidadmedida:unidadmedidaid (
+        tipounidadmedida!inner(
           descripcion
         )
       `)
