@@ -632,11 +632,11 @@ export default function ProductosPage() {
                       alt={p.ProductoNombre}
                       layout="fill"
                       objectFit="cover"
-                      className="rounded-t-lg transition-transform duration-300 group-hover:scale-105"
+                      className="rounded-t-xs transition-transform duration-300 group-hover:scale-105"
                     />
                     <div className="absolute top-2 right-2">
                       <span
-                        className={`px-2 py-1 text-xs rounded-full font-semibold ${p.ProductoActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
+                        className={`px-2 py-1 text-xs rounded-xs font-semibold ${p.ProductoActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
                       >
                         {p.ProductoActivo ? "Activo" : "Inactivo"}
                       </span>
