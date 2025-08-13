@@ -1148,9 +1148,9 @@ export default function NuevaFormulaPage() {
                       ></div>
                     </div>
                     {/* Flask neck */}
-                    <div className="w-4 h-6 bg-gradient-to-b from-sky-200 to-sky-100 border-2 border-sky-300 border-b-0 mx-auto -mt-1"></div>
-                    {/* Flask mouth */}
-                    <div className="w-6 h-2 bg-sky-200 border-2 border-sky-300 border-b-0 rounded-t-lg mx-auto -mt-1"></div>
+                    <div src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/matraz.gif" ></div>
+                    {/* Flask mouth
+                    <div className="w-6 h-2 bg-sky-200 border-2 border-sky-300 border-b-0 rounded-t-lg mx-auto -mt-1"></div> */}
                   </div>
                 </div>
 
