@@ -1130,7 +1130,7 @@ export default function NuevaFormulaPage() {
                     <div>
                       <Image
                       src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/matraz.gif"
-                      alt="Cocinando"
+                      alt="matraz"
                       width={200}
                       height={200}
                       className="absolute inset-0 animate-bounce-slow" // Animación de rebote lento
