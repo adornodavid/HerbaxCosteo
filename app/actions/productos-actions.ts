@@ -824,7 +824,7 @@ export async function finalizarProducto(productoId: number, catalogoId: number) 
     })
 
     if (insertError) {
-      console.error("Error insertando en productoxcatalogo:", insertError)
+      console.error("Error insertando en productosxcatalogo:", insertError)
       return { success: false, error: insertError.message }
     }
 
