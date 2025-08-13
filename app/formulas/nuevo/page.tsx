@@ -1123,9 +1123,9 @@ export default function NuevaFormulaPage() {
             <div className="text-center space-y-6">
               {/* Laboratory Animation */}
               <div className="relative mx-auto w-32 h-32">
-                {/* Flask */}
+                {/* Flask 
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative">
+                  <div className="relative">*/}
                     {/* Flask body */}
                     <div src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/matraz.gif" >
                       {/* Liquid animation */}
@@ -1151,8 +1151,8 @@ export default function NuevaFormulaPage() {
                     <div ></div>*/}
                     {/* Flask mouth
                     <div className="w-6 h-2 bg-sky-200 border-2 border-sky-300 border-b-0 rounded-t-lg mx-auto -mt-1"></div> */}
-                  </div>
-                </div>
+                  {/*</div>
+                </div>*/}
 
                 {/* Particles around flask */}
                 <div className="absolute inset-0">
