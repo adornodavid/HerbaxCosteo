@@ -1161,9 +1161,9 @@ export default function NuevoProducto() {
                         <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                           Unidad
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        {/*<th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                           Costo Unitario
-                        </th>
+                        </th>*/}
                         <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                           Costo Parcial
                         </th>
