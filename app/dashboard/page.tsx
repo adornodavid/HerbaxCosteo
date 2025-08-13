@@ -175,7 +175,7 @@ export default function DashboardPage() {
     <div className="container mx-auto p-6 space-y-8">
       {/* Sección Título de la página */}
       <div className="w-full text-center space-y-2">
-        <h1 className="text-4xl font-bold text-gray-900">Sistema de costeo</h1>
+        <h1 className="text-4xl font-bold text-gray-900">Sistema de Costeo Healthylab</h1>
         <h2 className="text-2xl font-semibold text-gray-700">Dashboard</h2>
 
         <div className="w-80 flex flex-col gap-2 p-8 shadow-xl sm:flex-row sm:items-center sm:gap-6 sm:py-4 ...">
