@@ -300,7 +300,6 @@ export async function obtenerCatalogosPorCliente(clienteId: number) {
   }
 }
 
-
 // Función: obtenerUnidadMedidaFormula: función para obtener la unidad de medida de una fórmula
 export async function obtenerUnidadMedidaFormula(formulaId: number) {
   try {
@@ -328,9 +327,6 @@ export async function obtenerUnidadMedidaFormula(formulaId: number) {
     return { success: false, error: "Error interno del servidor" }
   }
 }
-
-
-
 
 // Función: agregarFormulaAProducto: función para agregar una fórmula a un producto
 export async function agregarFormulaAProducto(
@@ -369,36 +365,48 @@ export async function agregarFormulaAProducto(
 // Función: obtenerFormulasAgregadas: función para obtener las fórmulas agregadas a un producto
 export async function obtenerFormulasAgregadas(productoId: number) {
   try {
-    const { data, error } = await supabaseAdmin
+    // First get the productosdetalles records
+    const { data: productosDetalles, error: detallesError } = await supabaseAdmin
       .from("productosdetalles")
-      .select(`
-        id,
-        elementoid,
-        cantidad,
-        costoparcial,
-        formulas:elementoid (
-          id,
-          nombre,
-          costo
-        )
-      `)
+      .select("id, elementoid, cantidad, costoparcial")
       .eq("productoid", productoId)
       .eq("tiposegmentoid", 1)
 
-    if (error) {
-      console.error("Error obteniendo fórmulas agregadas:", error)
-      return { success: false, error: error.message }
+    if (detallesError) {
+      console.error("Error obteniendo detalles de producto:", detallesError)
+      return { success: false, error: detallesError.message }
     }
 
-    // Transform data to match expected interface
-    const transformedData = data.map((item) => ({
-      id: item.id,
-      formulaId: item.elementoid,
-      nombre: item.formulas?.nombre || "",
-      cantidad: item.cantidad,
-      costo: item.formulas?.costo || 0,
-      costoParcial: item.costoparcial,
-    }))
+    if (!productosDetalles || productosDetalles.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    // Get the formula IDs
+    const formulaIds = productosDetalles.map((item) => item.elementoid)
+
+    // Get the formulas data
+    const { data: formulas, error: formulasError } = await supabaseAdmin
+      .from("formulas")
+      .select("id, nombre, costo")
+      .in("id", formulaIds)
+
+    if (formulasError) {
+      console.error("Error obteniendo fórmulas:", formulasError)
+      return { success: false, error: formulasError.message }
+    }
+
+    // Combine the data
+    const transformedData = productosDetalles.map((item) => {
+      const formula = formulas?.find((f) => f.id === item.elementoid)
+      return {
+        id: item.id,
+        formulaId: item.elementoid,
+        nombre: formula?.nombre || "",
+        cantidad: item.cantidad,
+        costo: formula?.costo || 0,
+        costoParcial: item.costoparcial,
+      }
+    })
 
     return { success: true, data: transformedData }
   } catch (error) {
