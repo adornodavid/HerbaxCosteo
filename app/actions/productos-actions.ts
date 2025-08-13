@@ -27,11 +27,15 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
     - obtenerZonas / ddlZonas
     - obtenerCatalogosPorCliente / selCatalogosXCliente
     - obtenerFormulasAgregadas / selFormulasAgregadas
+    - obtenerIngredientes / selIngredientes
+    - getIngredientDetails / selIngredienteDetalles
+    - obtenerIngredientesAgregados / selIngredientesAgregados
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
   * DELETES-ELIMINAR (DELETES)
     - eliminarProducto / delProducto
     - eliminarFormulaDeProducto / delFormulaDeProducto
+    - eliminarIngredienteDeProducto / delIngredienteDeProducto
   * SPECIALS-ESPECIALES ()
     - estatusActivoProducto / actProducto
     - listaDesplegableProductos / ddlProductos
@@ -140,7 +144,7 @@ export async function actualizarProducto(
 ) {
   try {
     const { data, error } = await supabaseAdmin
-      .from("productos") // Cambiado de 'platillos' a 'productos'
+      .from("productos")
       .update({
         ...productoData,
         fechaactualizacion: new Date().toISOString(),
@@ -154,8 +158,8 @@ export async function actualizarProducto(
       return { success: false, error: error.message }
     }
 
-    revalidatePath("/productos") // Cambiado de '/platillos' a '/productos'
-    revalidatePath(`/productos/${id}`) // Cambiado de '/platillos/${id}' a '/productos/${id}'
+    revalidatePath("/productos")
+    revalidatePath(`/productos/${id}`)
     return { success: true, data }
   } catch (error) {
     console.error("Error en actualizarProducto:", error)
@@ -167,7 +171,7 @@ export async function actualizarProducto(
 export async function obtenerProductos() {
   try {
     const { data, error } = await supabaseAdmin
-      .from("productos") // Cambiado de 'platillos' a 'productos'
+      .from("productos")
       .select("*")
       .eq("activo", true)
       .order("fechacreacion", { ascending: false })
@@ -188,7 +192,7 @@ export async function obtenerProductos() {
 export async function obtenerProductoPorId(id: number) {
   try {
     const { data, error } = await supabaseAdmin
-      .from("productos") // Cambiado de 'platillos' a 'productos'
+      .from("productos")
       .select(`
         *,
         productos_ingredientes (
@@ -429,6 +433,201 @@ export async function eliminarFormulaDeProducto(productoDetalleId: number) {
     return { success: true }
   } catch (error) {
     console.error("Error en eliminarFormulaDeProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: obtenerIngredientes: función para obtener el listado de ingredientes
+export async function obtenerIngredientes() {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("ingredientes")
+      .select("id, codigo, nombre, costo, unidadmedidaid")
+      .eq("activo", true)
+      .order("nombre", { ascending: true })
+
+    if (error) {
+      console.error("Error obteniendo ingredientes:", error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en obtenerIngredientes:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: getIngredientDetails: función para obtener detalles de un ingrediente específico
+export async function getIngredientDetails(ingredienteId: number) {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("ingredientes")
+      .select(`
+        id,
+        nombre,
+        costo,
+        unidadmedidaid,
+        tipounidadesmedida!inner(
+          id,
+          descripcion
+        )
+      `)
+      .eq("id", ingredienteId)
+      .single()
+
+    if (error) {
+      console.error("Error obteniendo detalles del ingrediente:", error)
+      return { success: false, error: error.message }
+    }
+
+    return {
+      success: true,
+      data: {
+        costo: data.costo,
+        unidadMedida: data.tipounidadesmedida?.descripcion,
+      },
+      unidadMedidaId: data.unidadmedidaid,
+    }
+  } catch (error) {
+    console.error("Error en getIngredientDetails:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: verificarIngredienteDuplicadoProducto: función para verificar si un ingrediente ya está agregado al producto
+export async function verificarIngredienteDuplicadoProducto(productoId: number, ingredienteId: number) {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("productosdetalles")
+      .select("id")
+      .eq("productoid", productoId)
+      .eq("elementoid", ingredienteId)
+      .eq("tiposegmentoid", 2)
+      .single()
+
+    if (error && error.code !== "PGRST116") {
+      console.error("Error verificando ingrediente duplicado:", error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, exists: !!data }
+  } catch (error) {
+    console.error("Error en verificarIngredienteDuplicadoProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: agregarIngredienteAProducto: función para agregar un ingrediente a un producto
+export async function agregarIngredienteAProducto(
+  productoId: number,
+  ingredienteId: number,
+  cantidad: number,
+  costo: number,
+) {
+  try {
+    const costoParcial = costo * cantidad
+
+    const { data, error } = await supabaseAdmin
+      .from("productosdetalles")
+      .insert({
+        tiposegmentoid: 2,
+        productoid: productoId,
+        elementoid: ingredienteId,
+        cantidad: cantidad,
+        costoparcial: costoParcial,
+        fechacreacion: new Date().toISOString(),
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error agregando ingrediente a producto:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/productos")
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en agregarIngredienteAProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: obtenerIngredientesAgregados: función para obtener los ingredientes agregados a un producto
+export async function obtenerIngredientesAgregados(productoId: number) {
+  try {
+    // First get the productosdetalles records for ingredients (tiposegmentoid = 2)
+    const { data: productosDetalles, error: detallesError } = await supabaseAdmin
+      .from("productosdetalles")
+      .select("id, elementoid, cantidad, costoparcial")
+      .eq("productoid", productoId)
+      .eq("tiposegmentoid", 2)
+
+    if (detallesError) {
+      console.error("Error obteniendo detalles de ingredientes:", detallesError)
+      return { success: false, error: detallesError.message }
+    }
+
+    if (!productosDetalles || productosDetalles.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    // Get the ingredient IDs
+    const ingredienteIds = productosDetalles.map((item) => item.elementoid)
+
+    // Get the ingredients data with unit information
+    const { data: ingredientes, error: ingredientesError } = await supabaseAdmin
+      .from("ingredientes")
+      .select(`
+        id,
+        nombre,
+        costo,
+        tipounidadesmedida!inner(
+          descripcion
+        )
+      `)
+      .in("id", ingredienteIds)
+
+    if (ingredientesError) {
+      console.error("Error obteniendo ingredientes:", ingredientesError)
+      return { success: false, error: ingredientesError.message }
+    }
+
+    // Combine the data
+    const transformedData = productosDetalles.map((item) => {
+      const ingrediente = ingredientes?.find((i) => i.id === item.elementoid)
+      return {
+        id: item.id,
+        ingredienteId: item.elementoid,
+        nombre: ingrediente?.nombre || "",
+        cantidad: item.cantidad,
+        unidad: ingrediente?.tipounidadesmedida?.descripcion || "",
+        ingredientecostoparcial: item.costoparcial,
+      }
+    })
+
+    return { success: true, data: transformedData }
+  } catch (error) {
+    console.error("Error en obtenerIngredientesAgregados:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: eliminarIngredienteDeProducto: función para eliminar un ingrediente de un producto
+export async function eliminarIngredienteDeProducto(productoDetalleId: number) {
+  try {
+    const { error } = await supabaseAdmin.from("productosdetalles").delete().eq("id", productoDetalleId)
+
+    if (error) {
+      console.error("Error eliminando ingrediente de producto:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/productos")
+    return { success: true }
+  } catch (error) {
+    console.error("Error en eliminarIngredienteDeProducto:", error)
     return { success: false, error: "Error interno del servidor" }
   }
 }

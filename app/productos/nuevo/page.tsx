@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, Upload, ArrowLeft, ArrowRight, FileImage } from "lucide-react"
+import { CheckCircle, Upload, ArrowLeft, ArrowRight, FileImage, AlertTriangle, Loader2 } from "lucide-react"
 import {
   crearProducto,
   obtenerClientes,
@@ -21,11 +21,18 @@ import {
   agregarFormulaAProducto,
   obtenerFormulasAgregadas,
   eliminarFormulaDeProducto,
+  agregarIngredienteAProducto,
+  obtenerIngredientesAgregados,
+  eliminarIngredienteDeProducto,
+  verificarIngredienteDuplicadoProducto,
+  obtenerIngredientes,
+  getIngredientDetails,
 } from "@/app/actions/productos-actions"
 import Image from "next/image"
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { ChevronDown, ChevronUp } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 interface FormData {
   nombre: string
@@ -80,6 +87,14 @@ interface FormulaAgregada {
   costoParcial: number
 }
 
+interface Ingrediente {
+  id: number
+  codigo: string
+  nombre: string
+  costo: number
+  unidadMedidaId: number
+}
+
 export default function NuevoProducto() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -127,6 +142,22 @@ export default function NuevoProducto() {
   const [modoUsoOpen, setModoUsoOpen] = useState(false)
   const [detallesOpen, setDetallesOpen] = useState(false)
 
+  const [ingredientes, setIngredientes] = useState<Ingrediente[]>([])
+  const [ingredientesAgregados, setIngredientesAgregados] = useState<any[]>([])
+  const [ingredienteSearchTerm, setIngredienteSearchTerm] = useState("")
+  const [filteredIngredientes, setFilteredIngredientes] = useState<Ingrediente[]>([])
+  const [showIngredienteDropdown, setShowIngredienteDropdown] = useState(false)
+  const [selIngredienteId, setSelIngredienteId] = useState("")
+  const [selIngredienteCantidad, setSelIngredienteCantidad] = useState("")
+  const [selIngredienteUnidad, setSelIngredienteUnidad] = useState("")
+  const [selIngredienteCosto, setSelIngredienteCosto] = useState("")
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false)
+  const [duplicateMessage, setDuplicateMessage] = useState("")
+
+  const [errorMessage, setErrorMessage] = useState("")
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const steps = [
     { number: 1, title: "Información Básica", description: "Datos generales del producto" },
     { number: 2, title: "Agregar Elementos", description: "Ingredientes y fórmulas" },
@@ -137,15 +168,17 @@ export default function NuevoProducto() {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const [clientesResult, formulasResult, zonasResult] = await Promise.all([
+        const [clientesResult, formulasResult, zonasResult, ingredientesResult] = await Promise.all([
           obtenerClientes(),
           obtenerFormulas(),
           obtenerZonas(),
+          obtenerIngredientes(),
         ])
 
         if (clientesResult.success) setClientes(clientesResult.data)
         if (formulasResult.success) setFormulas(formulasResult.data)
         if (zonasResult.success) setZonas(zonasResult.data)
+        if (ingredientesResult.success) setIngredientes(ingredientesResult.data)
       } catch (error) {
         console.error("Error loading initial data:", error)
       }
@@ -315,6 +348,127 @@ export default function NuevoProducto() {
     } catch (error) {
       console.error("Error removing formula:", error)
       alert("Error al eliminar la fórmula")
+    }
+  }
+
+  const handleIngredienteSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value
+    setIngredienteSearchTerm(term)
+
+    if (term.length >= 2) {
+      const filtered = ingredientes.filter(
+        (ing) =>
+          ing.codigo.toLowerCase().includes(term.toLowerCase()) ||
+          ing.nombre.toLowerCase().includes(term.toLowerCase()),
+      )
+      setFilteredIngredientes(filtered)
+      setShowIngredienteDropdown(filtered.length > 0)
+    } else {
+      setFilteredIngredientes([])
+      setShowIngredienteDropdown(false)
+    }
+  }
+
+  const handleSelectIngredienteFromDropdown = (ing: any) => {
+    setSelIngredienteId(ing.id.toString())
+    setIngredienteSearchTerm(`${ing.codigo} - ${ing.nombre}`)
+    setShowIngredienteDropdown(false)
+  }
+
+  useEffect(() => {
+    const getIngredientInfo = async () => {
+      if (selIngredienteId) {
+        try {
+          const result = await getIngredientDetails(Number(selIngredienteId))
+          if (result.success && result.data) {
+            setSelIngredienteCosto(result.data.costo?.toString() || "0")
+            setSelIngredienteUnidad(result.unidadMedidaId?.toString() || "")
+          }
+        } catch (error) {
+          console.error("Error getting ingredient details:", error)
+        }
+      }
+    }
+
+    getIngredientInfo()
+  }, [selIngredienteId])
+
+  const handleAgregarIngrediente = async () => {
+    if (!productoId) {
+      setErrorMessage("Error: No se ha creado el producto base")
+      setShowErrorModal(true)
+      return
+    }
+
+    if (!selIngredienteId || !selIngredienteCantidad) {
+      setErrorMessage("Favor de llenar la información faltante del ingrediente.")
+      setShowErrorModal(true)
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      // Check for duplicate ingredient
+      const duplicateCheck = await verificarIngredienteDuplicadoProducto(Number(productoId), Number(selIngredienteId))
+
+      if (duplicateCheck.exists) {
+        const ingredienteNombre =
+          ingredientes.find((i) => i.id.toString() === selIngredienteId)?.nombre || "Ingrediente"
+        setDuplicateMessage(`El ingrediente "${ingredienteNombre}" ya está agregado a este producto.`)
+        setShowDuplicateModal(true)
+        setIsSubmitting(false)
+        return
+      }
+
+      const result = await agregarIngredienteAProducto(
+        productoId,
+        Number(selIngredienteId),
+        Number(selIngredienteCantidad),
+        Number(selIngredienteCosto),
+      )
+
+      if (result.success) {
+        // Reload ingredients list
+        const ingredientesResult = await obtenerIngredientesAgregados(productoId)
+        if (ingredientesResult.data) {
+          setIngredientesAgregados(ingredientesResult.data)
+        }
+
+        // Clear inputs
+        setSelIngredienteId("")
+        setSelIngredienteCantidad("")
+        setSelIngredienteUnidad("")
+        setSelIngredienteCosto("")
+        setIngredienteSearchTerm("")
+      } else {
+        setErrorMessage(result.error || "No se pudo agregar el ingrediente.")
+        setShowErrorModal(true)
+      }
+    } catch (error) {
+      setErrorMessage("Error inesperado al agregar ingrediente")
+      setShowErrorModal(true)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleEliminarIngrediente = async (detalleId: number) => {
+    try {
+      const result = await eliminarIngredienteDeProducto(detalleId)
+
+      if (result.success && productoId) {
+        // Reload ingredients list
+        const ingredientesResult = await obtenerIngredientesAgregados(productoId)
+        if (ingredientesResult.data) {
+          setIngredientesAgregados(ingredientesResult.data)
+        }
+      } else {
+        setErrorMessage(result.error || "No se pudo eliminar el ingrediente.")
+        setShowErrorModal(true)
+      }
+    } catch (error) {
+      setErrorMessage("Error inesperado al eliminar ingrediente")
+      setShowErrorModal(true)
     }
   }
 
@@ -841,11 +995,155 @@ export default function NuevoProducto() {
 
           <div className="space-y-4">
             <h4 className="text-md font-medium text-slate-700">Ingredientes Adicionales</h4>
-            <p className="text-sm text-slate-600">
-              Los ingredientes adicionales se pueden agregar aquí si es necesario.
-            </p>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
+              <div className="md:col-span-2 relative">
+                <Label htmlFor="txtIngredienteSearch">Ingrediente</Label>
+                <Input
+                  id="txtIngredienteSearch"
+                  name="txtIngredienteSearch"
+                  value={ingredienteSearchTerm}
+                  onChange={handleIngredienteSearchChange}
+                  onFocus={() =>
+                    ingredienteSearchTerm.length >= 2 &&
+                    filteredIngredientes.length > 0 &&
+                    setShowIngredienteDropdown(true)
+                  }
+                  onBlur={() => setTimeout(() => setShowIngredienteDropdown(false), 100)}
+                  placeholder="Buscar por código o nombre..."
+                  autoComplete="off"
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                />
+                {showIngredienteDropdown && filteredIngredientes.length > 0 && (
+                  <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto mt-1">
+                    {filteredIngredientes.map((ing) => (
+                      <div
+                        key={ing.id}
+                        className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                        onMouseDown={() => handleSelectIngredienteFromDropdown(ing)}
+                      >
+                        {ing.codigo} - {ing.nombre}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="txtCantidadIngrediente">Cantidad</Label>
+                <Input
+                  id="txtCantidadIngrediente"
+                  name="txtCantidadIngrediente"
+                  type="number"
+                  value={selIngredienteCantidad}
+                  onChange={(e) => setSelIngredienteCantidad(e.target.value)}
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                />
+              </div>
+              <div>
+                <Label htmlFor="ddlUnidadMedidaIng">Unidad</Label>
+                <Input
+                  id="ddlUnidadMedidaIng"
+                  value={selIngredienteUnidad}
+                  disabled
+                  placeholder="Automático"
+                  className="bg-gray-100 border-slate-200/60"
+                />
+              </div>
+              <div>
+                <Label htmlFor="txtCostoIngrediente">Costo Ingrediente</Label>
+                <Input
+                  id="txtCostoIngrediente"
+                  name="txtCostoIngrediente"
+                  value={selIngredienteCosto}
+                  disabled
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Button
+                id="btnAgregarIngrediente"
+                name="btnAgregarIngrediente"
+                onClick={handleAgregarIngrediente}
+                disabled={isSubmitting}
+                className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
+              >
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Agregar Ingrediente
+              </Button>
+            </div>
+
+            {ingredientesAgregados.length > 0 && (
+              <div className="mt-6">
+                <h5 className="text-sm font-medium text-slate-700 mb-3">Ingredientes Agregados</h5>
+                <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-slate-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Nombre
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Cantidad
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Unidad
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Costo Parcial
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Acciones
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-slate-200">
+                      {ingredientesAgregados.map((ingrediente) => (
+                        <tr key={ingrediente.id}>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">{ingrediente.nombre}</td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">{ingrediente.cantidad}</td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">{ingrediente.unidad}</td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
+                            ${ingrediente.ingredientecostoparcial.toFixed(2)}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleEliminarIngrediente(ingrediente.id)}
+                            >
+                              Eliminar
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+
+        <Dialog open={showDuplicateModal} onOpenChange={setShowDuplicateModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-amber-600">
+                <AlertTriangle className="h-5 w-5" />
+                Ingrediente Duplicado
+              </DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-slate-600">{duplicateMessage}</p>
+            </div>
+            <div className="flex justify-end">
+              <Button onClick={() => setShowDuplicateModal(false)} className="bg-slate-600 hover:bg-slate-700">
+                Entendido
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   )
