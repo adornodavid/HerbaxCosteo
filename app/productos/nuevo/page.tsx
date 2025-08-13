@@ -1180,9 +1180,9 @@ export default function NuevoProducto() {
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
                             {ingrediente.unidadMedida}
                           </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
+                          {/*<td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
                             ${ingrediente.costo.toFixed(2)}
-                          </td>
+                          </td>*/}
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
                             ${ingrediente.costoParcial.toFixed(2)}
                           </td>
