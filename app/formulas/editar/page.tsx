@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -24,11 +24,9 @@ import {
   getIngredientDetails,
   obtenerIngredientesFormula,
   verificarIngredienteDuplicado,
-  eliminarRegistroIncompleto,
 } from "@/app/actions/formulas-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 import { getSession } from "@/app/actions/session-actions"
-import { useNavigationGuard } from "@/contexts/navigation-guard-context"
 
 interface FormData {
   nombre: string
@@ -77,19 +75,15 @@ export default function EditarFormulaPage() {
   const formulaId = searchParams.get("getFormulaId")
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const { setGuard } = useNavigationGuard()
-  const resolveNavigationRef = useRef<((value: boolean) => void) | null>(null)
-
   // Estados para el formulario por etapas
   const [currentStep, setCurrentStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [showErrorModal, setShowErrorModal] = useState(false)
   const [showDuplicateModal, setShowDuplicateModal] = useState(false)
-  const [showExitConfirmModal, setShowExitConfirmModal] = useState(false)
   const [showValidationModal, setShowValidationModal] = useState(false)
-  const [nextPath, setNextPath] = useState("")
   const [validationMessage, setValidationMessage] = useState("")
+  const [showSuccessAnimationModal, setShowSuccessAnimationModal] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
   const [duplicateMessage, setDuplicateMessage] = useState("")
 
@@ -131,61 +125,6 @@ export default function EditarFormulaPage() {
     { number: 4, title: "Finalización" },
   ]
 
-  const handleLeavePage = useCallback(
-    async (confirm: boolean) => {
-      setShowExitConfirmModal(false)
-      if (confirm) {
-        if (formulaId) {
-          await eliminarRegistroIncompleto(Number(formulaId))
-        }
-        resolveNavigationRef.current?.(true) // Allow navigation
-      } else {
-        resolveNavigationRef.current?.(false) // Cancel navigation
-      }
-      resolveNavigationRef.current = null
-    },
-    [formulaId],
-  )
-
-  const checkLeaveAndConfirm = useCallback(
-    async (targetPath: string): Promise<boolean> => {
-      if (currentStep >= 2 && currentStep <= 3 && formulaId) {
-        return new Promise<boolean>((resolve) => {
-          resolveNavigationRef.current = resolve
-          setShowExitConfirmModal(true)
-          setNextPath(targetPath)
-        })
-      }
-      return true // Allow navigation if not in protected state
-    },
-    [currentStep, formulaId],
-  )
-
-  const validateStep2 = () => {
-    // Check if at least 2 ingredients are added
-    if (ingredientesAgregados.length < 2) {
-      setValidationMessage("Debes agregar al menos 2 ingredientes a la fórmula")
-      setShowValidationModal(true)
-      return false
-    }
-
-    // Check if cantidad is greater than 0
-    if (!formData.cantidad || formData.cantidad <= 0) {
-      setValidationMessage("Debes ingresar una cantidad mayor a 0")
-      setShowValidationModal(true)
-      return false
-    }
-
-    // Check if unidad de medida is selected
-    if (!formData.unidadmedidaid || formData.unidadmedidaid <= 0) {
-      setValidationMessage("Debes seleccionar una unidad de medida")
-      setShowValidationModal(true)
-      return false
-    }
-
-    return true
-  }
-
   useEffect(() => {
     const loadFormulaData = async () => {
       if (!formulaId) {
@@ -213,6 +152,7 @@ export default function EditarFormulaPage() {
           activo: formula.activo,
           cantidad: formula.cantidad || 0,
           unidadmedidaid: formula.unidadmedidaid || 1,
+          imagen: undefined,
           clienteId: formula.ingredientesxformula?.[0]?.ingredientes?.clienteid || 0,
         })
 
@@ -342,34 +282,6 @@ export default function EditarFormulaPage() {
     setCostoTotal(total)
   }, [ingredientesAgregados])
 
-  useEffect(() => {
-    if (currentStep >= 2 && currentStep <= 3 && formulaId) {
-      setGuard(checkLeaveAndConfirm)
-    } else {
-      setGuard(null)
-    }
-
-    return () => {
-      setGuard(null)
-    }
-  }, [currentStep, formulaId, setGuard, checkLeaveAndConfirm])
-
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (currentStep >= 2 && currentStep <= 3 && formulaId) {
-        e.preventDefault()
-        e.returnValue = ""
-        return ""
-      }
-    }
-
-    window.addEventListener("beforeunload", handleBeforeUnload)
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload)
-    }
-  }, [currentStep, formulaId])
-
   const handleInputChange = (field: keyof FormData, value: any) => {
     setFormData((prev) => ({
       ...prev,
@@ -476,6 +388,31 @@ export default function EditarFormulaPage() {
     }
   }
 
+  const validateStep2 = () => {
+    // Check if at least 2 ingredients are added
+    if (ingredientesAgregados.length < 2) {
+      setValidationMessage("Debes agregar al menos 2 ingredientes a la fórmula")
+      setShowValidationModal(true)
+      return false
+    }
+
+    // Check if cantidad is greater than 0
+    if (!formData.cantidad || formData.cantidad <= 0) {
+      setValidationMessage("Debes ingresar una cantidad mayor a 0")
+      setShowValidationModal(true)
+      return false
+    }
+
+    // Check if unidad de medida is selected
+    if (!formData.unidadmedidaid || formData.unidadmedidaid <= 0) {
+      setValidationMessage("Debes seleccionar una unidad de medida")
+      setShowValidationModal(true)
+      return false
+    }
+
+    return true
+  }
+
   const handleNextStep = async () => {
     if (currentStep === 1) {
       if (!validateStep1()) {
@@ -526,8 +463,13 @@ export default function EditarFormulaPage() {
     setIsLoading(true)
 
     try {
-      setCurrentStep(4)
-      setShowSuccessModal(true)
+      setShowSuccessAnimationModal(true)
+
+      setTimeout(() => {
+        setShowSuccessAnimationModal(false)
+        setCurrentStep(4)
+        setShowSuccessModal(true)
+      }, 4000)
     } catch (error) {
       setErrorMessage("Error inesperado")
       setShowErrorModal(true)
@@ -1013,12 +955,12 @@ export default function EditarFormulaPage() {
     if (showSuccessModal) {
       const timer = setTimeout(() => {
         setShowSuccessModal(false)
-        //router.push("/formulas")
-      }, 4000) // 4 seconds
+        window.location.href = "/formulas"
+      }, 4000)
 
       return () => clearTimeout(timer)
     }
-  }, [showSuccessModal, router])
+  }, [showSuccessModal])
 
   if (!formulaId) {
     return (
@@ -1136,8 +1078,7 @@ export default function EditarFormulaPage() {
         </div>
       )}
 
-      {/* Success Modal */}
-      {showSuccessModal && (
+      {showSuccessAnimationModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
             <div className="text-center space-y-6">
@@ -1149,7 +1090,7 @@ export default function EditarFormulaPage() {
                     alt="matraz"
                     width={200}
                     height={200}
-                    className="absolute inset-0 animate-bounce-slow" // Animación de rebote lento
+                    className="absolute inset-0 animate-bounce-slow"
                   />
                   {/* Bubbles */}
                   <div
@@ -1223,11 +1164,6 @@ export default function EditarFormulaPage() {
 
             {/* Custom CSS animations */}
             <style jsx>{`
-              @keyframes liquidFill {
-                0% { height: 40%; }
-                100% { height: 80%; }
-              }
-              
               @keyframes progressFill {
                 0% { width: 0%; }
                 100% { width: 100%; }
@@ -1237,32 +1173,53 @@ export default function EditarFormulaPage() {
         </div>
       )}
 
-      <Dialog open={showExitConfirmModal} onOpenChange={setShowExitConfirmModal}>
-        <DialogContent className="bg-white/95 backdrop-blur-sm border-slate-200/60">
-          <DialogHeader>
-            <DialogTitle className="text-slate-800">¿Salir del registro?</DialogTitle>
-            <DialogDescription className="text-slate-600">
-              Si sales ahora, los datos ingresados se perderán. ¿Estás seguro de que deseas continuar?
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => handleLeavePage(false)}>
-              Cancelar
-            </Button>
-            <Button variant="destructive" onClick={() => handleLeavePage(true)}>
-              Sí, Salir
-            </Button>
+      {/* Success Modal */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent className="sm:max-w-md">
+          <div className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 rounded-lg p-8">
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/10 via-teal-400/10 to-cyan-400/10 animate-pulse"></div>
+
+            <div className="relative z-10 text-center space-y-6">
+              <div className="relative">
+                <div className="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-lg">
+                  <CheckCircle className="h-10 w-10 text-white" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  ¡Fórmula Actualizada!
+                </h3>
+                <p className="text-gray-600">La fórmula ha sido actualizada exitosamente en el sistema.</p>
+              </div>
+
+              <div className="flex gap-3 justify-center">
+                <Button
+                  onClick={() => router.push("/formulas")}
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500"
+                >
+                  Ver Fórmulas
+                </Button>
+                <Button variant="outline" onClick={() => setShowSuccessModal(false)}>
+                  Cerrar
+                </Button>
+              </div>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
 
+      {/* Validation Modal */}
       <Dialog open={showValidationModal} onOpenChange={setShowValidationModal}>
-        <DialogContent className="bg-white/95 backdrop-blur-sm border-slate-200/60">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-slate-800">Información faltante</DialogTitle>
-            <DialogDescription className="text-slate-600">{validationMessage}</DialogDescription>
+            <DialogTitle className="text-amber-600 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              Información Faltante
+            </DialogTitle>
+            <DialogDescription>{validationMessage}</DialogDescription>
           </DialogHeader>
-          <div className="flex justify-end mt-4">
+          <div className="flex justify-end">
             <Button onClick={() => setShowValidationModal(false)}>Entendido</Button>
           </div>
         </DialogContent>
@@ -1295,17 +1252,6 @@ export default function EditarFormulaPage() {
           </div>
         </DialogContent>
       </Dialog>
-
-      <style jsx>{`
-        @keyframes progress {
-          0% { width: 0%; }
-          100% { width: 100%; }
-        }
-        @keyframes progressFill {
-          0% { width: 0%; }
-          100% { width: 100%; }
-        }
-      `}</style>
     </div>
   )
 }
