@@ -362,7 +362,7 @@ export async function actualizarFormula(
       }
 
       // Obtener URL pública de la imagen
-      const { data: urlData } = supabase.storage.from("imagenes").getPublicUrl(fileName)
+      const { data: urlData } = supabase.storage.from("herbax/formulas").getPublicUrl(fileName)
 
       imgUrl = urlData.publicUrl
     }
@@ -779,17 +779,27 @@ export async function eliminarRegistroIncompleto(formulaId: number) {
 
     if (formulaData?.imgurl) {
       try {
-        // Extraer el nombre del archivo de la URL
         const url = new URL(formulaData.imgurl)
         const pathSegments = url.pathname.split("/")
-        const fileName = pathSegments[pathSegments.length - 1]
-        console.log(fileName)
-        // Eliminar la imagen del bucket
-        const { error: deleteImageError } = await supabase.storage.from("herbax/formulas").remove([fileName])
 
-        if (deleteImageError) {
-          console.error("Error al eliminar imagen:", deleteImageError)
-          // No retornamos error aquí para que continúe con la eliminación de registros
+        // Buscar el segmento que contiene el nombre del archivo (después de 'formulas')
+        const formulasIndex = pathSegments.findIndex((segment) => segment === "formulas")
+        if (formulasIndex !== -1 && formulasIndex < pathSegments.length - 1) {
+          // Tomar el nombre del archivo que está después de 'formulas'
+          const fileName = pathSegments[formulasIndex + 1]
+          console.log("Intentando eliminar archivo:", fileName)
+
+          // Eliminar la imagen del bucket herbax con el path completo
+          const { error: deleteImageError } = await supabase.storage.from("herbax").remove([`formulas/${fileName}`])
+
+          if (deleteImageError) {
+            console.error("Error al eliminar imagen:", deleteImageError)
+            // No retornamos error aquí para que continúe con la eliminación de registros
+          } else {
+            console.log("Imagen eliminada exitosamente")
+          }
+        } else {
+          console.log("No se pudo extraer el nombre del archivo de la URL")
         }
       } catch (imageError) {
         console.error("Error al procesar eliminación de imagen:", imageError)
