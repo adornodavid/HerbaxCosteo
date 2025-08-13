@@ -319,6 +319,7 @@ export default function NuevoProducto() {
   }
 
   const handleNextStep = async () => {
+  console.log(currentStep)
     if (currentStep === 1) {
       // Validate step 1
       if (!formData.nombre.trim()) {
