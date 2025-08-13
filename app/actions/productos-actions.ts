@@ -707,7 +707,7 @@ export async function actualizarProductoEtapa1(productoId: number, formData: For
       nombre: formData.get("nombre") as string,
       descripcion: formData.get("descripcion") as string,
       clienteid: Number.parseInt(formData.get("clienteid") as string),
-      catalogoid: Number.parseInt(formData.get("catalogoid") as string) || null,
+      //catalogoid: Number.parseInt(formData.get("catalogoid") as string) || null,
       presentacion: formData.get("presentacion") as string,
       porcion: formData.get("porcion") as string,
       modouso: formData.get("modouso") as string,
