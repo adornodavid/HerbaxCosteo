@@ -783,7 +783,7 @@ export default function NuevaFormulaPage() {
             {formData.notaspreparacion && (
               <div className="mt-4 space-y-2">
                 <Label className="text-sm font-medium text-gray-600">Notas de Preparación</Label>
-                <p className="text-base text-gray-900 px-3 py-2 min-h-[60px]">
+                <p className="text-base text-gray-900 bg-white px-3 py-2 border min-h-[60px]">
                   {formData.notaspreparacion}
                 </p>
               </div>
