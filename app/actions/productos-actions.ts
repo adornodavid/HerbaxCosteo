@@ -321,7 +321,7 @@ export async function obtenerUnidadMedidaFormula(formulaId: number) {
       return { success: false, error: error.message }
     }
 
-    return { success: true, data: data.descripcion }
+    return { success: true, data }
   } catch (error) {
     console.error("Error en obtenerUnidadMedidaFormula:", error)
     return { success: false, error: "Error interno del servidor" }
