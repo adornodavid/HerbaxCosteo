@@ -262,7 +262,6 @@ export async function obtenerZonas() {
     const { data, error } = await supabaseAdmin
       .from("zonas")
       .select("id, nombre")
-      .eq("activo", true)
       .order("nombre", { ascending: true })
 
     if (error) {
