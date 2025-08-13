@@ -803,4 +803,49 @@ export async function verificarFormulaEnProducto(productoId: number) {
   }
 }
 
+// Función: finalizarProducto: función para finalizar un producto con insert a productoxcatalogo y update de costo
+export async function finalizarProducto(productoId: number, catalogoId: number) {
+  try {
+    // First, get the total cost of the product
+    const costoResult = await obtenerCostoTotalProducto(productoId)
+    if (!costoResult.success) {
+      return { success: false, error: "Error obteniendo costo total del producto" }
+    }
+
+    // Insert into productoxcatalogo
+    const { error: insertError } = await supabaseAdmin.from("productoxcatalogo").insert({
+      catalogoid: catalogoId,
+      productoid: productoId,
+      precioventa: null,
+      margenutilidad: null,
+      fechacreacion: new Date().toISOString(),
+      activo: true,
+    })
+
+    if (insertError) {
+      console.error("Error insertando en productoxcatalogo:", insertError)
+      return { success: false, error: insertError.message }
+    }
+
+    // Update productos table with the total cost
+    const { error: updateError } = await supabaseAdmin
+      .from("productos")
+      .update({
+        costo: costoResult.total,
+      })
+      .eq("id", productoId)
+
+    if (updateError) {
+      console.error("Error actualizando costo del producto:", updateError)
+      return { success: false, error: updateError.message }
+    }
+
+    revalidatePath("/productos")
+    return { success: true }
+  } catch (error) {
+    console.error("Error en finalizarProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
 export const getUnidadMedidaFormula = obtenerUnidadMedidaFormula
