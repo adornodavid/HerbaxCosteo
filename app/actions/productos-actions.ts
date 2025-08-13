@@ -309,6 +309,7 @@ export async function obtenerUnidadMedidaFormula(formulaId: number) {
       .select(`
         unidadmedidaid,
         tipounidadmedida!inner(
+          id,
           descripcion
         )
       `)
