@@ -572,7 +572,7 @@ export default function FormulasPage() {
       </Card>
 
       {/* Tabla de resultados */}
-      <Card>
+      <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
           <CardTitle>Listado de Fórmulas</CardTitle>
           <CardDescription>
