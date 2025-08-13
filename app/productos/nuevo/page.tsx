@@ -332,7 +332,7 @@ export default function NuevoProducto() {
         setShowValidationModal(true)
         return
       }
-      setCurrentStep((prev) => prev + 1)
+      //setCurrentStep((prev) => prev + 1)
     } else if (currentStep < 4) {
       setCurrentStep((prev) => prev + 1)
     }
