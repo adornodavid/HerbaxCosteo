@@ -355,18 +355,38 @@ export default function NuevoProducto() {
       }
     } else if (currentStep === 2) {
       console.log("etapa 2")
-      console.log("total de formulas: ", formulasAgregadas.length)
-      console.log("total de ingredientes: ", ingredientesAgregados.length)
 
-      if (formulasAgregadas.length === 0 && ingredientesAgregados.length === 0) {
-        console.log("se pasa validacion - mostrando modal")
+      if (productoId) {
+        try {
+          const [formulasResult, ingredientesResult] = await Promise.all([
+            obtenerFormulasAgregadas(productoId),
+            obtenerIngredientesAgregados(productoId),
+          ])
+
+          const currentFormulas = formulasResult.success ? formulasResult.data : []
+          const currentIngredientes = ingredientesResult.success ? ingredientesResult.data : []
+
+          console.log("total de formulas actualizadas: ", currentFormulas.length)
+          console.log("total de ingredientes actualizadas: ", currentIngredientes.length)
+
+          if (currentFormulas.length === 0 && currentIngredientes.length === 0) {
+            console.log("se pasa validacion - mostrando modal")
+            setShowValidationModal(true)
+            console.log("modal establecido, retornando para impedir avance")
+            return // Impedir avance a la siguiente etapa
+          }
+
+          console.log("validacion pasada - avanzando a siguiente etapa")
+          setCurrentStep((prev) => prev + 1)
+        } catch (error) {
+          console.error("Error validating step 2:", error)
+          setShowValidationModal(true)
+          return
+        }
+      } else {
         setShowValidationModal(true)
-        console.log("modal establecido, retornando para impedir avance")
-        return // Impedir avance a la siguiente etapa
+        return
       }
-
-      console.log("validacion pasada - avanzando a siguiente etapa")
-      setCurrentStep((prev) => prev + 1)
     } else if (currentStep < 4) {
       setCurrentStep((prev) => prev + 1)
     }
