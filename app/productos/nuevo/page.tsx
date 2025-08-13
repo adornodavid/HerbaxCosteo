@@ -11,13 +11,24 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Upload, ArrowLeft, ArrowRight, FileImage } from "lucide-react"
-import { crearProducto, obtenerClientes, obtenerFormulas, obtenerZonas } from "@/app/actions/productos-actions"
+import {
+  crearProducto,
+  obtenerClientes,
+  obtenerFormulas,
+  obtenerZonas,
+  obtenerCatalogosPorCliente,
+  obtenerUnidadMedidaFormula,
+  agregarFormulaAProducto,
+  obtenerFormulasAgregadas,
+  eliminarFormulaDeProducto,
+} from "@/app/actions/productos-actions"
 import Image from "next/image"
 
 interface FormData {
   nombre: string
   descripcion: string
   clienteid: number
+  catalogoid: number | null
   presentacion: string
   porcion: string
   modouso: string
@@ -44,11 +55,26 @@ interface Cliente {
 interface Formula {
   id: number
   nombre: string
+  costo: number
 }
 
 interface Zona {
   id: number
   nombre: string
+}
+
+interface Catalogo {
+  id: number
+  nombre: string
+}
+
+interface FormulaAgregada {
+  id: number
+  formulaId: number
+  nombre: string
+  cantidad: number
+  costo: number
+  costoParcial: number
 }
 
 export default function NuevoProductoPage() {
@@ -65,6 +91,7 @@ export default function NuevoProductoPage() {
     nombre: "",
     descripcion: "",
     clienteid: 0,
+    catalogoid: null,
     presentacion: "",
     porcion: "",
     modouso: "",
@@ -87,6 +114,11 @@ export default function NuevoProductoPage() {
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [formulas, setFormulas] = useState<Formula[]>([])
   const [zonas, setZonas] = useState<Zona[]>([])
+  const [catalogos, setCatalogos] = useState<Catalogo[]>([])
+  const [formulaCantidad, setFormulaCantidad] = useState("")
+  const [formulaUnidadMedida, setFormulaUnidadMedida] = useState("")
+  const [formulasAgregadas, setFormulasAgregadas] = useState<FormulaAgregada[]>([])
+  const [productoId, setProductoId] = useState<number | null>(null)
 
   const steps = [
     { number: 1, title: "Información Básica", description: "Datos generales del producto" },
@@ -114,6 +146,45 @@ export default function NuevoProductoPage() {
 
     loadInitialData()
   }, [])
+
+  useEffect(() => {
+    const loadCatalogos = async () => {
+      if (formData.clienteid > 0) {
+        try {
+          const result = await obtenerCatalogosPorCliente(formData.clienteid)
+          if (result.success) {
+            setCatalogos(result.data)
+          }
+        } catch (error) {
+          console.error("Error loading catalogs:", error)
+        }
+      } else {
+        setCatalogos([])
+        setFormData((prev) => ({ ...prev, catalogoid: null }))
+      }
+    }
+
+    loadCatalogos()
+  }, [formData.clienteid])
+
+  useEffect(() => {
+    const loadFormulaUnit = async () => {
+      if (formData.formaid) {
+        try {
+          const result = await obtenerUnidadMedidaFormula(formData.formaid)
+          if (result.success && result.data) {
+            setFormulaUnidadMedida(result.data.descripcion)
+          }
+        } catch (error) {
+          console.error("Error loading formula unit:", error)
+        }
+      } else {
+        setFormulaUnidadMedida("")
+      }
+    }
+
+    loadFormulaUnit()
+  }, [formData.formaid])
 
   const handleInputChange = (field: keyof FormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -153,6 +224,7 @@ export default function NuevoProductoPage() {
 
         const result = await crearProducto(formDataToSend)
         if (result.success) {
+          setProductoId(result.data?.id || null)
           setCurrentStep((prev) => prev + 1)
         } else {
           alert("Error al crear el producto: " + result.error)
@@ -176,6 +248,67 @@ export default function NuevoProductoPage() {
 
   const handleSubmit = async () => {
     setShowSuccessAnimation(true)
+  }
+
+  const handleAgregarFormula = async () => {
+    if (!formData.formaid || !formulaCantidad || Number(formulaCantidad) <= 0) {
+      alert("Favor de seleccionar una fórmula y agregar una cantidad válida")
+      return
+    }
+
+    if (!productoId) {
+      alert("Error: No se encontró el ID del producto")
+      return
+    }
+
+    try {
+      const formula = formulas.find((f) => f.id === formData.formaid)
+      if (!formula) {
+        alert("Error: No se encontró la fórmula seleccionada")
+        return
+      }
+
+      const cantidad = Number(formulaCantidad)
+      const costoParcial = formula.costo * cantidad
+
+      const result = await agregarFormulaAProducto(productoId, formData.formaid, cantidad, costoParcial)
+
+      if (result.success) {
+        // Reload formulas list
+        const formulasResult = await obtenerFormulasAgregadas(productoId)
+        if (formulasResult.success) {
+          setFormulasAgregadas(formulasResult.data)
+        }
+
+        // Clear inputs
+        setFormData((prev) => ({ ...prev, formaid: null }))
+        setFormulaCantidad("")
+        setFormulaUnidadMedida("")
+
+        alert("Fórmula agregada exitosamente")
+      } else {
+        alert("Error al agregar la fórmula: " + result.error)
+      }
+    } catch (error) {
+      console.error("Error adding formula:", error)
+      alert("Error al agregar la fórmula")
+    }
+  }
+
+  const handleEliminarFormula = async (productoDetalleId: number) => {
+    try {
+      const result = await eliminarFormulaDeProducto(productoDetalleId)
+
+      if (result.success) {
+        setFormulasAgregadas((prev) => prev.filter((f) => f.id !== productoDetalleId))
+        alert("Fórmula eliminada exitosamente")
+      } else {
+        alert("Error al eliminar la fórmula: " + result.error)
+      }
+    } catch (error) {
+      console.error("Error removing formula:", error)
+      alert("Error al eliminar la fórmula")
+    }
   }
 
   useEffect(() => {
@@ -223,6 +356,28 @@ export default function NuevoProductoPage() {
                   {clientes.map((cliente) => (
                     <SelectItem key={cliente.id} value={cliente.id.toString()}>
                       {cliente.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="catalogoid" className="text-slate-700 font-medium">
+                Catálogo
+              </Label>
+              <Select
+                value={formData.catalogoid?.toString() || ""}
+                onValueChange={(value) => handleInputChange("catalogoid", value ? Number.parseInt(value) : null)}
+                disabled={!formData.clienteid || catalogos.length === 0}
+              >
+                <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
+                  <SelectValue placeholder="Selecciona un catálogo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {catalogos.map((catalogo) => (
+                    <SelectItem key={catalogo.id} value={catalogo.id.toString()}>
+                      {catalogo.nombre}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -505,29 +660,118 @@ export default function NuevoProductoPage() {
       <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-6 shadow-sm">
         <h3 className="text-lg font-medium text-slate-800 mb-6">Agregar Elementos</h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-6">
           <div className="space-y-4">
             <h4 className="text-md font-medium text-slate-700">Fórmula Asociada</h4>
-            <div className="space-y-2">
-              <Label htmlFor="formaid" className="text-slate-700 font-medium">
-                Seleccionar Fórmula
-              </Label>
-              <Select
-                value={formData.formaid?.toString() || ""}
-                onValueChange={(value) => handleInputChange("formaid", value ? Number.parseInt(value) : null)}
-              >
-                <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
-                  <SelectValue placeholder="Selecciona una fórmula" />
-                </SelectTrigger>
-                <SelectContent>
-                  {formulas.map((formula) => (
-                    <SelectItem key={formula.id} value={formula.id.toString()}>
-                      {formula.nombre}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="md:col-span-2 space-y-2">
+                <Label htmlFor="formaid" className="text-slate-700 font-medium">
+                  Seleccionar Fórmula
+                </Label>
+                <Select
+                  value={formData.formaid?.toString() || ""}
+                  onValueChange={(value) => handleInputChange("formaid", value ? Number.parseInt(value) : null)}
+                >
+                  <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
+                    <SelectValue placeholder="Selecciona una fórmula" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {formulas.map((formula) => (
+                      <SelectItem key={formula.id} value={formula.id.toString()}>
+                        {formula.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cantidad" className="text-slate-700 font-medium">
+                  Cantidad
+                </Label>
+                <Input
+                  id="cantidad"
+                  type="number"
+                  min="1"
+                  value={formulaCantidad}
+                  onChange={(e) => setFormulaCantidad(e.target.value)}
+                  placeholder="0"
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="unidadmedida" className="text-slate-700 font-medium">
+                  Unidad Medida
+                </Label>
+                <Input
+                  id="unidadmedida"
+                  value={formulaUnidadMedida}
+                  disabled
+                  placeholder="Selecciona una fórmula"
+                  className="bg-gray-100 border-slate-200/60"
+                />
+              </div>
             </div>
+
+            <div className="flex justify-end">
+              <Button
+                onClick={handleAgregarFormula}
+                disabled={!formData.formaid || !formulaCantidad}
+                className="bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600"
+              >
+                Agregar Fórmula
+              </Button>
+            </div>
+
+            {formulasAgregadas.length > 0 && (
+              <div className="mt-6">
+                <h5 className="text-sm font-medium text-slate-700 mb-3">Fórmulas Agregadas</h5>
+                <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-slate-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Nombre
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Cantidad
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Costo Unitario
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Costo Parcial
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Acciones
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-slate-200">
+                      {formulasAgregadas.map((formula) => (
+                        <tr key={formula.id}>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">{formula.nombre}</td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">{formula.cantidad}</td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
+                            ${formula.costo.toFixed(2)}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
+                            ${formula.costoParcial.toFixed(2)}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
+                            <Button variant="destructive" size="sm" onClick={() => handleEliminarFormula(formula.id)}>
+                              Eliminar
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">
