@@ -495,7 +495,7 @@ export default function FormulasPage() {
       </div>
 
       {/* Filtros */}
-      <Card className="mb-6 rounded-xs">
+      <Card className="mb-6 ">
         <CardHeader>
           <CardTitle>Filtros de Búsqueda</CardTitle>
         </CardHeader>
