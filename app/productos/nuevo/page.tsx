@@ -1443,7 +1443,7 @@ export default function NuevoProducto() {
       </div>
 
       {/* Form Content */}
-      <Card className="bg-white/80 backdrop-blur-sm border-slate-200/60 shadow-lg">
+      <Card className="rounded-xs border text-card-foreground bg-white/80 backdrop-blur-sm border-slate-200/60 shadow-lg">
         <CardHeader className="bg-gradient-to-r from-slate-50/80 to-slate-100/50 backdrop-blur-sm">
           <CardTitle className="text-slate-800">{steps[currentStep - 1].title}</CardTitle>
           <CardDescription className="text-slate-600">{steps[currentStep - 1].description}</CardDescription>
