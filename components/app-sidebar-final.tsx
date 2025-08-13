@@ -130,7 +130,7 @@ export function AppSidebar() {
               boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 12px rgba(0,0,0,0.1)",
             }}*/
           >
-            <img className="shrink-0 size-15 rounded-full" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/suplementos-removebg-preview.png" alt="Avatar2" />
+            <img className="shrink-0 size-15 rounded-full" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/vitaminas.png" alt="Avatar2" />
             {/*<Icons.PillBottle className="w-6 h-6 text-slate-700" />*/}
           </div>
           <span className="font-semibold text-lg text-slate-700">Sistema de Costeo</span>
