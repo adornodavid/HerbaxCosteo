@@ -321,7 +321,7 @@ export default function NuevoProducto() {
   const handleNextStep = async () => {
   console.log(currentStep)
     if (currentStep === 1) {
-      console.log("etapa 1")
+    console.log("etapa 1")
       // Validate step 1
       if (!formData.nombre.trim()) {
         alert("El nombre del producto es requerido")
