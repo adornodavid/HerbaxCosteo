@@ -67,7 +67,7 @@ export async function crearProducto(formData: FormData) {
     const nombre = formData.get("nombre") as string
     const descripcion = formData.get("descripcion") as string
     const clienteid = Number.parseInt(formData.get("clienteid") as string)
-    const catalogoid = Number.parseInt(formData.get("catalogoid") as string) || null
+    //const catalogoid = Number.parseInt(formData.get("catalogoid") as string) || null
     const presentacion = formData.get("presentacion") as string
     const porcion = formData.get("porcion") as string
     const modouso = formData.get("modouso") as string
@@ -91,7 +91,6 @@ export async function crearProducto(formData: FormData) {
         nombre,
         descripcion,
         clienteid,
-        catalogoid,
         presentacion,
         porcion,
         modouso,
