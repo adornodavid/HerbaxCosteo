@@ -405,17 +405,18 @@ export default function NuevoProducto() {
 
   const handleConfirmedSubmit = async () => {
     setShowConfirmModal(false)
+    setShowSuccessAnimation(true)
 
     try {
       const result = await finalizarProducto(productoId!, formData.catalogoid)
       if (!result.success) {
+        setShowSuccessAnimation(false)
         alert(`Error al finalizar producto: ${result.error}`)
         return
       }
-
-      setShowSuccessAnimation(true)
     } catch (error) {
       console.error("Error finalizando producto:", error)
+      setShowSuccessAnimation(false)
       alert("Error al finalizar el producto")
     }
   }
