@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -22,6 +22,7 @@ import {
   eliminarIngredienteFormula,
   getIngredientDetails, // Added import for moved function
   obtenerIngredientesFormula, // Added import for missing function
+  eliminarRegistroIncompleto,
   verificarIngredienteDuplicado,
 } from "@/app/actions/formulas-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
@@ -364,7 +365,7 @@ export default function NuevaFormulaPage() {
     if (currentStep === 1) {
       if (!validateStep1()) {
         setErrorMessage("Por favor completa el nombre de la fórmula")
-        setShowErrorModal(true)
+        //setShowErrorModal(true)
         return
       }
 
@@ -733,7 +734,7 @@ export default function NuevaFormulaPage() {
         <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-50/80 to-slate-100/50 backdrop-blur-sm">
           Resumen de la Fórmula
         </h3>
-        <p className="text-gray-600">Revisa toda la información antes de finalizar</p>
+        <p className="text-gray-600 mt-2">Revisa toda la información antes de finalizar</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -912,12 +913,70 @@ export default function NuevaFormulaPage() {
       const timer = setTimeout(() => {
         setShowSuccessModal(false)
         // Redirect to formulas list
-        //window.location.href = "/formulas"
+        window.location.href = "/formulas"
       }, 4000) // 4 seconds
 
       return () => clearTimeout(timer)
     }
   }, [showSuccessModal])
+
+  const handleLeavePage = useCallback(
+    async (confirm: boolean) => {
+      setShowExitConfirmModal(false)
+      if (confirm) {
+        if (formulaId) {
+          await eliminarRegistroIncompleto(formulaId)
+        }
+        resolveNavigationRef.current?.(true) // Allow navigation
+      } else {
+        resolveNavigationRef.current?.(false) // Cancel navigation
+      }
+      resolveNavigationRef.current = null
+    },
+    [formulaId],
+  )
+
+  const checkLeaveAndConfirm = useCallback(
+    async (targetPath: string): Promise<boolean> => {
+      if (currentStep >= 2 && currentStep <= 3 && formulaId) {
+        return new Promise<boolean>((resolve) => {
+          resolveNavigationRef.current = resolve
+          setShowExitConfirmModal(true)
+          setNextPath(targetPath)
+        })
+      }
+      return true // Allow navigation if not in protected state
+    },
+    [currentStep, formulaId],
+  )
+
+  useEffect(() => {
+    if (currentStep >= 2 && currentStep <= 3 && formulaId) {
+      setGuard(checkLeaveAndConfirm)
+    } else {
+      setGuard(null)
+    }
+
+    return () => {
+      setGuard(null)
+    }
+  }, [currentStep, formulaId, setGuard, checkLeaveAndConfirm])
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (currentStep >= 2 && currentStep <= 3 && formulaId) {
+        e.preventDefault()
+        e.returnValue = ""
+        return ""
+      }
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [currentStep, formulaId])
 
   const validateStep2 = () => {
     // Check if at least 2 ingredients are added
@@ -942,15 +1001,6 @@ export default function NuevaFormulaPage() {
     }
 
     return true
-  }
-
-  const handleLeavePage = (confirm: boolean) => {
-    if (confirm && resolveNavigationRef.current) {
-      resolveNavigationRef.current(true)
-    } else {
-      resolveNavigationRef.current?.(false)
-    }
-    setShowExitConfirmModal(false)
   }
 
   return (
