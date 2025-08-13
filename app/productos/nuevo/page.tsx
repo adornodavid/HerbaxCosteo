@@ -1184,7 +1184,7 @@ export default function NuevoProducto() {
                             ${ingrediente.costo.toFixed(2)}
                           </td>*/}
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
-                            ${ingrediente.costoParcial.toFixed(2)}
+                            ${ingrediente.ingredientecostoparcial.toFixed(2)}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
                             <Button
