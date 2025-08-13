@@ -842,7 +842,7 @@ export default function NuevaFormulaPage() {
 
         {/* Imagen */}
         <div className="lg:col-span-1">
-          <div className="bg-gradient-to-br from-white to-purple-50 rounded-xl p-6 border border-purple-100 shadow-sm h-fit">
+          <div className="bg-gradient-to-br from-white to-purple-50 rounded-xs p-6 border border-purple-100 shadow-sm h-fit">
             <h4 className="text-lg font-semibold text-purple-800 mb-4 flex items-center gap-2">
               <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
               Imagen de la Fórmula
