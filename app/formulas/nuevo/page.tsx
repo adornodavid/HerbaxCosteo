@@ -749,7 +749,7 @@ export default function NuevaFormulaPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-600">Nombre de la Fórmula</Label>
-                <p className="text-base font-medium text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                <p className="text-base font-medium text-gray-900 bg-white px-3 py-2">
                   {formData.nombre}
                 </p>
               </div>
@@ -763,7 +763,7 @@ export default function NuevaFormulaPage() {
 
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-600">Cantidad</Label>
-                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                <p className="text-base text-gray-900 bg-white px-3 py-2 ">
                   {formData.cantidad}{" "}
                   {unidadesMedida.find((u) => u.id === Number.parseInt(formData.unidadmedidaid))?.descripcion || ""}
                 </p>
@@ -783,7 +783,7 @@ export default function NuevaFormulaPage() {
             {formData.notaspreparacion && (
               <div className="mt-4 space-y-2">
                 <Label className="text-sm font-medium text-gray-600">Notas de Preparación</Label>
-                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border min-h-[60px]">
+                <p className="text-base text-gray-900 bg-white px-3 py-2 border min-h-[60px]">
                   {formData.notaspreparacion}
                 </p>
               </div>
