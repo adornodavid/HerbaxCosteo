@@ -1137,10 +1137,10 @@ export default function NuevaFormulaPage() {
                       className="absolute inset-0 animate-bounce-slow" // Animación de rebote lento
                       />
                       {/* Liquid animation */}
-                      <div
+                      {/*<div
                         className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-emerald-400 to-emerald-300 rounded-b-full animate-pulse"
                         style={{ height: "60%", animation: "liquidFill 2s ease-in-out infinite alternate" }}
-                      ></div>
+                      ></div>*/}
                       {/* Bubbles */}
                       <div
                         className="absolute bottom-2 left-2 w-1 h-1 bg-white rounded-full animate-bounce"
