@@ -1,0 +1,812 @@
+"use client"
+
+import type React from "react"
+import { useState, useRef, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import { CheckCircle, Upload, ArrowLeft, ArrowRight, FileImage } from "lucide-react"
+import { crearProducto, obtenerClientes, obtenerFormulas, obtenerZonas } from "@/app/actions/productos-actions"
+import Image from "next/image"
+
+interface FormData {
+  nombre: string
+  descripcion: string
+  clienteid: number
+  presentacion: string
+  porcion: string
+  modouso: string
+  porcionenvase: string
+  formaid: number | null
+  categoriauso: string
+  propositoprincipal: string
+  propuestavalor: string
+  instruccionesingesta: string
+  edadminima: number
+  advertencia: string
+  condicionesalmacenamiento: string
+  vidaanaquelmeses: number
+  activo: boolean
+  zonaid: number | null
+  imagen?: File
+}
+
+interface Cliente {
+  id: number
+  nombre: string
+}
+
+interface Formula {
+  id: number
+  nombre: string
+}
+
+interface Zona {
+  id: number
+  nombre: string
+}
+
+export default function NuevoProductoPage() {
+  const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Estados para el formulario por etapas
+  const [currentStep, setCurrentStep] = useState(1)
+  const [isLoading, setIsLoading] = useState(false)
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false)
+
+  // Estados para los datos del formulario
+  const [formData, setFormData] = useState<FormData>({
+    nombre: "",
+    descripcion: "",
+    clienteid: 0,
+    presentacion: "",
+    porcion: "",
+    modouso: "",
+    porcionenvase: "",
+    formaid: null,
+    categoriauso: "",
+    propositoprincipal: "",
+    propuestavalor: "",
+    instruccionesingesta: "",
+    edadminima: 0,
+    advertencia: "",
+    condicionesalmacenamiento: "",
+    vidaanaquelmeses: 0,
+    activo: true,
+    zonaid: null,
+    imagen: undefined,
+  })
+
+  const [imagePreview, setImagePreview] = useState<string>("")
+  const [clientes, setClientes] = useState<Cliente[]>([])
+  const [formulas, setFormulas] = useState<Formula[]>([])
+  const [zonas, setZonas] = useState<Zona[]>([])
+
+  const steps = [
+    { number: 1, title: "Información Básica", description: "Datos generales del producto" },
+    { number: 2, title: "Agregar Elementos", description: "Ingredientes y fórmulas" },
+    { number: 3, title: "Resumen y Confirmación", description: "Revisar información" },
+    { number: 4, title: "Finalización", description: "Producto creado" },
+  ]
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const [clientesResult, formulasResult, zonasResult] = await Promise.all([
+          obtenerClientes(),
+          obtenerFormulas(),
+          obtenerZonas(),
+        ])
+
+        if (clientesResult.success) setClientes(clientesResult.data)
+        if (formulasResult.success) setFormulas(formulasResult.data)
+        if (zonasResult.success) setZonas(zonasResult.data)
+      } catch (error) {
+        console.error("Error loading initial data:", error)
+      }
+    }
+
+    loadInitialData()
+  }, [])
+
+  const handleInputChange = (field: keyof FormData, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setFormData((prev) => ({ ...prev, imagen: file }))
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleNextStep = async () => {
+    if (currentStep === 1) {
+      // Validate step 1
+      if (!formData.nombre.trim()) {
+        alert("El nombre del producto es requerido")
+        return
+      }
+
+      // Create product in step 1
+      setIsLoading(true)
+      try {
+        const formDataToSend = new FormData()
+        Object.entries(formData).forEach(([key, value]) => {
+          if (key === "imagen" && value instanceof File) {
+            formDataToSend.append(key, value)
+          } else if (value !== null && value !== undefined) {
+            formDataToSend.append(key, value.toString())
+          }
+        })
+
+        const result = await crearProducto(formDataToSend)
+        if (result.success) {
+          setCurrentStep((prev) => prev + 1)
+        } else {
+          alert("Error al crear el producto: " + result.error)
+        }
+      } catch (error) {
+        console.error("Error creating product:", error)
+        alert("Error al crear el producto")
+      } finally {
+        setIsLoading(false)
+      }
+    } else if (currentStep < 4) {
+      setCurrentStep((prev) => prev + 1)
+    }
+  }
+
+  const handlePrevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep((prev) => prev - 1)
+    }
+  }
+
+  const handleSubmit = async () => {
+    setShowSuccessAnimation(true)
+  }
+
+  useEffect(() => {
+    if (showSuccessAnimation) {
+      const timer = setTimeout(() => {
+        setShowSuccessAnimation(false)
+        setCurrentStep(4)
+      }, 4000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [showSuccessAnimation])
+
+  const renderStep1 = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Left side - Form inputs */}
+      <div className="lg:col-span-2 space-y-6">
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-6 shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="nombre" className="text-slate-700 font-medium">
+                Nombre del Producto *
+              </Label>
+              <Input
+                id="nombre"
+                value={formData.nombre}
+                onChange={(e) => handleInputChange("nombre", e.target.value)}
+                placeholder="Ingresa el nombre del producto"
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="clienteid" className="text-slate-700 font-medium">
+                Cliente *
+              </Label>
+              <Select
+                value={formData.clienteid.toString()}
+                onValueChange={(value) => handleInputChange("clienteid", Number.parseInt(value))}
+              >
+                <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
+                  <SelectValue placeholder="Selecciona un cliente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {clientes.map((cliente) => (
+                    <SelectItem key={cliente.id} value={cliente.id.toString()}>
+                      {cliente.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="presentacion" className="text-slate-700 font-medium">
+                Presentación
+              </Label>
+              <Input
+                id="presentacion"
+                value={formData.presentacion}
+                onChange={(e) => handleInputChange("presentacion", e.target.value)}
+                placeholder="Ej: Cápsulas, Polvo, Líquido"
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="porcion" className="text-slate-700 font-medium">
+                Porción
+              </Label>
+              <Input
+                id="porcion"
+                value={formData.porcion}
+                onChange={(e) => handleInputChange("porcion", e.target.value)}
+                placeholder="Ej: 2 cápsulas, 1 cucharada"
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="modouso" className="text-slate-700 font-medium">
+                Modo de Uso
+              </Label>
+              <Input
+                id="modouso"
+                value={formData.modouso}
+                onChange={(e) => handleInputChange("modouso", e.target.value)}
+                placeholder="Ej: Oral, Tópico"
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="porcionenvase" className="text-slate-700 font-medium">
+                Porción por Envase
+              </Label>
+              <Input
+                id="porcionenvase"
+                value={formData.porcionenvase}
+                onChange={(e) => handleInputChange("porcionenvase", e.target.value)}
+                placeholder="Ej: 30 porciones"
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="categoriauso" className="text-slate-700 font-medium">
+                Categoría de Uso
+              </Label>
+              <Input
+                id="categoriauso"
+                value={formData.categoriauso}
+                onChange={(e) => handleInputChange("categoriauso", e.target.value)}
+                placeholder="Ej: Suplemento alimenticio"
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edadminima" className="text-slate-700 font-medium">
+                Edad Mínima
+              </Label>
+              <Input
+                id="edadminima"
+                type="number"
+                min="0"
+                value={formData.edadminima}
+                onChange={(e) => handleInputChange("edadminima", Number.parseInt(e.target.value) || 0)}
+                placeholder="0"
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="vidaanaquelmeses" className="text-slate-700 font-medium">
+                Vida de Anaquel (meses)
+              </Label>
+              <Input
+                id="vidaanaquelmeses"
+                type="number"
+                min="0"
+                value={formData.vidaanaquelmeses}
+                onChange={(e) => handleInputChange("vidaanaquelmeses", Number.parseInt(e.target.value) || 0)}
+                placeholder="0"
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="zonaid" className="text-slate-700 font-medium">
+                Zona
+              </Label>
+              <Select
+                value={formData.zonaid?.toString() || ""}
+                onValueChange={(value) => handleInputChange("zonaid", value ? Number.parseInt(value) : null)}
+              >
+                <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
+                  <SelectValue placeholder="Selecciona una zona" />
+                </SelectTrigger>
+                <SelectContent>
+                  {zonas.map((zona) => (
+                    <SelectItem key={zona.id} value={zona.id.toString()}>
+                      {zona.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="mt-6 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="descripcion" className="text-slate-700 font-medium">
+                Descripción
+              </Label>
+              <Textarea
+                id="descripcion"
+                value={formData.descripcion}
+                onChange={(e) => handleInputChange("descripcion", e.target.value)}
+                placeholder="Descripción del producto..."
+                rows={3}
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="propositoprincipal" className="text-slate-700 font-medium">
+                Propósito Principal
+              </Label>
+              <Textarea
+                id="propositoprincipal"
+                value={formData.propositoprincipal}
+                onChange={(e) => handleInputChange("propositoprincipal", e.target.value)}
+                placeholder="Propósito principal del producto..."
+                rows={2}
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="propuestavalor" className="text-slate-700 font-medium">
+                Propuesta de Valor
+              </Label>
+              <Textarea
+                id="propuestavalor"
+                value={formData.propuestavalor}
+                onChange={(e) => handleInputChange("propuestavalor", e.target.value)}
+                placeholder="Propuesta de valor del producto..."
+                rows={2}
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="instruccionesingesta" className="text-slate-700 font-medium">
+                Instrucciones de Ingesta
+              </Label>
+              <Textarea
+                id="instruccionesingesta"
+                value={formData.instruccionesingesta}
+                onChange={(e) => handleInputChange("instruccionesingesta", e.target.value)}
+                placeholder="Instrucciones de cómo tomar el producto..."
+                rows={2}
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="advertencia" className="text-slate-700 font-medium">
+                Advertencias
+              </Label>
+              <Textarea
+                id="advertencia"
+                value={formData.advertencia}
+                onChange={(e) => handleInputChange("advertencia", e.target.value)}
+                placeholder="Advertencias y contraindicaciones..."
+                rows={2}
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="condicionesalmacenamiento" className="text-slate-700 font-medium">
+                Condiciones de Almacenamiento
+              </Label>
+              <Textarea
+                id="condicionesalmacenamiento"
+                value={formData.condicionesalmacenamiento}
+                onChange={(e) => handleInputChange("condicionesalmacenamiento", e.target.value)}
+                placeholder="Condiciones de almacenamiento..."
+                rows={2}
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right side - Image upload and preview */}
+      <div className="lg:col-span-1">
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-4 shadow-sm h-full">
+          <div className="space-y-4">
+            <Label className="text-slate-700 font-medium">Imagen del Producto</Label>
+
+            {/* Image preview area */}
+            <div className="relative">
+              {imagePreview ? (
+                <div className="relative group">
+                  <img
+                    src={imagePreview || "/placeholder.svg"}
+                    alt="Preview"
+                    className="w-full h-48 object-cover rounded-xl border-2 border-slate-200/60 shadow-sm"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl flex items-center justify-center">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-white/90 hover:bg-white text-slate-700"
+                    >
+                      Cambiar imagen
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className="w-full h-48 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-sky-400 hover:bg-sky-50/50"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="h-8 w-8 text-slate-400 mb-2" />
+                  <p className="text-sm text-slate-500 text-center">
+                    Haz clic para subir
+                    <br />
+                    una imagen
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full flex items-center gap-2 bg-white/80 backdrop-blur-sm border-slate-200/60 hover:border-sky-400 hover:bg-sky-50/50"
+            >
+              <Upload className="h-4 w-4" />
+              {formData.imagen ? "Cambiar Imagen" : "Subir Imagen"}
+            </Button>
+
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+
+            {formData.imagen && (
+              <Badge variant="secondary" className="flex items-center gap-1 w-fit">
+                <FileImage className="h-3 w-3" />
+                {formData.imagen.name}
+              </Badge>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderStep2 = () => (
+    <div className="space-y-6">
+      <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-6 shadow-sm">
+        <h3 className="text-lg font-medium text-slate-800 mb-6">Agregar Elementos</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h4 className="text-md font-medium text-slate-700">Fórmula Asociada</h4>
+            <div className="space-y-2">
+              <Label htmlFor="formaid" className="text-slate-700 font-medium">
+                Seleccionar Fórmula
+              </Label>
+              <Select
+                value={formData.formaid?.toString() || ""}
+                onValueChange={(value) => handleInputChange("formaid", value ? Number.parseInt(value) : null)}
+              >
+                <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
+                  <SelectValue placeholder="Selecciona una fórmula" />
+                </SelectTrigger>
+                <SelectContent>
+                  {formulas.map((formula) => (
+                    <SelectItem key={formula.id} value={formula.id.toString()}>
+                      {formula.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="text-md font-medium text-slate-700">Ingredientes Adicionales</h4>
+            <p className="text-sm text-slate-600">
+              Los ingredientes adicionales se pueden agregar aquí si es necesario.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderStep3 = () => (
+    <div className="space-y-8">
+      <div className="text-center">
+        <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-50/80 to-slate-100/50 backdrop-blur-sm">
+          Resumen del Producto
+        </h3>
+        <p className="text-gray-600 mt-2">Revisa toda la información antes de finalizar</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Información Básica */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-gradient-to-br from-white to-sky-50 rounded-xs p-6 border border-sky-100 shadow-sm">
+            <h4 className="text-lg font-semibold text-sky-800 mb-4 flex items-center gap-2">
+              <div className="w-2 h-2 bg-sky-500 rounded-full"></div>
+              Información Básica
+            </h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Nombre del Producto</Label>
+                <p className="text-base font-medium text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {formData.nombre}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Cliente</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {clientes.find((c) => c.id === formData.clienteid)?.nombre || "No seleccionado"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Presentación</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {formData.presentacion || "No especificada"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Porción</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {formData.porcion || "No especificada"}
+                </p>
+              </div>
+            </div>
+
+            {formData.descripcion && (
+              <div className="mt-4 space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Descripción</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border min-h-[60px]">
+                  {formData.descripcion}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Imagen */}
+        <div className="lg:col-span-1">
+          <div className="bg-gradient-to-br from-white to-purple-50 rounded-xs p-6 border border-purple-100 shadow-sm h-fit">
+            <h4 className="text-lg font-semibold text-purple-800 mb-4 flex items-center gap-2">
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              Imagen del Producto
+            </h4>
+
+            {imagePreview ? (
+              <div className="space-y-3">
+                <img
+                  src={imagePreview || "/placeholder.svg"}
+                  alt="Preview del producto"
+                  className="w-full h-48 object-cover rounded-lg border border-purple-200 shadow-sm"
+                />
+                <p className="text-sm text-gray-600 text-center">Imagen cargada correctamente</p>
+              </div>
+            ) : (
+              <div className="w-full h-48 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-gray-500">Sin imagen</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderStep4 = () => (
+    <div className="text-center py-12">
+      <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+      <h3 className="text-lg font-medium text-gray-900 mb-2">¡Producto Creado Exitosamente!</h3>
+      <p className="text-gray-500 mb-6">El producto ha sido guardado correctamente en el sistema.</p>
+      <div className="flex gap-4 justify-center">
+        <Button onClick={() => router.push("/productos")}>Ver Productos</Button>
+        <Button variant="outline" onClick={() => window.location.reload()}>
+          Crear Otro Producto
+        </Button>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4">
+      {/* Header */}
+      <div className="mb-5">
+        <div className="flex items-center gap-4 mb-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push("/productos")}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver a Productos
+          </Button>
+        </div>
+
+        <h1 className="text-3xl font-bold text-gray-900">Nuevo Producto</h1>
+        <p className="text-gray-600 mt-2">Crea un nuevo producto siguiendo los pasos del asistente</p>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="mb-3">
+        <div className="relative">
+          <div className="w-full h-3 bg-gradient-to-r from-slate-200/60 to-slate-300/60 rounded-full backdrop-blur-sm border border-slate-200/40 shadow-inner">
+            <div
+              className="h-full bg-gradient-to-r from-sky-400 via-sky-500 to-cyan-400 rounded-full shadow-lg backdrop-blur-sm border border-sky-300/30 transition-all duration-700 ease-out relative overflow-hidden"
+              style={{ width: `${(currentStep / steps.length) * 100}%` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+              <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent"></div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mt-3">
+            {steps.map((step, index) => (
+              <div key={step.number} className="flex flex-col items-center">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
+                    currentStep >= step.number
+                      ? "bg-gradient-to-br from-sky-400 to-cyan-500 text-white shadow-lg backdrop-blur-sm border border-sky-300/30"
+                      : "bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 backdrop-blur-sm border border-slate-200/60"
+                  }`}
+                >
+                  {step.number}
+                </div>
+                <div className="mt-2 text-center">
+                  <p
+                    className={`text-xs font-medium ${currentStep >= step.number ? "text-sky-700" : "text-slate-600"}`}
+                  >
+                    {step.title}
+                  </p>
+                  <p className="text-xs text-slate-500">{step.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Form Content */}
+      <Card className="bg-white/80 backdrop-blur-sm border-slate-200/60 shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-slate-50/80 to-slate-100/50 backdrop-blur-sm">
+          <CardTitle className="text-slate-800">{steps[currentStep - 1].title}</CardTitle>
+          <CardDescription className="text-slate-600">{steps[currentStep - 1].description}</CardDescription>
+        </CardHeader>
+        <CardContent className="p-4">
+          {currentStep === 1 && renderStep1()}
+          {currentStep === 2 && renderStep2()}
+          {currentStep === 3 && renderStep3()}
+          {currentStep === 4 && renderStep4()}
+        </CardContent>
+      </Card>
+
+      {/* Navigation Buttons */}
+      {currentStep < 4 && (
+        <div className="flex justify-between mt-6">
+          <Button
+            variant="outline"
+            onClick={handlePrevStep}
+            disabled={currentStep === 1}
+            className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-slate-200/60 hover:border-sky-400 hover:bg-sky-50/50"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Anterior
+          </Button>
+
+          <div className="flex gap-2">
+            {currentStep === 3 ? (
+              <Button
+                onClick={handleSubmit}
+                disabled={isLoading}
+                className="flex items-center gap-2 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 shadow-lg"
+              >
+                {isLoading ? "Finalizando..." : "Finalizar Producto"}
+              </Button>
+            ) : (
+              <Button
+                onClick={handleNextStep}
+                disabled={isLoading}
+                className="flex items-center gap-2 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 shadow-lg"
+              >
+                {isLoading ? "Procesando..." : "Siguiente"}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Success Animation Modal */}
+      {showSuccessAnimation && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div className="text-center space-y-6">
+              <div className="relative mx-auto w-32 h-32">
+                <Image
+                  src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/matraz.gif"
+                  alt="matraz"
+                  width={200}
+                  height={200}
+                  className="absolute inset-0 animate-bounce-slow"
+                />
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-2xl font-bold text-gray-900 animate-pulse">
+                  Creando Producto
+                  <span className="inline-flex ml-1">
+                    <span className="animate-bounce" style={{ animationDelay: "0s" }}>
+                      .
+                    </span>
+                    <span className="animate-bounce" style={{ animationDelay: "0.2s" }}>
+                      .
+                    </span>
+                    <span className="animate-bounce" style={{ animationDelay: "0.4s" }}>
+                      .
+                    </span>
+                  </span>
+                </h3>
+
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-gradient-to-r from-sky-400 to-cyan-500 h-2 rounded-full animate-pulse"
+                    style={{ width: "100%", animation: "progressFill 4s ease-in-out" }}
+                  ></div>
+                </div>
+
+                <p className="text-gray-600 animate-fade-in">Procesando información del producto...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
