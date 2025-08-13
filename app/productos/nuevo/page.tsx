@@ -319,7 +319,7 @@ export default function NuevoProducto() {
   }
 
   const handleNextStep = async () => {
-  console.log(currentStep)
+    console.log(currentStep)
     if (currentStep === 1) {
       console.log("etapa 1")
       // Validate step 1
@@ -354,15 +354,18 @@ export default function NuevoProducto() {
         setIsLoading(false)
       }
     } else if (currentStep === 2) {
-    console.log("etapa 2")
-    console.log("total de formulas: ", formulasAgregadas.length)
-    console.log("total de ingredientes: ", ingredientesAgregados.length)
-      if (formulasAgregadas.length == 0 && ingredientesAgregados.length == 0) {
-        console.log("se pasa validacion")
+      console.log("etapa 2")
+      console.log("total de formulas: ", formulasAgregadas.length)
+      console.log("total de ingredientes: ", ingredientesAgregados.length)
+
+      if (formulasAgregadas.length === 0 && ingredientesAgregados.length === 0) {
+        console.log("se pasa validacion - mostrando modal")
         setShowValidationModal(true)
-        console.log("se pasa validacion y finaliza")
-        return
+        console.log("modal establecido, retornando para impedir avance")
+        return // Impedir avance a la siguiente etapa
       }
+
+      console.log("validacion pasada - avanzando a siguiente etapa")
       setCurrentStep((prev) => prev + 1)
     } else if (currentStep < 4) {
       setCurrentStep((prev) => prev + 1)
