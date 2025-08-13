@@ -610,565 +610,727 @@ function EditarProductoContent() {
   }, [currentStep, productoId])
 
   const renderStep1 = () => (
-    <div className="space-y-6">
-      {/* Inputs principales visibles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="nombre">Nombre del Producto *</Label>
-          <Input
-            id="nombre"
-            value={formData.nombre}
-            onChange={(e) => handleInputChange("nombre", e.target.value)}
-            placeholder="Ingresa el nombre del producto"
-            required
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="cliente">Cliente *</Label>
-          <Select value={formData.clienteid.toString()} onValueChange={handleClienteChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Selecciona un cliente" />
-            </SelectTrigger>
-            <SelectContent>
-              {clientes.map((cliente) => (
-                <SelectItem key={cliente.id} value={cliente.id.toString()}>
-                  {cliente.nombre}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label htmlFor="catalogo">Catálogo</Label>
-          <Select
-            value={formData.catalogoid?.toString() || ""}
-            onValueChange={(value) => handleInputChange("catalogoid", value ? Number.parseInt(value) : null)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecciona un catálogo" />
-            </SelectTrigger>
-            <SelectContent>
-              {catalogos.map((catalogo) => (
-                <SelectItem key={catalogo.id} value={catalogo.id.toString()}>
-                  {catalogo.nombre}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label htmlFor="zona">Zona</Label>
-          <Select
-            value={formData.zonaid?.toString() || ""}
-            onValueChange={(value) => handleInputChange("zonaid", value ? Number.parseInt(value) : null)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecciona una zona" />
-            </SelectTrigger>
-            <SelectContent>
-              {zonas.map((zona) => (
-                <SelectItem key={zona.id} value={zona.id.toString()}>
-                  {zona.nombre}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="descripcion">Descripción</Label>
-        <Textarea
-          id="descripcion"
-          value={formData.descripcion}
-          onChange={(e) => handleInputChange("descripcion", e.target.value)}
-          placeholder="Describe el producto"
-          rows={3}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="imagen">Imagen del Producto</Label>
-        <div className="flex items-center gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2"
-          >
-            <Upload className="h-4 w-4" />
-            Seleccionar Imagen
-          </Button>
-          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-          {imagePreview && (
-            <div className="relative">
-              <Image
-                src={imagePreview || "/placeholder.svg"}
-                alt="Preview"
-                width={100}
-                height={100}
-                className="rounded-md object-cover"
-              />
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
-                onClick={() => {
-                  setImagePreview("")
-                  handleInputChange("imagen", undefined)
-                }}
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Sección Porciones */}
-      <Collapsible open={porcionesOpen} onOpenChange={setPorcionesOpen}>
-        <CollapsibleTrigger asChild>
-          <Button variant="outline" className="w-full justify-between bg-transparent">
-            Porciones
-            {porcionesOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-4 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="presentacion">Presentación</Label>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Left side - Form inputs */}
+      <div className="lg:col-span-2 space-y-6">
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-6 shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="nombre" className="text-slate-700 font-medium">
+                Nombre del Producto *
+              </Label>
               <Input
-                id="presentacion"
-                value={formData.presentacion}
-                onChange={(e) => handleInputChange("presentacion", e.target.value)}
-                placeholder="Ej: Botella, Caja, etc."
+                id="nombre"
+                value={formData.nombre}
+                onChange={(e) => handleInputChange("nombre", e.target.value)}
+                placeholder="Ingresa el nombre del producto"
+                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                required
               />
             </div>
-            <div>
-              <Label htmlFor="porcion">Porción</Label>
-              <Input
-                id="porcion"
-                value={formData.porcion}
-                onChange={(e) => handleInputChange("porcion", e.target.value)}
-                placeholder="Ej: 250ml, 100g, etc."
-              />
-            </div>
-            <div>
-              <Label htmlFor="porcionenvase">Porción por Envase</Label>
-              <Input
-                id="porcionenvase"
-                value={formData.porcionenvase}
-                onChange={(e) => handleInputChange("porcionenvase", e.target.value)}
-                placeholder="Ej: 4 porciones"
-              />
-            </div>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
 
-      {/* Sección Modo Uso */}
-      <Collapsible open={modoUsoOpen} onOpenChange={setModoUsoOpen}>
-        <CollapsibleTrigger asChild>
-          <Button variant="outline" className="w-full justify-between bg-transparent">
-            Modo Uso
-            {modoUsoOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-4 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="modouso">Modo de Uso</Label>
-              <Textarea
-                id="modouso"
-                value={formData.modouso}
-                onChange={(e) => handleInputChange("modouso", e.target.value)}
-                placeholder="Instrucciones de uso"
-                rows={3}
-              />
-            </div>
-            <div>
-              <Label htmlFor="categoriauso">Categoría de Uso</Label>
-              <Input
-                id="categoriauso"
-                value={formData.categoriauso}
-                onChange={(e) => handleInputChange("categoriauso", e.target.value)}
-                placeholder="Ej: Suplemento, Alimento, etc."
-              />
-            </div>
-            <div>
-              <Label htmlFor="edadminima">Edad Mínima</Label>
-              <Input
-                id="edadminima"
-                type="number"
-                value={formData.edadminima}
-                onChange={(e) => handleInputChange("edadminima", Number.parseInt(e.target.value) || 0)}
-                placeholder="Edad mínima recomendada"
-              />
-            </div>
-            <div>
-              <Label htmlFor="instruccionesingesta">Instrucciones de Ingesta</Label>
-              <Textarea
-                id="instruccionesingesta"
-                value={formData.instruccionesingesta}
-                onChange={(e) => handleInputChange("instruccionesingesta", e.target.value)}
-                placeholder="Cómo consumir el producto"
-                rows={3}
-              />
-            </div>
-            <div>
-              <Label htmlFor="advertencia">Advertencias</Label>
-              <Textarea
-                id="advertencia"
-                value={formData.advertencia}
-                onChange={(e) => handleInputChange("advertencia", e.target.value)}
-                placeholder="Advertencias importantes"
-                rows={3}
-              />
-            </div>
-            <div>
-              <Label htmlFor="condicionesalmacenamiento">Condiciones de Almacenamiento</Label>
-              <Textarea
-                id="condicionesalmacenamiento"
-                value={formData.condicionesalmacenamiento}
-                onChange={(e) => handleInputChange("condicionesalmacenamiento", e.target.value)}
-                placeholder="Cómo almacenar el producto"
-                rows={3}
-              />
-            </div>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-
-      {/* Sección Detalles Adicionales */}
-      <Collapsible open={detallesOpen} onOpenChange={setDetallesOpen}>
-        <CollapsibleTrigger asChild>
-          <Button variant="outline" className="w-full justify-between bg-transparent">
-            Detalles Adicionales
-            {detallesOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-4 mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="vidaanaquelmeses">Vida de Anaquel (meses)</Label>
-              <Input
-                id="vidaanaquelmeses"
-                type="number"
-                value={formData.vidaanaquelmeses}
-                onChange={(e) => handleInputChange("vidaanaquelmeses", Number.parseInt(e.target.value) || 0)}
-                placeholder="Meses de vida útil"
-              />
-            </div>
-            <div>
-              <Label htmlFor="propositoprincipal">Propósito Principal</Label>
-              <Input
-                id="propositoprincipal"
-                value={formData.propositoprincipal}
-                onChange={(e) => handleInputChange("propositoprincipal", e.target.value)}
-                placeholder="Objetivo principal del producto"
-              />
-            </div>
-            <div>
-              <Label htmlFor="propuestavalor">Propuesta de Valor</Label>
-              <Input
-                id="propuestavalor"
-                value={formData.propuestavalor}
-                onChange={(e) => handleInputChange("propuestavalor", e.target.value)}
-                placeholder="Valor único del producto"
-              />
-            </div>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-    </div>
-  )
-
-  const renderStep2 = () => (
-    <div className="space-y-6">
-      {/* Sección Fórmulas */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Fórmula Asociada</CardTitle>
-          <CardDescription>Selecciona y agrega fórmulas al producto</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div>
-              <Label htmlFor="formula">Fórmula</Label>
-              <Select
-                value={formData.formaid?.toString() || ""}
-                onValueChange={(value) => {
-                  const formulaId = value ? Number.parseInt(value) : null
-                  handleInputChange("formaid", formulaId)
-                  handleFormulaChange(value)
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona una fórmula" />
+            <div className="space-y-2">
+              <Label htmlFor="cliente" className="text-slate-700 font-medium">
+                Cliente *
+              </Label>
+              <Select value={formData.clienteid.toString()} onValueChange={handleClienteChange}>
+                <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
+                  <SelectValue placeholder="Selecciona un cliente" />
                 </SelectTrigger>
                 <SelectContent>
-                  {formulas.map((formula) => (
-                    <SelectItem key={formula.id} value={formula.id.toString()}>
-                      {formula.nombre}
+                  {clientes.map((cliente) => (
+                    <SelectItem key={cliente.id} value={cliente.id.toString()}>
+                      {cliente.nombre}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
-            <div>
-              <Label htmlFor="unidadmedida">Unidad de Medida</Label>
-              <Input id="unidadmedida" value={formulaUnidadMedida} readOnly placeholder="Unidad automática" />
+            <div className="space-y-2">
+              <Label htmlFor="catalogo" className="text-slate-700 font-medium">
+                Catálogo
+              </Label>
+              <Select
+                value={formData.catalogoid?.toString() || ""}
+                onValueChange={(value) => handleInputChange("catalogoid", value ? Number.parseInt(value) : null)}
+              >
+                <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
+                  <SelectValue placeholder="Selecciona un catálogo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {catalogos.map((catalogo) => (
+                    <SelectItem key={catalogo.id} value={catalogo.id.toString()}>
+                      {catalogo.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
-              <Label htmlFor="costo">Costo</Label>
-              <Input id="costo" value={formulaCosto} readOnly placeholder="Costo automático" />
-            </div>
-
-            <div>
-              <Label htmlFor="rangocantidad">Rango de Cantidad</Label>
-              <div className="space-y-2">
-                <Slider
-                  value={[formulaRangoCantidad]}
-                  onValueChange={(value) => setFormulaRangoCantidad(value[0])}
-                  max={formulaCantidadMaxima}
-                  min={1}
-                  step={1}
-                  className="w-full"
-                />
-                <div className="text-sm text-center">{formulaRangoCantidad}</div>
-              </div>
-            </div>
-
-            <div className="flex items-end">
-              <Button onClick={handleAgregarFormula} disabled={!formData.formaid} className="w-full">
-                Agregar Fórmula
-              </Button>
+            <div className="space-y-2">
+              <Label htmlFor="zona" className="text-slate-700 font-medium">
+                Zona
+              </Label>
+              <Select
+                value={formData.zonaid?.toString() || ""}
+                onValueChange={(value) => handleInputChange("zonaid", value ? Number.parseInt(value) : null)}
+              >
+                <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
+                  <SelectValue placeholder="Selecciona una zona" />
+                </SelectTrigger>
+                <SelectContent>
+                  {zonas.map((zona) => (
+                    <SelectItem key={zona.id} value={zona.id.toString()}>
+                      {zona.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
-          {/* Tabla de fórmulas agregadas */}
-          {formulasAgregadas.length > 0 && (
-            <div className="mt-6">
-              <h4 className="text-lg font-semibold mb-3">Fórmulas Agregadas</h4>
-              <div className="border rounded-lg overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-2 text-left">Fórmula</th>
-                      <th className="px-4 py-2 text-left">Cantidad</th>
-                      <th className="px-4 py-2 text-left">Costo Parcial</th>
-                      <th className="px-4 py-2 text-left">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {formulasAgregadas.map((formula) => (
-                      <tr key={formula.id} className="border-t">
-                        <td className="px-4 py-2">{formula.nombre}</td>
-                        <td className="px-4 py-2">{formula.cantidad}</td>
-                        <td className="px-4 py-2">${formula.costoParcial.toFixed(2)}</td>
-                        <td className="px-4 py-2">
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => {
-                              setDeleteFormulaId(formula.id)
-                              setShowDeleteFormulaModal(true)
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          <div className="mt-6 space-y-2">
+            <Label htmlFor="descripcion" className="text-slate-700 font-medium">
+              Descripción
+            </Label>
+            <Textarea
+              id="descripcion"
+              value={formData.descripcion}
+              onChange={(e) => handleInputChange("descripcion", e.target.value)}
+              placeholder="Describe el producto"
+              rows={3}
+              className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+            />
+          </div>
+        </div>
 
-      {/* Sección Ingredientes */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Ingredientes Adicionales</CardTitle>
-          <CardDescription>Agrega ingredientes adicionales al producto</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* Sección Porciones */}
+        <Collapsible open={porcionesOpen} onOpenChange={setPorcionesOpen}>
+          <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs shadow-sm">
+            <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-slate-100/50 transition-colors rounded-xs">
+              <h3 className="text-lg font-semibold text-slate-700">Porciones</h3>
+              {porcionesOpen ? (
+                <ChevronUp className="h-5 w-5 text-slate-500" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-slate-500" />
+              )}
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="p-6 pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="presentacion" className="text-slate-700 font-medium">
+                      Presentación
+                    </Label>
+                    <Input
+                      id="presentacion"
+                      value={formData.presentacion}
+                      onChange={(e) => handleInputChange("presentacion", e.target.value)}
+                      placeholder="Ej: Cápsulas, Polvo, Líquido"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="porcion" className="text-slate-700 font-medium">
+                      Porción
+                    </Label>
+                    <Input
+                      id="porcion"
+                      value={formData.porcion}
+                      onChange={(e) => handleInputChange("porcion", e.target.value)}
+                      placeholder="Ej: 2 cápsulas, 1 cucharada"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="porcionenvase" className="text-slate-700 font-medium">
+                      Porción por Envase
+                    </Label>
+                    <Input
+                      id="porcionenvase"
+                      value={formData.porcionenvase}
+                      onChange={(e) => handleInputChange("porcionenvase", e.target.value)}
+                      placeholder="Ej: 30 porciones"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
+
+        {/* Sección Modo Uso */}
+        <Collapsible open={modoUsoOpen} onOpenChange={setModoUsoOpen}>
+          <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs shadow-sm">
+            <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-slate-100/50 transition-colors rounded-xs">
+              <h3 className="text-lg font-semibold text-slate-700">Modo Uso</h3>
+              {modoUsoOpen ? (
+                <ChevronUp className="h-5 w-5 text-slate-500" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-slate-500" />
+              )}
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="p-6 pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="modouso" className="text-slate-700 font-medium">
+                      Modo de Uso
+                    </Label>
+                    <Textarea
+                      id="modouso"
+                      value={formData.modouso}
+                      onChange={(e) => handleInputChange("modouso", e.target.value)}
+                      placeholder="Instrucciones de uso"
+                      rows={3}
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="categoriauso" className="text-slate-700 font-medium">
+                      Categoría de Uso
+                    </Label>
+                    <Input
+                      id="categoriauso"
+                      value={formData.categoriauso}
+                      onChange={(e) => handleInputChange("categoriauso", e.target.value)}
+                      placeholder="Ej: Suplemento, Alimento, etc."
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edadminima" className="text-slate-700 font-medium">
+                      Edad Mínima
+                    </Label>
+                    <Input
+                      id="edadminima"
+                      type="number"
+                      value={formData.edadminima}
+                      onChange={(e) => handleInputChange("edadminima", Number.parseInt(e.target.value) || 0)}
+                      placeholder="Edad mínima recomendada"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="instruccionesingesta" className="text-slate-700 font-medium">
+                      Instrucciones de Ingesta
+                    </Label>
+                    <Textarea
+                      id="instruccionesingesta"
+                      value={formData.instruccionesingesta}
+                      onChange={(e) => handleInputChange("instruccionesingesta", e.target.value)}
+                      placeholder="Cómo consumir el producto"
+                      rows={3}
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="advertencia" className="text-slate-700 font-medium">
+                      Advertencias
+                    </Label>
+                    <Textarea
+                      id="advertencia"
+                      value={formData.advertencia}
+                      onChange={(e) => handleInputChange("advertencia", e.target.value)}
+                      placeholder="Advertencias importantes"
+                      rows={3}
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="condicionesalmacenamiento" className="text-slate-700 font-medium">
+                      Condiciones de Almacenamiento
+                    </Label>
+                    <Textarea
+                      id="condicionesalmacenamiento"
+                      value={formData.condicionesalmacenamiento}
+                      onChange={(e) => handleInputChange("condicionesalmacenamiento", e.target.value)}
+                      placeholder="Cómo almacenar el producto"
+                      rows={3}
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
+
+        {/* Sección Detalles Adicionales */}
+        <Collapsible open={detallesOpen} onOpenChange={setDetallesOpen}>
+          <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs shadow-sm">
+            <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-slate-100/50 transition-colors rounded-xs">
+              <h3 className="text-lg font-semibold text-slate-700">Detalles Adicionales</h3>
+              {detallesOpen ? (
+                <ChevronUp className="h-5 w-5 text-slate-500" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-slate-500" />
+              )}
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="p-6 pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="vidaanaquelmeses" className="text-slate-700 font-medium">
+                      Vida de Anaquel (meses)
+                    </Label>
+                    <Input
+                      id="vidaanaquelmeses"
+                      type="number"
+                      value={formData.vidaanaquelmeses}
+                      onChange={(e) => handleInputChange("vidaanaquelmeses", Number.parseInt(e.target.value) || 0)}
+                      placeholder="Meses de vida útil"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="propositoprincipal" className="text-slate-700 font-medium">
+                      Propósito Principal
+                    </Label>
+                    <Input
+                      id="propositoprincipal"
+                      value={formData.propositoprincipal}
+                      onChange={(e) => handleInputChange("propositoprincipal", e.target.value)}
+                      placeholder="Objetivo principal del producto"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="propuestavalor" className="text-slate-700 font-medium">
+                      Propuesta de Valor
+                    </Label>
+                    <Input
+                      id="propuestavalor"
+                      value={formData.propuestavalor}
+                      onChange={(e) => handleInputChange("propuestavalor", e.target.value)}
+                      placeholder="Valor único del producto"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
+      </div>
+
+      {/* Right side - Image upload and preview */}
+      <div className="lg:col-span-1">
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-4 shadow-sm h-full">
+          <div className="space-y-4">
+            <Label className="text-slate-700 font-medium">Imagen del Producto</Label>
+
+            {/* Image preview area */}
             <div className="relative">
-              <Label htmlFor="ingrediente">Ingrediente</Label>
-              <Input
-                id="ingrediente"
-                value={ingredienteSearchTerm}
-                onChange={(e) => handleIngredienteSearch(e.target.value)}
-                placeholder="Buscar ingrediente..."
-              />
-              {showIngredienteDropdown && filteredIngredientes.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-                  {filteredIngredientes.map((ingrediente) => (
-                    <div
-                      key={ingrediente.id}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleIngredienteSelect(ingrediente)}
+              {imagePreview ? (
+                <div className="relative group">
+                  <Image
+                    src={imagePreview || "/placeholder.svg"}
+                    alt="Preview"
+                    width={300}
+                    height={200}
+                    className="w-full h-48 object-cover rounded-xl border-2 border-slate-200/60 shadow-sm"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl flex items-center justify-center">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-white/90 hover:bg-white text-slate-700"
                     >
-                      <div className="font-medium">{ingrediente.nombre}</div>
-                      <div className="text-sm text-gray-500">Código: {ingrediente.codigo}</div>
-                    </div>
-                  ))}
+                      Cambiar imagen
+                    </Button>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                    onClick={() => {
+                      setImagePreview("")
+                      handleInputChange("imagen", undefined)
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ) : (
+                <div
+                  className="w-full h-48 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-sky-400 hover:bg-sky-50/50"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="h-8 w-8 text-slate-400 mb-2" />
+                  <p className="text-sm text-slate-500 text-center">
+                    Haz clic para subir
+                    <br />
+                    una imagen
+                  </p>
                 </div>
               )}
             </div>
 
-            <div>
-              <Label htmlFor="ingredientecantidad">Cantidad</Label>
-              <Input
-                id="ingredientecantidad"
-                type="number"
-                value={selIngredienteCantidad}
-                onChange={(e) => setSelIngredienteCantidad(e.target.value)}
-                placeholder="Cantidad"
-                step="0.01"
-              />
-            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full flex items-center gap-2 bg-white/80 backdrop-blur-sm border-slate-200/60 hover:border-sky-400 hover:bg-sky-50/50"
+            >
+              <Upload className="h-4 w-4" />
+              {formData.imagen ? "Cambiar Imagen" : "Subir Imagen"}
+            </Button>
 
-            <div>
-              <Label htmlFor="ingredienteunidad">Unidad</Label>
-              <Input id="ingredienteunidad" value={selIngredienteUnidad} readOnly placeholder="Unidad automática" />
-            </div>
-
-            <div>
-              <Label htmlFor="ingredientecosto">Costo</Label>
-              <Input id="ingredientecosto" value={selIngredienteCosto} readOnly placeholder="Costo automático" />
-            </div>
-
-            <div className="flex items-end">
-              <Button
-                onClick={handleAgregarIngrediente}
-                disabled={!selIngredienteId || !selIngredienteCantidad}
-                className="w-full"
-              >
-                Agregar Ingrediente
-              </Button>
-            </div>
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
           </div>
-
-          {/* Tabla de ingredientes agregados */}
-          {ingredientesAgregados.length > 0 && (
-            <div className="mt-6">
-              <h4 className="text-lg font-semibold mb-3">Ingredientes Agregados</h4>
-              <div className="border rounded-lg overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-2 text-left">Ingrediente</th>
-                      <th className="px-4 py-2 text-left">Cantidad</th>
-                      <th className="px-4 py-2 text-left">Unidad</th>
-                      <th className="px-4 py-2 text-left">Costo Parcial</th>
-                      <th className="px-4 py-2 text-left">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {ingredientesAgregados.map((ingrediente) => (
-                      <tr key={ingrediente.id} className="border-t">
-                        <td className="px-4 py-2">{ingrediente.nombre}</td>
-                        <td className="px-4 py-2">{ingrediente.cantidad}</td>
-                        <td className="px-4 py-2">{ingrediente.unidad}</td>
-                        <td className="px-4 py-2">${ingrediente.ingredientecostoparcial.toFixed(2)}</td>
-                        <td className="px-4 py-2">
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => {
-                              setDeleteIngredienteId(ingrediente.id)
-                              setShowDeleteIngredienteModal(true)
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 
-  const renderStep3 = () => (
+  const renderStep2 = () => (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Resumen del Producto</CardTitle>
-          <CardDescription>Revisa toda la información antes de finalizar</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Información básica */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="text-lg font-semibold mb-3">Información Básica</h4>
+      <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-6 shadow-sm">
+        <h3 className="text-lg font-medium text-slate-800 mb-6">Agregar Elementos</h3>
+
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <h4 className="text-md font-medium text-slate-700">Fórmula Asociada</h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
               <div className="space-y-2">
-                <p>
-                  <strong>Nombre:</strong> {formData.nombre}
-                </p>
-                <p>
-                  <strong>Descripción:</strong> {formData.descripcion || "N/A"}
-                </p>
-                <p>
-                  <strong>Cliente:</strong> {clientes.find((c) => c.id === formData.clienteid)?.nombre || "N/A"}
-                </p>
-                <p>
-                  <strong>Catálogo:</strong> {catalogos.find((c) => c.id === formData.catalogoid)?.nombre || "N/A"}
-                </p>
-                <p>
-                  <strong>Zona:</strong> {zonas.find((z) => z.id === formData.zonaid)?.nombre || "N/A"}
-                </p>
+                <Label htmlFor="formula" className="text-slate-700 font-medium">
+                  Fórmula
+                </Label>
+                <Select
+                  value={formData.formaid?.toString() || ""}
+                  onValueChange={(value) => {
+                    const formulaId = value ? Number.parseInt(value) : null
+                    handleInputChange("formaid", formulaId)
+                    handleFormulaChange(value)
+                  }}
+                >
+                  <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
+                    <SelectValue placeholder="Selecciona una fórmula" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {formulas.map((formula) => (
+                      <SelectItem key={formula.id} value={formula.id.toString()}>
+                        {formula.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="unidadmedida" className="text-slate-700 font-medium">
+                  Unidad de Medida
+                </Label>
+                <Input
+                  id="unidadmedida"
+                  value={formulaUnidadMedida}
+                  readOnly
+                  placeholder="Unidad automática"
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="costo" className="text-slate-700 font-medium">
+                  Costo
+                </Label>
+                <Input
+                  id="costo"
+                  value={formulaCosto}
+                  readOnly
+                  placeholder="Costo automático"
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="rangocantidad" className="text-slate-700 font-medium">
+                  Rango de Cantidad
+                </Label>
+                <div className="space-y-2">
+                  <Slider
+                    value={[formulaRangoCantidad]}
+                    onValueChange={(value) => setFormulaRangoCantidad(value[0])}
+                    max={formulaCantidadMaxima}
+                    min={1}
+                    step={1}
+                    className="w-full"
+                  />
+                  <div className="text-sm text-center text-slate-600">{formulaRangoCantidad}</div>
+                </div>
+              </div>
+
+              <div className="flex items-end col-span-2">
+                <Button
+                  onClick={handleAgregarFormula}
+                  disabled={!formData.formaid}
+                  className="w-full bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600"
+                >
+                  Agregar Fórmula
+                </Button>
               </div>
             </div>
 
-            {imagePreview && (
-              <div>
-                <h4 className="text-lg font-semibold mb-3">Imagen</h4>
-                <Image
-                  src={imagePreview || "/placeholder.svg"}
-                  alt="Producto"
-                  width={200}
-                  height={200}
-                  className="rounded-md object-cover"
-                />
+            {/* Tabla de fórmulas agregadas */}
+            {formulasAgregadas.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-lg font-semibold mb-3 text-slate-700">Fórmulas Agregadas</h4>
+                <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-lg overflow-hidden shadow-sm">
+                  <table className="w-full">
+                    <thead className="bg-gradient-to-r from-slate-50 to-slate-100">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Fórmula</th>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Cantidad</th>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Costo Parcial</th>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {formulasAgregadas.map((formula) => (
+                        <tr key={formula.id} className="border-t border-slate-200/60 hover:bg-slate-50/50">
+                          <td className="px-4 py-3 text-slate-700">{formula.nombre}</td>
+                          <td className="px-4 py-3 text-slate-700">{formula.cantidad}</td>
+                          <td className="px-4 py-3 text-slate-700">${formula.costoParcial.toFixed(2)}</td>
+                          <td className="px-4 py-3">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => {
+                                setDeleteFormulaId(formula.id)
+                                setShowDeleteFormulaModal(true)
+                              }}
+                              className="hover:bg-red-600"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
 
+          <div className="space-y-4">
+            <h4 className="text-md font-medium text-slate-700">Ingredientes Adicionales</h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="relative space-y-2">
+                <Label htmlFor="ingrediente" className="text-slate-700 font-medium">
+                  Ingrediente
+                </Label>
+                <Input
+                  id="ingrediente"
+                  value={ingredienteSearchTerm}
+                  onChange={(e) => handleIngredienteSearch(e.target.value)}
+                  placeholder="Buscar ingrediente..."
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                />
+                {showIngredienteDropdown && filteredIngredientes.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white/95 backdrop-blur-sm border border-slate-200/60 rounded-md shadow-lg max-h-60 overflow-auto">
+                    {filteredIngredientes.map((ingrediente) => (
+                      <div
+                        key={ingrediente.id}
+                        className="px-4 py-2 hover:bg-slate-100/80 cursor-pointer transition-colors"
+                        onClick={() => handleIngredienteSelect(ingrediente)}
+                      >
+                        <div className="font-medium text-slate-700">{ingrediente.nombre}</div>
+                        <div className="text-sm text-slate-500">Código: {ingrediente.codigo}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ingredientecantidad" className="text-slate-700 font-medium">
+                  Cantidad
+                </Label>
+                <Input
+                  id="ingredientecantidad"
+                  type="number"
+                  value={selIngredienteCantidad}
+                  onChange={(e) => setSelIngredienteCantidad(e.target.value)}
+                  placeholder="Cantidad"
+                  step="0.01"
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ingredienteunidad" className="text-slate-700 font-medium">
+                  Unidad
+                </Label>
+                <Input
+                  id="ingredienteunidad"
+                  value={selIngredienteUnidad}
+                  readOnly
+                  placeholder="Unidad automática"
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ingredientecosto" className="text-slate-700 font-medium">
+                  Costo
+                </Label>
+                <Input
+                  id="ingredientecosto"
+                  value={selIngredienteCosto}
+                  readOnly
+                  placeholder="Costo automático"
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60"
+                />
+              </div>
+
+              <div className="flex items-end">
+                <Button
+                  onClick={handleAgregarIngrediente}
+                  disabled={!selIngredienteId || !selIngredienteCantidad}
+                  className="w-full bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600"
+                >
+                  Agregar Ingrediente
+                </Button>
+              </div>
+            </div>
+
+            {/* Tabla de ingredientes agregados */}
+            {ingredientesAgregados.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-lg font-semibold mb-3 text-slate-700">Ingredientes Agregados</h4>
+                <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-lg overflow-hidden shadow-sm">
+                  <table className="w-full">
+                    <thead className="bg-gradient-to-r from-slate-50 to-slate-100">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Ingrediente</th>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Cantidad</th>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Unidad</th>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Costo Parcial</th>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ingredientesAgregados.map((ingrediente) => (
+                        <tr key={ingrediente.id} className="border-t border-slate-200/60 hover:bg-slate-50/50">
+                          <td className="px-4 py-3 text-slate-700">{ingrediente.nombre}</td>
+                          <td className="px-4 py-3 text-slate-700">{ingrediente.cantidad}</td>
+                          <td className="px-4 py-3 text-slate-700">{ingrediente.unidad}</td>
+                          <td className="px-4 py-3 text-slate-700">
+                            ${ingrediente.ingredientecostoparcial.toFixed(2)}
+                          </td>
+                          <td className="px-4 py-3">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => {
+                                setDeleteIngredienteId(ingrediente.id)
+                                setShowDeleteIngredienteModal(true)
+                              }}
+                              className="hover:bg-red-600"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderStep3 = () => (
+    <div className="space-y-8">
+      <div className="text-center">
+        <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+          Resumen del Producto
+        </h3>
+        <p className="text-gray-600 mt-2">Revisa toda la información antes de finalizar</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Información Básica */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-gradient-to-br from-white to-sky-50 rounded-lg p-6 border border-sky-100 shadow-sm">
+            <h4 className="text-lg font-semibold text-sky-800 mb-4 flex items-center gap-2">
+              <div className="w-2 h-2 bg-sky-500 rounded-full"></div>
+              Información Básica
+            </h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Nombre del Producto</Label>
+                <p className="text-base font-medium text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {formData.nombre}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Cliente</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {clientes.find((c) => c.id === formData.clienteid)?.nombre || "No seleccionado"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Catálogo</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {catalogos.find((c) => c.id === formData.catalogoid)?.nombre || "No seleccionado"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Zona</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {zonas.find((z) => z.id === formData.zonaid)?.nombre || "No seleccionada"}
+                </p>
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label className="text-sm font-medium text-gray-600">Descripción</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {formData.descripcion || "Sin descripción"}
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Fórmulas agregadas */}
           {formulasAgregadas.length > 0 && (
-            <div>
-              <h4 className="text-lg font-semibold mb-3">Fórmulas Agregadas</h4>
-              <div className="border rounded-lg overflow-hidden">
+            <div className="bg-gradient-to-br from-white to-emerald-50 rounded-lg p-6 border border-emerald-100 shadow-sm">
+              <h4 className="text-lg font-semibold text-emerald-800 mb-4 flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                Fórmulas Agregadas
+              </h4>
+              <div className="bg-white rounded-lg border overflow-hidden">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-emerald-50">
                     <tr>
-                      <th className="px-4 py-2 text-left">Fórmula</th>
-                      <th className="px-4 py-2 text-left">Cantidad</th>
-                      <th className="px-4 py-2 text-left">Costo Parcial</th>
+                      <th className="px-4 py-3 text-left text-emerald-800 font-medium">Fórmula</th>
+                      <th className="px-4 py-3 text-left text-emerald-800 font-medium">Cantidad</th>
+                      <th className="px-4 py-3 text-left text-emerald-800 font-medium">Costo Parcial</th>
                     </tr>
                   </thead>
                   <tbody>
                     {formulasAgregadas.map((formula) => (
-                      <tr key={formula.id} className="border-t">
-                        <td className="px-4 py-2">{formula.nombre}</td>
-                        <td className="px-4 py-2">{formula.cantidad}</td>
-                        <td className="px-4 py-2">${formula.costoParcial.toFixed(2)}</td>
+                      <tr key={formula.id} className="border-t border-emerald-100">
+                        <td className="px-4 py-3 text-gray-900">{formula.nombre}</td>
+                        <td className="px-4 py-3 text-gray-900">{formula.cantidad}</td>
+                        <td className="px-4 py-3 text-gray-900 font-medium">${formula.costoParcial.toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1179,25 +1341,30 @@ function EditarProductoContent() {
 
           {/* Ingredientes agregados */}
           {ingredientesAgregados.length > 0 && (
-            <div>
-              <h4 className="text-lg font-semibold mb-3">Ingredientes Agregados</h4>
-              <div className="border rounded-lg overflow-hidden">
+            <div className="bg-gradient-to-br from-white to-amber-50 rounded-lg p-6 border border-amber-100 shadow-sm">
+              <h4 className="text-lg font-semibold text-amber-800 mb-4 flex items-center gap-2">
+                <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+                Ingredientes Agregados
+              </h4>
+              <div className="bg-white rounded-lg border overflow-hidden">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-amber-50">
                     <tr>
-                      <th className="px-4 py-2 text-left">Ingrediente</th>
-                      <th className="px-4 py-2 text-left">Cantidad</th>
-                      <th className="px-4 py-2 text-left">Unidad</th>
-                      <th className="px-4 py-2 text-left">Costo Parcial</th>
+                      <th className="px-4 py-3 text-left text-amber-800 font-medium">Ingrediente</th>
+                      <th className="px-4 py-3 text-left text-amber-800 font-medium">Cantidad</th>
+                      <th className="px-4 py-3 text-left text-amber-800 font-medium">Unidad</th>
+                      <th className="px-4 py-3 text-left text-amber-800 font-medium">Costo Parcial</th>
                     </tr>
                   </thead>
                   <tbody>
                     {ingredientesAgregados.map((ingrediente) => (
-                      <tr key={ingrediente.id} className="border-t">
-                        <td className="px-4 py-2">{ingrediente.nombre}</td>
-                        <td className="px-4 py-2">{ingrediente.cantidad}</td>
-                        <td className="px-4 py-2">{ingrediente.unidad}</td>
-                        <td className="px-4 py-2">${ingrediente.ingredientecostoparcial.toFixed(2)}</td>
+                      <tr key={ingrediente.id} className="border-t border-amber-100">
+                        <td className="px-4 py-3 text-gray-900">{ingrediente.nombre}</td>
+                        <td className="px-4 py-3 text-gray-900">{ingrediente.cantidad}</td>
+                        <td className="px-4 py-3 text-gray-900">{ingrediente.unidad}</td>
+                        <td className="px-4 py-3 text-gray-900 font-medium">
+                          ${ingrediente.ingredientecostoparcial.toFixed(2)}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -1207,14 +1374,37 @@ function EditarProductoContent() {
           )}
 
           {/* Costo total */}
-          <div className="border-t pt-4">
-            <div className="flex justify-between items-center text-xl font-bold">
-              <span>Costo Total del Producto:</span>
-              <span className="text-green-600">${costoTotal.toFixed(2)}</span>
+          <div className="bg-gradient-to-br from-white to-green-50 rounded-lg p-6 border border-green-200 shadow-sm">
+            <div className="flex justify-between items-center">
+              <h4 className="text-xl font-bold text-green-800">Costo Total del Producto:</h4>
+              <span className="text-2xl font-bold text-green-600 bg-green-100 px-4 py-2 rounded-lg">
+                ${costoTotal.toFixed(2)}
+              </span>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* Right side - Image */}
+        {imagePreview && (
+          <div className="lg:col-span-1">
+            <div className="bg-gradient-to-br from-white to-slate-50 rounded-lg p-6 border border-slate-200 shadow-sm h-fit">
+              <h4 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
+                Imagen del Producto
+              </h4>
+              <div className="relative">
+                <Image
+                  src={imagePreview || "/placeholder.svg"}
+                  alt="Producto"
+                  width={300}
+                  height={300}
+                  className="w-full h-64 object-cover rounded-xl border-2 border-slate-200 shadow-sm"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 
