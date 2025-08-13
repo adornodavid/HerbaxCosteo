@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { CheckCircle, Upload, ArrowLeft, ArrowRight, FileImage, Loader2, AlertTriangle } from "lucide-react"
+import Image from "next/image"
 import {
   obtenerFormulaCompleta,
   actualizarFormulaEtapa1,
@@ -26,6 +27,7 @@ import {
 } from "@/app/actions/formulas-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 import { getSession } from "@/app/actions/session-actions"
+import { useNavigationGuard } from "@/contexts/navigation-guard-context"
 
 interface FormData {
   nombre: string
@@ -74,6 +76,9 @@ export default function EditarFormulaPage() {
   const formulaId = searchParams.get("getFormulaId")
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const { setNavigationGuard } = useNavigationGuard()
+  const resolveNavigationRef = useRef<((value: boolean) => void) | null>(null)
+
   // Estados para el formulario por etapas
   const [currentStep, setCurrentStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
@@ -82,6 +87,10 @@ export default function EditarFormulaPage() {
   const [showDuplicateModal, setShowDuplicateModal] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
   const [duplicateMessage, setDuplicateMessage] = useState("")
+
+  const [showExitConfirmModal, setShowExitConfirmModal] = useState(false)
+  const [showValidationModal, setShowValidationModal] = useState(false)
+  const [validationMessage, setValidationMessage] = useState("")
 
   // Estados para los datos del formulario
   const [formData, setFormData] = useState<FormData>({
@@ -120,6 +129,67 @@ export default function EditarFormulaPage() {
     { number: 3, title: "Resumen y Confirmación" },
     { number: 4, title: "Finalización" },
   ]
+
+  const checkLeaveAndConfirm = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if (currentStep >= 2 && currentStep <= 3 && formulaId) {
+        resolveNavigationRef.current = resolve
+        setShowExitConfirmModal(true)
+      } else {
+        resolve(true)
+      }
+    })
+  }
+
+  const handleLeavePage = async (confirmed: boolean) => {
+    setShowExitConfirmModal(false)
+    if (resolveNavigationRef.current) {
+      resolveNavigationRef.current(confirmed)
+      resolveNavigationRef.current = null
+    }
+  }
+
+  const validateStep2 = () => {
+    // Check if at least 2 ingredients are added
+    if (ingredientesAgregados.length < 2) {
+      setValidationMessage("Debes agregar al menos 2 ingredientes a la fórmula")
+      setShowValidationModal(true)
+      return false
+    }
+
+    // Check if cantidad is greater than 0
+    if (!formData.cantidad || formData.cantidad <= 0) {
+      setValidationMessage("Debes ingresar una cantidad mayor a 0")
+      setShowValidationModal(true)
+      return false
+    }
+
+    // Check if unidad de medida is selected
+    if (!formData.unidadmedidaid || formData.unidadmedidaid <= 0) {
+      setValidationMessage("Debes seleccionar una unidad de medida")
+      setShowValidationModal(true)
+      return false
+    }
+
+    return true
+  }
+
+  useEffect(() => {
+    setNavigationGuard(checkLeaveAndConfirm)
+    return () => setNavigationGuard(null)
+  }, [currentStep, formulaId, setNavigationGuard])
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (currentStep >= 2 && currentStep <= 3 && formulaId) {
+        e.preventDefault()
+        e.returnValue = ""
+      }
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload)
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload)
+  }, [currentStep, formulaId])
 
   useEffect(() => {
     const loadFormulaData = async () => {
@@ -413,6 +483,11 @@ export default function EditarFormulaPage() {
       } finally {
         setIsLoading(false)
       }
+    } else if (currentStep === 2) {
+      if (!validateStep2()) {
+        return
+      }
+      setCurrentStep(currentStep + 1)
     } else if (currentStep < 4) {
       setCurrentStep(currentStep + 1)
     }
@@ -1038,52 +1113,126 @@ export default function EditarFormulaPage() {
         </div>
       )}
 
-      {/* Success Modal */}
-      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
-        <DialogContent className="sm:max-w-md">
-          <div className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 rounded-lg p-8">
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/10 via-teal-400/10 to-cyan-400/10 animate-pulse"></div>
-
-            <div className="relative z-10 text-center space-y-6">
-              <div className="relative">
-                <div className="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-lg animate-bounce">
-                  <CheckCircle className="h-10 w-10 text-white" />
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div className="text-center space-y-6">
+              {/* Laboratory Animation */}
+              <div className="relative mx-auto w-32 h-32">
+                <div>
+                  <Image
+                    src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/matraz.gif"
+                    alt="matraz"
+                    width={200}
+                    height={200}
+                    className="absolute inset-0 animate-bounce-slow"
+                  />
+                  {/* Bubbles */}
+                  <div
+                    className="absolute bottom-2 left-2 w-1 h-1 bg-white rounded-full animate-bounce"
+                    style={{ animationDelay: "0s" }}
+                  ></div>
+                  <div
+                    className="absolute bottom-4 right-6 w-1 h-1 bg-white rounded-full animate-bounce"
+                    style={{ animationDelay: "0.5s" }}
+                  ></div>
+                  <div
+                    className="absolute bottom-6 left-3 w-0.5 h-0.5 bg-white rounded-full animate-bounce"
+                    style={{ animationDelay: "1s" }}
+                  ></div>
                 </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full animate-ping"></div>
+
+                {/* Particles around flask */}
+                <div className="absolute inset-0">
+                  <div
+                    className="absolute top-4 left-4 w-1 h-1 bg-emerald-400 rounded-full animate-ping"
+                    style={{ animationDelay: "0s" }}
+                  ></div>
+                  <div
+                    className="absolute top-8 right-6 w-1 h-1 bg-sky-400 rounded-full animate-ping"
+                    style={{ animationDelay: "0.7s" }}
+                  ></div>
+                  <div
+                    className="absolute bottom-8 left-6 w-1 h-1 bg-purple-400 rounded-full animate-ping"
+                    style={{ animationDelay: "1.4s" }}
+                  ></div>
+                  <div
+                    className="absolute bottom-4 right-4 w-1 h-1 bg-yellow-400 rounded-full animate-ping"
+                    style={{ animationDelay: "2.1s" }}
+                  ></div>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                  Actualizando Fórmula...
+              {/* Loading text with laboratory style animation */}
+              <div className="space-y-4">
+                <h3 className="text-2xl font-bold text-gray-900 animate-pulse">
+                  Actualizando Fórmula
+                  <span className="inline-flex ml-1">
+                    <span className="animate-bounce" style={{ animationDelay: "0s" }}>
+                      .
+                    </span>
+                    <span className="animate-bounce" style={{ animationDelay: "0.2s" }}>
+                      .
+                    </span>
+                    <span className="animate-bounce" style={{ animationDelay: "0.4s" }}>
+                      .
+                    </span>
+                  </span>
                 </h3>
-                <div className="flex items-center justify-center space-x-1">
-                  <span className="text-gray-600">Procesando cambios</span>
-                  <div className="flex space-x-1">
-                    <div
-                      className="w-1 h-1 bg-emerald-500 rounded-full animate-bounce"
-                      style={{ animationDelay: "0ms" }}
-                    ></div>
-                    <div
-                      className="w-1 h-1 bg-emerald-500 rounded-full animate-bounce"
-                      style={{ animationDelay: "150ms" }}
-                    ></div>
-                    <div
-                      className="w-1 h-1 bg-emerald-500 rounded-full animate-bounce"
-                      style={{ animationDelay: "300ms" }}
-                    ></div>
-                  </div>
+
+                {/* Loading progress bar */}
+                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-400 via-sky-400 to-purple-400 rounded-full animate-pulse"
+                    style={{
+                      width: "100%",
+                      animation: "progressFill 4s ease-in-out forwards",
+                    }}
+                  ></div>
                 </div>
-              </div>
 
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                <div
-                  className="bg-gradient-to-r from-emerald-400 to-teal-500 h-2 rounded-full animate-pulse"
-                  style={{ width: "100%", animation: "progress 4s ease-in-out" }}
-                ></div>
+                <p className="text-gray-600 animate-pulse">
+                  Procesando cambios y actualizando fórmula en el laboratorio...
+                </p>
               </div>
-
-              <p className="text-sm text-gray-500">Validando datos y guardando cambios en el laboratorio...</p>
             </div>
+
+            {/* Custom CSS animations */}
+            <style jsx>{`
+              @keyframes progressFill {
+                0% { width: 0%; }
+                100% { width: 100%; }
+              }
+            `}</style>
+          </div>
+        </div>
+      )}
+
+      <Dialog open={showExitConfirmModal} onOpenChange={setShowExitConfirmModal}>
+        <DialogContent className="bg-white/95 backdrop-blur-sm border-slate-200/60">
+          <DialogHeader>
+            <DialogTitle className="text-slate-800">Confirmar salida</DialogTitle>
+            <DialogDescription className="text-slate-600">
+              ¿Estás seguro de que deseas salir? Los cambios realizados se mantendrán guardados.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => handleLeavePage(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={() => handleLeavePage(true)}>Sí, Salir</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showValidationModal} onOpenChange={setShowValidationModal}>
+        <DialogContent className="bg-white/95 backdrop-blur-sm border-slate-200/60">
+          <DialogHeader>
+            <DialogTitle className="text-slate-800">Información faltante</DialogTitle>
+            <DialogDescription className="text-slate-600">{validationMessage}</DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end mt-4">
+            <Button onClick={() => setShowValidationModal(false)}>Entendido</Button>
           </div>
         </DialogContent>
       </Dialog>
