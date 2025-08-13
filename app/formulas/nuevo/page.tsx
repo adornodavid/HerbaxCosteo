@@ -742,7 +742,7 @@ export default function NuevaFormulaPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-gradient-to-br from-white to-sky-50 rounded-xs p-6 border border-sky-100 shadow-sm">
             <h4 className="text-lg font-semibold text-sky-800 mb-4 flex items-center gap-2">
-              <div className="w-2 h-2 bg-sky-500 rounded-full"></div>
+              <div className="w-2 h-2 bg-sky-500 rounded-xs"></div>
               Información Básica
             </h4>
 
@@ -1066,7 +1066,7 @@ export default function NuevaFormulaPage() {
       </div>
 
       {/* Form Content */}
-      <Card className="bg-white/80 backdrop-blur-sm border-slate-200/60 shadow-lg">
+      <Card className="rounded-xs border text-card-foreground bg-white/80 backdrop-blur-sm border-slate-200/60 shadow-lg">
         <CardHeader className="bg-gradient-to-r from-slate-50/80 to-slate-100/50 backdrop-blur-sm">
           <CardTitle className="text-slate-800">{steps[currentStep - 1].title}</CardTitle>
           <CardDescription className="text-slate-600">{steps[currentStep - 1].description}</CardDescription>
