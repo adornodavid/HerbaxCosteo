@@ -495,11 +495,11 @@ export default function FormulasPage() {
       </div>
 
       {/* Filtros */}
-      <Card className="mb-6 ">
+      <Card className="rounded-xs border bg-card text-card-foreground shadow mb-6">
         <CardHeader>
           <CardTitle>Filtros de Búsqueda</CardTitle>
         </CardHeader>
-        <CardContent className="rounded-xs">
+        <CardContent >
           <form id="frmFormulasBuscar" name="frmFormulasBuscar" className="flex flex-wrap items-end gap-4">
             <div className="flex-1 min-w-[200px]">
               <Label htmlFor="txtFormulaNombre">Nombre</Label>
