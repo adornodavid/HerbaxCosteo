@@ -731,7 +731,7 @@ export default function NuevaFormulaPage() {
   const renderStep3 = () => (
     <div className="space-y-8">
       <div className="text-center">
-        <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-50/80 to-slate-100/50 backdrop-blur-sm">
+        <h3 className="text-2xl font-bold from-slate-50/80 to-slate-100/50 backdrop-blur-sm">
           Resumen de la Fórmula
         </h3>
         <p className="text-gray-600 mt-2">Revisa toda la información antes de finalizar</p>
