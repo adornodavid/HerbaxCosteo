@@ -12,7 +12,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Upload, ArrowLeft, ArrowRight, FileImage, Loader2 } from "lucide-react"
 import {
-  crearProducto,
   obtenerClientes,
   obtenerFormulas,
   obtenerZonas,
@@ -319,77 +318,55 @@ export default function NuevoProducto() {
   }
 
   const handleNextStep = async () => {
-    console.log(currentStep)
-    if (currentStep === 1) {
-      console.log("etapa 1")
-      // Validate step 1
-      if (!formData.nombre.trim()) {
-        alert("El nombre del producto es requerido")
-        return
-      }
+    console.log("=== INICIO VALIDACIÓN ===")
+    console.log("Current step:", currentStep)
 
-      // Create product in step 1
-      setIsLoading(true)
-      try {
-        const formDataToSend = new FormData()
-        Object.entries(formData).forEach(([key, value]) => {
-          if (key === "imagen" && value instanceof File) {
-            formDataToSend.append(key, value)
-          } else if (value !== null && value !== undefined) {
-            formDataToSend.append(key, value.toString())
-          }
-        })
+    if (currentStep === 2) {
+      console.log("Validando etapa 2...")
 
-        const result = await crearProducto(formDataToSend)
-        if (result.success) {
-          setProductoId(result.data?.id || null)
-          setCurrentStep((prev) => prev + 1)
-        } else {
-          alert("Error al crear el producto: " + result.error)
-        }
-      } catch (error) {
-        console.error("Error creating product:", error)
-        alert("Error al crear el producto")
-      } finally {
-        setIsLoading(false)
-      }
-    } else if (currentStep === 2) {
-      console.log("etapa 2")
-
+      // Actualizar arrays desde la base de datos
       if (productoId) {
-        try {
-          const [formulasResult, ingredientesResult] = await Promise.all([
-            obtenerFormulasAgregadas(productoId),
-            obtenerIngredientesAgregados(productoId),
-          ])
+        const [formulasResult, ingredientesResult] = await Promise.all([
+          obtenerFormulasAgregadas(productoId),
+          obtenerIngredientesAgregados(productoId),
+        ])
 
-          const currentFormulas = formulasResult.success ? formulasResult.data : []
-          const currentIngredientes = ingredientesResult.success ? ingredientesResult.data : []
+        console.log("Fórmulas desde BD:", formulasResult)
+        console.log("Ingredientes desde BD:", ingredientesResult)
 
-          console.log("total de formulas actualizadas: ", currentFormulas.length)
-          console.log("total de ingredientes actualizadas: ", currentIngredientes.length)
+        const totalFormulas = formulasResult?.length || 0
+        const totalIngredientes = ingredientesResult?.length || 0
 
-          if (currentFormulas.length === 0 && currentIngredientes.length === 0) {
-            console.log("se pasa validacion - mostrando modal")
+        console.log("Total fórmulas:", totalFormulas)
+        console.log("Total ingredientes:", totalIngredientes)
+
+        if (totalFormulas === 0 && totalIngredientes === 0) {
+          console.log("❌ VALIDACIÓN FALLIDA - No hay elementos")
+          console.log("Mostrando modal de validación...")
+
+          // Cerrar otros modales primero
+          setShowConfirmModal(false)
+          setShowErrorModal(false)
+          setShowDuplicateModal(false)
+          setShowDeleteFormulaModal(false)
+          setShowDeleteIngredienteModal(false)
+
+          // Pequeño delay para asegurar que otros modales se cierren
+          setTimeout(() => {
+            console.log("Ejecutando setShowValidationModal(true)")
             setShowValidationModal(true)
-            console.log("modal establecido, retornando para impedir avance")
-            return // Impedir avance a la siguiente etapa
-          }
-            setShowValidationModal(true)
-          console.log("validacion pasada - avanzando a siguiente etapa")
-          setCurrentStep((prev) => prev + 1)
-        } catch (error) {
-          console.error("Error validating step 2:", error)
-          setShowValidationModal(true)
+            console.log("Estado showValidationModal después de set:", true)
+          }, 100)
+
           return
+        } else {
+          console.log("✅ VALIDACIÓN EXITOSA - Hay elementos agregados")
         }
-      } else {
-        setShowValidationModal(true)
-        return
       }
-    } else if (currentStep < 4) {
-      setCurrentStep((prev) => prev + 1)
     }
+
+    console.log("Avanzando a siguiente etapa...")
+    setCurrentStep(currentStep + 1)
   }
 
   const handlePrevStep = () => {
@@ -1534,7 +1511,13 @@ export default function NuevoProducto() {
         </div>
       </div>
 
-      <Dialog open={showValidationModal} onOpenChange={setShowValidationModal}>
+      <Dialog
+        open={showValidationModal}
+        onOpenChange={(open) => {
+          console.log("Modal onOpenChange:", open)
+          setShowValidationModal(open)
+        }}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Información Incompleta</DialogTitle>
@@ -1543,7 +1526,14 @@ export default function NuevoProducto() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={() => setShowValidationModal(false)}>Entendido</Button>
+            <Button
+              onClick={() => {
+                console.log("Cerrando modal de validación")
+                setShowValidationModal(false)
+              }}
+            >
+              Entendido
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
