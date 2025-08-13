@@ -31,8 +31,10 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
     - getIngredientDetails / selIngredienteDetalles
     - obtenerIngredientesAgregados / selIngredientesAgregados
     - obtenerCostoTotalProducto / selCostoTotalProducto
+    - obtenerProductoCompleto
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
+    - actualizarProductoEtapa1
   * DELETES-ELIMINAR (DELETES)
     - eliminarProducto / delProducto
     - eliminarFormulaDeProducto / delFormulaDeProducto
@@ -41,6 +43,8 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
     - estatusActivoProducto / actProducto
     - listaDesplegableProductos / ddlProductos
     - obtenerUnidadMedidaFormula / selUnidadMedidaFormula
+    - listaDesplegableClientesProductos
+    - verificarFormulaEnProducto
 ================================================== */
 //Función: crearProducto: función para crear un producto
 export async function crearProducto(formData: FormData) {
@@ -72,7 +76,6 @@ export async function crearProducto(formData: FormData) {
     const nombre = formData.get("nombre") as string
     const descripcion = formData.get("descripcion") as string
     const clienteid = Number.parseInt(formData.get("clienteid") as string)
-    //const catalogoid = Number.parseInt(formData.get("catalogoid") as string) || null
     const presentacion = formData.get("presentacion") as string
     const porcion = formData.get("porcion") as string
     const modouso = formData.get("modouso") as string
@@ -653,6 +656,150 @@ export async function obtenerCostoTotalProducto(productoId: number) {
   } catch (error) {
     console.error("Error en obtenerCostoTotalProducto:", error)
     return { success: false, error: "Error interno del servidor", total: 0 }
+  }
+}
+
+// Función: obtenerProductoCompleto: función para obtener todos los datos de un producto para edición
+export async function obtenerProductoCompleto(productoId: number) {
+  try {
+    const { data, error } = await supabaseAdmin.from("productos").select("*").eq("id", productoId).single()
+
+    if (error) {
+      console.error("Error obteniendo producto completo:", error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en obtenerProductoCompleto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: actualizarProductoEtapa1: función para actualizar información básica del producto
+export async function actualizarProductoEtapa1(productoId: number, formData: FormData) {
+  try {
+    let imgUrl = ""
+
+    // Handle image upload if present
+    const imagen = formData.get("imagen") as File
+    if (imagen && imagen.size > 0) {
+      const fileName = `${Date.now()}-${imagen.name}`
+
+      // Upload image to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+        .from("herbax")
+        .upload(`productos/${fileName}`, imagen)
+
+      if (uploadError) {
+        console.error("Error uploading image:", uploadError)
+        return { success: false, error: "Error al subir la imagen" }
+      }
+
+      // Get public URL
+      const { data: urlData } = supabaseAdmin.storage.from("herbax").getPublicUrl(`productos/${fileName}`)
+
+      imgUrl = urlData.publicUrl
+    }
+
+    // Extract form data
+    const updateData: any = {
+      nombre: formData.get("nombre") as string,
+      descripcion: formData.get("descripcion") as string,
+      clienteid: Number.parseInt(formData.get("clienteid") as string),
+      catalogoid: Number.parseInt(formData.get("catalogoid") as string) || null,
+      presentacion: formData.get("presentacion") as string,
+      porcion: formData.get("porcion") as string,
+      modouso: formData.get("modouso") as string,
+      porcionenvase: formData.get("porcionenvase") as string,
+      formaid: Number.parseInt(formData.get("formaid") as string) || null,
+      categoriauso: formData.get("categoriauso") as string,
+      propositoprincipal: formData.get("propositoprincipal") as string,
+      propuestavalor: formData.get("propuestavalor") as string,
+      instruccionesingesta: formData.get("instruccionesingesta") as string,
+      edadminima: Number.parseInt(formData.get("edadminima") as string),
+      advertencia: formData.get("advertencia") as string,
+      condicionesalmacenamiento: formData.get("condicionesalmacenamiento") as string,
+      vidaanaquelmeses: Number.parseInt(formData.get("vidaanaquelmeses") as string),
+      activo: formData.get("activo") === "true",
+      zonaid: Number.parseInt(formData.get("zonaid") as string) || null,
+      fechaactualizacion: new Date().toISOString(),
+    }
+
+    // Only update image URL if a new image was uploaded
+    if (imgUrl) {
+      updateData.imgurl = imgUrl
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from("productos")
+      .update(updateData)
+      .eq("id", productoId)
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error updating producto:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/productos")
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en actualizarProductoEtapa1:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: listaDesplegableClientesProductos: función similar a listaDesplegableClientes para productos
+export async function listaDesplegableClientesProductos(id: string, nombre: string) {
+  try {
+    let query = supabaseAdmin.from("clientes").select("id, nombre").eq("activo", true)
+
+    // Apply filters conditionally
+    if (nombre && nombre.trim() !== "") {
+      query = query.ilike("nombre", `%${nombre}%`)
+    }
+
+    if (id && id !== "-1") {
+      query = query.eq("id", Number.parseInt(id))
+    }
+
+    query = query.order("nombre", { ascending: true })
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error("Error obteniendo clientes para dropdown:", error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en listaDesplegableClientesProductos:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: verificarFormulaEnProducto: función para verificar si un producto tiene al menos una fórmula
+export async function verificarFormulaEnProducto(productoId: number) {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("productosdetalles")
+      .select("id")
+      .eq("productoid", productoId)
+      .eq("tiposegmentoid", 1)
+      .limit(1)
+
+    if (error) {
+      console.error("Error verificando fórmula en producto:", error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, hasFormula: data && data.length > 0 }
+  } catch (error) {
+    console.error("Error en verificarFormulaEnProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
   }
 }
 
