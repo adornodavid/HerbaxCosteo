@@ -203,7 +203,7 @@ export function AppSidebar() {
                         onClick={() => handleNavigationClick(subItem.href)}
                         className={`group flex items-center space-x-3 px-4 py-2.5 rounded-xs text-sm transition-all duration-300 w-full ${
                           isActive(subItem.href)
-                            ? "bg-white/20 text-slate-800 border border-[#e1eef7] shadow-md"
+                            ? "bg-[#e1eef7] text-slate-800 border border-[#e1eef7] shadow-md"
                             : "text-slate-500 hover:bg-[#bcdef7] hover:text-slate-700 border border-transparent hover:border-white/15"
                         }`}
                         style={
