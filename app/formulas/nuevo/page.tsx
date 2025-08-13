@@ -1127,7 +1127,7 @@ export default function NuevaFormulaPage() {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative">
                     {/* Flask body */}
-                    <div className="w-16 h-20 bg-gradient-to-b from-transparent via-sky-100 to-sky-200 rounded-b-full border-2 border-sky-300 relative overflow-hidden">
+                    <div src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/matraz.gif" >
                       {/* Liquid animation */}
                       <div
                         className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-emerald-400 to-emerald-300 rounded-b-full animate-pulse"
@@ -1147,8 +1147,8 @@ export default function NuevaFormulaPage() {
                         style={{ animationDelay: "1s" }}
                       ></div>
                     </div>
-                    {/* Flask neck */}
-                    <div src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/matraz.gif" ></div>
+                    {/* Flask neck 
+                    <div ></div>*/}
                     {/* Flask mouth
                     <div className="w-6 h-2 bg-sky-200 border-2 border-sky-300 border-b-0 rounded-t-lg mx-auto -mt-1"></div> */}
                   </div>
