@@ -482,7 +482,7 @@ export default function FormulasPage() {
       </div>
 
       {/* Estadísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="rounded-xs grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card className="rounded-xs border bg-card text-card-foreground shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Fórmulas</CardTitle>
