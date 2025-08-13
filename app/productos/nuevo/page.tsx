@@ -28,7 +28,6 @@ import {
   obtenerIngredientes,
   getIngredientDetails,
 } from "@/app/actions/productos-actions"
-import Image from "next/image"
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { ChevronDown, ChevronUp } from "lucide-react"
@@ -1182,6 +1181,20 @@ export default function NuevoProducto() {
               </div>
 
               <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Catálogo</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {catalogos.find((c) => c.id === formData.catalogoid)?.nombre || "No seleccionado"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Zona</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {zonas.find((z) => z.id === formData.zonaid)?.nombre || "No seleccionada"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-600">Presentación</Label>
                 <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
                   {formData.presentacion || "No especificada"}
@@ -1194,6 +1207,20 @@ export default function NuevoProducto() {
                   {formData.porcion || "No especificada"}
                 </p>
               </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Porción por Envase</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {formData.porcionenvase || "No especificada"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Vida de Anaquel (meses)</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {formData.vidaanaquelmeses || "No especificada"}
+                </p>
+              </div>
             </div>
 
             {formData.descripcion && (
@@ -1204,7 +1231,140 @@ export default function NuevoProducto() {
                 </p>
               </div>
             )}
+
+            {(formData.modouso || formData.categoriauso || formData.edadminima) && (
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {formData.modouso && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-600">Modo de Uso</Label>
+                    <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">{formData.modouso}</p>
+                  </div>
+                )}
+
+                {formData.categoriauso && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-600">Categoría de Uso</Label>
+                    <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                      {formData.categoriauso}
+                    </p>
+                  </div>
+                )}
+
+                {formData.edadminima && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-600">Edad Mínima</Label>
+                    <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                      {formData.edadminima}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+
+          {formulasAgregadas.length > 0 && (
+            <div className="bg-gradient-to-br from-white to-green-50 rounded-xs p-6 border border-green-100 shadow-sm">
+              <h4 className="text-lg font-semibold text-green-800 mb-4 flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                Fórmulas Agregadas ({formulasAgregadas.length})
+              </h4>
+
+              <div className="space-y-3">
+                {formulasAgregadas.map((formula, index) => (
+                  <div key={index} className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                      <div>
+                        <Label className="text-xs font-medium text-gray-500">Fórmula</Label>
+                        <p className="text-sm font-medium text-gray-900">{formula.nombre}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-500">Cantidad</Label>
+                        <p className="text-sm text-gray-900">{formula.cantidad}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-500">Unidad</Label>
+                        <p className="text-sm text-gray-900">{formula.unidadMedida}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-500">Costo Parcial</Label>
+                        <p className="text-sm font-semibold text-green-600">${formula.costoParcial?.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-green-200">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-600">Total Fórmulas:</span>
+                  <span className="text-lg font-bold text-green-600">
+                    ${formulasAgregadas.reduce((sum, formula) => sum + (formula.costoParcial || 0), 0).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {ingredientesAgregados.length > 0 && (
+            <div className="bg-gradient-to-br from-white to-orange-50 rounded-xs p-6 border border-orange-100 shadow-sm">
+              <h4 className="text-lg font-semibold text-orange-800 mb-4 flex items-center gap-2">
+                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                Ingredientes Adicionales ({ingredientesAgregados.length})
+              </h4>
+
+              <div className="space-y-3">
+                {ingredientesAgregados.map((ingrediente, index) => (
+                  <div key={index} className="bg-white p-4 rounded-lg border border-orange-200 shadow-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                      <div>
+                        <Label className="text-xs font-medium text-gray-500">Ingrediente</Label>
+                        <p className="text-sm font-medium text-gray-900">{ingrediente.nombre}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-500">Cantidad</Label>
+                        <p className="text-sm text-gray-900">{ingrediente.cantidad}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-500">Unidad</Label>
+                        <p className="text-sm text-gray-900">{ingrediente.unidadMedida}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-500">Costo Parcial</Label>
+                        <p className="text-sm font-semibold text-orange-600">${ingrediente.costoParcial?.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-orange-200">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-600">Total Ingredientes:</span>
+                  <span className="text-lg font-bold text-orange-600">
+                    $
+                    {ingredientesAgregados
+                      .reduce((sum, ingrediente) => sum + (ingrediente.costoParcial || 0), 0)
+                      .toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {(formulasAgregadas.length > 0 || ingredientesAgregados.length > 0) && (
+            <div className="bg-gradient-to-br from-white to-slate-50 rounded-xs p-6 border border-slate-200 shadow-sm">
+              <div className="flex justify-between items-center">
+                <h4 className="text-xl font-bold text-slate-800">Costo Total del Producto:</h4>
+                <span className="text-2xl font-bold text-slate-800">
+                  $
+                  {(
+                    formulasAgregadas.reduce((sum, formula) => sum + (formula.costoParcial || 0), 0) +
+                    ingredientesAgregados.reduce((sum, ingrediente) => sum + (ingrediente.costoParcial || 0), 0)
+                  ).toFixed(2)}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Imagen */}
@@ -1248,172 +1408,109 @@ export default function NuevoProducto() {
   )
 
   const renderStep4 = () => (
-    <div className="text-center py-12">
-      <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-      <h3 className="text-lg font-medium text-gray-900 mb-2">¡Producto Creado Exitosamente!</h3>
-      <p className="text-gray-500 mb-6">El producto ha sido guardado correctamente en el sistema.</p>
-      <div className="flex gap-4 justify-center">
-        <Button onClick={() => router.push("/productos")}>Ver Productos</Button>
-        <Button variant="outline" onClick={() => window.location.reload()}>
-          Crear Otro Producto
-        </Button>
-      </div>
+    <div className="flex flex-col items-center justify-center h-96">
+      {showSuccessAnimation ? (
+        <div className="flex flex-col items-center space-y-4">
+          <CheckCircle className="h-16 w-16 text-green-500 animate-bounce" />
+          <h2 className="text-2xl font-semibold text-gray-800">¡Producto Creado!</h2>
+          <p className="text-gray-600">Redirigiendo...</p>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center space-y-4">
+          <h2 className="text-2xl font-semibold text-gray-800">¡Producto Creado!</h2>
+          <p className="text-gray-600">El producto ha sido creado exitosamente.</p>
+          <Button
+            onClick={() => router.push("/productos")}
+            className="bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600"
+          >
+            Ir a Productos
+          </Button>
+        </div>
+      )}
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4">
-      {/* Header */}
-      <div className="mb-5">
-        <div className="flex items-center gap-4 mb-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push("/productos")}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Volver a Productos
-          </Button>
-        </div>
-
-        <h1 className="text-3xl font-bold text-gray-900">Nuevo Producto</h1>
-        <p className="text-gray-600 mt-2">Crea un nuevo producto siguiendo los pasos del asistente</p>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="mb-3">
-        <div className="relative">
-          <div className="w-full h-3 bg-gradient-to-r from-slate-200/60 to-slate-300/60 rounded-full backdrop-blur-sm border border-slate-200/40 shadow-inner">
-            <div
-              className="h-full bg-gradient-to-r from-sky-400 via-sky-500 to-cyan-400 rounded-full shadow-lg backdrop-blur-sm border border-sky-300/30 transition-all duration-700 ease-out relative overflow-hidden"
-              style={{ width: `${(currentStep / steps.length) * 100}%` }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
-              <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent"></div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between mt-3">
-            {steps.map((step, index) => (
-              <div key={step.number} className="flex flex-col items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
-                    currentStep >= step.number
-                      ? "bg-gradient-to-br from-sky-400 to-cyan-500 text-white shadow-lg backdrop-blur-sm border border-sky-300/30"
-                      : "bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 backdrop-blur-sm border border-slate-200/60"
-                  }`}
-                >
-                  {step.number}
-                </div>
-                <div className="mt-2 text-center">
-                  <p
-                    className={`text-xs font-medium ${currentStep >= step.number ? "text-sky-700" : "text-slate-600"}`}
-                  >
-                    {step.title}
-                  </p>
-                  <p className="text-xs text-slate-500">{step.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Form Content */}
-      <Card className="bg-white/80 backdrop-blur-sm border-slate-200/60 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-slate-50/80 to-slate-100/50 backdrop-blur-sm">
-          <CardTitle className="text-slate-800">{steps[currentStep - 1].title}</CardTitle>
-          <CardDescription className="text-slate-600">{steps[currentStep - 1].description}</CardDescription>
+    <div className="container py-12">
+      <Card>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-2xl font-bold">Nuevo Producto</CardTitle>
+          <CardDescription>Crea un nuevo producto en el sistema.</CardDescription>
         </CardHeader>
-        <CardContent className="p-4">
-          {currentStep === 1 && renderStep1()}
-          {currentStep === 2 && renderStep2()}
-          {currentStep === 3 && renderStep3()}
-          {currentStep === 4 && renderStep4()}
+        <CardContent>
+          {/* Stepper */}
+          <div className="mb-8">
+            <ul className="steps">
+              {steps.map((step, index) => (
+                <li key={index} className={`step ${currentStep === step.number ? "step-primary" : ""}`}>
+                  {step.title}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Form */}
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <Loader2 className="mr-2 h-8 w-8 animate-spin" />
+              Creando producto...
+            </div>
+          ) : (
+            <form onSubmit={(e) => e.preventDefault()}>
+              {currentStep === 1 && renderStep1()}
+              {currentStep === 2 && renderStep2()}
+              {currentStep === 3 && renderStep3()}
+              {currentStep === 4 && renderStep4()}
+
+              {/* Navigation buttons */}
+              {currentStep !== 4 && (
+                <div className="flex justify-between mt-8">
+                  <Button variant="outline" onClick={handlePrevStep} disabled={currentStep === 1}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Anterior
+                  </Button>
+                  {currentStep === 3 ? (
+                    <Button
+                      onClick={handleSubmit}
+                      className="bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600"
+                    >
+                      Finalizar
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleNextStep}
+                      className="bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600"
+                    >
+                      Siguiente
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              )}
+            </form>
+          )}
         </CardContent>
       </Card>
 
-      {/* Navigation Buttons */}
-      {currentStep < 4 && (
-        <div className="flex justify-between mt-6">
-          <Button
-            variant="outline"
-            onClick={handlePrevStep}
-            disabled={currentStep === 1}
-            className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-slate-200/60 hover:border-sky-400 hover:bg-sky-50/50"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Anterior
-          </Button>
-
-          <div className="flex gap-2">
-            {currentStep === 3 ? (
-              <Button
-                onClick={handleSubmit}
-                disabled={isLoading}
-                className="flex items-center gap-2 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 shadow-lg"
-              >
-                {isLoading ? "Finalizando..." : "Finalizar Producto"}
-              </Button>
-            ) : (
-              <Button
-                onClick={handleNextStep}
-                disabled={isLoading}
-                className="flex items-center gap-2 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 shadow-lg"
-              >
-                {isLoading ? "Procesando..." : "Siguiente"}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            )}
+      <Dialog open={showErrorModal} onOpenChange={setShowErrorModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="h-5 w-5" />
+              Error
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-slate-600">{errorMessage}</p>
           </div>
-        </div>
-      )}
-
-      {/* Success Animation Modal */}
-      {showSuccessAnimation && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
-            <div className="text-center space-y-6">
-              <div className="relative mx-auto w-32 h-32">
-                <Image
-                  src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/matraz.gif"
-                  alt="matraz"
-                  width={200}
-                  height={200}
-                  className="absolute inset-0 animate-bounce-slow"
-                />
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-2xl font-bold text-gray-900 animate-pulse">
-                  Creando Producto
-                  <span className="inline-flex ml-1">
-                    <span className="animate-bounce" style={{ animationDelay: "0s" }}>
-                      .
-                    </span>
-                    <span className="animate-bounce" style={{ animationDelay: "0.2s" }}>
-                      .
-                    </span>
-                    <span className="animate-bounce" style={{ animationDelay: "0.4s" }}>
-                      .
-                    </span>
-                  </span>
-                </h3>
-
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-gradient-to-r from-sky-400 to-cyan-500 h-2 rounded-full animate-pulse"
-                    style={{ width: "100%", animation: "progressFill 4s ease-in-out" }}
-                  ></div>
-                </div>
-
-                <p className="text-gray-600 animate-fade-in">Procesando información del producto...</p>
-              </div>
-            </div>
+          <div className="flex justify-end">
+            <Button onClick={() => setShowErrorModal(false)} className="bg-slate-600 hover:bg-slate-700">
+              Entendido
+            </Button>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
