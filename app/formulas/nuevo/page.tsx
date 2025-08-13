@@ -1127,7 +1127,14 @@ export default function NuevaFormulaPage() {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative">*/}
                     {/* Flask body */}
-                    <div src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/matraz.gif" >
+                    <div>
+                      <Image
+                      src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/matraz.gif"
+                      alt="Cocinando"
+                      width={200}
+                      height={200}
+                      className="absolute inset-0 animate-bounce-slow" // Animación de rebote lento
+                      />
                       {/* Liquid animation */}
                       <div
                         className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-emerald-400 to-emerald-300 rounded-b-full animate-pulse"
