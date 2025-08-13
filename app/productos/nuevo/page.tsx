@@ -114,7 +114,6 @@ export default function NuevoProducto() {
   const [isLoading, setIsLoading] = useState(false)
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false)
 
-
   // Estados para los datos del formulario
   const [formData, setFormData] = useState<FormData>({
     nombre: "",
@@ -264,6 +263,30 @@ export default function NuevoProducto() {
     }
   }, [currentStep, productoId])
 
+  useEffect(() => {
+    const loadExistingElements = async () => {
+      if (currentStep === 2 && productoId) {
+        try {
+          // Load existing formulas
+          const formulasResult = await obtenerFormulasAgregadas(productoId)
+          if (formulasResult.success && formulasResult.data) {
+            setFormulasAgregadas(formulasResult.data)
+          }
+
+          // Load existing ingredients
+          const ingredientesResult = await obtenerIngredientesAgregados(productoId)
+          if (ingredientesResult.success && ingredientesResult.data) {
+            setIngredientesAgregados(ingredientesResult.data)
+          }
+        } catch (error) {
+          console.error("Error loading existing elements:", error)
+        }
+      }
+    }
+
+    loadExistingElements()
+  }, [currentStep, productoId])
+
   const handleInputChange = (field: any, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
 
@@ -330,7 +353,6 @@ export default function NuevoProducto() {
       }
     } else if (currentStep === 2) {
       if (formulasAgregadas.length === 0 && ingredientesAgregados.length === 0) {
-        
         setShowValidationModal(true)
         return
       }
