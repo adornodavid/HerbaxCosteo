@@ -1178,7 +1178,7 @@ export default function NuevoProducto() {
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">{ingrediente.nombre}</td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">{ingrediente.cantidad}</td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
-                            {ingrediente.unidadMedida}
+                            {ingrediente.unidad}
                           </td>
                           {/*<td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
                             ${ingrediente.costo.toFixed(2)}
