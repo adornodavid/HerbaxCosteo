@@ -113,7 +113,7 @@ export default function NuevoProducto() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false)
-  const [validationMessage, setValidationMessage] = useState("")
+
 
   // Estados para los datos del formulario
   const [formData, setFormData] = useState<FormData>({
@@ -330,7 +330,7 @@ export default function NuevoProducto() {
       }
     } else if (currentStep === 2) {
       if (formulasAgregadas.length === 0 && ingredientesAgregados.length === 0) {
-        setValidationMessage("Debes agregar al menos 2 ingredientes a la fórmula")
+        
         setShowValidationModal(true)
         return
       }
