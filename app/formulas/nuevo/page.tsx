@@ -28,6 +28,7 @@ import {
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 import { getSession } from "@/app/actions/session-actions"
 import { useNavigationGuard } from "@/contexts/navigation-guard-context"
+import Image from "next/image" // Importar Image de next/image
 
 interface FormData {
   nombre: string
