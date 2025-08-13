@@ -185,7 +185,7 @@ export function AppSidebar() {
                   <CollapsibleTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="group w-full justify-start space-x-3 px-4 py-3 text-sm font-medium text-slate-600 hover:bg-[#c5dedb] hover:text-slate-800 rounded-xs border border-transparent hover:border-white/20 transition-all duration-300"
+                      className="group w-full justify-start space-x-3 px-4 py-3 text-sm font-medium text-slate-600 hover:bg-[#bcdef7] hover:text-slate-800 rounded-xs border border-transparent hover:border-white/20 transition-all duration-300"
                     >
                       <item.icon className="w-5 h-5 transition-colors duration-300" />
                       <span className="flex-1 text-left">{item.name}</span>
@@ -204,7 +204,7 @@ export function AppSidebar() {
                         className={`group flex items-center space-x-3 px-4 py-2.5 rounded-xs text-sm transition-all duration-300 w-full ${
                           isActive(subItem.href)
                             ? "bg-white/20 text-slate-800 border border-white/25 shadow-md"
-                            : "text-slate-500 hover:bg-[#c5dedb] hover:text-slate-700 border border-transparent hover:border-white/15"
+                            : "text-slate-500 hover:bg-[#bcdef7] hover:text-slate-700 border border-transparent hover:border-white/15"
                         }`}
                         style={
                           isActive(subItem.href)
