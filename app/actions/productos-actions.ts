@@ -32,6 +32,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
     - obtenerIngredientesAgregados / selIngredientesAgregados
     - obtenerCostoTotalProducto / selCostoTotalProducto
     - obtenerProductoCompleto
+    - finalizarProducto
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
     - actualizarProductoEtapa1
@@ -813,7 +814,7 @@ export async function finalizarProducto(productoId: number, catalogoId: number) 
     }
 
     // Insert into productoxcatalogo
-    const { error: insertError } = await supabaseAdmin.from("productoxcatalogo").insert({
+    const { error: insertError } = await supabaseAdmin.from("productosxcatalogo").insert({
       catalogoid: catalogoId,
       productoid: productoId,
       precioventa: null,
