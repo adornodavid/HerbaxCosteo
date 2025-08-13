@@ -371,7 +371,7 @@ export default function NuevoProducto() {
 
           if (currentFormulas.length === 0 && currentIngredientes.length === 0) {
             console.log("se pasa validacion - mostrando modal")
-            
+            setShowValidationModal(true)
             console.log("modal establecido, retornando para impedir avance")
             return // Impedir avance a la siguiente etapa
           }
