@@ -307,8 +307,9 @@ export async function obtenerUnidadMedidaFormula(formulaId: number) {
     const { data, error } = await supabaseAdmin
       .from("formulas")
       .select(`
+        id,
         unidadmedidaid,
-        tipounidadmedida!inner(
+        tipounidadesmedida!inner(
           id,
           descripcion
         )
@@ -327,6 +328,9 @@ export async function obtenerUnidadMedidaFormula(formulaId: number) {
     return { success: false, error: "Error interno del servidor" }
   }
 }
+
+
+
 
 // Función: agregarFormulaAProducto: función para agregar una fórmula a un producto
 export async function agregarFormulaAProducto(
