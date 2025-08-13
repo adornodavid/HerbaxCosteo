@@ -365,7 +365,7 @@ export default function NuevaFormulaPage() {
     if (currentStep === 1) {
       if (!validateStep1()) {
         setErrorMessage("Por favor completa el nombre de la fórmula")
-        setShowErrorModal(true)
+        //setShowErrorModal(true)
         return
       }
 
