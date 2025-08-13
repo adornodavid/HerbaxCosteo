@@ -1013,7 +1013,7 @@ export default function EditarFormulaPage() {
     if (showSuccessModal) {
       const timer = setTimeout(() => {
         setShowSuccessModal(false)
-        router.push("/formulas")
+        //router.push("/formulas")
       }, 4000) // 4 seconds
 
       return () => clearTimeout(timer)
