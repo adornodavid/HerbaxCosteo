@@ -28,6 +28,7 @@ import {
   obtenerIngredientes,
   getIngredientDetails,
   getUnidadMedidaFormula,
+  obtenerCostoTotalProducto,
 } from "@/app/actions/productos-actions"
 import Image from "next/image"
 
@@ -137,6 +138,10 @@ export default function NuevoProducto() {
     imagen: undefined,
   })
 
+  const [showValidationModal, setShowValidationModal] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [costoTotal, setCostoTotal] = useState(0)
+
   const [imagePreview, setImagePreview] = useState<string>("")
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [formulas, setFormulas] = useState<Formula[]>([])
@@ -243,6 +248,21 @@ export default function NuevoProducto() {
     loadFormulaUnit()
   }, [formData.formaid])
 
+  const cargarCostoTotal = async () => {
+    if (productoId) {
+      const result = await obtenerCostoTotalProducto(productoId)
+      if (result.success) {
+        setCostoTotal(result.total)
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (currentStep === 3 && productoId) {
+      cargarCostoTotal()
+    }
+  }, [currentStep, productoId])
+
   const handleInputChange = (field: any, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
 
@@ -307,6 +327,12 @@ export default function NuevoProducto() {
       } finally {
         setIsLoading(false)
       }
+    } else if (currentStep === 2) {
+      if (formulasAgregadas.length === 0 && ingredientesAgregados.length === 0) {
+        setShowValidationModal(true)
+        return
+      }
+      setCurrentStep((prev) => prev + 1)
     } else if (currentStep < 4) {
       setCurrentStep((prev) => prev + 1)
     }
@@ -319,6 +345,11 @@ export default function NuevoProducto() {
   }
 
   const handleSubmit = async () => {
+    setShowConfirmModal(true)
+  }
+
+  const handleConfirmedSubmit = async () => {
+    setShowConfirmModal(false)
     setShowSuccessAnimation(true)
   }
 
@@ -1177,10 +1208,8 @@ export default function NuevoProducto() {
                         <tr key={ingrediente.id}>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">{ingrediente.nombre}</td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">{ingrediente.cantidad}</td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
-                            {ingrediente.unidad}
-                          </td>
-                          {/*<td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">{ingrediente.unidad}</td>
+                          {/*<td className="px-4 py-3 whitespace-nowrap text-sm text-slate-900">
                             ${ingrediente.costo.toFixed(2)}
                           </td>*/}
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
@@ -1273,7 +1302,7 @@ export default function NuevoProducto() {
   const renderStep3 = () => (
     <div className="space-y-8">
       <div className="text-center">
-        <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-50/80 to-slate-100/50 backdrop-blur-sm">
+        <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
           Resumen del Producto
         </h3>
         <p className="text-gray-600 mt-2">Revisa toda la información antes de finalizar</p>
@@ -1282,7 +1311,7 @@ export default function NuevoProducto() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Información Básica */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-gradient-to-br from-white to-sky-50 rounded-xs p-6 border border-sky-100 shadow-sm">
+          <div className="bg-gradient-to-br from-white to-sky-50 rounded-lg p-6 border border-sky-100 shadow-sm">
             <h4 className="text-lg font-semibold text-sky-800 mb-4 flex items-center gap-2">
               <div className="w-2 h-2 bg-sky-500 rounded-full"></div>
               Información Básica
@@ -1300,6 +1329,20 @@ export default function NuevoProducto() {
                 <Label className="text-sm font-medium text-gray-600">Cliente</Label>
                 <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
                   {clientes.find((c) => c.id === formData.clienteid)?.nombre || "No seleccionado"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Catálogo</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {catalogos.find((c) => c.id === formData.catalogoid)?.nombre || "No seleccionado"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-600">Zona</Label>
+                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
+                  {zonas.find((z) => z.id === formData.zonaid)?.nombre || "No seleccionada"}
                 </p>
               </div>
 
@@ -1327,11 +1370,81 @@ export default function NuevoProducto() {
               </div>
             )}
           </div>
+
+          {formulasAgregadas.length > 0 && (
+            <div className="bg-gradient-to-br from-white to-emerald-50 rounded-lg p-6 border border-emerald-100 shadow-sm">
+              <h4 className="text-lg font-semibold text-emerald-800 mb-4 flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                Fórmulas Agregadas ({formulasAgregadas.length})
+              </h4>
+              <div className="space-y-3">
+                {formulasAgregadas.map((formula) => (
+                  <div
+                    key={formula.id}
+                    className="bg-white p-4 rounded-lg border border-emerald-200 flex justify-between items-center"
+                  >
+                    <div>
+                      <p className="font-medium text-gray-900">{formula.nombre}</p>
+                      <p className="text-sm text-gray-600">Cantidad: {formula.cantidad}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium text-emerald-700">${formula.costoParcial.toFixed(2)}</p>
+                      <p className="text-xs text-gray-500">Costo parcial</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {ingredientesAgregados.length > 0 && (
+            <div className="bg-gradient-to-br from-white to-orange-50 rounded-lg p-6 border border-orange-100 shadow-sm">
+              <h4 className="text-lg font-semibold text-orange-800 mb-4 flex items-center gap-2">
+                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                Ingredientes Agregados ({ingredientesAgregados.length})
+              </h4>
+              <div className="space-y-3">
+                {ingredientesAgregados.map((ingrediente) => (
+                  <div
+                    key={ingrediente.id}
+                    className="bg-white p-4 rounded-lg border border-orange-200 flex justify-between items-center"
+                  >
+                    <div>
+                      <p className="font-medium text-gray-900">{ingrediente.nombre}</p>
+                      <p className="text-sm text-gray-600">
+                        Cantidad: {ingrediente.cantidad} {ingrediente.unidad}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium text-orange-700">${ingrediente.ingredientecostoparcial.toFixed(2)}</p>
+                      <p className="text-xs text-gray-500">Costo parcial</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="bg-gradient-to-br from-white to-indigo-50 rounded-lg p-6 border border-indigo-100 shadow-sm">
+            <h4 className="text-lg font-semibold text-indigo-800 mb-4 flex items-center gap-2">
+              <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+              Costo Total del Producto
+            </h4>
+            <div className="bg-white p-4 rounded-lg border border-indigo-200">
+              <div className="flex justify-between items-center">
+                <span className="text-lg font-medium text-gray-900">Total:</span>
+                <span className="text-2xl font-bold text-indigo-700">${costoTotal.toFixed(2)}</span>
+              </div>
+              <p className="text-sm text-gray-600 mt-2">
+                Suma de todos los costos parciales de fórmulas e ingredientes
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Imagen */}
         <div className="lg:col-span-1">
-          <div className="bg-gradient-to-br from-white to-purple-50 rounded-xs p-6 border border-purple-100 shadow-sm h-fit">
+          <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg p-6 border border-purple-100 shadow-sm h-fit">
             <h4 className="text-lg font-semibold text-purple-800 mb-4 flex items-center gap-2">
               <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
               Imagen del Producto
@@ -1366,6 +1479,38 @@ export default function NuevoProducto() {
           </div>
         </div>
       </div>
+
+      <Dialog open={showValidationModal} onOpenChange={setShowValidationModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Información Incompleta</DialogTitle>
+            <DialogDescription>
+              No es posible avanzar hasta que no agregues por lo menos una fórmula o un ingrediente al producto.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setShowValidationModal(false)}>Entendido</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmar Registro</DialogTitle>
+            <DialogDescription>
+              ¿Estás seguro de que deseas registrar este producto? Una vez confirmado, el producto será creado en el
+              sistema.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowConfirmModal(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleConfirmedSubmit}>Sí, Registrar Producto</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 

@@ -30,6 +30,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
     - obtenerIngredientes / selIngredientes
     - getIngredientDetails / selIngredienteDetalles
     - obtenerIngredientesAgregados / selIngredientesAgregados
+    - obtenerCostoTotalProducto / selCostoTotalProducto
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
   * DELETES-ELIMINAR (DELETES)
@@ -629,6 +630,29 @@ export async function eliminarIngredienteDeProducto(productoDetalleId: number) {
   } catch (error) {
     console.error("Error en eliminarIngredienteDeProducto:", error)
     return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: obtenerCostoTotalProducto: función para obtener el costo total de un producto
+export async function obtenerCostoTotalProducto(productoId: number) {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("productosdetalles")
+      .select("costoparcial")
+      .eq("productoid", productoId)
+
+    if (error) {
+      console.error("Error obteniendo costo total del producto:", error)
+      return { success: false, error: error.message, total: 0 }
+    }
+
+    // Calculate the sum of all costoparcial values
+    const total = data?.reduce((sum, item) => sum + (item.costoparcial || 0), 0) || 0
+
+    return { success: true, total }
+  } catch (error) {
+    console.error("Error en obtenerCostoTotalProducto:", error)
+    return { success: false, error: "Error interno del servidor", total: 0 }
   }
 }
 
