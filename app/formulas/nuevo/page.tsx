@@ -769,7 +769,7 @@ export default function NuevaFormulaPage() {
                 </p>
               </div>
 
-              <div className="space-y-2">
+              {/*<div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-600">Estado</Label>
                 <Badge
                   variant={formData.activo ? "default" : "secondary"}
@@ -777,7 +777,7 @@ export default function NuevaFormulaPage() {
                 >
                   {formData.activo ? "Activo" : "Inactivo"}
                 </Badge>
-              </div>
+              </div>*/}
             </div>
 
             {formData.notaspreparacion && (
