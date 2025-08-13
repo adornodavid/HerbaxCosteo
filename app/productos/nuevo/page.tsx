@@ -321,6 +321,7 @@ export default function NuevoProducto() {
   const handleNextStep = async () => {
   console.log(currentStep)
     if (currentStep === 1) {
+    console.log("etapa 1")
       // Validate step 1
       if (!formData.nombre.trim()) {
         alert("El nombre del producto es requerido")
@@ -353,6 +354,9 @@ export default function NuevoProducto() {
         setIsLoading(false)
       }
     } else if (currentStep === 2) {
+    console.log("etapa 2")
+    console.log("total de formulas: ", formulasAgregadas.length)
+    console.log("total de ingredientes: ", ingredientesAgregados.length)
       if (formulasAgregadas.length === 0 && ingredientesAgregados.length === 0) {
         setShowValidationModal(true)
         return
