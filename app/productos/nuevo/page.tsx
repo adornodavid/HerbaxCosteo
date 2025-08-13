@@ -358,7 +358,9 @@ export default function NuevoProducto() {
     console.log("total de formulas: ", formulasAgregadas.length)
     console.log("total de ingredientes: ", ingredientesAgregados.length)
       if (formulasAgregadas.length == 0 && ingredientesAgregados.length == 0) {
+        console.log("se pasa validacion")
         setShowValidationModal(true)
+        console.log("se pasa validacion y finaliza")
         return
       }
       setCurrentStep((prev) => prev + 1)
