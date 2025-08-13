@@ -301,7 +301,7 @@ export default function NuevoProductoPage() {
 
       if (result.success) {
         setFormulasAgregadas((prev) => prev.filter((f) => f.id !== productoDetalleId))
-        alert("Fórmula eliminada exitosamente")
+        //alert("Fórmula eliminada exitosamente")
       } else {
         alert("Error al eliminar la fórmula: " + result.error)
       }
