@@ -249,7 +249,7 @@ export async function obtenerFormulas() {
   try {
     const { data, error } = await supabaseAdmin
       .from("formulas")
-      .select("id, nombre, costo")
+      .select("id, nombre, costo, cantidad")
       .eq("activo", true)
       .order("nombre", { ascending: true })
 
@@ -631,3 +631,5 @@ export async function eliminarIngredienteDeProducto(productoDetalleId: number) {
     return { success: false, error: "Error interno del servidor" }
   }
 }
+
+export const getUnidadMedidaFormula = obtenerUnidadMedidaFormula
