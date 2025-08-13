@@ -285,7 +285,7 @@ export default function NuevoProductoPage() {
         setFormulaCantidad("")
         setFormulaUnidadMedida("")
 
-        alert("Fórmula agregada exitosamente")
+        //alert("Fórmula agregada exitosamente")
       } else {
         alert("Error al agregar la fórmula: " + result.error)
       }
