@@ -43,6 +43,10 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+
+const supabase = createClientComponentClient()
+
 interface FormData {
   nombre: string
   descripcion: string
@@ -375,7 +379,7 @@ export default function NuevoProducto() {
             console.log("modal establecido, retornando para impedir avance")
             return // Impedir avance a la siguiente etapa
           }
-            setShowValidationModal(true)
+          setShowValidationModal(true)
           console.log("validacion pasada - avanzando a siguiente etapa")
           setCurrentStep((prev) => prev + 1)
         } catch (error) {
@@ -404,6 +408,46 @@ export default function NuevoProducto() {
 
   const handleConfirmedSubmit = async () => {
     setShowConfirmModal(false)
+
+    try {
+      if (productoId && formData.catalogoid) {
+        // Insert into productoxcatalogo
+        const { error: insertError } = await supabase.from("productoxcatalogo").insert({
+          catalogoid: formData.catalogoid,
+          productoid: productoId,
+          precioventa: null,
+          margenutilidad: null,
+          fechacreacion: new Date().toISOString(),
+          activo: true,
+        })
+
+        if (insertError) {
+          console.error("Error inserting into productoxcatalogo:", insertError)
+          alert("Error al registrar el producto en el catálogo")
+          return
+        }
+
+        // Get total cost and update productos
+        const costoTotalResult = await obtenerCostoTotalProducto(productoId)
+        if (costoTotalResult.success && costoTotalResult.data !== null) {
+          const { error: updateError } = await supabase
+            .from("productos")
+            .update({ costo: costoTotalResult.data })
+            .eq("id", productoId)
+
+          if (updateError) {
+            console.error("Error updating product cost:", updateError)
+            alert("Error al actualizar el costo del producto")
+            return
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error in final product registration:", error)
+      alert("Error al finalizar el registro del producto")
+      return
+    }
+
     setShowSuccessAnimation(true)
   }
 
@@ -1533,38 +1577,49 @@ export default function NuevoProducto() {
           </div>
         </div>
       </div>
+      </div>
+  \
+      <Dialog open=
+  showValidationModal
+  onOpenChange =
+    { setShowValidationModal } >
+    (
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Información Incompleta</DialogTitle>
+          <DialogDescription>
+            No es posible avanzar hasta que no agregues por lo menos una fórmula o un ingrediente al producto.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button onClick={() => setShowValidationModal(false)}>Entendido</Button>
+        </DialogFooter>
+      </DialogContent>
+    )
+  </Dialog>
 
-      <Dialog open={showValidationModal} onOpenChange={setShowValidationModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Información Incompleta</DialogTitle>
-            <DialogDescription>
-              No es posible avanzar hasta que no agregues por lo menos una fórmula o un ingrediente al producto.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => setShowValidationModal(false)}>Entendido</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Confirmar Registro</DialogTitle>
-            <DialogDescription>
-              ¿Estás seguro de que deseas registrar este producto? Una vez confirmado, el producto será creado en el
-              sistema.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setShowConfirmModal(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleConfirmedSubmit}>Sí, Registrar Producto</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <Dialog open=
+  showConfirmModal
+  onOpenChange =
+    { setShowConfirmModal } >
+    (
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Confirmar Registro</DialogTitle>
+          <DialogDescription>
+            ¿Estás seguro de que deseas registrar este producto? Una vez confirmado, el producto será creado en el
+            sistema.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => setShowConfirmModal(false)}>
+            Cancelar
+          </Button>
+          <Button onClick={handleConfirmedSubmit}>Sí, Registrar Producto</Button>
+        </DialogFooter>
+      </DialogContent>
+    )
+  </Dialog>
     </div>
   )
 
