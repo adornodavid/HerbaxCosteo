@@ -781,7 +781,7 @@ export async function eliminarRegistroIncompleto(formulaId: number) {
       try {
         // Extraer el nombre del archivo de la URL
         const url = new URL(formulaData.imgurl)
-        const pathSegments = url.pathname.split("formulas/")
+        const pathSegments = url.pathname.split("/")
         const fileName = pathSegments[pathSegments.length - 1]
         console.log(fileName)
         // Eliminar la imagen del bucket
