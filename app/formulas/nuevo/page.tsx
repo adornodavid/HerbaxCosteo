@@ -739,7 +739,7 @@ export default function NuevaFormulaPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Información Básica */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-gradient-to-br from-white to-sky-50 rounded-xl p-6 border border-sky-100 shadow-sm">
+          <div className="bg-gradient-to-br from-white to-sky-50 rounded-xs p-6 border border-sky-100 shadow-sm">
             <h4 className="text-lg font-semibold text-sky-800 mb-4 flex items-center gap-2">
               <div className="w-2 h-2 bg-sky-500 rounded-full"></div>
               Información Básica
