@@ -24,6 +24,9 @@ import {
 } from "@/app/actions/productos-actions"
 import Image from "next/image"
 
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { ChevronDown, ChevronUp } from "lucide-react"
+
 interface FormData {
   nombre: string
   descripcion: string
@@ -77,7 +80,7 @@ interface FormulaAgregada {
   costoParcial: number
 }
 
-export default function NuevoProductoPage() {
+export default function NuevoProducto() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -119,6 +122,10 @@ export default function NuevoProductoPage() {
   const [formulaUnidadMedida, setFormulaUnidadMedida] = useState("")
   const [formulasAgregadas, setFormulasAgregadas] = useState<FormulaAgregada[]>([])
   const [productoId, setProductoId] = useState<number | null>(null)
+
+  const [porcionesOpen, setPorcionesOpen] = useState(false)
+  const [modoUsoOpen, setModoUsoOpen] = useState(false)
+  const [detallesOpen, setDetallesOpen] = useState(false)
 
   const steps = [
     { number: 1, title: "Información Básica", description: "Datos generales del producto" },
@@ -385,101 +392,6 @@ export default function NuevoProductoPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="presentacion" className="text-slate-700 font-medium">
-                Presentación
-              </Label>
-              <Input
-                id="presentacion"
-                value={formData.presentacion}
-                onChange={(e) => handleInputChange("presentacion", e.target.value)}
-                placeholder="Ej: Cápsulas, Polvo, Líquido"
-                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="porcion" className="text-slate-700 font-medium">
-                Porción
-              </Label>
-              <Input
-                id="porcion"
-                value={formData.porcion}
-                onChange={(e) => handleInputChange("porcion", e.target.value)}
-                placeholder="Ej: 2 cápsulas, 1 cucharada"
-                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="modouso" className="text-slate-700 font-medium">
-                Modo de Uso
-              </Label>
-              <Input
-                id="modouso"
-                value={formData.modouso}
-                onChange={(e) => handleInputChange("modouso", e.target.value)}
-                placeholder="Ej: Oral, Tópico"
-                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="porcionenvase" className="text-slate-700 font-medium">
-                Porción por Envase
-              </Label>
-              <Input
-                id="porcionenvase"
-                value={formData.porcionenvase}
-                onChange={(e) => handleInputChange("porcionenvase", e.target.value)}
-                placeholder="Ej: 30 porciones"
-                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="categoriauso" className="text-slate-700 font-medium">
-                Categoría de Uso
-              </Label>
-              <Input
-                id="categoriauso"
-                value={formData.categoriauso}
-                onChange={(e) => handleInputChange("categoriauso", e.target.value)}
-                placeholder="Ej: Suplemento alimenticio"
-                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="edadminima" className="text-slate-700 font-medium">
-                Edad Mínima
-              </Label>
-              <Input
-                id="edadminima"
-                type="number"
-                min="0"
-                value={formData.edadminima}
-                onChange={(e) => handleInputChange("edadminima", Number.parseInt(e.target.value) || 0)}
-                placeholder="0"
-                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="vidaanaquelmeses" className="text-slate-700 font-medium">
-                Vida de Anaquel (meses)
-              </Label>
-              <Input
-                id="vidaanaquelmeses"
-                type="number"
-                min="0"
-                value={formData.vidaanaquelmeses}
-                onChange={(e) => handleInputChange("vidaanaquelmeses", Number.parseInt(e.target.value) || 0)}
-                placeholder="0"
-                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="zonaid" className="text-slate-700 font-medium">
                 Zona
               </Label>
@@ -515,78 +427,231 @@ export default function NuevoProductoPage() {
                 className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="propositoprincipal" className="text-slate-700 font-medium">
-                Propósito Principal
-              </Label>
-              <Textarea
-                id="propositoprincipal"
-                value={formData.propositoprincipal}
-                onChange={(e) => handleInputChange("propositoprincipal", e.target.value)}
-                placeholder="Propósito principal del producto..."
-                rows={2}
-                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="propuestavalor" className="text-slate-700 font-medium">
-                Propuesta de Valor
-              </Label>
-              <Textarea
-                id="propuestavalor"
-                value={formData.propuestavalor}
-                onChange={(e) => handleInputChange("propuestavalor", e.target.value)}
-                placeholder="Propuesta de valor del producto..."
-                rows={2}
-                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="instruccionesingesta" className="text-slate-700 font-medium">
-                Instrucciones de Ingesta
-              </Label>
-              <Textarea
-                id="instruccionesingesta"
-                value={formData.instruccionesingesta}
-                onChange={(e) => handleInputChange("instruccionesingesta", e.target.value)}
-                placeholder="Instrucciones de cómo tomar el producto..."
-                rows={2}
-                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="advertencia" className="text-slate-700 font-medium">
-                Advertencias
-              </Label>
-              <Textarea
-                id="advertencia"
-                value={formData.advertencia}
-                onChange={(e) => handleInputChange("advertencia", e.target.value)}
-                placeholder="Advertencias y contraindicaciones..."
-                rows={2}
-                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="condicionesalmacenamiento" className="text-slate-700 font-medium">
-                Condiciones de Almacenamiento
-              </Label>
-              <Textarea
-                id="condicionesalmacenamiento"
-                value={formData.condicionesalmacenamiento}
-                onChange={(e) => handleInputChange("condicionesalmacenamiento", e.target.value)}
-                placeholder="Condiciones de almacenamiento..."
-                rows={2}
-                className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
-              />
-            </div>
           </div>
         </div>
+
+        <Collapsible open={porcionesOpen} onOpenChange={setPorcionesOpen}>
+          <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs shadow-sm">
+            <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-slate-100/50 transition-colors rounded-xs">
+              <h3 className="text-lg font-semibold text-slate-700">Porciones</h3>
+              {porcionesOpen ? (
+                <ChevronUp className="h-5 w-5 text-slate-500" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-slate-500" />
+              )}
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="p-6 pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="presentacion" className="text-slate-700 font-medium">
+                      Presentación
+                    </Label>
+                    <Input
+                      id="presentacion"
+                      value={formData.presentacion}
+                      onChange={(e) => handleInputChange("presentacion", e.target.value)}
+                      placeholder="Ej: Cápsulas, Polvo, Líquido"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="porcion" className="text-slate-700 font-medium">
+                      Porción
+                    </Label>
+                    <Input
+                      id="porcion"
+                      value={formData.porcion}
+                      onChange={(e) => handleInputChange("porcion", e.target.value)}
+                      placeholder="Ej: 2 cápsulas, 1 cucharada"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="porcionenvase" className="text-slate-700 font-medium">
+                      Porción por Envase
+                    </Label>
+                    <Input
+                      id="porcionenvase"
+                      value={formData.porcionenvase}
+                      onChange={(e) => handleInputChange("porcionenvase", e.target.value)}
+                      placeholder="Ej: 30 porciones"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
+
+        <Collapsible open={modoUsoOpen} onOpenChange={setModoUsoOpen}>
+          <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs shadow-sm">
+            <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-slate-100/50 transition-colors rounded-xs">
+              <h3 className="text-lg font-semibold text-slate-700">Modo Uso</h3>
+              {modoUsoOpen ? (
+                <ChevronUp className="h-5 w-5 text-slate-500" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-slate-500" />
+              )}
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="p-6 pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="modouso" className="text-slate-700 font-medium">
+                      Modo de Uso
+                    </Label>
+                    <Input
+                      id="modouso"
+                      value={formData.modouso}
+                      onChange={(e) => handleInputChange("modouso", e.target.value)}
+                      placeholder="Ej: Oral, Tópico"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="categoriauso" className="text-slate-700 font-medium">
+                      Categoría de Uso
+                    </Label>
+                    <Input
+                      id="categoriauso"
+                      value={formData.categoriauso}
+                      onChange={(e) => handleInputChange("categoriauso", e.target.value)}
+                      placeholder="Ej: Suplemento alimenticio"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edadminima" className="text-slate-700 font-medium">
+                      Edad Mínima
+                    </Label>
+                    <Input
+                      id="edadminima"
+                      type="number"
+                      min="0"
+                      value={formData.edadminima}
+                      onChange={(e) => handleInputChange("edadminima", Number.parseInt(e.target.value) || 0)}
+                      placeholder="0"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-6 space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="instruccionesingesta" className="text-slate-700 font-medium">
+                      Instrucciones de Ingesta
+                    </Label>
+                    <Textarea
+                      id="instruccionesingesta"
+                      value={formData.instruccionesingesta}
+                      onChange={(e) => handleInputChange("instruccionesingesta", e.target.value)}
+                      placeholder="Instrucciones de cómo tomar el producto..."
+                      rows={2}
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="advertencia" className="text-slate-700 font-medium">
+                      Advertencias
+                    </Label>
+                    <Textarea
+                      id="advertencia"
+                      value={formData.advertencia}
+                      onChange={(e) => handleInputChange("advertencia", e.target.value)}
+                      placeholder="Advertencias y contraindicaciones..."
+                      rows={2}
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="condicionesalmacenamiento" className="text-slate-700 font-medium">
+                      Condiciones de Almacenamiento
+                    </Label>
+                    <Textarea
+                      id="condicionesalmacenamiento"
+                      value={formData.condicionesalmacenamiento}
+                      onChange={(e) => handleInputChange("condicionesalmacenamiento", e.target.value)}
+                      placeholder="Condiciones de almacenamiento..."
+                      rows={2}
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
+
+        <Collapsible open={detallesOpen} onOpenChange={setDetallesOpen}>
+          <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs shadow-sm">
+            <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-slate-100/50 transition-colors rounded-xs">
+              <h3 className="text-lg font-semibold text-slate-700">Detalles Adicionales</h3>
+              {detallesOpen ? (
+                <ChevronUp className="h-5 w-5 text-slate-500" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-slate-500" />
+              )}
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="p-6 pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="vidaanaquelmeses" className="text-slate-700 font-medium">
+                      Vida de Anaquel (meses)
+                    </Label>
+                    <Input
+                      id="vidaanaquelmeses"
+                      type="number"
+                      min="0"
+                      value={formData.vidaanaquelmeses}
+                      onChange={(e) => handleInputChange("vidaanaquelmeses", Number.parseInt(e.target.value) || 0)}
+                      placeholder="0"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-6 space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="propositoprincipal" className="text-slate-700 font-medium">
+                      Propósito Principal
+                    </Label>
+                    <Textarea
+                      id="propositoprincipal"
+                      value={formData.propositoprincipal}
+                      onChange={(e) => handleInputChange("propositoprincipal", e.target.value)}
+                      placeholder="Propósito principal del producto..."
+                      rows={2}
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="propuestavalor" className="text-slate-700 font-medium">
+                      Propuesta de Valor
+                    </Label>
+                    <Textarea
+                      id="propuestavalor"
+                      value={formData.propuestavalor}
+                      onChange={(e) => handleInputChange("propuestavalor", e.target.value)}
+                      placeholder="Propuesta de valor del producto..."
+                      rows={2}
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
       </div>
 
       {/* Right side - Image upload and preview */}
