@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -22,7 +22,6 @@ import {
   eliminarIngredienteFormula,
   getIngredientDetails, // Added import for moved function
   obtenerIngredientesFormula, // Added import for missing function
-  eliminarRegistroIncompleto,
   verificarIngredienteDuplicado,
 } from "@/app/actions/formulas-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
@@ -920,66 +919,6 @@ export default function NuevaFormulaPage() {
     }
   }, [showSuccessModal])
 
-  const handleLeavePage = useCallback(
-    async (confirm: boolean) => {
-      setShowExitConfirmModal(false)
-      if (confirm) {
-        if (formulaId) {
-          await eliminarRegistroIncompleto(formulaId)
-        }
-        resolveNavigationRef.current?.(true) // Allow navigation
-      } else {
-        resolveNavigationRef.current?.(false) // Cancel navigation
-      }
-      resolveNavigationRef.current = null
-    },
-    [formulaId],
-  )
-
-  const checkLeaveAndConfirm = useCallback(
-    async (targetPath: string): Promise<boolean> => {
-      if (currentStep >= 2 && formulaId) {
-        return new Promise<boolean>((resolve) => {
-          resolveNavigationRef.current = resolve
-          setShowExitConfirmModal(true)
-          setNextPath(targetPath)
-        })
-      }
-      return true // Allow navigation if not in protected state
-    },
-    [currentStep, formulaId],
-  )
-
-  useEffect(() => {
-    if (currentStep >= 2 && formulaId) {
-      setGuard(checkLeaveAndConfirm)
-    } else {
-      setGuard(null)
-    }
-
-    return () => {
-      setGuard(null)
-    }
-  }, [currentStep, formulaId, setGuard, checkLeaveAndConfirm])
-
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (currentStep >= 2 && formulaId) {
-        e.preventDefault()
-        e.returnValue = ""
-        return ""
-      }
-    }
-
-    if (currentStep >= 2 && formulaId) {
-      window.addEventListener("beforeunload", handleBeforeUnload)
-    }
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload)
-    }
-  }, [currentStep, formulaId])
-
   const validateStep2 = () => {
     // Check if at least 2 ingredients are added
     if (ingredientesAgregados.length < 2) {
@@ -1003,6 +942,15 @@ export default function NuevaFormulaPage() {
     }
 
     return true
+  }
+
+  const handleLeavePage = (confirm: boolean) => {
+    if (confirm && resolveNavigationRef.current) {
+      resolveNavigationRef.current(true)
+    } else {
+      resolveNavigationRef.current?.(false)
+    }
+    setShowExitConfirmModal(false)
   }
 
   return (
@@ -1127,39 +1075,39 @@ export default function NuevaFormulaPage() {
                 {/* Flask 
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative">*/}
-                    {/* Flask body */}
-                    <div>
-                      <Image
-                      src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/matraz.gif"
-                      alt="matraz"
-                      width={200}
-                      height={200}
-                      className="absolute inset-0 animate-bounce-slow" // Animación de rebote lento
-                      />
-                      {/* Liquid animation */}
-                      {/*<div
+                {/* Flask body */}
+                <div>
+                  <Image
+                    src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/matraz.gif"
+                    alt="matraz"
+                    width={200}
+                    height={200}
+                    className="absolute inset-0 animate-bounce-slow" // Animación de rebote lento
+                  />
+                  {/* Liquid animation */}
+                  {/*<div
                         className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-emerald-400 to-emerald-300 rounded-b-full animate-pulse"
                         style={{ height: "60%", animation: "liquidFill 2s ease-in-out infinite alternate" }}
                       ></div>*/}
-                      {/* Bubbles */}
-                      <div
-                        className="absolute bottom-2 left-2 w-1 h-1 bg-white rounded-full animate-bounce"
-                        style={{ animationDelay: "0s" }}
-                      ></div>
-                      <div
-                        className="absolute bottom-4 right-6 w-1 h-1 bg-white rounded-full animate-bounce"
-                        style={{ animationDelay: "0.5s" }}
-                      ></div>
-                      <div
-                        className="absolute bottom-6 left-3 w-0.5 h-0.5 bg-white rounded-full animate-bounce"
-                        style={{ animationDelay: "1s" }}
-                      ></div>
-                    </div>
-                    {/* Flask neck 
+                  {/* Bubbles */}
+                  <div
+                    className="absolute bottom-2 left-2 w-1 h-1 bg-white rounded-full animate-bounce"
+                    style={{ animationDelay: "0s" }}
+                  ></div>
+                  <div
+                    className="absolute bottom-4 right-6 w-1 h-1 bg-white rounded-full animate-bounce"
+                    style={{ animationDelay: "0.5s" }}
+                  ></div>
+                  <div
+                    className="absolute bottom-6 left-3 w-0.5 h-0.5 bg-white rounded-full animate-bounce"
+                    style={{ animationDelay: "1s" }}
+                  ></div>
+                </div>
+                {/* Flask neck 
                     <div ></div>*/}
-                    {/* Flask mouth
+                {/* Flask mouth
                     <div className="w-6 h-2 bg-sky-200 border-2 border-sky-300 border-b-0 rounded-t-lg mx-auto -mt-1"></div> */}
-                  {/*</div>
+                {/*</div>
                 </div>*/}
 
                 {/* Particles around flask */}
