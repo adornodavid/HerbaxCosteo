@@ -328,7 +328,7 @@ export default function NuevoProducto() {
         setIsLoading(false)
       }
     } else if (currentStep === 2) {
-      if (formulasAgregadas.length === 0 ) {
+      if (formulasAgregadas.length === 0) {
         setShowValidationModal(true)
         return
       }
