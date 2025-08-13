@@ -913,7 +913,7 @@ export default function NuevaFormulaPage() {
       const timer = setTimeout(() => {
         setShowSuccessModal(false)
         // Redirect to formulas list
-        window.location.href = "/formulas"
+        //window.location.href = "/formulas"
       }, 4000) // 4 seconds
 
       return () => clearTimeout(timer)
