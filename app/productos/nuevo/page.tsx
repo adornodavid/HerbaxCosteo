@@ -1049,7 +1049,7 @@ export default function NuevoProducto() {
 
         <div className="space-y-6">
           <div className="space-y-4">
-            <h4 className="text-md font-medium text-slate-700">Fórmula Asociada</h4>
+            {/*<h4 className="text-md font-medium text-slate-700">Fórmula Asociada</h4>*/}
 
             <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
               <div className="md:col-span-2 space-y-2">
