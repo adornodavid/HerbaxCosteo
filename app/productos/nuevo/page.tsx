@@ -1513,22 +1513,27 @@ export default function NuevoProducto() {
                 <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
                 Fórmulas Agregadas ({formulasAgregadas.length})
               </h4>
-              <div className="space-y-3">
-                {formulasAgregadas.map((formula) => (
-                  <div
-                    key={formula.id}
-                    className="bg-white p-2 border border-emerald-200 flex justify-between items-center"
-                  >
-                    <div>
-                      <p className="font-medium text-gray-900">{formula.nombre}</p>
-                      <p className="text-sm text-gray-600">Cantidad: {formula.cantidad}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium text-emerald-700">${formula.costoParcial.toFixed(2)}</p>
-                      <p className="text-xs text-gray-500">Costo parcial</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="bg-white border border-emerald-200">
+                <table className="w-full text-sm">
+                  <thead className="bg-emerald-50">
+                    <tr>
+                      <th className="text-left p-2 font-medium text-emerald-800">Fórmula</th>
+                      <th className="text-center p-2 font-medium text-emerald-800">Cantidad</th>
+                      <th className="text-right p-2 font-medium text-emerald-800">Costo Parcial</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {formulasAgregadas.map((formula, index) => (
+                      <tr key={formula.id} className={index % 2 === 0 ? "bg-white" : "bg-emerald-25"}>
+                        <td className="p-2 font-medium text-gray-900">{formula.nombre}</td>
+                        <td className="p-2 text-center text-gray-600">{formula.cantidad}</td>
+                        <td className="p-2 text-right font-medium text-emerald-700">
+                          ${formula.costoParcial.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
@@ -1539,24 +1544,29 @@ export default function NuevoProducto() {
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                 Ingredientes Agregados ({ingredientesAgregados.length})
               </h4>
-              <div className="space-y-3">
-                {ingredientesAgregados.map((ingrediente) => (
-                  <div
-                    key={ingrediente.id}
-                    className="bg-white p-4 border border-orange-200 flex justify-between items-center"
-                  >
-                    <div>
-                      <p className="font-medium text-gray-900">{ingrediente.nombre}</p>
-                      <p className="text-sm text-gray-600">
-                        Cantidad: {ingrediente.cantidad} {ingrediente.unidad}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium text-orange-700">${ingrediente.ingredientecostoparcial.toFixed(2)}</p>
-                      <p className="text-xs text-gray-500">Costo parcial</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="bg-white border border-orange-200">
+                <table className="w-full text-sm">
+                  <thead className="bg-orange-50">
+                    <tr>
+                      <th className="text-left p-2 font-medium text-orange-800">Ingrediente</th>
+                      <th className="text-center p-2 font-medium text-orange-800">Cantidad</th>
+                      <th className="text-right p-2 font-medium text-orange-800">Costo Parcial</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ingredientesAgregados.map((ingrediente, index) => (
+                      <tr key={ingrediente.id} className={index % 2 === 0 ? "bg-white" : "bg-orange-25"}>
+                        <td className="p-2 font-medium text-gray-900">{ingrediente.nombre}</td>
+                        <td className="p-2 text-center text-gray-600">
+                          {ingrediente.cantidad} {ingrediente.unidad}
+                        </td>
+                        <td className="p-2 text-right font-medium text-orange-700">
+                          ${ingrediente.ingredientecostoparcial.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
