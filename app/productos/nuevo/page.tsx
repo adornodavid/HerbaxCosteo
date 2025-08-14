@@ -1517,7 +1517,7 @@ export default function NuevoProducto() {
                 {formulasAgregadas.map((formula) => (
                   <div
                     key={formula.id}
-                    className="bg-white p-4 border border-emerald-200 flex justify-between items-center"
+                    className="bg-white p-2 border border-emerald-200 flex justify-between items-center"
                   >
                     <div>
                       <p className="font-medium text-gray-900">{formula.nombre}</p>
