@@ -1134,7 +1134,7 @@ export default function NuevoProducto() {
             {formulasAgregadas.length > 0 && (
               <div className="mt-6">
                 <h5 className="text-sm font-medium text-slate-700 mb-3">Fórmulas Agregadas</h5>
-                <div className="bg-white rounded-xs border border-slate-200 overflow-hidden">
+                <div className="bg-white rounded-xs border border-slate-200 overflow-hidden mb-5">
                   <table className="w-full">
                     <thead className="bg-slate-50">
                       <tr>
