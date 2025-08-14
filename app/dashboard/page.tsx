@@ -1,5 +1,8 @@
 "use client"
 
+/* ==================================================
+  Imports
+================================================== */
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,6 +14,9 @@ import Link from "next/link"
 import Image from "next/image" // Importar Image de next/image
 import { useAuth } from "@/contexts/auth-context"
 
+/* ==================================================
+  Interfaces, clases, objetos
+================================================== */
 interface ResumenesDashboard {
   hoteles: number
   restaurantes: number
@@ -29,7 +35,13 @@ interface DatosSesion {
   SesionActiva: boolean
 }
 
+/* ==================================================
+  Principal - pagina
+================================================== */
 export default function DashboardPage() {
+  /* ==================================================
+    Estados
+  ================================================== */
   const [resumenes, setResumenes] = useState<ResumenesDashboard | null>(null)
   const [sesion, setSesion] = useState<DatosSesion | null>(null)
   const [loading, setLoading] = useState(true)
