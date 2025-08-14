@@ -141,6 +141,7 @@ export async function crearFormulaEtapa2(
 export async function obtenerFormulas(page = 1, limit = 20) {
   const offset = (page - 1) * limit
   try {
+    /*
     const {
       data: queryData,
       error: queryError,
@@ -149,6 +150,7 @@ export async function obtenerFormulas(page = 1, limit = 20) {
       p_offset: offset,
       p_limit: limit,
     })
+    */
 
     // Alternative using raw SQL if RPC doesn't work
     const { data: rawData, error: rawError } = await supabase
