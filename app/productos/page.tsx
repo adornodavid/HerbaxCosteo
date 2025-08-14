@@ -335,7 +335,7 @@ export default function ProductosPage() {
           setFiltroCliente("-1")
         }
         else{
-        let aux = clientesData.id.toString()
+        let aux = clientesData.id
           setFiltroCliente(aux)
         }
         //setFiltroCliente("-1")
