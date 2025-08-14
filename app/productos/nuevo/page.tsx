@@ -1406,32 +1406,32 @@ export default function NuevoProducto() {
             <div className="space-y-3 mb-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
                 <div>
-                  <span className="font-medium text-gray-700">Nombre del Producto:</span>{" "}
+                  <span className="font-medium text-black">Nombre del Producto:</span>{" "}
                   <span className="text-gray-900">{formData.nombre}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700">Cliente:</span>{" "}
-                  <span className="text-gray-900">
+                  <span className="font-medium text-black">Cliente:</span>{" "}
+                  <span className="text-gray-700">
                     {clientes.find((c) => c.id === formData.clienteid)?.nombre || "No seleccionado"}
                   </span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700">Catálogo:</span>{" "}
-                  <span className="text-gray-900">
+                  <span className="font-medium text-black">Catálogo:</span>{" "}
+                  <span className="text-gray-700">
                     {catalogos.find((c) => c.id === formData.catalogoid)?.nombre || "No seleccionado"}
                   </span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700">Zona:</span>{" "}
-                  <span className="text-gray-900">
+                  <span className="font-medium text-black">Zona:</span>{" "}
+                  <span className="text-gray-700">
                     {zonas.find((z) => z.id === formData.zonaid)?.nombre || "No seleccionada"}
                   </span>
                 </div>
               </div>
               {formData.descripcion && (
                 <div className="text-sm">
-                  <span className="font-medium text-gray-700">Descripción:</span>{" "}
-                  <span className="text-gray-900">{formData.descripcion}</span>
+                  <span className="font-medium text-black">Descripción:</span>{" "}
+                  <span className="text-gray-700">{formData.descripcion}</span>
                 </div>
               )}
             </div>
@@ -1441,16 +1441,16 @@ export default function NuevoProducto() {
               <h5 className="text-sm font-semibold text-sky-700 mb-2 border-b border-sky-200 pb-1">Porciones</h5>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 text-sm">
                 <div>
-                  <span className="font-medium text-gray-600">Presentación:</span>{" "}
-                  <span className="text-gray-800">{formData.presentacion || "No especificada"}</span>
+                  <span className="font-medium text-black">Presentación:</span>{" "}
+                  <span className="text-gray-700">{formData.presentacion || "No especificada"}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-600">Porción:</span>{" "}
-                  <span className="text-gray-800">{formData.porcion || "No especificada"}</span>
+                  <span className="font-medium text-black">Porción:</span>{" "}
+                  <span className="text-gray-700">{formData.porcion || "No especificada"}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-600">Porción por Envase:</span>{" "}
-                  <span className="text-gray-800">{formData.porcionenvase || "No especificada"}</span>
+                  <span className="font-medium text-black">Porción por Envase:</span>{" "}
+                  <span className="text-gray-700">{formData.porcionenvase || "No especificada"}</span>
                 </div>
               </div>
             </div>
@@ -1460,28 +1460,28 @@ export default function NuevoProducto() {
               <h5 className="text-sm font-semibold text-sky-700 mb-2 border-b border-sky-200 pb-1">Modo de Uso</h5>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 text-sm">
                 <div>
-                  <span className="font-medium text-gray-600">Modo de Uso:</span>{" "}
-                  <span className="text-gray-800">{formData.modouso || "No especificado"}</span>
+                  <span className="font-medium text-black">Modo de Uso:</span>{" "}
+                  <span className="text-gray-700">{formData.modouso || "No especificado"}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-600">Categoría de Uso:</span>{" "}
-                  <span className="text-gray-800">{formData.categoriauso || "No especificada"}</span>
+                  <span className="font-medium text-black">Categoría de Uso:</span>{" "}
+                  <span className="text-gray-700">{formData.categoriauso || "No especificada"}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-600">Edad Mínima:</span>{" "}
-                  <span className="text-gray-800">{formData.edadminima || "No especificada"}</span>
+                  <span className="font-medium text-black">Edad Mínima:</span>{" "}
+                  <span className="text-gray-700">{formData.edadminima || "No especificada"}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-600">Instrucciones de Ingesta:</span>{" "}
-                  <span className="text-gray-800">{formData.instruccionesingesta || "No especificadas"}</span>
+                  <span className="font-medium text-black">Instrucciones de Ingesta:</span>{" "}
+                  <span className="text-gray-700">{formData.instruccionesingesta || "No especificadas"}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-600">Advertencias:</span>{" "}
-                  <span className="text-gray-800">{formData.advertencia || "No especificadas"}</span>
+                  <span className="font-medium text-black">Advertencias:</span>{" "}
+                  <span className="text-gray-700">{formData.advertencia || "No especificadas"}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-600">Condiciones de Almacenamiento:</span>{" "}
-                  <span className="text-gray-800">{formData.condicionesalmacenamiento || "No especificadas"}</span>
+                  <span className="font-medium text-black">Condiciones de Almacenamiento:</span>{" "}
+                  <span className="text-gray-700">{formData.condicionesalmacenamiento || "No especificadas"}</span>
                 </div>
               </div>
             </div>
@@ -1493,16 +1493,16 @@ export default function NuevoProducto() {
               </h5>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 text-sm">
                 <div>
-                  <span className="font-medium text-gray-600">Vida de Anaquel (meses):</span>{" "}
-                  <span className="text-gray-800">{formData.vidaanaquelmeses || "No especificada"}</span>
+                  <span className="font-medium text-black">Vida de Anaquel (meses):</span>{" "}
+                  <span className="text-gray-700">{formData.vidaanaquelmeses || "No especificada"}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-600">Propósito Principal:</span>{" "}
-                  <span className="text-gray-800">{formData.propositoprincipal || "No especificado"}</span>
+                  <span className="font-medium text-black">Propósito Principal:</span>{" "}
+                  <span className="text-gray-700">{formData.propositoprincipal || "No especificado"}</span>
                 </div>
                 <div className="md:col-span-2">
-                  <span className="font-medium text-gray-600">Propuesta de Valor:</span>{" "}
-                  <span className="text-gray-800">{formData.propuestavalor || "No especificada"}</span>
+                  <span className="font-medium text-black">Propuesta de Valor:</span>{" "}
+                  <span className="text-gray-700">{formData.propuestavalor || "No especificada"}</span>
                 </div>
               </div>
             </div>
