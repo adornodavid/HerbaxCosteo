@@ -180,6 +180,46 @@ export default function ProductosPage() {
     try {
       const resultado = await obtenerProductosXFiltros(nombre, clienteId, catalogoId, estatus)
 
+      // Transformar datos de la consulta para manejar productos sin asociación
+      const flattenedData = resultado.data.flatMap((p: any) => {
+        if (p.productosxcatalogo.length === 0) {
+          // Producto sin asociaciones, mostrarlo una vez
+          return {
+            ProductoId: p.id,
+            ProductoNombre: p.nombre,
+            ProductoDescripcion: p.descripcion,
+            ProductoTiempo: p.propositoprincipal,
+            ProductoCosto: p.costo,
+            ProductoActivo: p.activo,
+            ProductoImagenUrl: p.imgurl,
+            ClienteId: -1, // O algún valor que indique "N/A"
+            ClienteNombre: "N/A",
+            CatalogoId: -1, // O algún valor que indique "N/A"
+            CatalogoNombre: "N/A",
+          }
+        }
+        // Producto con asociaciones, aplanarlas
+        return p.productosxcatalogo.map((x: any) => ({
+          ProductoId: p.id,
+          ProductoNombre: p.nombre,
+          ProductoDescripcion: p.descripcion,
+          ProductoTiempo: p.propositoprincipal,
+          ProductoCosto: p.costo,
+          ProductoActivo: p.activo,
+          ProductoImagenUrl: p.imgurl,
+          ClienteId: x.catalogos?.clientes?.id || -1,
+          ClienteNombre: x.catalogos?.clientes?.nombre || "N/A",
+          CatalogoId: x.catalogos?.id || -1,
+          CatalogoNombre: x.catalogos?.nombre || "N/A",
+        }))
+      })
+
+      // Eliminar duplicados si un producto aparece varias veces debido a múltiples asociaciones
+      const uniqueProducts = Array.from(
+        new Map(flattenedData.map((item: ProductoListado) => [item.ProductoId, item])).values(),
+      )
+
+      /*
       if (resultado.success) {
         setProductos(resultado.data || [])
         setTotalProductos(resultado.data?.length || 0)
@@ -191,6 +231,7 @@ export default function ProductosPage() {
           variant: "destructive",
         })
       }
+      */
     } catch (error) {
       console.error("Error inesperado al buscar productos:", error)
       toast({
