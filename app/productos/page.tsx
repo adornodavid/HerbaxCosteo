@@ -188,6 +188,8 @@ export default function ProductosPage() {
           variant: "destructive",
       }
 
+console.log(resultado.data)
+
       // Transformar datos de la consulta para manejar productos sin asociación
       const flattenedData = resultado.data.flatMap((p: any) => {
         if (p.productosxcatalogo.length === 0) {
