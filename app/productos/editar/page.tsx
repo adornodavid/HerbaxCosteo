@@ -649,7 +649,7 @@ function EditarProductoContent() {
               <Label htmlFor="cliente" className="text-slate-700 font-medium">
                 Cliente *
               </Label>
-              <Select value={formData.clienteid.toString()} onValueChange={handleClienteChange}>
+              <Select value={formData.clienteid.toString()} onValueChange={handleClienteChange} disabled>
                 <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
                   <SelectValue placeholder="Selecciona un cliente" />
                 </SelectTrigger>
