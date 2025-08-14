@@ -36,6 +36,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
     - actualizarProductoEtapa1
+    - actualizarCostoProducto
   * DELETES-ELIMINAR (DELETES)
     - eliminarProducto / delProducto
     - eliminarFormulaDeProducto / delFormulaDeProducto
@@ -908,6 +909,36 @@ export async function eliminarProductoIncompleto(productoId: number) {
     return { success: true }
   } catch (error) {
     console.error("Error en eliminarProductoIncompleto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: actualizarCostoProducto: función para actualizar solo el costo de un producto
+export async function actualizarCostoProducto(productoId: number) {
+  try {
+    // Get the total cost of the product
+    const costoResult = await obtenerCostoTotalProducto(productoId)
+    if (!costoResult.success) {
+      return { success: false, error: "Error obteniendo costo total del producto" }
+    }
+
+    // Update productos table with the total cost
+    const { error: updateError } = await supabaseAdmin
+      .from("productos")
+      .update({
+        costo: costoResult.total,
+      })
+      .eq("id", productoId)
+
+    if (updateError) {
+      console.error("Error actualizando costo del producto:", updateError)
+      return { success: false, error: updateError.message }
+    }
+
+    revalidatePath("/productos")
+    return { success: true }
+  } catch (error) {
+    console.error("Error en actualizarCostoProducto:", error)
     return { success: false, error: "Error interno del servidor" }
   }
 }

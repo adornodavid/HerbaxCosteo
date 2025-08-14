@@ -45,6 +45,7 @@ import {
   obtenerIngredientesAgregados,
   eliminarIngredienteDeProducto,
   obtenerCostoTotalProducto,
+  actualizarCostoProducto, // Added import
 } from "@/app/actions/productos-actions"
 
 // Interfaces
@@ -405,13 +406,28 @@ function EditarProductoContent() {
     setShowUpdateConfirmModal(false)
     setShowSuccessAnimation(true)
 
-    setTimeout(() => {
-      setShowSuccessAnimation(false)
-      setCurrentStep(4)
+    try {
+      // Update product cost with total from formulas and ingredients
+      const result = await actualizarCostoProducto(Number.parseInt(productoId))
+
+      if (!result.success) {
+        alert("Error al actualizar el costo del producto: " + result.error)
+        setShowSuccessAnimation(false)
+        return
+      }
+
       setTimeout(() => {
-        router.push("/productos")
-      }, 2000)
-    }, 4000)
+        setShowSuccessAnimation(false)
+        setCurrentStep(4)
+        setTimeout(() => {
+          router.push("/productos")
+        }, 2000)
+      }, 4000)
+    } catch (error) {
+      console.error("Error actualizando producto:", error)
+      alert("Error al actualizar el producto")
+      setShowSuccessAnimation(false)
+    }
   }
 
   // Funciones para fórmulas
