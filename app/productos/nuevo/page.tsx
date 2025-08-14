@@ -1568,17 +1568,17 @@ export default function NuevoProducto() {
 
       <Alertdialog open={showValidationModal} onOpenChange={setShowValidationModal}>
         <AlertdialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Información Incompleta</DialogTitle>
-            <DialogDescription>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Información Incompleta</DialogTitle>
+            <AlertDialogDescription>
               No es posible avanzar hasta que no agregues por lo menos una fórmula o un ingrediente al producto.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
             <Button onClick={() => setShowValidationModal(false)}>Entendido</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
         <DialogContent className="sm:max-w-md">
