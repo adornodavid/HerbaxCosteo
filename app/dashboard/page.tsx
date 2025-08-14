@@ -56,6 +56,8 @@ export default function DashboardPage() {
       try {
         // Validar cookies de sesión del lado del cliente
         console.log("Sesion de user: ", user.SesionActiva)
+        
+        console.log("Sesion de email: ", user.Email)
         /*
         const sesionActiva = document.cookie
           .split("; ")
