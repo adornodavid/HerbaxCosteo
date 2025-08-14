@@ -821,7 +821,7 @@ export default function NuevoProducto() {
             <CollapsibleContent>
               <div className="p-6 pt-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
+                  <div className="space-y-2 col-span-2">
                     <Label htmlFor="modouso" className="text-slate-700 font-medium">
                       Modo de Uso
                     </Label>
