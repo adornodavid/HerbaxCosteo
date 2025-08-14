@@ -180,6 +180,14 @@ export default function ProductosPage() {
     try {
       const resultado = await obtenerProductosXFiltros(nombre, clienteId, catalogoId, estatus)
 
+      if (!resultado.success) {
+        console.error("Error en búsqueda:", resultado.error)
+        toast({
+          title: "Error",
+          description: "Error al buscar productos",
+          variant: "destructive",
+      }
+
       // Transformar datos de la consulta para manejar productos sin asociación
       const flattenedData = resultado.data.flatMap((p: any) => {
         if (p.productosxcatalogo.length === 0) {
@@ -222,7 +230,7 @@ export default function ProductosPage() {
       setProductos(uniqueProducts)
       setProductosFiltrados(uniqueProducts)
       setTotalProductos(uniqueProducts.length)
-      
+
       /*
       if (resultado.success) {
         setProductos(resultado.data || [])
