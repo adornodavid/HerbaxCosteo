@@ -7,7 +7,6 @@ import { createClient } from "@/lib/supabase"
   Conexion a la base de datos: Supabase
 ================================================== */
 
-
 /* ==================================================
   Funciones
   --------------------
@@ -169,6 +168,45 @@ export async function obtenerDetalleCatalogo(catalogoId: string) {
     console.error("Error en obtenerDetalleCatalogo:", error.message)
     return {
       catalogo: null,
+      error: error.message,
+    }
+  }
+}
+
+//Función: listaDesplegableCatalogos: función para obtener el listado de catalogos para dropdownlist con filtros opcionales
+export async function listaDesplegableCatalogos(id = -1, nombre = "", clienteid = -1) {
+  const supabase = createClient()
+
+  try {
+    let query = supabase.from("catalogos").select("id, nombre").eq("activo", true)
+
+    if (id > 0) {
+      query = query.eq("id", id)
+    }
+
+    if (nombre && nombre !== "" && nombre !== null) {
+      query = query.eq("nombre", nombre)
+    }
+
+    if (clienteid > 0) {
+      query = query.eq("clienteid", clienteid)
+    }
+
+    const { data, error } = await query.order("nombre", { ascending: true })
+
+    if (error) throw error
+
+    return {
+      data: (data || []).map((catalogo) => ({
+        id: catalogo.id,
+        nombre: catalogo.nombre,
+      })),
+      error: null,
+    }
+  } catch (error: any) {
+    console.error("Error en listaDesplegableCatalogos:", error.message)
+    return {
+      data: [],
       error: error.message,
     }
   }

@@ -40,6 +40,7 @@ import {
   obtenerIngredientesAsociadosProducto,
 } from "@/app/actions/productos-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
+import { listaDesplegableCatalogos } from "@/app/actions/catalogos-actions"
 
 // --- Interfaces ---
 interface DropdownItem {
@@ -305,19 +306,19 @@ export default function ProductosPage() {
       }
 
       // Cargar catálogos iniciales (todos, sin filtro de cliente al inicio)
-      const catalogosQuery = supabase.from("catalogos").select(`id, nombre`).eq("activo", true).order("nombre")
+      const clienteIdParamCatalogos = [1, 2, 3, 4].includes(Number(user.RolId)) ? -1 : Number(user.ClienteId)
 
-      const { data: catalogosData, error: catalogosError } = await catalogosQuery
+      const catalogosResult = await listaDesplegableCatalogos(-1, "", clienteIdParamCatalogos)
 
-      if (!catalogosError) {
+      if (!catalogosResult.error) {
         const catalogosConTodos = [
           { id: -1, nombre: "Todos" },
-          ...(catalogosData || []).map((m: any) => ({ id: m.id, nombre: m.nombre })),
+          ...(catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre })),
         ]
         setCatalogos(catalogosConTodos)
         setFiltroCatalogo("-1")
       } else {
-        console.error("Error cargando catálogos iniciales:", catalogosError)
+        console.error("Error cargando catálogos iniciales:", catalogosResult.error)
       }
 
       // Ejecutar búsqueda inicial con todos los filtros en -1
