@@ -394,7 +394,7 @@ export default function NuevoProducto() {
             console.log("modal establecido, retornando para impedir avance")
             return // Impedir avance a la siguiente etapa
           }
-          setShowValidationModal(true)
+          
           console.log("validacion pasada - avanzando a siguiente etapa")
           setCurrentStep((prev) => prev + 1)
         } catch (error) {
