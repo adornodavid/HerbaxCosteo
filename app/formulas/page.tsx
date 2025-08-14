@@ -97,7 +97,7 @@ export default function FormulasPage() {
   const router = useRouter()
 
   /* ==================================================
-    Estados
+    Estaods
   ================================================== */
   // Estados de sesión y carga
   const [sesion, setSesion] = useState<SessionData | null>(null)
