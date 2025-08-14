@@ -44,6 +44,16 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { useNavigationGuard } from "@/contexts/navigation-guard-context"
 
 interface FormData {
@@ -1556,8 +1566,8 @@ export default function NuevoProducto() {
         </div>
       </div>
 
-      <Dialog open={showValidationModal} onOpenChange={setShowValidationModal}>
-        <DialogContent className="sm:max-w-md">
+      <Alertdialog open={showValidationModal} onOpenChange={setShowValidationModal}>
+        <AlertdialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Información Incompleta</DialogTitle>
             <DialogDescription>
