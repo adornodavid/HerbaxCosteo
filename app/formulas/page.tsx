@@ -46,6 +46,7 @@ interface SessionData {
   RolId: string | null
   Permisos: string[] | null
   SesionActiva: boolean | null
+  ClienteId: string | null // Added ClienteId to SessionData
 }
 
 interface Cliente {
@@ -249,33 +250,47 @@ export default function FormulasPage() {
   }
 
   //Función: cargarFormulasIniciales: función para cargar el listado de formulas iniciales
-  const cargarFormulasIniciales = useCallback(async () => {
-    try {
-      if (!sesion) return
+  const cargarFormulasIniciales = useCallback(
+    async (ClienteId = -1) => {
+      try {
+        if (!sesion) return
 
-      const { data, error, totalCount } = await obtenerFormulas(currentPage, itemsPerPage)
+        let clienteIdParam = ClienteId
+        if (ClienteId === -1) {
+          const rolId = Number.parseInt(sesion.RolId?.toString() || "0", 10)
+          if ([1, 2, 3, 4].includes(rolId)) {
+            clienteIdParam = -1
+          } else {
+            const clienteIdFromCookies = Number.parseInt(sesion.ClienteId?.toString() || "0", 10)
+            clienteIdParam = clienteIdFromCookies
+          }
+        }
 
-      if (error) {
-        throw new Error(error)
+        const { data, error, totalCount } = await obtenerFormulas(currentPage, itemsPerPage, clienteIdParam)
+
+        if (error) {
+          throw new Error(error)
+        }
+
+        const formulasFormateadas = (data || []).map((formula: any) => ({
+          folio: formula.Folio,
+          formula: formula.Nombre,
+          costo: formula.Costo || 0,
+          notaspreparacion: formula.NotasPreparacion || "",
+          cliente: formula.Cliente || "N/A",
+          activo: formula.Activo,
+        }))
+
+        setFormulas(formulasFormateadas)
+        setTotalPages(Math.ceil(totalCount / itemsPerPage))
+      } catch (error) {
+        console.error("Error cargando fórmulas iniciales:", error)
+        setError("Error al cargar las fórmulas. Por favor, intente de nuevo.")
+        setFormulas([])
       }
-
-      const formulasFormateadas = (data || []).map((formula: any) => ({
-        folio: formula.Folio,
-        formula: formula.Nombre,
-        costo: formula.Costo || 0,
-        notaspreparacion: formula.NotasPreparacion || "",
-        cliente: formula.Cliente || "N/A",
-        activo: formula.Activo,
-      }))
-
-      setFormulas(formulasFormateadas)
-      setTotalPages(Math.ceil(totalCount / itemsPerPage))
-    } catch (error) {
-      console.error("Error cargando fórmulas iniciales:", error)
-      setError("Error al cargar las fórmulas. Por favor, intente de nuevo.")
-      setFormulas([])
-    }
-  }, [sesion, currentPage, ddlEstatusFormula])
+    },
+    [sesion, currentPage, ddlEstatusFormula],
+  )
 
   //Función: btnFormulaBuscar: función para cargar el listado de formulas de acuerdo a la busqueda
   const btnFormulaBuscar = async () => {
@@ -499,7 +514,7 @@ export default function FormulasPage() {
         <CardHeader>
           <CardTitle>Filtros de Búsqueda</CardTitle>
         </CardHeader>
-        <CardContent >
+        <CardContent>
           <form id="frmFormulasBuscar" name="frmFormulasBuscar" className="flex flex-wrap items-end gap-4">
             <div className="flex-1 min-w-[200px]">
               <Label htmlFor="txtFormulaNombre">Nombre</Label>

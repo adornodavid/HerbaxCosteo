@@ -138,7 +138,7 @@ export async function crearFormulaEtapa2(
 }
 
 //Función: obtenerFormulas: funcion para obtener todas las formulas
-export async function obtenerFormulas(page = 1, limit = 20) {
+export async function obtenerFormulas(page = 1, limit = 20, clienteid = -1) {
   const offset = (page - 1) * limit
   try {
     /*
@@ -153,9 +153,7 @@ export async function obtenerFormulas(page = 1, limit = 20) {
     */
 
     // Alternative using raw SQL if RPC doesn't work
-    const { data: rawData, error: rawError } = await supabase
-      .from("formulas")
-      .select(`
+    let supabaseQuery = supabase.from("formulas").select(`
         id,
         nombre,
         notaspreparacion,
@@ -175,7 +173,12 @@ export async function obtenerFormulas(page = 1, limit = 20) {
           )
         )
       `)
-      .range(offset, offset + limit - 1)
+
+    if (clienteid > 0) {
+      supabaseQuery = supabaseQuery.eq("ingredientesxformula.ingredientes.clienteid", clienteid)
+    }
+
+    const { data: rawData, error: rawError } = await supabaseQuery.range(offset, offset + limit - 1)
 
     if (rawError) {
       console.error("Error al obtener formulas:", rawError)
