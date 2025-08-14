@@ -331,7 +331,7 @@ export default function ProductosPage() {
 
         setClientes(clientesConTodos)
         
-        [1, 2, 3, 4].includes(rolId) ? setFiltroCliente("-1") : setFiltroCliente(clientesData.id.toString())
+        [1, 2, 3, 4].includes(Number(user.RolId)) ? setFiltroCliente("-1") : setFiltroCliente(clientesData.id.toString())
         //setFiltroCliente("-1")
       } else {
         console.error("Error cargando clientes:", clientesError)
