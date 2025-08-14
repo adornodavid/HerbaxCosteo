@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -30,6 +30,7 @@ import {
   getUnidadMedidaFormula,
   obtenerCostoTotalProducto,
   finalizarProducto,
+  eliminarProductoIncompleto,
 } from "@/app/actions/productos-actions"
 import Image from "next/image"
 
@@ -43,6 +44,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog"
+import { useNavigationGuard } from "@/contexts/navigation-guard-context"
 
 interface FormData {
   nombre: string
@@ -109,6 +111,8 @@ interface Ingrediente {
 export default function NuevoProducto() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { setGuard } = useNavigationGuard()
+  const resolveNavigationRef = useRef<((value: boolean) => void) | null>(null)
 
   // Estados para el formulario por etapas
   const [currentStep, setCurrentStep] = useState(1)
@@ -182,6 +186,8 @@ export default function NuevoProducto() {
   const [deleteIngredienteId, setDeleteIngredienteId] = useState<number | null>(null)
 
   const [showStep1ValidationModal, setShowStep1ValidationModal] = useState(false)
+  const [showExitConfirmModal, setShowExitConfirmModal] = useState(false)
+  const [nextPath, setNextPath] = useState("")
 
   const steps = [
     { number: 1, title: "Información Básica", description: "Datos generales del producto" },
@@ -1538,7 +1544,7 @@ export default function NuevoProducto() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2  2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
                   </div>
@@ -1597,6 +1603,64 @@ export default function NuevoProducto() {
       </div>
     </div>
   )
+
+  const handleLeavePage = useCallback(
+    async (confirm: boolean) => {
+      setShowExitConfirmModal(false)
+      if (confirm) {
+        if (productoId) {
+          await eliminarProductoIncompleto(productoId)
+        }
+        resolveNavigationRef.current?.(true) // Allow navigation
+      } else {
+        resolveNavigationRef.current?.(false) // Cancel navigation
+      }
+      resolveNavigationRef.current = null
+    },
+    [productoId],
+  )
+
+  const checkLeaveAndConfirm = useCallback(
+    async (targetPath: string): Promise<boolean> => {
+      if (currentStep >= 2 && currentStep <= 3 && productoId) {
+        return new Promise<boolean>((resolve) => {
+          resolveNavigationRef.current = resolve
+          setShowExitConfirmModal(true)
+          setNextPath(targetPath)
+        })
+      }
+      return true // Allow navigation if not in protected state
+    },
+    [currentStep, productoId],
+  )
+
+  useEffect(() => {
+    if (currentStep >= 2 && currentStep <= 3 && productoId) {
+      setGuard(checkLeaveAndConfirm)
+    } else {
+      setGuard(null)
+    }
+
+    return () => {
+      setGuard(null)
+    }
+  }, [currentStep, productoId, setGuard, checkLeaveAndConfirm])
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (currentStep >= 2 && currentStep <= 3 && productoId) {
+        e.preventDefault()
+        e.returnValue = ""
+        return ""
+      }
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [currentStep, productoId])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4">
@@ -1776,6 +1840,29 @@ export default function NuevoProducto() {
               Entendido
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showExitConfirmModal} onOpenChange={setShowExitConfirmModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-amber-600">
+              <AlertTriangle className="h-5 w-5" />
+              Confirmar Salida
+            </DialogTitle>
+            <DialogDescription className="text-gray-600">
+              Si sales del registro de producto, todos los datos ingresados se perderán y el registro será eliminado.
+              ¿Realmente deseas salir?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => handleLeavePage(false)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={() => handleLeavePage(true)} className="bg-red-500 hover:bg-red-600">
+              Sí, salir
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
