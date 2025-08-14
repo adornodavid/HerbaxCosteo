@@ -45,7 +45,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import {
+  AlertDialog,
   AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -392,6 +394,7 @@ export default function NuevoProducto() {
             console.log("modal establecido, retornando para impedir avance")
             return // Impedir avance a la siguiente etapa
           }
+          setShowValidationModal(true)
           console.log("validacion pasada - avanzando a siguiente etapa")
           setCurrentStep((prev) => prev + 1)
         } catch (error) {
@@ -857,180 +860,180 @@ export default function NuevoProducto() {
                       className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
                     />
                   </div>
-
-                  <div className="mt-6 space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="instruccionesingesta" className="text-slate-700 font-medium">
-                        Instrucciones de Ingesta
-                      </Label>
-                      <Textarea
-                        id="instruccionesingesta"
-                        value={formData.instruccionesingesta}
-                        onChange={(e) => handleInputChange("instruccionesingesta", e.target.value)}
-                        placeholder="Instrucciones de cómo tomar el producto..."
-                        rows={2}
-                        className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="advertencia" className="text-slate-700 font-medium">
-                        Advertencias
-                      </Label>
-                      <Textarea
-                        id="advertencia"
-                        value={formData.advertencia}
-                        onChange={(e) => handleInputChange("advertencia", e.target.value)}
-                        placeholder="Advertencias y contraindicaciones..."
-                        rows={2}
-                        className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="condicionesalmacenamiento" className="text-slate-700 font-medium">
-                        Condiciones de Almacenamiento
-                      </Label>
-                      <Textarea
-                        id="condicionesalmacenamiento"
-                        value={formData.condicionesalmacenamiento}
-                        onChange={(e) => handleInputChange("condicionesalmacenamiento", e.target.value)}
-                        placeholder="Condiciones de almacenamiento..."
-                        rows={2}
-                        className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
-                      />
-                    </div>
-                  </div>
                 </div>
-              </CollapsibleContent>
-            </div>
-          </Collapsible>
 
-          <Collapsible open={detallesOpen} onOpenChange={setDetallesOpen}>
-            <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs shadow-sm">
-              <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-slate-100/50 transition-colors rounded-xs">
-                <h3 className="text-lg font-semibold text-slate-700">Detalles Adicionales</h3>
-                {detallesOpen ? (
-                  <ChevronUp className="h-5 w-5 text-slate-500" />
-                ) : (
-                  <ChevronDown className="h-5 w-5 text-slate-500" />
-                )}
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="p-6 pt-0">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="vidaanaquelmeses" className="text-slate-700 font-medium">
-                        Vida de Anaquel (meses)
-                      </Label>
-                      <Input
-                        id="vidaanaquelmeses"
-                        type="number"
-                        min="0"
-                        value={formData.vidaanaquelmeses}
-                        onChange={(e) => handleInputChange("vidaanaquelmeses", Number.parseInt(e.target.value) || 0)}
-                        placeholder="0"
-                        className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-6 space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="propositoprincipal" className="text-slate-700 font-medium">
-                        Propósito Principal
-                      </Label>
-                      <Textarea
-                        id="propositoprincipal"
-                        value={formData.propositoprincipal}
-                        onChange={(e) => handleInputChange("propositoprincipal", e.target.value)}
-                        placeholder="Propósito principal del producto..."
-                        rows={2}
-                        className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="propuestavalor" className="text-slate-700 font-medium">
-                        Propuesta de Valor
-                      </Label>
-                      <Textarea
-                        id="propuestavalor"
-                        value={formData.propuestavalor}
-                        onChange={(e) => handleInputChange("propuestavalor", e.target.value)}
-                        placeholder="Propuesta de valor del producto..."
-                        rows={2}
-                        className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </CollapsibleContent>
-            </div>
-          </Collapsible>
-        </div>
-
-        {/* Right side - Image upload and preview */}
-        <div className="lg:col-span-1">
-          <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-4 shadow-sm h-full">
-            <div className="space-y-4">
-              <Label className="text-slate-700 font-medium">Imagen del Producto</Label>
-
-              {/* Image preview area */}
-              <div className="relative">
-                {imagePreview ? (
-                  <div className="relative group">
-                    <img
-                      src={imagePreview || "/placeholder.svg"}
-                      alt="Preview"
-                      className="w-full h-48 object-cover rounded-xl border-2 border-slate-200/60 shadow-sm"
+                <div className="mt-6 space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="instruccionesingesta" className="text-slate-700 font-medium">
+                      Instrucciones de Ingesta
+                    </Label>
+                    <Textarea
+                      id="instruccionesingesta"
+                      value={formData.instruccionesingesta}
+                      onChange={(e) => handleInputChange("instruccionesingesta", e.target.value)}
+                      placeholder="Instrucciones de cómo tomar el producto..."
+                      rows={2}
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
                     />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl flex items-center justify-center">
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="bg-white/90 hover:bg-white text-slate-700"
-                      >
-                        Cambiar imagen
-                      </Button>
-                    </div>
                   </div>
-                ) : (
-                  <div
-                    className="w-full h-48 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-sky-400 hover:bg-sky-50/50"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Upload className="h-8 w-8 text-slate-400 mb-2" />
-                    <p className="text-sm text-slate-500 text-center">
-                      Haz clic para subir
-                      <br />
-                      una imagen
-                    </p>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="advertencia" className="text-slate-700 font-medium">
+                      Advertencias
+                    </Label>
+                    <Textarea
+                      id="advertencia"
+                      value={formData.advertencia}
+                      onChange={(e) => handleInputChange("advertencia", e.target.value)}
+                      placeholder="Advertencias y contraindicaciones..."
+                      rows={2}
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+                    />
                   </div>
-                )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="condicionesalmacenamiento" className="text-slate-700 font-medium">
+                      Condiciones de Almacenamiento
+                    </Label>
+                    <Textarea
+                      id="condicionesalmacenamiento"
+                      value={formData.condicionesalmacenamiento}
+                      onChange={(e) => handleInputChange("condicionesalmacenamiento", e.target.value)}
+                      placeholder="Condiciones de almacenamiento..."
+                      rows={2}
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+                    />
+                  </div>
+                </div>
               </div>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full flex items-center gap-2 bg-white/80 backdrop-blur-sm border-slate-200/60 hover:border-sky-400 hover:bg-sky-50/50"
-              >
-                <Upload className="h-4 w-4" />
-                {formData.imagen ? "Cambiar Imagen" : "Subir Imagen"}
-              </Button>
+        <Collapsible open={detallesOpen} onOpenChange={setDetallesOpen}>
+          <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs shadow-sm">
+            <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-slate-100/50 transition-colors rounded-xs">
+              <h3 className="text-lg font-semibold text-slate-700">Detalles Adicionales</h3>
+              {detallesOpen ? (
+                <ChevronUp className="h-5 w-5 text-slate-500" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-slate-500" />
+              )}
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="p-6 pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="vidaanaquelmeses" className="text-slate-700 font-medium">
+                      Vida de Anaquel (meses)
+                    </Label>
+                    <Input
+                      id="vidaanaquelmeses"
+                      type="number"
+                      min="0"
+                      value={formData.vidaanaquelmeses}
+                      onChange={(e) => handleInputChange("vidaanaquelmeses", Number.parseInt(e.target.value) || 0)}
+                      placeholder="0"
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    />
+                  </div>
+                </div>
 
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                <div className="mt-6 space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="propositoprincipal" className="text-slate-700 font-medium">
+                      Propósito Principal
+                    </Label>
+                    <Textarea
+                      id="propositoprincipal"
+                      value={formData.propositoprincipal}
+                      onChange={(e) => handleInputChange("propositoprincipal", e.target.value)}
+                      placeholder="Propósito principal del producto..."
+                      rows={2}
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+                    />
+                  </div>
 
-              {formData.imagen && (
-                <Badge variant="secondary" className="flex items-center gap-1 w-fit">
-                  <FileImage className="h-3 w-3" />
-                  {formData.imagen.name}
-                </Badge>
+                  <div className="space-y-2">
+                    <Label htmlFor="propuestavalor" className="text-slate-700 font-medium">
+                      Propuesta de Valor
+                    </Label>
+                    <Textarea
+                      id="propuestavalor"
+                      value={formData.propuestavalor}
+                      onChange={(e) => handleInputChange("propuestavalor", e.target.value)}
+                      placeholder="Propuesta de valor del producto..."
+                      rows={2}
+                      className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
+      </div>
+
+      {/* Right side - Image upload and preview */}
+      <div className="lg:col-span-1">
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-4 shadow-sm h-full">
+          <div className="space-y-4">
+            <Label className="text-slate-700 font-medium">Imagen del Producto</Label>
+
+            {/* Image preview area */}
+            <div className="relative">
+              {imagePreview ? (
+                <div className="relative group">
+                  <img
+                    src={imagePreview || "/placeholder.svg"}
+                    alt="Preview"
+                    className="w-full h-48 object-cover rounded-xl border-2 border-slate-200/60 shadow-sm"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl flex items-center justify-center">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-white/90 hover:bg-white text-slate-700"
+                    >
+                      Cambiar imagen
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className="w-full h-48 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-sky-400 hover:bg-sky-50/50"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="h-8 w-8 text-slate-400 mb-2" />
+                  <p className="text-sm text-slate-500 text-center">
+                    Haz clic para subir
+                    <br />
+                    una imagen
+                  </p>
+                </div>
               )}
             </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full flex items-center gap-2 bg-white/80 backdrop-blur-sm border-slate-200/60 hover:border-sky-400 hover:bg-sky-50/50"
+            >
+              <Upload className="h-4 w-4" />
+              {formData.imagen ? "Cambiar Imagen" : "Subir Imagen"}
+            </Button>
+
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+
+            {formData.imagen && (
+              <Badge variant="secondary" className="flex items-center gap-1 w-fit">
+                <FileImage className="h-3 w-3" />
+                {formData.imagen.name}
+              </Badge>
+            )}
           </div>
         </div>
       </div>
@@ -1551,61 +1554,39 @@ export default function NuevoProducto() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2  2 0 00-2 2v12a2 2 0 002 2z"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2  2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
                   </div>
                   <p className="text-sm text-gray-500">Sin imagen</p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+     
+
+      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmar Registro</DialogTitle>
+            <DialogDescription>
+              ¿Estás seguro de que deseas registrar este producto? Una vez confirmado, el producto será creado en el
+              sistema.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowConfirmModal(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleConfirmedSubmit}>Sí, Registrar Producto</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
-  \
-    <AlertDialog open=
-  showValidationModal
-  onOpenChange =
-    { setShowValidationModal } >
-    (
-      <AlertDialogContent className="sm:max-w-md">
-        <AlertDialogHeader>
-          <AlertDialogTitle>Información Incompleta</AlertDialogTitle>
-          <AlertDialogDescription>
-            No es posible avanzar hasta que no agregues por lo menos una fórmula o un ingrediente al producto.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogAction onClick={() => setShowValidationModal(false)}>Entendido</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    )
-  </AlertDialog>
-    <Dialog open=
-  showConfirmModal
-  onOpenChange =
-    { setShowConfirmModal } >
-    (
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Confirmar Registro</DialogTitle>
-          <DialogDescription>
-            ¿Estás seguro de que deseas registrar este producto? Una vez confirmado, el producto será creado en el
-            sistema.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setShowConfirmModal(false)}>
-            Cancelar
-          </Button>
-          <Button onClick={handleConfirmedSubmit}>Sí, Registrar Producto</Button>
-        </DialogFooter>
-      </DialogContent>
-    )
-  </Dialog>
-  </div>
-)
+  )
 
   const renderStep4 = () => (
     <div className="text-center py-12">
@@ -1832,6 +1813,20 @@ export default function NuevoProducto() {
           </div>
         </div>
       )}
+
+      <AlertDialog open={showValidationModal} onOpenChange={setShowValidationModal}>
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Información Incompleta</AlertDialogTitle>
+            <AlertDialogDescription>
+              No es posible avanzar hasta que no agregues por lo menos una fórmula o un ingrediente al producto.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowValidationModal(false)}>Entendido</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={showStep1ValidationModal} onOpenChange={setShowStep1ValidationModal}>
         <DialogContent className="sm:max-w-md">
