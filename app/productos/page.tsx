@@ -33,12 +33,12 @@ import {
 } from "@/components/ui/dialog"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { Search, Eye, Edit, ToggleLeft, ToggleRight, Loader2, PlusCircle, RotateCcw } from "lucide-react"
-import { getProductoDetailsForModal } from "@/app/actions/productos-details-actions" // Importar la nueva acción
 import {
+  obtenerProductosXFiltros,
+  getProductoDetailsForModal,
   obtenerProductoDetalladoCompleto,
   obtenerFormulasAsociadasProducto,
   obtenerIngredientesAsociadosProducto,
-  obtenerProductos,
 } from "@/app/actions/productos-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos-actions"
@@ -266,13 +266,63 @@ export default function ProductosPage() {
     if (!user) return
 
     try {
-      // Cargar clientes
       const rolId = Number.parseInt(user.RolId?.toString() || "0", 10)
-      const clienteIdFromCookies = user.ClienteId?.toString() || "0"
+      const clienteIdParam = [1, 2, 3, 4].includes(rolId) ? -1 : Number.parseInt(user.ClienteId?.toString() || "-1", 10)
 
+      const productosResult = await obtenerProductosXFiltros("", clienteIdParam, -1, "true")
+
+      if (productosResult.success && productosResult.data) {
+        // Transformar datos de la consulta para manejar productos sin asociación
+        const flattenedData = productosResult.data.flatMap((p: any) => {
+          if (p.productosxcatalogo.length === 0) {
+            // Producto sin asociaciones, mostrarlo una vez
+            return {
+              ProductoId: p.id,
+              ProductoNombre: p.nombre,
+              ProductoDescripcion: p.descripcion,
+              ProductoTiempo: p.propositoprincipal,
+              ProductoCosto: p.costo,
+              ProductoActivo: p.activo,
+              ProductoImagenUrl: p.imgurl,
+              ClienteId: -1, // O algún valor que indique "N/A"
+              ClienteNombre: "N/A",
+              CatalogoId: -1, // O algún valor que indique "N/A"
+              CatalogoNombre: "N/A",
+            }
+          }
+          // Producto con asociaciones, aplanarlas
+          return p.productosxcatalogo.map((x: any) => ({
+            ProductoId: p.id,
+            ProductoNombre: p.nombre,
+            ProductoDescripcion: p.descripcion,
+            ProductoTiempo: p.propositoprincipal,
+            ProductoCosto: p.costo,
+            ProductoActivo: p.activo,
+            ProductoImagenUrl: p.imgurl,
+            ClienteId: x.catalogos?.clientes?.id || -1,
+            ClienteNombre: x.catalogos?.clientes?.nombre || "N/A",
+            CatalogoId: x.catalogos?.id || -1,
+            CatalogoNombre: x.catalogos?.nombre || "N/A",
+          }))
+        })
+
+        // Eliminar duplicados si un producto aparece varias veces debido a múltiples asociaciones
+        const uniqueProducts = Array.from(
+          new Map(flattenedData.map((item: ProductoListado) => [item.ProductoId, item])).values(),
+        )
+
+        setProductos(uniqueProducts)
+        setProductosFiltrados(uniqueProducts)
+        setTotalProductos(uniqueProducts.length)
+      }
+
+      // Cargar clientes
       const clienteIdParamCatalogos = [1, 2, 3, 4].includes(Number(user.RolId)) ? -1 : Number(user.ClienteId)
 
-      const { data: clientesData, error: clientesError } = await listaDesplegableClientes(clienteIdParamCatalogos.toString(), "")
+      const { data: clientesData, error: clientesError } = await listaDesplegableClientes(
+        clienteIdParamCatalogos.toString(),
+        "",
+      )
 
       if (!clientesError) {
         const clientesConTodos = [
@@ -298,11 +348,6 @@ export default function ProductosPage() {
       } else {
         console.error("Error cargando catálogos iniciales:", catalogosResult.error)
       }
-
-      // Ejecutar búsqueda inicial con todos los filtros en -1
-      // Determine clienteid parameter based on user role
-      const clienteIdParam = [1, 2, 3, 4].includes(user.RolId) ? -1 : Number.parseInt(user.ClienteId)
-      await ejecutarBusquedaProductos("", clienteIdParam, -1, "-1")
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error)
       toast.error("Error al cargar datos iniciales")
