@@ -48,6 +48,9 @@ export default function DashboardPage() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
 
+/* ================================================== 
+    Al cargar la pagina
+  ================================================== */
   useEffect(() => {
     const validarSeguridadYCargarDatos = async () => {
       try {
