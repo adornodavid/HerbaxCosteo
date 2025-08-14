@@ -655,7 +655,7 @@ export default function NuevoProducto() {
                 Cliente *
               </Label>
               <Select
-                value={formData.clienteid.toString() || ""}
+                value={formData.clienteid?.toString() || ""}
                 onValueChange={(value) => handleInputChange("clienteid", value ? Number.parseInt(value) : null)}
               >
                 <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
