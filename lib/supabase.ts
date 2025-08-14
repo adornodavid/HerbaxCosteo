@@ -1,6 +1,13 @@
-import { createClientComponentClient, createServerComponentClient } from "@supabase/auth-helpers-nextjs" // Importar createServerComponentClient
-import type { Database } from "@/lib/types-sistema-costeo" // Asegúrate de que esta ruta sea correcta
-import { cookies } from "next/headers"
+import { createClient as createSupabaseClient } from "@supabase/supabase-js"
+import type { Database } from "@/lib/types-sistema-costeo"
+
+// Verify environment variables are available
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error("Missing Supabase environment variables")
+}
 
 // Define the database schema types
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
@@ -47,13 +54,10 @@ export type Enums<PublicEnumNameOrOptions extends keyof PublicSchema["Enums"] | 
       ? PublicSchema["Enums"][PublicEnumNameOrOptions]
       : never
 
-// Client-side Supabase client
-export const createClient = () => createClientComponentClient<Database>()
+export const createClient = () => createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey)
 
-// Server-side Supabase client wrapper
-export const createServerSupabaseClientWrapper = () => {
-  return createServerComponentClient<Database>({ cookies })
-}
+// Server-side client (same as client-side in this setup)
+export const createServerClient = () => createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey)
 
 // Instancia principal de Supabase (para uso en cliente)
 export const supabase = createClient()
