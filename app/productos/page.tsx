@@ -825,7 +825,7 @@ export default function ProductosPage() {
                     <img
                       src={selectedProductoCompleto.imgurl || "/placeholder.svg"}
                       alt={selectedProductoCompleto.nombre}
-                      className="w-full h-64 object-cover rounded-lg shadow-md"
+                      className="w-full h-64 object-cover rounded-xs shadow-md"
                     />
                   )}
                   <div className="bg-gray-50 p-4 rounded-lg">
@@ -846,7 +846,7 @@ export default function ProductosPage() {
                 {/* Información detallada */}
                 <div className="space-y-4">
                   {/* Porciones */}
-                  <div className="bg-blue-50 p-4 rounded-lg">
+                  <div className="bg-blue-50 p-4 rounded-xs">
                     <h4 className="font-semibold text-blue-800 mb-2">Información de Porciones</h4>
                     <div className="grid grid-cols-1 gap-1 text-sm">
                       <p>
@@ -864,7 +864,7 @@ export default function ProductosPage() {
                   </div>
 
                   {/* Modo de Uso */}
-                  <div className="bg-green-50 p-4 rounded-lg">
+                  <div className="bg-green-50 p-4 rounded-xs">
                     <h4 className="font-semibold text-green-800 mb-2">Modo de Uso</h4>
                     <div className="grid grid-cols-1 gap-1 text-sm">
                       <p>
@@ -894,7 +894,7 @@ export default function ProductosPage() {
                   </div>
 
                   {/* Detalles Adicionales */}
-                  <div className="bg-purple-50 p-4 rounded-lg">
+                  <div className="bg-purple-50 p-4 rounded-xs">
                     <h4 className="font-semibold text-purple-800 mb-2">Detalles Adicionales</h4>
                     <div className="grid grid-cols-1 gap-1 text-sm">
                       <p>
