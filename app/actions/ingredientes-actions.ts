@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase"
 /* ==================================================
   Conexion a la base de datos: Supabase
 ================================================== */
+const supabase = createClient()
 
 /* ==================================================
   Funciones
@@ -27,8 +28,6 @@ import { createClient } from "@/lib/supabase"
 
 //Función: crearIngrediente: funcion para crear un ingrediente
 export async function crearIngrediente(ingredienteData: any) {
-  const supabase = createClient()
-
   try {
     const { data, error } = await supabase.from("ingredientes").insert(ingredienteData).select()
 
@@ -46,61 +45,81 @@ export async function crearIngrediente(ingredienteData: any) {
 
 //Función: obtenerIngredientes: funcion para obtener todos los ingredientes
 export async function obtenerIngredientes(rolId: number, clienteId = -1) {
-  const supabase = createClient()
-
   try {
-    let query: string
+    // First get ingredientes with basic info
+    let ingredientesQuery = supabase.from("ingredientes").select(`
+      id,
+      codigo,
+      nombre,
+      costo,
+      activo,
+      clienteid,
+      categoriaid,
+      unidadmedidaid,
+      categoriasingredientes!inner(descripcion),
+      tipounidadesmedida!inner(descripcion)
+    `)
 
-    if ([1, 2, 3].includes(rolId)) {
-      // Para roles 1, 2, 3 - mostrar todos los ingredientes
-      query = `
-        select 
-          a.id as Folio,
-          a.codigo, 
-          a.nombre, 
-          e.nombre as Cliente, 
-          d.nombre as Catalogo, 
-          b.descripcion as categoria, 
-          c.descripcion as UnidadMedida,
-          a.costo, 
-          a.activo 
-        from ingredientes a
-        inner join categoriasingredientes b on a.categoriaid = b.id
-        inner join tipounidadesmedida c on a.unidadmedidaid = c.id
-        inner join catalogos d on a.clienteid = d.clienteid
-        inner join clientes e on a.clienteid = e.id
-        where (e.id = -1 or -1 = -1) and (d.id = -1 or -1 = -1)
-      `
-    } else {
-      // Para otros roles - filtrar por cliente específico
-      query = `
-        select 
-          a.id as Folio,
-          a.codigo, 
-          a.nombre, 
-          e.nombre as Cliente, 
-          d.nombre as Catalogo, 
-          b.descripcion as categoria, 
-          c.descripcion as UnidadMedida,
-          a.costo, 
-          a.activo 
-        from ingredientes a
-        inner join categoriasingredientes b on a.categoriaid = b.id
-        inner join tipounidadesmedida c on a.unidadmedidaid = c.id
-        inner join catalogos d on a.clienteid = d.clienteid
-        inner join clientes e on a.clienteid = e.id
-        where e.id = ${clienteId} and d.id = ${clienteId}
-      `
+    // Apply role-based filtering
+    if (![1, 2, 3].includes(rolId) && clienteId > 0) {
+      ingredientesQuery = ingredientesQuery.eq("clienteid", clienteId)
     }
 
-    const { data, error } = await supabase.rpc("execute_sql", { query })
+    const { data: ingredientesData, error: ingredientesError } = await ingredientesQuery
 
-    if (error) {
-      console.error("Error obteniendo ingredientes:", error)
-      return { data: null, error: error.message }
+    if (ingredientesError) {
+      console.error("Error obteniendo ingredientes:", ingredientesError)
+      return { data: null, error: ingredientesError.message }
     }
 
-    return { data: data || [], error: null }
+    if (!ingredientesData || ingredientesData.length === 0) {
+      return { data: [], error: null }
+    }
+
+    // Get unique client IDs to fetch client and catalog info
+    const clienteIds = [...new Set(ingredientesData.map((item) => item.clienteid))]
+
+    // Get clients info
+    const { data: clientesData, error: clientesError } = await supabase
+      .from("clientes")
+      .select("id, nombre")
+      .in("id", clienteIds)
+
+    if (clientesError) {
+      console.error("Error obteniendo clientes:", clientesError)
+      return { data: null, error: clientesError.message }
+    }
+
+    // Get catalogs info
+    const { data: catalogosData, error: catalogosError } = await supabase
+      .from("catalogos")
+      .select("id, nombre, clienteid")
+      .in("clienteid", clienteIds)
+
+    if (catalogosError) {
+      console.error("Error obteniendo catálogos:", catalogosError)
+      return { data: null, error: catalogosError.message }
+    }
+
+    // Transform data to match expected structure
+    const transformedData = ingredientesData.map((ingrediente: any) => {
+      const cliente = clientesData?.find((c) => c.id === ingrediente.clienteid)
+      const catalogo = catalogosData?.find((cat) => cat.clienteid === ingrediente.clienteid)
+
+      return {
+        Folio: ingrediente.id,
+        codigo: ingrediente.codigo,
+        nombre: ingrediente.nombre,
+        Cliente: cliente?.nombre || "N/A",
+        Catalogo: catalogo?.nombre || "N/A",
+        categoria: ingrediente.categoriasingredientes?.descripcion || "N/A",
+        UnidadMedida: ingrediente.tipounidadesmedida?.descripcion || "N/A",
+        costo: ingrediente.costo,
+        activo: ingrediente.activo,
+      }
+    })
+
+    return { data: transformedData, error: null }
   } catch (error: any) {
     console.error("Error en obtenerIngredientes:", error)
     return { data: null, error: error.message }
@@ -109,63 +128,86 @@ export async function obtenerIngredientes(rolId: number, clienteId = -1) {
 
 //Función: obtenerIngredientesPorFiltros: funcion para obtener todos los ingredientes por el filtrado
 export async function obtenerIngredientesPorFiltros(nombre = "", clienteId = -1, estatus = true) {
-  const supabase = createClient()
-
   try {
-    const whereConditions = []
+    let query = supabase.from("ingredientes").select(`
+      id,
+      codigo,
+      nombre,
+      costo,
+      activo,
+      clienteid,
+      categoriaid,
+      unidadmedidaid,
+      categoriasingredientes!inner(descripcion),
+      tipounidadesmedida!inner(descripcion)
+    `)
 
-    // Filtro por nombre
+    // Apply filters conditionally
     if (nombre && nombre.trim() !== "") {
-      whereConditions.push(`a.nombre ILIKE '%${nombre.trim()}%'`)
+      query = query.ilike("nombre", `%${nombre.trim()}%`)
     }
 
-    // Filtro por cliente
     if (clienteId > 0) {
-      whereConditions.push(`e.id = ${clienteId}`)
-    } else {
-      whereConditions.push(`(e.id = ${clienteId} or ${clienteId} = -1)`)
+      query = query.eq("clienteid", clienteId)
     }
 
-    // Filtro por catálogo (usando el mismo clienteId)
-    if (clienteId > 0) {
-      whereConditions.push(`d.id = ${clienteId}`)
-    } else {
-      whereConditions.push(`(d.id = ${clienteId} or ${clienteId} = -1)`)
+    query = query.eq("activo", estatus).order("nombre")
+
+    const { data: ingredientesData, error: ingredientesError } = await query
+
+    if (ingredientesError) {
+      console.error("Error obteniendo ingredientes por filtros:", ingredientesError)
+      return { data: null, error: ingredientesError.message }
     }
 
-    // Filtro por estatus
-    whereConditions.push(`a.activo = ${estatus}`)
-
-    const whereClause = whereConditions.length > 0 ? `where ${whereConditions.join(" and ")}` : ""
-
-    const query = `
-      select 
-        a.id as Folio,
-        a.codigo, 
-        a.nombre, 
-        e.nombre as Cliente, 
-        d.nombre as Catalogo, 
-        b.descripcion as categoria, 
-        c.descripcion as UnidadMedida,
-        a.costo, 
-        a.activo 
-      from ingredientes a
-      inner join categoriasingredientes b on a.categoriaid = b.id
-      inner join tipounidadesmedida c on a.unidadmedidaid = c.id
-      inner join catalogos d on a.clienteid = d.clienteid
-      inner join clientes e on a.clienteid = e.id
-      ${whereClause}
-      order by a.nombre
-    `
-
-    const { data, error } = await supabase.rpc("execute_sql", { query })
-
-    if (error) {
-      console.error("Error obteniendo ingredientes por filtros:", error)
-      return { data: null, error: error.message }
+    if (!ingredientesData || ingredientesData.length === 0) {
+      return { data: [], error: null }
     }
 
-    return { data: data || [], error: null }
+    // Get unique client IDs to fetch client and catalog info
+    const clienteIds = [...new Set(ingredientesData.map((item) => item.clienteid))]
+
+    // Get clients info
+    const { data: clientesData, error: clientesError } = await supabase
+      .from("clientes")
+      .select("id, nombre")
+      .in("id", clienteIds)
+
+    if (clientesError) {
+      console.error("Error obteniendo clientes:", clientesError)
+      return { data: null, error: clientesError.message }
+    }
+
+    // Get catalogs info
+    const { data: catalogosData, error: catalogosError } = await supabase
+      .from("catalogos")
+      .select("id, nombre, clienteid")
+      .in("clienteid", clienteIds)
+
+    if (catalogosError) {
+      console.error("Error obteniendo catálogos:", catalogosError)
+      return { data: null, error: catalogosError.message }
+    }
+
+    // Transform data to match expected structure
+    const transformedData = ingredientesData.map((ingrediente: any) => {
+      const cliente = clientesData?.find((c) => c.id === ingrediente.clienteid)
+      const catalogo = catalogosData?.find((cat) => cat.clienteid === ingrediente.clienteid)
+
+      return {
+        Folio: ingrediente.id,
+        codigo: ingrediente.codigo,
+        nombre: ingrediente.nombre,
+        Cliente: cliente?.nombre || "N/A",
+        Catalogo: catalogo?.nombre || "N/A",
+        categoria: ingrediente.categoriasingredientes?.descripcion || "N/A",
+        UnidadMedida: ingrediente.tipounidadesmedida?.descripcion || "N/A",
+        costo: ingrediente.costo,
+        activo: ingrediente.activo,
+      }
+    })
+
+    return { data: transformedData, error: null }
   } catch (error: any) {
     console.error("Error en obtenerIngredientesPorFiltros:", error)
     return { data: null, error: error.message }
@@ -174,8 +216,6 @@ export async function obtenerIngredientesPorFiltros(nombre = "", clienteId = -1,
 
 //Función: obtenerIngredientePorId: funcion para obtener el ingrediente por Id del ingrediente
 export async function obtenerIngredientePorId(ingredienteId: number) {
-  const supabase = createClient()
-
   try {
     const { data, error } = await supabase.from("ingredientes").select("*").eq("id", ingredienteId).single()
 
@@ -193,8 +233,6 @@ export async function obtenerIngredientePorId(ingredienteId: number) {
 
 //Función: actualizarIngrediente: funcion para actualizar la información de un ingrediente por Id del ingrediente
 export async function actualizarIngrediente(ingredienteId: number, ingredienteData: any) {
-  const supabase = createClient()
-
   try {
     const { data, error } = await supabase.from("ingredientes").update(ingredienteData).eq("id", ingredienteId).select()
 
@@ -212,8 +250,6 @@ export async function actualizarIngrediente(ingredienteId: number, ingredienteDa
 
 //Función: eliminarIngrediente: funcion para eliminar la información de un ingrediente por Id del ingrediente
 export async function eliminarIngrediente(ingredienteId: number) {
-  const supabase = createClient()
-
   try {
     const { error } = await supabase.from("ingredientes").delete().eq("id", ingredienteId)
 
@@ -231,8 +267,6 @@ export async function eliminarIngrediente(ingredienteId: number) {
 
 // Función: estatusActivoIngrediente: función para cambiar el estatus de un ingrediente por Id del ingrediente
 export async function estatusActivoIngrediente(ingredienteId: number, estadoActual: boolean) {
-  const supabase = createClient()
-
   try {
     const nuevoEstado = !estadoActual
 
@@ -252,8 +286,6 @@ export async function estatusActivoIngrediente(ingredienteId: number, estadoActu
 
 //Función: estadisticasIngredientesTotales: función para obtener estadísticas totales de ingredientes
 export async function estadisticasIngredientesTotales() {
-  const supabase = createClient()
-
   try {
     const { count, error } = await supabase.from("ingredientes").select("*", { count: "exact", head: true })
 
@@ -271,8 +303,6 @@ export async function estadisticasIngredientesTotales() {
 
 //Función: listaDesplegableIngredientes: funcion para obtener todos los ingredientes para el input dropdownlist
 export async function listaDesplegableIngredientes(clienteId = "-1", nombre = "") {
-  const supabase = createClient()
-
   try {
     let query = supabase.from("ingredientes").select("id, nombre").eq("activo", true)
 
