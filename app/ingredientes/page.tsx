@@ -29,6 +29,9 @@ import {
   obtenerIngredientesPorFiltros,
   estatusActivoIngrediente,
   estadisticasIngredientesTotales,
+  obtenerDetalleIngrediente,
+  obtenerFormulasQueUsanIngrediente,
+  obtenerProductosRelacionadosIngrediente,
 } from "@/app/actions/ingredientes-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 
@@ -61,6 +64,34 @@ interface Ingrediente {
   UnidadMedida: string
   costo: number
   activo: boolean
+}
+
+interface DetalleIngrediente {
+  Folio: number
+  codigo: string
+  nombre: string
+  Cliente: string
+  Catalogo: string
+  categoria: string
+  UnidadMedida: string
+  costo: number
+  activo: boolean
+  categoriaid: number
+}
+
+interface FormulaIngrediente {
+  imgurl: string | null
+  Formula: string
+  cantidad: number
+  ingredientecostoparcial: number
+}
+
+interface ProductoIngrediente {
+  imgurl: string | null
+  Producto: string
+  Cliente?: string
+  cantidad: number
+  costoparcial: number
 }
 
 /* ==================================================
@@ -102,6 +133,14 @@ export default function IngredientesPage() {
   const [errorDialog, setErrorDialog] = useState({
     open: false,
     message: "",
+  })
+
+  const [detailsModal, setDetailsModal] = useState({
+    open: false,
+    loading: false,
+    ingrediente: null as DetalleIngrediente | null,
+    formulas: [] as FormulaIngrediente[],
+    productos: [] as ProductoIngrediente[],
   })
 
   /* ==================================================
@@ -321,8 +360,36 @@ export default function IngredientesPage() {
 
   //Función: handleViewIngredienteDetails: función para ver la informacion de un ingrediente en un modal
   const handleViewIngredienteDetails = async (ingredienteId: number) => {
-    // Placeholder para funcionalidad futura
-    toast.success("Funcionalidad de detalles pendiente de implementación")
+    try {
+      setDetailsModal((prev) => ({ ...prev, open: true, loading: true }))
+
+      // Get ingredient details
+      const { data: ingredienteData, error: ingredienteError } = await obtenerDetalleIngrediente(ingredienteId)
+      if (ingredienteError) throw new Error(ingredienteError)
+
+      // Get formulas that use this ingredient
+      const { data: formulasData, error: formulasError } = await obtenerFormulasQueUsanIngrediente(ingredienteId)
+      if (formulasError) throw new Error(formulasError)
+
+      // Get products related to this ingredient
+      const { data: productosData, error: productosError } = await obtenerProductosRelacionadosIngrediente(
+        ingredienteId,
+        ingredienteData?.categoriaid || 0,
+      )
+      if (productosError) throw new Error(productosError)
+
+      setDetailsModal({
+        open: true,
+        loading: false,
+        ingrediente: ingredienteData,
+        formulas: formulasData || [],
+        productos: productosData || [],
+      })
+    } catch (error: any) {
+      console.error("Error cargando detalles del ingrediente:", error)
+      setDetailsModal((prev) => ({ ...prev, loading: false }))
+      toast.error("Error al cargar los detalles del ingrediente")
+    }
   }
 
   if (loading) {
@@ -549,6 +616,174 @@ export default function IngredientesPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Modal de Detalles del Ingrediente */}
+      <Dialog open={detailsModal.open} onOpenChange={(open) => setDetailsModal((prev) => ({ ...prev, open }))}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Detalles del Ingrediente</DialogTitle>
+            <DialogDescription>Información completa del ingrediente seleccionado</DialogDescription>
+          </DialogHeader>
+
+          {detailsModal.loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin" />
+              <span className="ml-2">Cargando detalles...</span>
+            </div>
+          ) : detailsModal.ingrediente ? (
+            <div className="space-y-6">
+              {/* Información Básica */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Información Básica</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium">Folio:</span> {detailsModal.ingrediente.Folio}
+                    </div>
+                    <div>
+                      <span className="font-medium">Código:</span> {detailsModal.ingrediente.codigo}
+                    </div>
+                    <div>
+                      <span className="font-medium">Nombre:</span> {detailsModal.ingrediente.nombre}
+                    </div>
+                    <div>
+                      <span className="font-medium">Cliente:</span> {detailsModal.ingrediente.Cliente}
+                    </div>
+                    <div>
+                      <span className="font-medium">Catálogo:</span> {detailsModal.ingrediente.Catalogo}
+                    </div>
+                    <div>
+                      <span className="font-medium">Categoría:</span> {detailsModal.ingrediente.categoria}
+                    </div>
+                    <div>
+                      <span className="font-medium">Unidad Medida:</span> {detailsModal.ingrediente.UnidadMedida}
+                    </div>
+                    <div>
+                      <span className="font-medium">Costo:</span> ${detailsModal.ingrediente.costo.toFixed(2)}
+                    </div>
+                    <div>
+                      <span className="font-medium">Estado:</span>
+                      <span
+                        className={`ml-1 px-2 py-1 rounded text-xs ${
+                          detailsModal.ingrediente.activo ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {detailsModal.ingrediente.activo ? "Activo" : "Inactivo"}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Fórmulas que usan este ingrediente */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Fórmulas que usan este ingrediente</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {detailsModal.formulas.length > 0 ? (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Imagen</TableHead>
+                          <TableHead>Fórmula</TableHead>
+                          <TableHead>Cantidad</TableHead>
+                          <TableHead>Costo Parcial</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {detailsModal.formulas.map((formula, index) => (
+                          <TableRow key={index}>
+                            <TableCell>
+                              {formula.imgurl ? (
+                                <Image
+                                  src={formula.imgurl || "/placeholder.svg"}
+                                  alt={formula.Formula}
+                                  width={40}
+                                  height={40}
+                                  className="rounded object-cover"
+                                />
+                              ) : (
+                                <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
+                                  <Package className="h-4 w-4 text-gray-400" />
+                                </div>
+                              )}
+                            </TableCell>
+                            <TableCell>{formula.Formula}</TableCell>
+                            <TableCell>{formula.cantidad}</TableCell>
+                            <TableCell>${formula.ingredientecostoparcial.toFixed(2)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <p className="text-muted-foreground text-center py-4">No hay fórmulas que usen este ingrediente</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Productos relacionados */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Productos relacionados</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {detailsModal.productos.length > 0 ? (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Imagen</TableHead>
+                          <TableHead>Producto</TableHead>
+                          {detailsModal.ingrediente.categoriaid === 3 && <TableHead>Cliente</TableHead>}
+                          <TableHead>Cantidad</TableHead>
+                          <TableHead>Costo Parcial</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {detailsModal.productos.map((producto, index) => (
+                          <TableRow key={index}>
+                            <TableCell>
+                              {producto.imgurl ? (
+                                <Image
+                                  src={producto.imgurl || "/placeholder.svg"}
+                                  alt={producto.Producto}
+                                  width={40}
+                                  height={40}
+                                  className="rounded object-cover"
+                                />
+                              ) : (
+                                <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
+                                  <Package className="h-4 w-4 text-gray-400" />
+                                </div>
+                              )}
+                            </TableCell>
+                            <TableCell>{producto.Producto}</TableCell>
+                            {detailsModal.ingrediente.categoriaid === 3 && (
+                              <TableCell>{producto.Cliente || "N/A"}</TableCell>
+                            )}
+                            <TableCell>{producto.cantidad}</TableCell>
+                            <TableCell>${producto.costoparcial.toFixed(2)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <p className="text-muted-foreground text-center py-4">
+                      No hay productos relacionados con este ingrediente
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          ) : null}
+
+          <DialogFooter>
+            <Button onClick={() => setDetailsModal((prev) => ({ ...prev, open: false }))}>Cerrar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Confirmation Dialog */}
       <Dialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>

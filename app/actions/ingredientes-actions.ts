@@ -17,6 +17,9 @@ const supabase = createClient()
     - obtenerIngredientes / selIngredientes
     - obtenerIngredientesPorFiltros / selIngredientesXFiltros
     - obtenerIngredientePorId / selIngredienteXId
+    - obtenerDetalleIngrediente / selDetalleIngrediente
+    - obtenerFormulasQueUsanIngrediente / selFormulasXIngrediente
+    - obtenerProductosRelacionadosIngrediente / selProductosXIngrediente
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarIngrediente / updIngrediente
   * DELETES-ELIMINAR (DELETES)
@@ -227,6 +230,258 @@ export async function obtenerIngredientePorId(ingredienteId: number) {
     return { data, error: null }
   } catch (error: any) {
     console.error("Error en obtenerIngredientePorId:", error)
+    return { data: null, error: error.message }
+  }
+}
+
+//Función: obtenerDetalleIngrediente: función para obtener información detallada del ingrediente
+export async function obtenerDetalleIngrediente(ingredienteId: number) {
+  try {
+    // Get ingredient with related data
+    const { data: ingredienteData, error: ingredienteError } = await supabase
+      .from("ingredientes")
+      .select(`
+        id,
+        codigo,
+        nombre,
+        costo,
+        activo,
+        clienteid,
+        categoriaid,
+        unidadmedidaid
+      `)
+      .eq("id", ingredienteId)
+      .single()
+
+    if (ingredienteError) {
+      console.error("Error obteniendo ingrediente:", ingredienteError)
+      return { data: null, error: ingredienteError.message }
+    }
+
+    // Get categoria info
+    const { data: categoriaData, error: categoriaError } = await supabase
+      .from("categoriasingredientes")
+      .select("descripcion")
+      .eq("id", ingredienteData.categoriaid)
+      .single()
+
+    // Get unidad medida info
+    const { data: unidadData, error: unidadError } = await supabase
+      .from("tipounidadesmedida")
+      .select("descripcion")
+      .eq("id", ingredienteData.unidadmedidaid)
+      .single()
+
+    // Get cliente info
+    const { data: clienteData, error: clienteError } = await supabase
+      .from("clientes")
+      .select("nombre")
+      .eq("id", ingredienteData.clienteid)
+      .single()
+
+    // Get catalogo info
+    const { data: catalogoData, error: catalogoError } = await supabase
+      .from("catalogos")
+      .select("nombre")
+      .eq("clienteid", ingredienteData.clienteid)
+      .single()
+
+    // Transform data to match expected structure
+    const detalleIngrediente = {
+      Folio: ingredienteData.id,
+      codigo: ingredienteData.codigo,
+      nombre: ingredienteData.nombre,
+      Cliente: clienteData?.nombre || "N/A",
+      Catalogo: catalogoData?.nombre || "N/A",
+      categoria: categoriaData?.descripcion || "N/A",
+      UnidadMedida: unidadData?.descripcion || "N/A",
+      costo: ingredienteData.costo,
+      activo: ingredienteData.activo,
+      categoriaid: ingredienteData.categoriaid,
+    }
+
+    return { data: detalleIngrediente, error: null }
+  } catch (error: any) {
+    console.error("Error en obtenerDetalleIngrediente:", error)
+    return { data: null, error: error.message }
+  }
+}
+
+//Función: obtenerFormulasQueUsanIngrediente: función para obtener fórmulas que usan este ingrediente
+export async function obtenerFormulasQueUsanIngrediente(ingredienteId: number) {
+  try {
+    // Get ingredientesxformula records for this ingredient
+    const { data: ingredientesFormulasData, error: ingredientesFormulasError } = await supabase
+      .from("ingredientesxformula")
+      .select("formulaid, cantidad, ingredientecostoparcial")
+      .eq("ingredienteid", ingredienteId)
+
+    if (ingredientesFormulasError) {
+      console.error("Error obteniendo ingredientes x formula:", ingredientesFormulasError)
+      return { data: null, error: ingredientesFormulasError.message }
+    }
+
+    if (!ingredientesFormulasData || ingredientesFormulasData.length === 0) {
+      return { data: [], error: null }
+    }
+
+    // Get formula IDs
+    const formulaIds = ingredientesFormulasData.map((item) => item.formulaid)
+
+    // Get formulas info
+    const { data: formulasData, error: formulasError } = await supabase
+      .from("formulas")
+      .select("id, nombre, imgurl")
+      .in("id", formulaIds)
+
+    if (formulasError) {
+      console.error("Error obteniendo fórmulas:", formulasError)
+      return { data: null, error: formulasError.message }
+    }
+
+    // Combine data
+    const formulasConIngrediente = ingredientesFormulasData.map((item) => {
+      const formula = formulasData?.find((f) => f.id === item.formulaid)
+      return {
+        imgurl: formula?.imgurl || null,
+        Formula: formula?.nombre || "N/A",
+        cantidad: item.cantidad,
+        ingredientecostoparcial: item.ingredientecostoparcial,
+      }
+    })
+
+    return { data: formulasConIngrediente, error: null }
+  } catch (error: any) {
+    console.error("Error en obtenerFormulasQueUsanIngrediente:", error)
+    return { data: null, error: error.message }
+  }
+}
+
+//Función: obtenerProductosRelacionadosIngrediente: función para obtener productos relacionados a este ingrediente
+export async function obtenerProductosRelacionadosIngrediente(ingredienteId: number, categoriaId: number) {
+  try {
+    let productosData = []
+
+    if (categoriaId !== 3) {
+      // Query for categoriaid <> 3
+      // First get ingredientesxformula
+      const { data: ingredientesFormulasData, error: ingredientesFormulasError } = await supabase
+        .from("ingredientesxformula")
+        .select("formulaid")
+        .eq("ingredienteid", ingredienteId)
+
+      if (ingredientesFormulasError) {
+        console.error("Error obteniendo ingredientes x formula:", ingredientesFormulasError)
+        return { data: null, error: ingredientesFormulasError.message }
+      }
+
+      if (!ingredientesFormulasData || ingredientesFormulasData.length === 0) {
+        return { data: [], error: null }
+      }
+
+      const formulaIds = ingredientesFormulasData.map((item) => item.formulaid)
+
+      // Get productosdetalles for these formulas
+      const { data: productosDetallesData, error: productosDetallesError } = await supabase
+        .from("productosdetalles")
+        .select("productoid, cantidad, costoparcial")
+        .in("elementoid", formulaIds)
+        .eq("tiposegmentoid", 1)
+
+      if (productosDetallesError) {
+        console.error("Error obteniendo productos detalles:", productosDetallesError)
+        return { data: null, error: productosDetallesError.message }
+      }
+
+      if (!productosDetallesData || productosDetallesData.length === 0) {
+        return { data: [], error: null }
+      }
+
+      const productoIds = productosDetallesData.map((item) => item.productoid)
+
+      // Get productos info
+      const { data: productosInfo, error: productosError } = await supabase
+        .from("productos")
+        .select("id, nombre, imgurl")
+        .in("id", productoIds)
+
+      if (productosError) {
+        console.error("Error obteniendo productos:", productosError)
+        return { data: null, error: productosError.message }
+      }
+
+      // Combine data
+      productosData = productosDetallesData.map((item) => {
+        const producto = productosInfo?.find((p) => p.id === item.productoid)
+        return {
+          imgurl: producto?.imgurl || null,
+          Producto: producto?.nombre || "N/A",
+          cantidad: item.cantidad,
+          costoparcial: item.costoparcial,
+        }
+      })
+    } else {
+      // Query for categoriaid = 3
+      // Get productosdetalles directly
+      const { data: productosDetallesData, error: productosDetallesError } = await supabase
+        .from("productosdetalles")
+        .select("productoid, cantidad, costoparcial")
+        .eq("elementoid", ingredienteId)
+        .eq("tiposegmentoid", 2)
+
+      if (productosDetallesError) {
+        console.error("Error obteniendo productos detalles:", productosDetallesError)
+        return { data: null, error: productosDetallesError.message }
+      }
+
+      if (!productosDetallesData || productosDetallesData.length === 0) {
+        return { data: [], error: null }
+      }
+
+      const productoIds = productosDetallesData.map((item) => item.productoid)
+
+      // Get productos info
+      const { data: productosInfo, error: productosError } = await supabase
+        .from("productos")
+        .select("id, nombre, imgurl, clienteid")
+        .in("id", productoIds)
+
+      if (productosError) {
+        console.error("Error obteniendo productos:", productosError)
+        return { data: null, error: productosError.message }
+      }
+
+      // Get unique client IDs
+      const clienteIds = [...new Set(productosInfo?.map((p) => p.clienteid) || [])]
+
+      // Get clientes info
+      const { data: clientesData, error: clientesError } = await supabase
+        .from("clientes")
+        .select("id, nombre")
+        .in("id", clienteIds)
+
+      if (clientesError) {
+        console.error("Error obteniendo clientes:", clientesError)
+        return { data: null, error: clientesError.message }
+      }
+
+      // Combine data
+      productosData = productosDetallesData.map((item) => {
+        const producto = productosInfo?.find((p) => p.id === item.productoid)
+        const cliente = clientesData?.find((c) => c.id === producto?.clienteid)
+        return {
+          imgurl: producto?.imgurl || null,
+          Producto: producto?.nombre || "N/A",
+          Cliente: cliente?.nombre || "N/A",
+          cantidad: item.cantidad,
+          costoparcial: item.costoparcial,
+        }
+      })
+    }
+
+    return { data: productosData, error: null }
+  } catch (error: any) {
+    console.error("Error en obtenerProductosRelacionadosIngrediente:", error)
     return { data: null, error: error.message }
   }
 }
