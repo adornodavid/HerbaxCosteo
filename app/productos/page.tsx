@@ -266,18 +266,6 @@ export default function ProductosPage() {
     if (!user) return
 
     try {
-      // Determine clienteid parameter based on user role
-      const clienteIdParam = [1, 2, 3, 4].includes(user.RolId) ? -1 : Number.parseInt(user.ClienteId)
-
-      const productosResult = await obtenerProductos(clienteIdParam)
-      if (productosResult.success) {
-        setProductos(productosResult.data || [])
-        setProductosFiltrados(productosResult.data || [])
-        setTotalProductos(productosResult.data?.length || 0)
-      } else {
-        console.error("Error cargando productos iniciales:", productosResult.error)
-      }
-
       // Cargar clientes
       const rolId = Number.parseInt(user.RolId?.toString() || "0", 10)
       const clienteIdFromCookies = user.ClienteId?.toString() || "0"
@@ -312,8 +300,9 @@ export default function ProductosPage() {
       }
 
       // Ejecutar búsqueda inicial con todos los filtros en -1
-      //await ejecutarBusquedaProductos("", -1, -1, "-1")
-      await obtenerProductos(clienteIdParam)
+      // Determine clienteid parameter based on user role
+      const clienteIdParam = [1, 2, 3, 4].includes(user.RolId) ? -1 : Number.parseInt(user.ClienteId)
+      await ejecutarBusquedaProductos("", clienteIdParam, -1, "-1")
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error)
       toast.error("Error al cargar datos iniciales")
