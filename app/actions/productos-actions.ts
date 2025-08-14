@@ -1071,4 +1071,51 @@ export async function obtenerIngredientesAsociadosProducto(productoId: number) {
   }
 }
 
+// Función: obtenerProductosXFiltros: función para obtener productos con filtros específicos
+export async function obtenerProductosXFiltros(nombre = "", clienteId = -1, catalogoId = -1, estatus = "true") {
+  try {
+    let query = supabaseAdmin.from("productos").select(`
+      id, nombre, descripcion, propositoprincipal, costo, activo, imgurl,
+      productosxcatalogo!left(
+        catalogos!left(
+          id, nombre,
+          clientes!left(id, nombre)
+        )
+      )
+    `)
+
+    if (nombre !== "" && nombre !== null) {
+      query = query.ilike("nombre", `%${nombre}%`) // Búsqueda insensible a mayúsculas/minúsculas
+    }
+
+    if (clienteId > 0) {
+      query = query.eq("productosxcatalogo.catalogos.clientes.id", clienteId)
+    }
+
+    if (catalogoId > 0) {
+      query = query.eq("productosxcatalogo.catalogos.id", catalogoId)
+    }
+
+    if (estatus === "false") {
+      query = query.eq("activo", false)
+    } else if (estatus === "true") {
+      query = query.eq("activo", true)
+    }
+
+    query = query.order("fechacreacion", { ascending: false })
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error("Error obteniendo productos con filtros:", error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en obtenerProductosXFiltros:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
 export const getUnidadMedidaFormula = obtenerUnidadMedidaFormula
