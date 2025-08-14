@@ -1487,7 +1487,7 @@ export default function NuevoProducto() {
           )}
 
           {ingredientesAgregados.length > 0 && (
-            <div className="bg-gradient-to-br from-white to-orange-50 rounded-lg p-6 border border-orange-100 shadow-sm">
+            <div className="bg-gradient-to-br from-white to-orange-50 rounded-xs p-6 border border-orange-100 shadow-sm">
               <h4 className="text-lg font-semibold text-orange-800 mb-4 flex items-center gap-2">
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                 Ingredientes Agregados ({ingredientesAgregados.length})
