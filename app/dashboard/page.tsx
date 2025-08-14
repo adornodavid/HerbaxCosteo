@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Hotel, Building, Menu, Utensils, Package, TrendingUp, Activity } from 'lucide-react'
+import { Hotel, Building, Menu, Utensils, Package, TrendingUp, Activity } from "lucide-react"
 import { obtenerResumenesDashboard } from "@/app/actions/dashboard-actions"
 import Link from "next/link"
 import Image from "next/image" // Importar Image de next/image
@@ -48,29 +48,21 @@ export default function DashboardPage() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
 
-/* ================================================== 
+  /* ================================================== 
     Al cargar la pagina
   ================================================== */
   useEffect(() => {
     const validarSeguridadYCargarDatos = async () => {
       try {
+        if (authLoading || !user) {
+          console.log("Esperando a que termine de cargar la autenticación...")
+          return
+        }
+
         // Validar cookies de sesión del lado del cliente
         console.log("Sesion de user: ", user.SesionActiva)
-        
+
         console.log("Sesion de email: ", user.Email)
-        /*
-        const sesionActiva = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("SesionActiva="))
-          ?.split("=")[1]
-        console.log("sesionActiva: ", sesionActiva)
-        
-        const rolId = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("RolId="))
-          ?.split("=")[1]
-        console.log("rolId: ", rolId)
-        */
 
         // Validaciones de seguridad como especificas
         if (user.SesionActiva !== true) {
@@ -80,53 +72,12 @@ export default function DashboardPage() {
         }
 
         if (!user.RolId || user.RolId === "0" || user.RolId === "") {
-        console.log("Variable de user: RolId es 0 o es ")
+          console.log("Variable de user: RolId es 0 o es ")
           router.push("/login")
           return
         }
-
-        /*
-        if (sesionActiva !== "true") {
-          console.log("Variable de sesion sesionActiva es falsa")
-          router.push("/login")
-          return
-        }
-
-        if (!rolId || rolId === "0" || rolId === "") {
-        console.log("Variable de sesion rolId es 0 o es ")
-          router.push("/login")
-          return
-        }
-        */
 
         // Obtener datos de sesión
-        /*
-        const nombreCompleto = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("NombreCompleto="))
-          ?.split("=")[1]
-
-        const usuarioId = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("UsuarioId="))
-          ?.split("=")[1]
-
-        const email = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("Email="))
-          ?.split("=")[1]
-
-        const hotelId = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("HotelId="))
-          ?.split("=")[1]
-
-        const permisos = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("Permisos="))
-          ?.split("=")[1]
-          */
-
         setSesion({
           UsuarioId: user.UsuarioId,
           Email: user.Email,
@@ -135,16 +86,6 @@ export default function DashboardPage() {
           RolId: user.RolId,
           Permisos: user.Permisos,
           SesionActiva: user.SesionActiva,
-
-          /*
-          UsuarioId: Number.parseInt(usuarioId || "0"),
-          Email: decodeURIComponent(email || ""),
-          NombreCompleto: decodeURIComponent(nombreCompleto || ""),
-          HotelId: Number.parseInt(hotelId || "0"),
-          RolId: Number.parseInt(rolId || "0"),
-          Permisos: decodeURIComponent(permisos || ""),
-          SesionActiva: true,
-          */
         })
 
         // Cargar resúmenes del dashboard
@@ -161,13 +102,13 @@ export default function DashboardPage() {
     }
 
     validarSeguridadYCargarDatos()
-  }, [router])
+  }, [router, authLoading, user])
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-          <div className="flex flex-col items-center justify-center p-8">
-            <div className="relative w-24 h-24 mb-4">
+        <div className="flex flex-col items-center justify-center p-8">
+          <div className="relative w-24 h-24 mb-4">
             <Image
               src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/cargando.gif"
               alt="Procesando..."
@@ -176,9 +117,8 @@ export default function DashboardPage() {
               unoptimized // Importante para GIFs externos
               className="absolute inset-0 animate-bounce-slow"
             />
-            </div>
-            <p className="text-lg font-semibold text-gray-800">Cargando Pagina...</p>
-           
+          </div>
+          <p className="text-lg font-semibold text-gray-800">Cargando Pagina...</p>
         </div>
       </div>
     )
@@ -196,20 +136,22 @@ export default function DashboardPage() {
         <h2 className="text-2xl font-semibold text-gray-700">Dashboard</h2>
 
         <div className="w-80 flex flex-col gap-2 p-8 shadow-xl sm:flex-row sm:items-center sm:gap-6 sm:py-4 ...">
-       <img className="mx-auto block h-24 rounded-full sm:mx-0 sm:shrink-0" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/quimico.png" alt="" />
-      <div className="space-y-2 text-center sm:text-left">
-    <div className="space-y-0.5">
-      <p className="text-lg font-semibold text-black">{sesion.NombreCompleto}</p>
-      <p className="font-medium text-gray-500">Product Engineer</p>
-    </div>
-    <button className="border-purple-200 text-purple-600 hover:border-transparent hover:bg-purple-600 hover:text-white active:bg-purple-700 ...">
-      Message
-    </button>
-    </div>
-    </div>
-    
+          <img
+            className="mx-auto block h-24 rounded-full sm:mx-0 sm:shrink-0"
+            src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/quimico.png"
+            alt=""
+          />
+          <div className="space-y-2 text-center sm:text-left">
+            <div className="space-y-0.5">
+              <p className="text-lg font-semibold text-black">{sesion.NombreCompleto}</p>
+              <p className="font-medium text-gray-500">Product Engineer</p>
+            </div>
+            <button className="border-purple-200 text-purple-600 hover:border-transparent hover:bg-purple-600 hover:text-white active:bg-purple-700 ...">
+              Message
+            </button>
+          </div>
+        </div>
       </div>
-      
 
       {/* Sección de bienvenida */}
       <div className="w-full">
