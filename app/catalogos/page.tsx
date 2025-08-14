@@ -1,5 +1,6 @@
 "use client"
 import Image from "next/image"
+import type React from "react"
 
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
@@ -14,7 +15,7 @@ import {
   PaginationLink,
   PaginationNext,
 } from "@/components/ui/pagination"
-import { BookOpen, Search, RotateCcw, Eye, Edit, PowerOff, Power, Folder } from "lucide-react"
+import { BookOpen, Search, RotateCcw, Eye, Edit, PowerOff, Power, Folder, Upload, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { getSession } from "@/app/actions/session-actions"
 import { useToast } from "@/components/ui/use-toast"
@@ -34,13 +35,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import {
   obtenerCatalogosFiltrados,
   obtenerClientesParaDropdown,
   obtenerDetalleCatalogo,
+  crearCatalogo,
 } from "@/app/actions/catalogos-actions"
+import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 import { supabase } from "@/lib/supabase"
-import { X } from "lucide-react"
 
 interface Catalogo {
   id: string
@@ -92,11 +96,23 @@ export default function CatalogosPage() {
 
   const [sessionRolId, setSessionRolId] = useState<number | null>(null)
   const [sessionHotelId, setSessionHotelId] = useState<string | null>(null)
+  const [sessionClienteId, setSessionClienteId] = useState<string | null>(null)
 
   const [showDetailsDialog, setShowDetailsDialog] = useState(false)
   const [selectedCatalogoDetails, setSelectedCatalogoDetails] = useState<CatalogoDetails | null>(null)
   const [loadingDetails, setLoadingDetails] = useState(false)
   const [detailsError, setDetailsError] = useState<string | null>(null)
+
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false)
+  const [registrationLoading, setRegistrationLoading] = useState(false)
+  const [registrationForm, setRegistrationForm] = useState({
+    nombre: "",
+    descripcion: "",
+    clienteId: "",
+  })
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [clientesRegistration, setClientesRegistration] = useState<Cliente[]>([])
 
   const cargarClientes = useCallback(async () => {
     try {
@@ -115,6 +131,41 @@ export default function CatalogosPage() {
       })
     }
   }, [toast])
+
+  const cargarClientesRegistration = useCallback(async () => {
+    try {
+      if (sessionRolId === null || sessionClienteId === null) return
+
+      const rolId = sessionRolId
+      let auxClienteId: string
+
+      if ([1, 2, 3, 4].includes(rolId)) {
+        auxClienteId = "-1"
+      } else {
+        auxClienteId = sessionClienteId
+      }
+
+      const { data: clientesData, error } = await listaDesplegableClientes(auxClienteId, "")
+
+      if (error) throw new Error(error)
+
+      let fetchedClientes: Cliente[] = []
+      if (auxClienteId === "-1") {
+        fetchedClientes = clientesData || []
+      } else {
+        fetchedClientes = clientesData || []
+      }
+
+      setClientesRegistration(fetchedClientes)
+    } catch (error: any) {
+      console.error("Error cargando clientes para registro:", error.message)
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los clientes.",
+        variant: "destructive",
+      })
+    }
+  }, [sessionRolId, sessionClienteId, toast])
 
   const cargarCatalogos = useCallback(
     async (nameFilter: string, clienteIdFilter: string, status: string, page: number) => {
@@ -164,6 +215,7 @@ export default function CatalogosPage() {
       }
       setSessionRolId(rolId)
       setSessionHotelId(session.HotelId || null)
+      setSessionClienteId(session.ClienteId || null)
 
       await cargarClientes()
 
@@ -175,6 +227,12 @@ export default function CatalogosPage() {
     }
     initPage()
   }, [router, cargarClientes, cargarCatalogos])
+
+  useEffect(() => {
+    if (sessionRolId !== null && sessionClienteId !== null) {
+      cargarClientesRegistration()
+    }
+  }, [sessionRolId, sessionClienteId, cargarClientesRegistration])
 
   const handleSearch = () => {
     setCurrentPage(1)
@@ -253,6 +311,92 @@ export default function CatalogosPage() {
     }
   }
 
+  const handleOpenRegistrationModal = () => {
+    setRegistrationForm({
+      nombre: "",
+      descripcion: "",
+      clienteId: "",
+    })
+    setSelectedImage(null)
+    setImagePreview(null)
+    setShowRegistrationModal(true)
+  }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setSelectedImage(file)
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleRegistrarCatalogo = async () => {
+    // Validación de campos
+    if (!registrationForm.nombre.trim()) {
+      toast({
+        title: "Error",
+        description: "El nombre del catálogo es requerido.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!registrationForm.clienteId) {
+      toast({
+        title: "Error",
+        description: "Debe seleccionar un cliente.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!registrationForm.descripcion.trim()) {
+      toast({
+        title: "Error",
+        description: "La descripción es requerida.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setRegistrationLoading(true)
+
+    try {
+      const { success, error } = await crearCatalogo(
+        registrationForm.clienteId,
+        registrationForm.nombre,
+        registrationForm.descripcion,
+        selectedImage,
+      )
+
+      if (!success) {
+        throw new Error(error || "Error al crear el catálogo")
+      }
+
+      toast({
+        title: "Éxito",
+        description: "Catálogo registrado correctamente.",
+      })
+
+      setShowRegistrationModal(false)
+      // Recargar la página de catálogos
+      cargarCatalogos(catalogoNameFilter, selectedClienteId, statusFilter, currentPage)
+    } catch (error: any) {
+      console.error("Error registrando catálogo:", error.message)
+      toast({
+        title: "Error",
+        description: `No se pudo registrar el catálogo: ${error.message}`,
+        variant: "destructive",
+      })
+    } finally {
+      setRegistrationLoading(false)
+    }
+  }
+
   const totalPages = Math.ceil(totalCatalogos / itemsPerPage)
 
   if (loading) {
@@ -284,7 +428,7 @@ export default function CatalogosPage() {
         </div>
         <Button
           type="button"
-          onClick={() => router.push("/catalogos/nuevo")}
+          onClick={handleOpenRegistrationModal}
           style={{ backgroundColor: "#5d8f72", color: "white" }}
           id="btnCatalogoNuevo"
           name="btnCatalogoNuevo"
@@ -426,7 +570,10 @@ export default function CatalogosPage() {
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-100/20 to-blue-100/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                     <div className="relative z-10">
-                      <div className="aspect-video relative overflow-hidden rounded-t-lg">
+                      <div
+                        className="aspect-video relative overflow-hidden rounded-t-lg cursor-pointer"
+                        onClick={() => handleViewCatalogoDetails(catalogo.id)}
+                      >
                         <Image
                           src={catalogo.imgurl || "/placeholder.svg?height=200&width=300&query=catalogo"}
                           alt={catalogo.nombre}
@@ -551,6 +698,136 @@ export default function CatalogosPage() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={showRegistrationModal} onOpenChange={setShowRegistrationModal}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-teal-500/10 rounded-lg" />
+          <div className="relative z-10">
+            <DialogHeader className="pb-6">
+              <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                Registrar Nuevo Catálogo
+              </DialogTitle>
+              <DialogDescription className="text-gray-600">
+                Complete la información para crear un nuevo catálogo.
+              </DialogDescription>
+            </DialogHeader>
+
+            <ScrollArea className="max-h-[60vh] pr-4">
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="nombreCatalogo" className="text-sm font-medium text-gray-700">
+                    Nombre del Catálogo *
+                  </Label>
+                  <Input
+                    id="nombreCatalogo"
+                    value={registrationForm.nombre}
+                    onChange={(e) => setRegistrationForm({ ...registrationForm, nombre: e.target.value })}
+                    placeholder="Ingrese el nombre del catálogo"
+                    className="bg-white/80 backdrop-blur-sm border-white/30 focus:border-purple-400 focus:ring-purple-400/20"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="clienteCatalogo" className="text-sm font-medium text-gray-700">
+                    Cliente *
+                  </Label>
+                  <Select
+                    value={registrationForm.clienteId}
+                    onValueChange={(value) => setRegistrationForm({ ...registrationForm, clienteId: value })}
+                  >
+                    <SelectTrigger className="bg-white/80 backdrop-blur-sm border-white/30 focus:border-purple-400">
+                      <SelectValue placeholder="Seleccione un cliente" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white/95 backdrop-blur-sm">
+                      {clientesRegistration.map((cliente) => (
+                        <SelectItem key={cliente.id} value={cliente.id}>
+                          {cliente.nombre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="descripcionCatalogo" className="text-sm font-medium text-gray-700">
+                    Descripción *
+                  </Label>
+                  <Textarea
+                    id="descripcionCatalogo"
+                    value={registrationForm.descripcion}
+                    onChange={(e) => setRegistrationForm({ ...registrationForm, descripcion: e.target.value })}
+                    placeholder="Ingrese la descripción del catálogo"
+                    rows={3}
+                    className="bg-white/80 backdrop-blur-sm border-white/30 focus:border-purple-400 focus:ring-purple-400/20"
+                  />
+                </div>
+
+                <div className="space-y-4">
+                  <Label className="text-sm font-medium text-gray-700">Imagen del Catálogo</Label>
+                  <div className="flex flex-col items-center space-y-4">
+                    {imagePreview ? (
+                      <div className="relative w-48 h-32 rounded-lg overflow-hidden border-2 border-white/30">
+                        <Image src={imagePreview || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute top-1 right-1 bg-red-500/80 hover:bg-red-600 text-white rounded-full p-1"
+                          onClick={() => {
+                            setSelectedImage(null)
+                            setImagePreview(null)
+                          }}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="w-48 h-32 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center bg-white/20">
+                        <div className="text-center">
+                          <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                          <p className="text-sm text-gray-500">Sin imagen seleccionada</p>
+                        </div>
+                      </div>
+                    )}
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="bg-white/80 backdrop-blur-sm border-white/30"
+                    />
+                  </div>
+                </div>
+              </div>
+            </ScrollArea>
+
+            <div className="flex justify-end space-x-3 pt-6 border-t border-white/20">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowRegistrationModal(false)}
+                className="bg-white/20 border-white/30 hover:bg-white/30"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                onClick={handleRegistrarCatalogo}
+                disabled={registrationLoading}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0"
+              >
+                {registrationLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Registrando...
+                  </>
+                ) : (
+                  "Registrar Catálogo"
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">

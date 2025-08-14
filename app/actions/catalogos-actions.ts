@@ -356,3 +356,58 @@ export async function asociarProductoACatalogo(
     }
   }
 }
+
+//Función: crearCatalogo: función para crear un nuevo catálogo con imagen
+export async function crearCatalogo(clienteId: string, nombre: string, descripcion: string, imageFile: File | null) {
+  const supabase = createClient()
+
+  try {
+    let imgUrl = null
+
+    // Si hay una imagen, subirla al bucket
+    if (imageFile) {
+      const fileExt = imageFile.name.split(".").pop()
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+      const filePath = `herbax/catalogos/${fileName}`
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("herbax")
+        .upload(`catalogos/${fileName}`, imageFile)
+
+      if (uploadError) throw uploadError
+
+      // Obtener la URL pública de la imagen
+      const { data: urlData } = supabase.storage.from("herbax").getPublicUrl(`catalogos/${fileName}`)
+
+      imgUrl = urlData.publicUrl
+    }
+
+    // Insertar el catálogo en la base de datos
+    const { data, error } = await supabase
+      .from("catalogos")
+      .insert({
+        clienteid: clienteId,
+        nombre: nombre,
+        descripcion: descripcion,
+        imgurl: imgUrl,
+        fechacreacion: new Date().toISOString(),
+        activo: true,
+      })
+      .select()
+
+    if (error) throw error
+
+    return {
+      success: true,
+      data: data[0],
+      error: null,
+    }
+  } catch (error: any) {
+    console.error("Error en crearCatalogo:", error.message)
+    return {
+      success: false,
+      data: null,
+      error: error.message,
+    }
+  }
+}
