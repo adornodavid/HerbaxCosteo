@@ -1575,7 +1575,7 @@ export default function NuevoProducto() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <Button onClick={() => setShowValidationModal(false)}>Entendido</Button>
+            <AlertDialogAction onClick={() => setShowValidationModal(false)}>Entendido</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
