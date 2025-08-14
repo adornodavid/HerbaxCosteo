@@ -38,6 +38,7 @@ import {
   obtenerProductoDetalladoCompleto,
   obtenerFormulasAsociadasProducto,
   obtenerIngredientesAsociadosProducto,
+  obtenerProductos,
 } from "@/app/actions/productos-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos-actions"
@@ -155,6 +156,8 @@ export default function ProductosPage() {
   const [selectedFormulasAsociadas, setSelectedFormulasAsociadas] = useState<FormulaAsociada[]>([])
   const [selectedIngredientesAsociados, setSelectedIngredientesAsociados] = useState<IngredienteAsociado[]>([])
   const [isDetailsLoading, setIsDetailsLoading] = useState(false)
+  const [productosFiltrados, setProductosFiltrados] = useState<ProductoListado[]>([])
+  const [totalProductos, setTotalProductos] = useState(0)
 
   // Filtros
   const [filtroNombre, setFiltroNombre] = useState("")
@@ -246,6 +249,8 @@ export default function ProductosPage() {
       )
 
       setProductos(uniqueProducts)
+      setProductosFiltrados(uniqueProducts)
+      setTotalProductos(uniqueProducts.length)
       toast.success(`Búsqueda completada. Se encontraron ${uniqueProducts.length} resultados.`)
     } catch (error) {
       console.error("Error inesperado al buscar productos:", error)
@@ -261,38 +266,25 @@ export default function ProductosPage() {
     if (!user) return
 
     try {
-      // Cargar estadísticas
-      const {
-        data: statsData,
-        error: statsError,
-        count,
-      } = await supabase.from("productos").select("costo, propositoprincipal", { count: "exact" })
+      // Determine clienteid parameter based on user role
+      const clienteIdParam = [1, 2, 3, 4].includes(user.RolId) ? -1 : Number.parseInt(user.ClienteId)
 
-      if (!statsError && statsData) {
-        const costoTotal = statsData.reduce((sum, p) => sum + (p.costo || 0), 0)
-        const costoPromedio = count ? costoTotal / count : 0
-        setEstadisticas({
-          totalProductos: count || 0,
-          costoPromedio,
-          costoTotal,
-          tiempoPromedio: "25 min", // Esto es un valor fijo, considera calcularlo si es dinámico
-        })
-      } else if (statsError) {
-        console.error("Error cargando estadísticas:", statsError)
+      const productosResult = await obtenerProductos(clienteIdParam)
+      if (productosResult.success) {
+        setProductos(productosResult.data || [])
+        setProductosFiltrados(productosResult.data || [])
+        setTotalProductos(productosResult.data?.length || 0)
+      } else {
+        console.error("Error cargando productos iniciales:", productosResult.error)
       }
 
       // Cargar clientes
       const rolId = Number.parseInt(user.RolId?.toString() || "0", 10)
       const clienteIdFromCookies = user.ClienteId?.toString() || "0"
 
-      let clienteIdParam: string
-      if ([1, 2, 3, 4].includes(rolId)) {
-        clienteIdParam = "-1"
-      } else {
-        clienteIdParam = clienteIdFromCookies
-      }
+      const clienteIdParamCatalogos = [1, 2, 3, 4].includes(Number(user.RolId)) ? -1 : Number(user.ClienteId)
 
-      const { data: clientesData, error: clientesError } = await listaDesplegableClientes(clienteIdParam, "")
+      const { data: clientesData, error: clientesError } = await listaDesplegableClientes(clienteIdParamCatalogos, "")
 
       if (!clientesError) {
         const clientesConTodos = [
@@ -306,8 +298,6 @@ export default function ProductosPage() {
       }
 
       // Cargar catálogos iniciales (todos, sin filtro de cliente al inicio)
-      const clienteIdParamCatalogos = [1, 2, 3, 4].includes(Number(user.RolId)) ? -1 : Number(user.ClienteId)
-
       const catalogosResult = await listaDesplegableCatalogos(-1, "", clienteIdParamCatalogos)
 
       if (!catalogosResult.error) {
@@ -489,10 +479,10 @@ export default function ProductosPage() {
   // --- Paginación ---
   const productosPaginados = useMemo(() => {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
-    return productos.slice(indiceInicio, indiceInicio + resultadosPorPagina)
-  }, [productos, paginaActual])
+    return productosFiltrados.slice(indiceInicio, indiceInicio + resultadosPorPagina)
+  }, [productosFiltrados, paginaActual])
 
-  const totalPaginas = Math.ceil(productos.length / resultadosPorPagina)
+  const totalPaginas = Math.ceil(totalProductos / resultadosPorPagina)
 
   const formatCurrency = (amount: number | null) =>
     new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(amount || 0)
@@ -681,7 +671,7 @@ export default function ProductosPage() {
         <CardHeader>
           <CardTitle>Resultados</CardTitle>
           <CardDescription>
-            Mostrando {productosPaginados.length} de {productos.length} productos encontrados.
+            Mostrando {productosPaginados.length} de {totalProductos} productos encontrados.
           </CardDescription>
         </CardHeader>
         <CardContent>
