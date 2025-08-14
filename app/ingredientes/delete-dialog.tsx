@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2, Trash2 } from "lucide-react"
-import { eliminarIngrediente } from "@/app/actions/ingredientes-actions-correcto"
+import { eliminarIngrediente } from "@/app/actions/ingredientes-actions"
 
 interface DeleteDialogProps {
   id: number

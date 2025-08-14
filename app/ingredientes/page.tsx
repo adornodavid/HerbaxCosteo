@@ -1,561 +1,596 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import Image from "next/image" // Importar Image de next/image
-import { Button } from "@/components/ui/button"
+/* ==================================================
+  Imports
+================================================== */
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Filter, Edit, Trash2, Package, Loader2, Eye, Calendar, AlertCircle, RotateCcw } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Loader2, Package, Search, RotateCcw, Eye, Edit, Power, PowerOff, AlertCircle } from "lucide-react"
+import { getSession } from "@/app/actions/session-actions"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import {
-  obtenerHoteles,
-  obtenerCategoriasIngredientes,
-  buscarIngredientes,
-  eliminarIngrediente,
-} from "@/app/actions/ingredientess-actions"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import Image from "next/image"
+import {
+  obtenerIngredientes,
+  obtenerIngredientesPorFiltros,
+  estatusActivoIngrediente,
+  estadisticasIngredientesTotales,
+} from "@/app/actions/ingredientes-actions"
+import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 
-interface Hotel {
+/* ==================================================
+  Interfaces, tipados, clases
+================================================== */
+interface SessionData {
+  UsuarioId: string | null
+  Email: string | null
+  NombreCompleto: string | null
+  HotelId: string | null
+  RolId: string | null
+  Permisos: string[] | null
+  SesionActiva: boolean | null
+  ClienteId: string | null
+}
+
+interface Cliente {
   id: number
   nombre: string
 }
 
-interface CategoriaIngrediente {
-  id: number
-  descripcion: string
-}
-
 interface Ingrediente {
-  id: number
-  codigo?: string
-  nombre?: string
-  categoriaid?: number
-  costo?: number
-  unidadmedidaid?: number
-  hotelid?: number
-  imgurl?: string
-  cambio?: number
-  activo?: boolean
-  fechacreacion?: string
-  fechamodificacion?: string
-  hotel?: {
-    id: number
-    nombre: string
-  }
-  categoria?: {
-    id: number
-    descripcion: string
-  }
-  unidadmedida?: {
-    id: number
-    descripcion: string
-  }
+  Folio: number
+  codigo: string
+  nombre: string
+  Cliente: string
+  Catalogo: string
+  categoria: string
+  UnidadMedida: string
+  costo: number
+  activo: boolean
 }
 
+/* ==================================================
+  Principal - pagina
+================================================== */
 export default function IngredientesPage() {
-  const [ingredientes, setIngredientes] = useState<Ingrediente[]>([])
-  const [hoteles, setHoteles] = useState<Hotel[]>([])
-  const [categorias, setCategorias] = useState<CategoriaIngrediente[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searching, setSearching] = useState(false)
-  const [totalCount, setTotalCount] = useState(0)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(0)
-  const [error, setError] = useState<string | null>(null)
-  const { toast } = useToast()
   const router = useRouter()
 
-  // Estados para los filtros
-  const [txtCodigo, setTxtCodigo] = useState("")
-  const [txtNombre, setTxtNombre] = useState("")
-  const [ddlHoteles, setDdlHoteles] = useState("")
-  const [ddlCategorias, setDdlCategorias] = useState("")
+  /* ==================================================
+    Estados
+  ================================================== */
+  // Estados de sesión y carga
+  const [sesion, setSesion] = useState<SessionData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [searching, setSearching] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const itemsPerPage = 20
+  // Estados de datos
+  const [clientes, setClientes] = useState<Cliente[]>([])
+  const [ingredientes, setIngredientes] = useState<Ingrediente[]>([])
+  const [totalIngredientes, setTotalIngredientes] = useState(0)
 
+  // Estados de filtros
+  const [txtIngredienteNombre, setTxtIngredienteNombre] = useState("")
+  const [ddlClientes, setDdlClientes] = useState("-1")
+  const [ddlEstatusIngrediente, setDdlEstatusIngrediente] = useState("true")
+
+  // Estados para los modales de confirmación y mensajes
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    folio: 0,
+    estadoActual: false,
+    accion: "",
+  })
+  const [successDialog, setSuccessDialog] = useState({
+    open: false,
+    message: "",
+  })
+  const [errorDialog, setErrorDialog] = useState({
+    open: false,
+    message: "",
+  })
+
+  /* ==================================================
+    Al cargar la pagina
+  ================================================== */
+  // Cargar sesión al montar el componente
   useEffect(() => {
-    cargarDatosIniciales()
+    cargarSesion()
   }, [])
 
-  const cargarDatosIniciales = async () => {
-    setLoading(true)
-    setError(null)
+  // Cargar datos iniciales cuando la sesión esté lista
+  useEffect(() => {
+    if (sesion) {
+      cargarClientes()
+      cargarEstadisticas()
+      cargarIngredientesIniciales()
+    }
+  }, [sesion])
 
+  /* ==================================================
+    Validaciones con session
+  ================================================== */
+  const cargarSesion = async () => {
     try {
-      // Verificar variables de entorno
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        throw new Error("Variables de entorno de Supabase no configuradas")
+      const datosSession = await getSession()
+
+      // Validación de seguridad
+      if (!datosSession || datosSession.SesionActiva !== true) {
+        router.push("/login")
+        return
       }
 
-      // Cargar hoteles
-      console.log("Cargando hoteles...")
-      const hotelesResult = await obtenerHoteles()
-      if (hotelesResult.success) {
-        setHoteles(hotelesResult.data)
-        console.log("Hoteles cargados:", hotelesResult.data.length)
-      } else {
-        console.error("Error cargando hoteles:", hotelesResult.error)
-        setError(`Error cargando hoteles: ${hotelesResult.error}`)
+      if (!datosSession.RolId || Number.parseInt(datosSession.RolId.toString(), 10) === 0) {
+        router.push("/login")
+        return
       }
 
-      // Cargar categorías
-      console.log("Cargando categorías...")
-      const categoriasResult = await obtenerCategoriasIngredientes()
-      if (categoriasResult.success) {
-        setCategorias(categoriasResult.data)
-        console.log("Categorías cargadas:", categoriasResult.data.length)
-      } else {
-        console.error("Error cargando categorías:", categoriasResult.error)
-      }
-
-      // Cargar ingredientes iniciales
-      console.log("Cargando ingredientes...")
-      await ejecutarBusqueda(1)
-    } catch (error: any) {
-      console.error("Error cargando datos iniciales:", error)
-      setError(`Error de conexión: ${error.message}`)
-      toast({
-        title: "Error de conexión",
-        description: "No se pudo conectar con la base de datos. Verifica tu conexión.",
-        variant: "destructive",
-      })
+      setSesion(datosSession)
+    } catch (error) {
+      console.error("Error cargando sesión:", error)
+      router.push("/login")
     } finally {
       setLoading(false)
     }
   }
 
-  const ejecutarBusqueda = async (page = 1) => {
-    setSearching(true)
+  /* ==================================================
+    Funciones
+  ================================================== */
+  //Función: cargarClientes: función para cargar el dropdownlist de clientes
+  const cargarClientes = async () => {
     try {
-      const filtros = {
-        codigo: txtCodigo,
-        nombre: txtNombre,
-        hotelId: ddlHoteles ? Number.parseInt(ddlHoteles) : undefined,
-        categoriaId: ddlCategorias ? Number.parseInt(ddlCategorias) : undefined,
-        page,
-        limit: itemsPerPage,
+      if (!sesion) return
+
+      const rolId = Number.parseInt(sesion.RolId?.toString() || "0", 10)
+      const clienteIdSesion = Number.parseInt(sesion.ClienteId?.toString() || "0", 10)
+
+      let auxClienteid: number
+      if (![1, 2, 3, 4].includes(rolId)) {
+        auxClienteid = clienteIdSesion
+      } else {
+        auxClienteid = -1
       }
 
-      const result = await buscarIngredientes(filtros)
-      if (result.success) {
-        setIngredientes(result.data)
-        setTotalCount(result.count)
-        setCurrentPage(page)
-        setTotalPages(Math.ceil(result.count / itemsPerPage))
+      let fetchedClientes: Cliente[] = []
+      let defaultSelectedValue = "-1"
+
+      const clienteId = auxClienteid === -1 ? "-1" : auxClienteid.toString()
+      const nombreCliente = ""
+
+      const { data: clientesData, error } = await listaDesplegableClientes(clienteId, nombreCliente)
+
+      if (error) throw new Error(error)
+
+      if (auxClienteid === -1) {
+        fetchedClientes = [{ id: -1, nombre: "Todos" }, ...(clientesData || [])]
+        defaultSelectedValue = "-1"
       } else {
-        setError(`Error en búsqueda: ${result.error}`)
+        fetchedClientes = clientesData || []
+        defaultSelectedValue = fetchedClientes.length > 0 ? auxClienteid.toString() : "-1"
       }
+
+      setClientes(fetchedClientes)
+      setDdlClientes(defaultSelectedValue)
     } catch (error: any) {
+      console.error("Error cargando clientes:", error)
+      setError(`Error al cargar clientes: ${error.message}`)
+      setClientes([])
+      setDdlClientes("-1")
+    }
+  }
+
+  //Función: cargarEstadisticas: función para cargar las estadisticas de totales
+  const cargarEstadisticas = async () => {
+    try {
+      const { count, error } = await estadisticasIngredientesTotales()
+
+      if (error) throw new Error(error)
+
+      setTotalIngredientes(count || 0)
+    } catch (error) {
+      console.error("Error cargando estadísticas:", error)
+    }
+  }
+
+  //Función: cargarIngredientesIniciales: función para cargar el listado de ingredientes iniciales
+  const cargarIngredientesIniciales = useCallback(async () => {
+    try {
+      if (!sesion) return
+
+      const rolId = Number.parseInt(sesion.RolId?.toString() || "0", 10)
+      let clienteIdParam = -1
+
+      if (![1, 2, 3].includes(rolId)) {
+        const clienteIdFromCookies = Number.parseInt(sesion.ClienteId?.toString() || "0", 10)
+        clienteIdParam = clienteIdFromCookies
+      }
+
+      const { data, error } = await obtenerIngredientes(rolId, clienteIdParam)
+
+      if (error) {
+        throw new Error(error)
+      }
+
+      setIngredientes(data || [])
+    } catch (error) {
+      console.error("Error cargando ingredientes iniciales:", error)
+      setError("Error al cargar los ingredientes. Por favor, intente de nuevo.")
+      setIngredientes([])
+    }
+  }, [sesion])
+
+  //Función: btnIngredienteBuscar: función para cargar el listado de ingredientes de acuerdo a la busqueda
+  const btnIngredienteBuscar = async () => {
+    try {
+      setSearching(true)
+
+      const nombre = txtIngredienteNombre.trim()
+      const clienteId = ddlClientes !== "-1" ? Number.parseInt(ddlClientes) : -1
+      const activo = ddlEstatusIngrediente === "true"
+
+      const result = await obtenerIngredientesPorFiltros(nombre, clienteId, activo)
+
+      if (result.error) {
+        throw new Error(result.error)
+      }
+
+      setIngredientes(result.data || [])
+
+      setTimeout(() => {
+        setSearching(false)
+      }, 500)
+    } catch (error) {
       console.error("Error en búsqueda:", error)
-      setError(`Error en búsqueda: ${error.message}`)
-      toast({
-        title: "Error",
-        description: "Error al buscar ingredientes",
-        variant: "destructive",
-      })
-    } finally {
+      setError("Error al realizar la búsqueda. Por favor, intente de nuevo.")
       setSearching(false)
     }
   }
 
-  const handleBtnBuscar = () => {
-    ejecutarBusqueda(1)
-  }
+  //Función: clearIngredientesBusqueda: función para limpiar filtros y cargar listado inicial
+  const clearIngredientesBusqueda = async () => {
+    try {
+      setTxtIngredienteNombre("")
+      setDdlClientes("-1")
+      setDdlEstatusIngrediente("true")
 
-  const handleBtnLimpiar = () => {
-    setTxtCodigo("")
-    setTxtNombre("")
-    setDdlHoteles("")
-    setDdlCategorias("")
-  }
-
-  const handleBtnImportarExcel = () => {
-    router.push("/importar")
-  }
-
-  const handleEliminarIngrediente = async (id: number, nombre: string) => {
-    if (!confirm(`¿Estás seguro de que quieres eliminar "${nombre}"?`)) {
-      return
+      await cargarIngredientesIniciales()
+    } catch (error) {
+      console.error("Error al limpiar filtros:", error)
+      setError("Error al limpiar filtros. Por favor, intente de nuevo.")
     }
+  }
+
+  //Función: toggleEstadoIngrediente: función para cambiar el estatus de activo del ingrediente
+  const toggleEstadoIngrediente = async (folio: number, estadoActual: boolean) => {
+    const accion = estadoActual ? "inactivar" : "activar"
+
+    setConfirmDialog({
+      open: true,
+      folio,
+      estadoActual,
+      accion,
+    })
+  }
+
+  //Función: handleConfirmedToggle: función para confirmar el cambio de estatus del ingrediente
+  const handleConfirmedToggle = async () => {
+    setConfirmDialog({ ...confirmDialog, open: false })
 
     try {
-      const result = await eliminarIngrediente(id)
-      if (result.success) {
-        toast({
-          title: "Ingrediente eliminado",
-          description: `El ingrediente ${nombre} ha sido eliminado correctamente`,
-        })
-        ejecutarBusqueda(currentPage)
-      } else {
-        toast({
-          title: "Error",
-          description: result.error || "Error al eliminar el ingrediente",
-          variant: "destructive",
-        })
+      const resultado = await estatusActivoIngrediente(confirmDialog.folio, confirmDialog.estadoActual)
+
+      if (!resultado.success) {
+        throw new Error(resultado.error)
       }
+
+      const nuevoEstado = resultado.nuevoEstado ? "ACTIVO" : "INACTIVO"
+      setSuccessDialog({
+        open: true,
+        message: `Ingrediente con folio ${confirmDialog.folio} ha cambiado su estado a: ${nuevoEstado}`,
+      })
+
+      btnIngredienteBuscar()
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Error al eliminar el ingrediente",
-        variant: "destructive",
+      console.error("Error cambiando estado:", error)
+      setErrorDialog({
+        open: true,
+        message: "Error al cambiar el estado del ingrediente",
       })
     }
   }
 
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat("es-MX", {
-      style: "currency",
-      currency: "MXN",
-    }).format(amount)
+  //Función: btnIngredienteNuevo: función para dirigir a la creacion de un ingrediente
+  const btnIngredienteNuevo = () => {
+    router.push("/ingredientes/nuevo")
   }
 
-  const formatDate = (dateString?: string): string => {
-    if (!dateString) return "Sin fecha"
-    return new Date(dateString).toLocaleDateString("es-MX")
+  //Función: handleViewIngredienteDetails: función para ver la informacion de un ingrediente en un modal
+  const handleViewIngredienteDetails = async (ingredienteId: number) => {
+    // Placeholder para funcionalidad futura
+    toast.success("Funcionalidad de detalles pendiente de implementación")
   }
 
-  const calcularEstadisticas = () => {
-    const totalIngredientes = totalCount
-    const costoPromedio =
-      ingredientes.length > 0 ? ingredientes.reduce((sum, i) => sum + (i.costo || 0), 0) / ingredientes.length : 0
-    const costoTotal = ingredientes.reduce((sum, i) => sum + (i.costo || 0), 0)
-    const hotelesConIngredientes = new Set(ingredientes.map((i) => i.hotel?.nombre).filter(Boolean)).size
-
-    return { totalIngredientes, costoPromedio, costoTotal, hotelesConIngredientes }
-  }
-
-  const estadisticas = calcularEstadisticas()
-  
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen" >
-      <div className="flex flex-col items-center justify-center">
-         <div className="relative w-24 h-24 mb-4">
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center justify-center p-8">
+          <div className="relative w-24 h-24 mb-4">
             <Image
-              src="https://nxtrsibnomdqmzcrwedc.supabase.co/storage/v1/object/public/imagenes/AnimationGif/CargarPage.gif"
+              src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/cargando.gif"
               alt="Procesando..."
-              width={300} // Ajusta el tamaño según sea necesario
-              height={300} // Ajusta el tamaño según sea necesario
-              unoptimized // Importante para GIFs externos
+              width={300}
+              height={300}
+              unoptimized
               className="absolute inset-0 animate-bounce-slow"
             />
-            </div>
-        
-            <span className="text-lg font-semibold text-gray-800">Cargando página...</span>
-            </div>
+          </div>
+          <p className="text-lg font-semibold text-gray-800">Cargando Pagina...</p>
+        </div>
       </div>
     )
   }
-  
-  
 
   if (error) {
     return (
-      <div className="space-y-6">
+      <div className="container mx-auto p-6">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
-        <div className="flex justify-center">
-          <Button onClick={cargarDatosIniciales}>Reintentar</Button>
-        </div>
       </div>
     )
   }
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      {/* 1. Título */}
-      <div className="flex justify-between items-center">
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">Ingredientes</h1>
-          <p className="text-base text-muted-foreground mt-2">Gestión completa de ingredientes por hotel</p>
+          <p className="text-lg text-muted-foreground">Gestión de Ingredientes</p>
         </div>
-        {/* 2. Botones con alineación derecha */}
-        {/*<div className="flex gap-2">
-          <Button onClick={() => router.push("/ingredientes/nuevo")}>Registrar Ingrediente</Button>
-          <Button variant="outline" onClick={handleBtnImportarExcel}>
-            Importar Excel
-          </Button>
-        </div>*/}
+        <Button
+          id="btnIngredienteNuevo"
+          name="btnIngredienteNuevo"
+          type="button"
+          onClick={btnIngredienteNuevo}
+          style={{
+            backgroundColor: "#5d8f72",
+            color: "white",
+            border: "none",
+          }}
+          className="hover:bg-[#44785a] transition-opacity"
+        >
+          <Package className="h-4 w-4 mr-2" />
+          Nuevo Ingrediente
+        </Button>
       </div>
 
-      {/* 3. Resumen de estadísticas generales */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Ingredientes</CardTitle>
+      {/* Estadísticas */}
+      <div className="rounded-xs grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <Card className="rounded-xs border bg-card text-card-foreground shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total de Ingredientes</CardTitle>
+            <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{estadisticas.totalIngredientes}</div>
-            <p className="text-xs text-muted-foreground">ingredientes activos</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Costo Promedio</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(estadisticas.costoPromedio)}</div>
-            <p className="text-xs text-muted-foreground">Por ingrediente</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Costo Total Inventario</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(estadisticas.costoTotal)}</div>
-            <p className="text-xs text-muted-foreground">Valor total</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Hoteles</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{estadisticas.hotelesConIngredientes}</div>
-            <p className="text-xs text-muted-foreground">Con ingredientes</p>
+            <div className="text-2xl font-bold">{totalIngredientes}</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* 4. Filtros de búsqueda */}
-      <Card>
+      {/* Filtros */}
+      <Card className="rounded-xs border bg-card text-card-foreground shadow mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Filtros de Búsqueda
-          </CardTitle>
+          <CardTitle>Filtros de Búsqueda</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-6 items-end">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Código de Ingrediente</label>
-              <input
+          <form id="frmIngredientesBuscar" name="frmIngredientesBuscar" className="flex flex-wrap items-end gap-4">
+            <div className="flex-1 min-w-[200px]">
+              <Label htmlFor="txtIngredienteNombre">Nombre</Label>
+              <Input
+                id="txtIngredienteNombre"
+                name="txtIngredienteNombre"
                 type="text"
-                value={txtCodigo}
-                onChange={(e) => setTxtCodigo(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Código..."
-                maxLength={20}
+                maxLength={150}
+                value={txtIngredienteNombre}
+                onChange={(e) => setTxtIngredienteNombre(e.target.value)}
+                placeholder="Buscar por nombre..."
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Nombre</label>
-              <input
-                type="text"
-                value={txtNombre}
-                onChange={(e) => setTxtNombre(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Nombre..."
-                maxLength={50}
-              />
+            <div className="flex-1 min-w-[200px]">
+              <Label htmlFor="ddlClientes">Cliente</Label>
+              <Select value={ddlClientes} onValueChange={setDdlClientes}>
+                <SelectTrigger id="ddlClientes" name="Cliente">
+                  <SelectValue placeholder="Seleccione un cliente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {clientes.map((cliente) => (
+                    <SelectItem key={cliente.id} value={cliente.id.toString()}>
+                      {cliente.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Hotel</label>
-              <select
-                value={ddlHoteles}
-                onChange={(e) => setDdlHoteles(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Todos los hoteles</option>
-                {hoteles.map((hotel) => (
-                  <option key={hotel.id} value={hotel.id.toString()}>
-                    {hotel.nombre}
-                  </option>
-                ))}
-              </select>
+            <div className="flex-1 min-w-[150px]">
+              <Label htmlFor="ddlEstatusIngrediente">Estatus</Label>
+              <Select value={ddlEstatusIngrediente} onValueChange={setDdlEstatusIngrediente}>
+                <SelectTrigger id="ddlEstatusIngrediente" name="ddlEstatusIngrediente">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Activo</SelectItem>
+                  <SelectItem value="false">Inactivo</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Categoría</label>
-              <select
-                value={ddlCategorias}
-                onChange={(e) => setDdlCategorias(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Todas las categorías</option>
-                {categorias.map((categoria) => (
-                  <option key={categoria.id} value={categoria.id.toString()}>
-                    {categoria.descripcion}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Button
+              id="btnIngredienteLimpiar"
+              name="btnIngredienteLimpiar"
+              type="button"
+              onClick={clearIngredientesBusqueda}
+              className="bg-[#4a4a4a] text-white hover:bg-[#333333]"
+              style={{ fontSize: "12px" }}
+            >
+              <RotateCcw className="h-3 w-3 mr-1" />
+              Limpiar filtros
+            </Button>
 
-            <div className="space-y-2">
-              <Button variant="outline" onClick={handleBtnLimpiar} className="w-full bg-transparent">
-                <RotateCcw className="h-3 w-3 mr-1" />
-                Limpiar Filtros
-              </Button>
-            </div>
-
-            <div className="space-y-2">
-              <Button onClick={handleBtnBuscar} disabled={searching} className="w-full">
-                {searching ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                Buscar
-              </Button>
-            </div>
-          </div>
+            <Button
+              id="btnIngredienteBuscar"
+              name="btnIngredienteBuscar"
+              type="button"
+              onClick={btnIngredienteBuscar}
+              disabled={searching}
+              className="bg-[#4a4a4a] text-white hover:bg-[#333333]"
+              style={{ fontSize: "12px" }}
+            >
+              {searching ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Search className="h-3 w-3 mr-1" />}
+              Buscar
+            </Button>
+          </form>
         </CardContent>
       </Card>
 
-      {/* 5. Grid que muestre el resultado de la búsqueda */}
-      <Card>
+      {/* Tabla de resultados */}
+      <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
-          <CardTitle>Ingredientes Registrados</CardTitle>
+          <CardTitle>Listado de Ingredientes</CardTitle>
           <CardDescription>
-            {totalCount} ingrediente(s) encontrado(s) - Página {currentPage} de {totalPages}
+            Mostrando {ingredientes.length} de {totalIngredientes} ingredientes
           </CardDescription>
         </CardHeader>
         <CardContent>
           {searching ? (
-            <div className="flex justify-center items-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <span className="ml-2">Buscando ingredientes...</span>
-            </div>
-          ) : ingredientes.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="text-lg font-medium">No se encontraron ingredientes</p>
-              <p className="text-sm">Intenta ajustar los filtros o crear un nuevo ingrediente</p>
+            <div className="flex items-center justify-center py-8">
+              <div className="flex flex-col items-center space-y-2">
+                <Package className="h-8 w-8 animate-pulse text-[#cfa661]" />
+                <span className="text-sm text-muted-foreground">Buscando ingredientes...</span>
+              </div>
             </div>
           ) : (
-            <>
-              <div className="border rounded-md">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b bg-muted/50">
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">ID</th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Código</th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Nombre</th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Hotel</th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Categoría</th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Costo</th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Unidad</th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Cambio</th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-                        Fecha Creación
-                      </th>
-                      <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {ingredientes.map((ingrediente) => (
-                      <tr key={ingrediente.id} className="border-b transition-colors hover:bg-muted/50">
-                        <td className="p-4 align-middle font-mono text-sm">{ingrediente.id}</td>
-                        <td className="p-4 align-middle font-medium">{ingrediente.codigo || "Sin código"}</td>
-                        <td className="p-4 align-middle">
-                          <div className="max-w-[200px]">
-                            <div className="font-medium">{ingrediente.nombre || "Sin nombre"}</div>
-                            {ingrediente.imgurl && <div className="text-xs text-muted-foreground">Con imagen</div>}
-                          </div>
-                        </td>
-                        <td className="p-4 align-middle">
-                          <Badge variant="outline">{ingrediente.hotel?.nombre || "Sin hotel"}</Badge>
-                        </td>
-                        <td className="p-4 align-middle">
-                          <Badge variant="secondary">{ingrediente.categoria?.descripcion || "Sin categoría"}</Badge>
-                        </td>
-                        <td className="p-4 align-middle">
-                          <Badge variant="default" className="bg-green-600">
-                            {formatCurrency(ingrediente.costo || 0)}
-                          </Badge>
-                        </td>
-                        <td className="p-4 align-middle">
-                          <div className="text-sm">{ingrediente.unidadmedida?.descripcion || "Sin unidad"}</div>
-                        </td>
-                        <td className="p-4 align-middle">
-                          <Badge variant={ingrediente.cambio ? "default" : "secondary"}>
-                            {ingrediente.cambio || 0}
-                          </Badge>
-                        </td>
-                        <td className="p-4 align-middle">
-                          <div className="flex items-center gap-1 text-sm">
-                            <Calendar className="h-3 w-3" />
-                            {formatDate(ingrediente.fechacreacion)}
-                          </div>
-                          {ingrediente.fechamodificacion &&
-                            ingrediente.fechamodificacion !== ingrediente.fechacreacion && (
-                              <div className="text-xs text-muted-foreground">
-                                Mod: {formatDate(ingrediente.fechamodificacion)}
-                              </div>
-                            )}
-                        </td>
-                        <td className="p-4 align-middle text-right">
-                          <div className="flex justify-end gap-2">
-                           {/* <Button variant="ghost" size="sm" asChild>
-                              <Link href={`/ingredientes/${ingrediente.id}`}>
-                                <Eye className="h-4 w-4" />
-                              </Link>
-                            </Button>
-                            <Button variant="ghost" size="sm" asChild>
-                              <Link href={`/ingredientes/${ingrediente.id}/editar`}>
-                                <Edit className="h-4 w-4" />
-                              </Link>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEliminarIngrediente(ingrediente.id, ingrediente.nombre || "")}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>*/}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Paginación */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-between space-x-2 py-4">
-                  <div className="text-sm text-muted-foreground">
-                    Mostrando {(currentPage - 1) * itemsPerPage + 1} a{" "}
-                    {Math.min(currentPage * itemsPerPage, totalCount)} de {totalCount} ingredientes
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      const pageNum = Math.max(1, currentPage - 2) + i
-                      if (pageNum > totalPages) return null
-                      return (
+            <Table id="tblIngredienteResultados">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Folio</TableHead>
+                  <TableHead>Código</TableHead>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Cliente</TableHead>
+                  <TableHead>Catálogo</TableHead>
+                  <TableHead>Categoría</TableHead>
+                  <TableHead>Unidad Medida</TableHead>
+                  <TableHead>Costo</TableHead>
+                  <TableHead>Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {ingredientes.map((ingrediente) => (
+                  <TableRow key={ingrediente.Folio}>
+                    <TableCell>{ingrediente.Folio}</TableCell>
+                    <TableCell>{ingrediente.codigo}</TableCell>
+                    <TableCell>{ingrediente.nombre}</TableCell>
+                    <TableCell>{ingrediente.Cliente}</TableCell>
+                    <TableCell>{ingrediente.Catalogo}</TableCell>
+                    <TableCell>{ingrediente.categoria}</TableCell>
+                    <TableCell>{ingrediente.UnidadMedida}</TableCell>
+                    <TableCell>${ingrediente.costo.toFixed(2)}</TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
                         <Button
-                          key={pageNum}
-                          variant={pageNum === currentPage ? "default" : "outline"}
                           size="sm"
-                          onClick={() => ejecutarBusqueda(pageNum)}
-                          disabled={searching}
+                          variant="outline"
+                          onClick={() => handleViewIngredienteDetails(ingrediente.Folio)}
                         >
-                          {pageNum}
+                          <Eye className="h-3 w-3" />
                         </Button>
-                      )
-                    })}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => ejecutarBusqueda(currentPage + 1)}
-                    disabled={currentPage >= totalPages || searching}
-                  >
-                    Siguiente
-                  </Button>
-                </div>
-              )}
-            </>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => router.push(`/ingredientes/editar?getIngredienteId=${ingrediente.Folio}`)}
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => toggleEstadoIngrediente(ingrediente.Folio, ingrediente.activo)}
+                        >
+                          {ingrediente.activo ? (
+                            <PowerOff className="h-3 w-3 text-red-500" />
+                          ) : (
+                            <Power className="h-3 w-3 text-green-500" />
+                          )}
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Acción</DialogTitle>
+            <DialogDescription>¿Está seguro que desea {confirmDialog.accion} este ingrediente?</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}>
+              Cancelar
+            </Button>
+            <Button onClick={handleConfirmedToggle}>Confirmar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Dialog */}
+      <Dialog open={successDialog.open} onOpenChange={(open) => setSuccessDialog({ ...successDialog, open })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Éxito</DialogTitle>
+            <DialogDescription>{successDialog.message}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setSuccessDialog({ ...successDialog, open: false })}>Aceptar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Error Dialog */}
+      <Dialog open={errorDialog.open} onOpenChange={(open) => setErrorDialog({ ...errorDialog, open })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Error</DialogTitle>
+            <DialogDescription>{errorDialog.message}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setErrorDialog({ ...errorDialog, open: false })}>Aceptar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

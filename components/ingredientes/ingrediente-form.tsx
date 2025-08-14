@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2, Save } from "lucide-react"
-import { crearIngrediente, actualizarIngrediente } from "@/app/actions/ingredientes-actions-correcto"
+import { crearIngrediente, actualizarIngrediente } from "@/app/actions/ingredientes-actions"
 import { createClient } from "@/lib/supabase" // Import the correct client for client-side fetching
 
 interface IngredienteFormProps {

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
-import { crearIngrediente } from "@/app/actions/ingredientes-actions-correcto"
+import { crearIngrediente } from "@/app/actions/ingredientes-actions"
 import { createClient } from "@/lib/supabase" // Import the correct client for server-side fetching
 
 interface Categoria {
