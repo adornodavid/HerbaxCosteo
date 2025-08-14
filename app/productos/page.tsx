@@ -176,7 +176,7 @@ export default function ProductosPage() {
     if (!user) return
     setIsSearching(true)
     setPaginaActual(1)
-
+consolo.log("estoy en ejecutarBusquedaProductos")
     try {
       const resultado = await obtenerProductosXFiltros(nombre, clienteId, catalogoId, estatus)
 
@@ -263,6 +263,7 @@ console.log(resultado.data)
     if (!user) return
 
     try {
+    consolo.log("estoy en cargarDatosInicialesProductos")
       // Cargar clientes
       const rolId = Number.parseInt(user.RolId?.toString() || "0", 10)
       const clienteIdFromCookies = user.ClienteId?.toString() || "0"
@@ -299,6 +300,7 @@ console.log(resultado.data)
       // Ejecutar búsqueda inicial con todos los filtros en -1
       // Determine clienteid parameter based on user role
       const clienteIdParam = [1, 2, 3, 4].includes(user.RolId) ? -1 : Number.parseInt(user.ClienteId)
+      consolo.log("estoy en casi por ejecutarBusquedaProductos")
       await ejecutarBusquedaProductos("", clienteIdParam, -1, "-1")
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error)
