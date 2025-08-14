@@ -47,7 +47,6 @@ import {
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -394,7 +393,7 @@ export default function NuevoProducto() {
             console.log("modal establecido, retornando para impedir avance")
             return // Impedir avance a la siguiente etapa
           }
-          
+
           console.log("validacion pasada - avanzando a siguiente etapa")
           setCurrentStep((prev) => prev + 1)
         } catch (error) {
@@ -1183,8 +1182,8 @@ export default function NuevoProducto() {
               </div>
             )}
           </div>
-      </div> 
-      </div>    
+        </div>
+      </div>
       <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-6 shadow-sm">
         <div className="space-y-6">
           <div className="space-y-4">
@@ -1393,78 +1392,123 @@ export default function NuevoProducto() {
 
   const renderStep3 = () => (
     <div className="space-y-8">
-      {/*<div className="text-center">
-        <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-          Resumen del Producto
-        </h3>
-        <p className="text-gray-600 mt-2">Revisa toda la información antes de finalizar</p>
-      </div>*/}
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Información Básica */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-gradient-to-br from-white to-sky-50 rounded-lg p-6 border border-sky-100 shadow-sm">
+          <div className="bg-gradient-to-br from-white to-sky-50 p-6 border border-sky-100 shadow-sm">
             <h4 className="text-lg font-semibold text-sky-800 mb-4 flex items-center gap-2">
               <div className="w-2 h-2 bg-sky-500 rounded-full"></div>
-              Información Básica
+              Información Completa del Producto
             </h4>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-600">Nombre del Producto</Label>
-                <p className="text-base font-medium text-gray-900 bg-white px-3 py-2 rounded-lg border">
-                  {formData.nombre}
-                </p>
+            {/* Información Principal */}
+            <div className="space-y-3 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                <div>
+                  <span className="font-medium text-gray-700">Nombre del Producto:</span>{" "}
+                  <span className="text-gray-900">{formData.nombre}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Cliente:</span>{" "}
+                  <span className="text-gray-900">
+                    {clientes.find((c) => c.id === formData.clienteid)?.nombre || "No seleccionado"}
+                  </span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Catálogo:</span>{" "}
+                  <span className="text-gray-900">
+                    {catalogos.find((c) => c.id === formData.catalogoid)?.nombre || "No seleccionado"}
+                  </span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Zona:</span>{" "}
+                  <span className="text-gray-900">
+                    {zonas.find((z) => z.id === formData.zonaid)?.nombre || "No seleccionada"}
+                  </span>
+                </div>
               </div>
+              {formData.descripcion && (
+                <div className="text-sm">
+                  <span className="font-medium text-gray-700">Descripción:</span>{" "}
+                  <span className="text-gray-900">{formData.descripcion}</span>
+                </div>
+              )}
+            </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-600">Cliente</Label>
-                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
-                  {clientes.find((c) => c.id === formData.clienteid)?.nombre || "No seleccionado"}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-600">Catálogo</Label>
-                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
-                  {catalogos.find((c) => c.id === formData.catalogoid)?.nombre || "No seleccionado"}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-600">Zona</Label>
-                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
-                  {zonas.find((z) => z.id === formData.zonaid)?.nombre || "No seleccionada"}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-600">Presentación</Label>
-                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
-                  {formData.presentacion || "No especificada"}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-600">Porción</Label>
-                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border">
-                  {formData.porcion || "No especificada"}
-                </p>
+            {/* Sección Porciones */}
+            <div className="mb-6">
+              <h5 className="text-sm font-semibold text-sky-700 mb-2 border-b border-sky-200 pb-1">Porciones</h5>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 text-sm">
+                <div>
+                  <span className="font-medium text-gray-600">Presentación:</span>{" "}
+                  <span className="text-gray-800">{formData.presentacion || "No especificada"}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Porción:</span>{" "}
+                  <span className="text-gray-800">{formData.porcion || "No especificada"}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Porción por Envase:</span>{" "}
+                  <span className="text-gray-800">{formData.porcionenvase || "No especificada"}</span>
+                </div>
               </div>
             </div>
 
-            {formData.descripcion && (
-              <div className="mt-4 space-y-2">
-                <Label className="text-sm font-medium text-gray-600">Descripción</Label>
-                <p className="text-base text-gray-900 bg-white px-3 py-2 rounded-lg border min-h-[60px]">
-                  {formData.descripcion}
-                </p>
+            {/* Sección Modo de Uso */}
+            <div className="mb-6">
+              <h5 className="text-sm font-semibold text-sky-700 mb-2 border-b border-sky-200 pb-1">Modo de Uso</h5>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 text-sm">
+                <div>
+                  <span className="font-medium text-gray-600">Modo de Uso:</span>{" "}
+                  <span className="text-gray-800">{formData.modouso || "No especificado"}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Categoría de Uso:</span>{" "}
+                  <span className="text-gray-800">{formData.categoriauso || "No especificada"}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Edad Mínima:</span>{" "}
+                  <span className="text-gray-800">{formData.edadminima || "No especificada"}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Instrucciones de Ingesta:</span>{" "}
+                  <span className="text-gray-800">{formData.instruccionesingesta || "No especificadas"}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Advertencias:</span>{" "}
+                  <span className="text-gray-800">{formData.advertencia || "No especificadas"}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Condiciones de Almacenamiento:</span>{" "}
+                  <span className="text-gray-800">{formData.condicionesalmacenamiento || "No especificadas"}</span>
+                </div>
               </div>
-            )}
+            </div>
+
+            {/* Sección Detalles Adicionales */}
+            <div>
+              <h5 className="text-sm font-semibold text-sky-700 mb-2 border-b border-sky-200 pb-1">
+                Detalles Adicionales
+              </h5>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 text-sm">
+                <div>
+                  <span className="font-medium text-gray-600">Vida de Anaquel (meses):</span>{" "}
+                  <span className="text-gray-800">{formData.vidaanaquelmeses || "No especificada"}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Propósito Principal:</span>{" "}
+                  <span className="text-gray-800">{formData.propositoprincipal || "No especificado"}</span>
+                </div>
+                <div className="md:col-span-2">
+                  <span className="font-medium text-gray-600">Propuesta de Valor:</span>{" "}
+                  <span className="text-gray-800">{formData.propuestavalor || "No especificada"}</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {formulasAgregadas.length > 0 && (
-            <div className="bg-gradient-to-br from-white to-emerald-50 rounded-xs p-6 border border-emerald-100 shadow-sm">
+            <div className="bg-gradient-to-br from-white to-emerald-50 p-6 border border-emerald-100 shadow-sm">
               <h4 className="text-lg font-semibold text-emerald-800 mb-4 flex items-center gap-2">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
                 Fórmulas Agregadas ({formulasAgregadas.length})
@@ -1473,7 +1517,7 @@ export default function NuevoProducto() {
                 {formulasAgregadas.map((formula) => (
                   <div
                     key={formula.id}
-                    className="bg-white p-4 rounded-lg border border-emerald-200 flex justify-between items-center"
+                    className="bg-white p-4 border border-emerald-200 flex justify-between items-center"
                   >
                     <div>
                       <p className="font-medium text-gray-900">{formula.nombre}</p>
@@ -1490,7 +1534,7 @@ export default function NuevoProducto() {
           )}
 
           {ingredientesAgregados.length > 0 && (
-            <div className="bg-gradient-to-br from-white to-orange-50 rounded-xs p-6 border border-orange-100 shadow-sm">
+            <div className="bg-gradient-to-br from-white to-orange-50 p-6 border border-orange-100 shadow-sm">
               <h4 className="text-lg font-semibold text-orange-800 mb-4 flex items-center gap-2">
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                 Ingredientes Agregados ({ingredientesAgregados.length})
@@ -1499,7 +1543,7 @@ export default function NuevoProducto() {
                 {ingredientesAgregados.map((ingrediente) => (
                   <div
                     key={ingrediente.id}
-                    className="bg-white p-4 rounded-lg border border-orange-200 flex justify-between items-center"
+                    className="bg-white p-4 border border-orange-200 flex justify-between items-center"
                   >
                     <div>
                       <p className="font-medium text-gray-900">{ingrediente.nombre}</p>
@@ -1517,12 +1561,12 @@ export default function NuevoProducto() {
             </div>
           )}
 
-          <div className="bg-gradient-to-br from-white to-indigo-50 rounded-lg p-6 border border-indigo-100 shadow-sm">
+          <div className="bg-gradient-to-br from-white to-indigo-50 p-6 border border-indigo-100 shadow-sm">
             <h4 className="text-lg font-semibold text-indigo-800 mb-4 flex items-center gap-2">
               <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
               Costo Total del Producto
             </h4>
-            <div className="bg-white p-4 rounded-lg border border-indigo-200">
+            <div className="bg-white p-4 border border-indigo-200">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-medium text-gray-900">Total:</span>
                 <span className="text-2xl font-bold text-indigo-700">${costoTotal.toFixed(2)}</span>
@@ -1536,7 +1580,7 @@ export default function NuevoProducto() {
 
         {/* Imagen */}
         <div className="lg:col-span-1">
-          <div className="bg-gradient-to-br from-white to-purple-50 rounded-lg p-6 border border-purple-100 shadow-sm h-fit">
+          <div className="bg-gradient-to-br from-white to-purple-50 p-6 border border-purple-100 shadow-sm h-fit">
             <h4 className="text-lg font-semibold text-purple-800 mb-4 flex items-center gap-2">
               <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
               Imagen del Producto
@@ -1547,12 +1591,12 @@ export default function NuevoProducto() {
                 <img
                   src={imagePreview || "/placeholder.svg"}
                   alt="Preview del producto"
-                  className="w-full h-48 object-cover rounded-lg border border-purple-200 shadow-sm"
+                  className="w-full h-48 object-cover border border-purple-200 shadow-sm"
                 />
                 <p className="text-sm text-gray-600 text-center">Imagen cargada correctamente</p>
               </div>
             ) : (
-              <div className="w-full h-48 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+              <div className="w-full h-48 bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
                 <div className="text-center">
                   <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2">
                     <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1571,8 +1615,6 @@ export default function NuevoProducto() {
           </div>
         </div>
       </div>
-
-     
 
       <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
         <DialogContent className="sm:max-w-md">
