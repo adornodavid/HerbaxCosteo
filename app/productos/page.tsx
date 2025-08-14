@@ -828,7 +828,7 @@ export default function ProductosPage() {
                       className="w-full h-64 object-cover rounded-xs shadow-md"
                     />
                   )}
-                  <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="bg-gray-50 p-4 rounded-xs">
                     <h3 className="text-xl font-bold mb-2">{selectedProductoCompleto.nombre}</h3>
                     <p className="text-gray-600 mb-3">{selectedProductoCompleto.descripcion}</p>
                     <div className="grid grid-cols-2 gap-2 text-sm">
