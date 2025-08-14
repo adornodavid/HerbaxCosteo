@@ -1390,12 +1390,12 @@ export default function NuevoProducto() {
 
   const renderStep3 = () => (
     <div className="space-y-8">
-      <div className="text-center">
+      {/*<div className="text-center">
         <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
           Resumen del Producto
         </h3>
         <p className="text-gray-600 mt-2">Revisa toda la información antes de finalizar</p>
-      </div>
+      </div>*/}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Información Básica */}
