@@ -1569,7 +1569,7 @@ export default function NuevoProducto() {
       <Alertdialog open={showValidationModal} onOpenChange={setShowValidationModal}>
         <AlertdialogContent className="sm:max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>Información Incompleta</DialogTitle>
+            <AlertDialogTitle>Información Incompleta</AlertDialogTitle>
             <AlertDialogDescription>
               No es posible avanzar hasta que no agregues por lo menos una fórmula o un ingrediente al producto.
             </AlertDialogDescription>
