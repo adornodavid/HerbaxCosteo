@@ -38,7 +38,7 @@ import {
   obtenerProductoDetalladoCompleto,
   obtenerFormulasAsociadasProducto,
   obtenerIngredientesAsociadosProducto,
-  obtenerProductos,
+  obtenerProductosXFiltros, // Importar la nueva función
 } from "@/app/actions/productos-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos-actions"
@@ -178,84 +178,26 @@ export default function ProductosPage() {
     setPaginaActual(1)
 
     try {
-      let query = supabase.from("productos").select(`
-          id, nombre, descripcion, propositoprincipal, costo, activo, imgurl,
-          productosxcatalogo!left(
-            catalogos!left(
-              id, nombre,
-              clientes!left(id, nombre)
-            )
-          )
-        `)
+      const resultado = await obtenerProductosXFiltros(nombre, clienteId, catalogoId, estatus)
 
-      if (nombre) query = query.ilike("nombre", `%${nombre}%`) // Cambiado a ilike para búsqueda insensible a mayúsculas/minúsculas
-
-      if (clienteId !== -1) {
-        query = query.eq("productosxcatalogo.catalogos.clientes.id", clienteId)
+      if (resultado.success) {
+        setProductos(resultado.data || [])
+        setTotalProductos(resultado.data?.length || 0)
+      } else {
+        console.error("Error en búsqueda:", resultado.error)
+        toast({
+          title: "Error",
+          description: "Error al buscar productos",
+          variant: "destructive",
+        })
       }
-      if (catalogoId !== -1) {
-        query = query.eq("productosxcatalogo.catalogos.id", catalogoId)
-      }
-      if (estatus !== "-1") {
-        query = query.eq("activo", estatus === "true")
-      }
-
-      const { data: queryData, error: queryError } = await query.order("nombre", { ascending: true })
-
-      if (queryError) {
-        console.error("Error en búsqueda:", queryError)
-        toast.error("Error al buscar productos.")
-        setProductos([])
-        return
-      }
-
-      // Transformar datos de la consulta para manejar productos sin asociación
-      const flattenedData = queryData.flatMap((p: any) => {
-        if (p.productosxcatalogo.length === 0) {
-          // Producto sin asociaciones, mostrarlo una vez
-          return {
-            ProductoId: p.id,
-            ProductoNombre: p.nombre,
-            ProductoDescripcion: p.descripcion,
-            ProductoTiempo: p.propositoprincipal,
-            ProductoCosto: p.costo,
-            ProductoActivo: p.activo,
-            ProductoImagenUrl: p.imgurl,
-            ClienteId: -1, // O algún valor que indique "N/A"
-            ClienteNombre: "N/A",
-            CatalogoId: -1, // O algún valor que indique "N/A"
-            CatalogoNombre: "N/A",
-          }
-        }
-        // Producto con asociaciones, aplanarlas
-        return p.productosxcatalogo.map((x: any) => ({
-          ProductoId: p.id,
-          ProductoNombre: p.nombre,
-          ProductoDescripcion: p.descripcion,
-          ProductoTiempo: p.propositoprincipal,
-          ProductoCosto: p.costo,
-          ProductoActivo: p.activo,
-          ProductoImagenUrl: p.imgurl,
-          ClienteId: x.catalogos?.clientes?.id || -1,
-          ClienteNombre: x.catalogos?.clientes?.nombre || "N/A",
-          CatalogoId: x.catalogos?.id || -1,
-          CatalogoNombre: x.catalogos?.nombre || "N/A",
-        }))
-      })
-
-      // Eliminar duplicados si un producto aparece varias veces debido a múltiples asociaciones
-      const uniqueProducts = Array.from(
-        new Map(flattenedData.map((item: ProductoListado) => [item.ProductoId, item])).values(),
-      )
-
-      setProductos(uniqueProducts)
-      setProductosFiltrados(uniqueProducts)
-      setTotalProductos(uniqueProducts.length)
-      toast.success(`Búsqueda completada. Se encontraron ${uniqueProducts.length} resultados.`)
     } catch (error) {
       console.error("Error inesperado al buscar productos:", error)
-      toast.error("Error inesperado al buscar productos")
-      setProductos([])
+      toast({
+        title: "Error",
+        description: "Error inesperado al buscar productos",
+        variant: "destructive",
+      })
     } finally {
       setIsSearching(false)
     }
@@ -305,7 +247,11 @@ export default function ProductosPage() {
       await ejecutarBusquedaProductos("", clienteIdParam, -1, "-1")
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error)
-      toast.error("Error al cargar datos iniciales")
+      toast({
+        title: "Error",
+        description: "Error al cargar datos iniciales",
+        variant: "destructive",
+      })
     } finally {
       setPageLoading(false)
     }
@@ -391,7 +337,11 @@ export default function ProductosPage() {
 
       if (error) {
         console.error("Error al cambiar estado:", error)
-        toast.error(`Error al cambiar estado del producto.`)
+        toast({
+          title: "Error",
+          description: `Error al cambiar estado del producto.`,
+          variant: "destructive",
+        })
       } else {
         // Actualizar el estado local para reflejar el cambio sin recargar todo
         setProductos((prev) => prev.map((p) => (p.ProductoId === id ? { ...p, ProductoActivo: nuevoEstado } : p)))
@@ -399,7 +349,11 @@ export default function ProductosPage() {
       }
     } catch (error) {
       console.error("Error inesperado al cambiar estado:", error)
-      toast.error("Error inesperado al cambiar estado")
+      toast({
+        title: "Error",
+        description: "Error inesperado al cambiar estado",
+        variant: "destructive",
+      })
     }
 
     setShowConfirmDialog(false)
@@ -469,8 +423,8 @@ export default function ProductosPage() {
   // --- Paginación ---
   const productosPaginados = useMemo(() => {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
-    return productosFiltrados.slice(indiceInicio, indiceInicio + resultadosPorPagina)
-  }, [productosFiltrados, paginaActual])
+    return productos.slice(indiceInicio, indiceInicio + resultadosPorPagina)
+  }, [productos, paginaActual])
 
   const totalPaginas = Math.ceil(totalProductos / resultadosPorPagina)
 
