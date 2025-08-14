@@ -1072,7 +1072,7 @@ export async function obtenerIngredientesAsociadosProducto(productoId: number) {
 }
 
 // Función: obtenerProductosXFiltros: función para obtener productos con filtros
-export async function obtenerProductosXFiltros(nombre = "", clienteId = -1, catalogoId = -1, estatus = "true") {
+export async function obtenerProductosXFiltros(nombre = "", clienteId = -1, catalogoId = -1, estatus = TRUE) {
   try {
     let query = supabaseAdmin.from("productos").select(`
       id, nombre, descripcion, propositoprincipal, costo, activo, imgurl,
@@ -1100,9 +1100,11 @@ export async function obtenerProductosXFiltros(nombre = "", clienteId = -1, cata
     }
 
     // Filtro por estatus
+    /*
     if (estatus !== "true" && estatus !== "TRUE" && estatus !== "True" && estatus !== null) {
       query = query.eq("activo", estatus === "true")
     }
+    */
 
     const { data, error } = await query.order("nombre", { ascending: true })
 
