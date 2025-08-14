@@ -39,6 +39,7 @@ import {
   obtenerFormulasAsociadasProducto,
   obtenerIngredientesAsociadosProducto,
 } from "@/app/actions/productos-actions"
+import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 
 // --- Interfaces ---
 interface DropdownItem {
@@ -280,9 +281,17 @@ export default function ProductosPage() {
       }
 
       // Cargar clientes
-      const clientesQuery = supabase.from("clientes").select("id, nombre").order("nombre")
+      const rolId = Number.parseInt(user.RolId?.toString() || "0", 10)
+      const clienteIdFromCookies = user.ClienteId?.toString() || "0"
 
-      const { data: clientesData, error: clientesError } = await clientesQuery
+      let clienteIdParam: string
+      if ([1, 2, 3, 4].includes(rolId)) {
+        clienteIdParam = "-1"
+      } else {
+        clienteIdParam = clienteIdFromCookies
+      }
+
+      const { data: clientesData, error: clientesError } = await listaDesplegableClientes(clienteIdParam, "")
 
       if (!clientesError) {
         const clientesConTodos = [
