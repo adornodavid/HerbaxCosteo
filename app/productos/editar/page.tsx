@@ -682,7 +682,8 @@ function EditarProductoContent() {
                   ))}
                 </SelectContent>
               </Select>
-            </div>*/}
+            </div>
+            */}
 
             <div className="space-y-2">
               <Label htmlFor="zona" className="text-slate-700 font-medium">
