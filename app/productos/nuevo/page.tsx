@@ -1566,8 +1566,8 @@ export default function NuevoProducto() {
         </div>
       </div>
 
-      <Alertdialog open={showValidationModal} onOpenChange={setShowValidationModal}>
-        <AlertdialogContent className="sm:max-w-md">
+      <AlertDialog open={showValidationModal} onOpenChange={setShowValidationModal}>
+        <AlertDialogContent className="sm:max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle>Información Incompleta</AlertDialogTitle>
             <AlertDialogDescription>
