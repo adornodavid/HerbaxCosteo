@@ -1183,8 +1183,10 @@ export default function NuevoProducto() {
               </div>
             )}
           </div>
+      </div> 
       </div>    
       <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm border border-slate-200/60 rounded-xs p-6 shadow-sm">
+        <div className="space-y-6">
           <div className="space-y-4">
             <h4 className="text-md font-medium text-slate-700">Ingredientes Adicionales</h4>
 
