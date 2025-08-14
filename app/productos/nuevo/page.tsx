@@ -569,7 +569,7 @@ export default function NuevoProducto() {
           const result = await getIngredientDetails(Number(selIngredienteId))
           if (result.success && result.data) {
             setSelIngredienteCosto(result.data.costo?.toString() || "0")
-            setSelIngredienteUnidad(result.unidadMedidaId?.toString() || "")
+            setSelIngredienteUnidad(result.unidadMedida?.toString() || "")
           }
         } catch (error) {
           console.error("Error getting ingredient details:", error)
