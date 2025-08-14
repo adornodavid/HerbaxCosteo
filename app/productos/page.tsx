@@ -22,7 +22,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import {
   Dialog,
@@ -33,8 +32,13 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { Eraser, Search, Eye, Edit, ToggleLeft, ToggleRight, Loader2, PlusCircle, RotateCcw } from 'lucide-react'
+import { Search, Eye, Edit, ToggleLeft, ToggleRight, Loader2, PlusCircle, RotateCcw } from "lucide-react"
 import { getProductoDetailsForModal } from "@/app/actions/productos-details-actions" // Importar la nueva acción
+import {
+  obtenerProductoDetalladoCompleto,
+  obtenerFormulasAsociadasProducto,
+  obtenerIngredientesAsociadosProducto,
+} from "@/app/actions/productos-actions"
 
 // --- Interfaces ---
 interface DropdownItem {
@@ -80,6 +84,46 @@ interface ProductoDetail {
   PrecioSugerido: number
 }
 
+// Nueva interfaz para los detalles completos del producto
+interface ProductoDetalleCompleto {
+  // Información básica
+  id: number
+  nombre: string
+  descripcion: string
+  presentacion: string
+  porcion: string
+  modouso: string
+  porcionenvase: string
+  categoriauso: string
+  propositoprincipal: string
+  propuestavalor: string
+  instruccionesingesta: string
+  edadminima: number
+  advertencia: string
+  condicionesalmacenamiento: string
+  vidaanaquelmeses: number
+  imgurl: string | null
+  costo: number
+  activo: boolean
+  fechacreacion: string
+  // Relaciones
+  clienteid: number
+  zonaid: number
+  formaid: number
+}
+
+interface FormulaAsociada {
+  formula: string
+  cantidad: number
+  costoparcial: number
+}
+
+interface IngredienteAsociado {
+  ingrediente: string
+  cantidad: number
+  costoparcial: number
+}
+
 // --- Componente Principal ---
 export default function ProductosPage() {
   const router = useRouter()
@@ -102,9 +146,12 @@ export default function ProductosPage() {
   const [searchTerm, setSearchTerm] = useState("") // Este estado no se usa en la búsqueda actual, pero se mantiene
   const [productoToDelete, setProductoToDelete] = useState<number | null>(null)
 
-  // Estados para el modal de detalles
+  // Estados para el modal de detalles mejorado
   const [showProductoDetailsModal, setShowProductoDetailsModal] = useState(false)
   const [selectedProductoDetails, setSelectedProductoDetails] = useState<ProductoDetail[] | null>(null)
+  const [selectedProductoCompleto, setSelectedProductoCompleto] = useState<ProductoDetalleCompleto | null>(null)
+  const [selectedFormulasAsociadas, setSelectedFormulasAsociadas] = useState<FormulaAsociada[]>([])
+  const [selectedIngredientesAsociados, setSelectedIngredientesAsociados] = useState<IngredienteAsociado[]>([])
   const [isDetailsLoading, setIsDetailsLoading] = useState(false)
 
   // Filtros
@@ -192,8 +239,9 @@ export default function ProductosPage() {
       })
 
       // Eliminar duplicados si un producto aparece varias veces debido a múltiples asociaciones
-      const uniqueProducts = Array.from(new Map(flattenedData.map((item: ProductoListado) => [item.ProductoId, item])).values());
-
+      const uniqueProducts = Array.from(
+        new Map(flattenedData.map((item: ProductoListado) => [item.ProductoId, item])).values(),
+      )
 
       setProductos(uniqueProducts)
       toast.success(`Búsqueda completada. Se encontraron ${uniqueProducts.length} resultados.`)
@@ -228,12 +276,11 @@ export default function ProductosPage() {
           tiempoPromedio: "25 min", // Esto es un valor fijo, considera calcularlo si es dinámico
         })
       } else if (statsError) {
-        console.error("Error cargando estadísticas:", statsError);
+        console.error("Error cargando estadísticas:", statsError)
       }
 
-
       // Cargar clientes
-      let clientesQuery = supabase.from("clientes").select("id, nombre").order("nombre")
+      const clientesQuery = supabase.from("clientes").select("id, nombre").order("nombre")
 
       const { data: clientesData, error: clientesError } = await clientesQuery
 
@@ -245,15 +292,11 @@ export default function ProductosPage() {
         setClientes(clientesConTodos)
         setFiltroCliente("-1")
       } else {
-        console.error("Error cargando clientes:", clientesError);
+        console.error("Error cargando clientes:", clientesError)
       }
 
       // Cargar catálogos iniciales (todos, sin filtro de cliente al inicio)
-      let catalogosQuery = supabase
-        .from("catalogos")
-        .select(`id, nombre`)
-        .eq("activo", true)
-        .order("nombre")
+      const catalogosQuery = supabase.from("catalogos").select(`id, nombre`).eq("activo", true).order("nombre")
 
       const { data: catalogosData, error: catalogosError } = await catalogosQuery
 
@@ -265,7 +308,7 @@ export default function ProductosPage() {
         setCatalogos(catalogosConTodos)
         setFiltroCatalogo("-1")
       } else {
-        console.error("Error cargando catálogos iniciales:", catalogosError);
+        console.error("Error cargando catálogos iniciales:", catalogosError)
       }
 
       // Ejecutar búsqueda inicial con todos los filtros en -1
@@ -302,11 +345,7 @@ export default function ProductosPage() {
     try {
       const clienteIdNum = Number.parseInt(value, 10)
 
-      let query = supabase
-        .from("catalogos")
-        .select(`id, nombre`)
-        .eq("activo", true)
-        .order("nombre")
+      let query = supabase.from("catalogos").select(`id, nombre`).eq("activo", true).order("nombre")
 
       if (clienteIdNum !== -1) {
         query = query.eq("clienteid", clienteIdNum)
@@ -321,7 +360,7 @@ export default function ProductosPage() {
         ]
         setCatalogos(catalogosConTodos)
       } else {
-        console.error("Error al cargar catálogos por cliente:", error);
+        console.error("Error al cargar catálogos por cliente:", error)
       }
     } catch (error) {
       console.error("Error al cambiar cliente:", error)
@@ -401,18 +440,40 @@ export default function ProductosPage() {
     setIsDetailsLoading(true)
     setShowProductoDetailsModal(true)
     setSelectedProductoDetails(null)
+    setSelectedProductoCompleto(null)
+    setSelectedFormulasAsociadas([])
+    setSelectedIngredientesAsociados([])
 
-    const { success, data, error } = await getProductoDetailsForModal(productoId)
+    try {
+      // Get complete product information
+      const productoResult = await obtenerProductoDetalladoCompleto(productoId)
+      if (productoResult.success && productoResult.data) {
+        setSelectedProductoCompleto(productoResult.data)
+      }
 
-    console.log(`getProductoDetailsForModal - Success: ${success}, Error: ${error ? error : "No error"}`)
+      // Get associated formulas
+      const formulasResult = await obtenerFormulasAsociadasProducto(productoId)
+      if (formulasResult.success && formulasResult.data) {
+        setSelectedFormulasAsociadas(formulasResult.data)
+      }
 
-    if (success && data) {
-      setSelectedProductoDetails(data)
-    } else {
-      toast.error(`Error al cargar detalles del producto: ${error}`)
-      setSelectedProductoDetails([])
+      // Get associated ingredients
+      const ingredientesResult = await obtenerIngredientesAsociadosProducto(productoId)
+      if (ingredientesResult.success && ingredientesResult.data) {
+        setSelectedIngredientesAsociados(ingredientesResult.data)
+      }
+
+      // Also get the original catalog associations for compatibility
+      const { success, data, error } = await getProductoDetailsForModal(productoId)
+      if (success && data) {
+        setSelectedProductoDetails(data)
+      }
+    } catch (error) {
+      console.error("Error loading detailed product information:", error)
+      toast.error("Error al cargar detalles del producto")
+    } finally {
+      setIsDetailsLoading(false)
     }
-    setIsDetailsLoading(false)
   }
 
   // --- Paginación ---
@@ -502,7 +563,7 @@ export default function ProductosPage() {
       </div>*/}
 
       {/* 3. Filtros */}
-     
+
       <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
           <CardTitle>Filtros de Búsqueda</CardTitle>
@@ -604,7 +665,7 @@ export default function ProductosPage() {
           </form>
         </CardContent>
       </Card>
-    
+
       {/* 4. Grid de Resultados - Ahora con Tarjetas */}
       <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
@@ -626,7 +687,11 @@ export default function ProductosPage() {
                   key={`${p.ProductoId}-${p.CatalogoId}-${index}`}
                   className="border bg-card text-card-foreground relative flex flex-col overflow-hidden rounded-xs shadow-lg hover:shadow-xl transition-shadow duration-300 group"
                 >
-                  <div className="relative w-full h-48 overflow-hidden">
+                  <div
+                    className="relative w-full h-48 overflow-hidden cursor-pointer"
+                    onClick={() => handleViewProductoDetails(p.ProductoId)}
+                    title="Ver detalles del producto"
+                  >
                     <Image
                       src={p.ProductoImagenUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
                       alt={p.ProductoNombre}
@@ -643,9 +708,7 @@ export default function ProductosPage() {
                     </div>
                   </div>
                   <CardContent className="flex flex-col flex-grow p-4">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                      {p.ProductoNombre}
-                    </h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{p.ProductoNombre}</h3>
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                       {p.ProductoDescripcion || "Sin descripción."}
                     </p>
@@ -653,7 +716,7 @@ export default function ProductosPage() {
                       <p className="text-lg font-bold text-green-600">{formatCurrency(p.ProductoCosto)}</p>
                       <div className="flex gap-1">
                         <Button
-                          className ="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-7"
+                          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-7"
                           variant="ghost"
                           size="icon"
                           title="Ver Detalles"
@@ -667,14 +730,17 @@ export default function ProductosPage() {
                           )}
                         </Button>
                         <Link href={`/productos/editar?getProductoId=${p.ProductoId}`} passHref>
-                          <Button 
-                          className ="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-7"
-                          variant="ghost" size="icon" title="Editar">
+                          <Button
+                            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-7"
+                            variant="ghost"
+                            size="icon"
+                            title="Editar"
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
                         </Link>
                         <Button
-                          className ="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2   focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  hover:bg-accent hover:text-accent-foreground h-10 w-7"
+                          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2   focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  hover:bg-accent hover:text-accent-foreground h-10 w-7"
                           variant="ghost"
                           size="icon"
                           title={p.ProductoActivo ? "Inactivar" : "Activar"}
@@ -738,76 +804,193 @@ export default function ProductosPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Modal de Detalles del Producto */}
       <Dialog open={showProductoDetailsModal} onOpenChange={setShowProductoDetailsModal}>
-        <DialogContent className="max-w-4xl overflow-y-auto max-h-[90vh]">
+        <DialogContent className="max-w-6xl overflow-y-auto max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Detalles del Producto</DialogTitle>
-            <DialogDescription>Información detallada del producto seleccionado.</DialogDescription>
+            <DialogDescription>Información completa del producto seleccionado.</DialogDescription>
           </DialogHeader>
           {isDetailsLoading ? (
             <div className="flex items-center justify-center h-48">
               <Loader2 className="h-8 w-8 animate-spin" />
               <span className="ml-2">Cargando detalles...</span>
             </div>
-          ) : selectedProductoDetails && selectedProductoDetails.length > 0 ? (
-            <div className="grid gap-4 py-4">
-              {/* Mostrar información principal del producto una vez */}
-              <div className="flex flex-col md:flex-row items-center gap-4">
-                {selectedProductoDetails[0].imgurl && (
-                  <img
-                    src={selectedProductoDetails[0].imgurl || "/placeholder.svg"}
-                    alt={selectedProductoDetails[0].Producto}
-                    className="w-64 h-64 object-cover rounded-md"
-                  />
-                )}
-                <div className="grid gap-1">
-                  <h3 className="text-xl font-semibold">{selectedProductoDetails[0].Producto}</h3>
-                  <p className="text-muted-foreground">{selectedProductoDetails[0].descripcion}</p>
-                  {selectedProductoDetails[0].instruccionespreparacion && (
-                    <p className="mt-2 text-sm text-gray-600">
-                      <span className="text-base text-black-600 font-medium">Instrucciones:</span>{" "}
-                      {selectedProductoDetails[0].instruccionespreparacion}
-                    </p>
+          ) : selectedProductoCompleto ? (
+            <div className="grid gap-6 py-4">
+              {/* Información Principal */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Imagen y datos básicos */}
+                <div className="space-y-4">
+                  {selectedProductoCompleto.imgurl && (
+                    <img
+                      src={selectedProductoCompleto.imgurl || "/placeholder.svg"}
+                      alt={selectedProductoCompleto.nombre}
+                      className="w-full h-64 object-cover rounded-lg shadow-md"
+                    />
                   )}
-                  {selectedProductoDetails[0].propositoprincipal && (
-                    <p className="mt-2 text-sm text-gray-600">
-                      <span className="text-base font-medium">Proposito Principal:</span>{" "}
-                      {selectedProductoDetails[0].propositoprincipal}
-                    </p>
-                  )}
-                  <p className="text-sm text-gray-600">
-                    <span className="text-base font-medium">Costo Total:</span>{" "}
-                    {formatCurrency(selectedProductoDetails[0].Costo)}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="text-base font-medium">Precio Mínimo:</span>{" "}
-                    {formatCurrency(selectedProductoDetails[0].PrecioSugerido)}
-                  </p>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="text-xl font-bold mb-2">{selectedProductoCompleto.nombre}</h3>
+                    <p className="text-gray-600 mb-3">{selectedProductoCompleto.descripcion}</p>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <p>
+                        <span className="font-medium">Costo:</span> {formatCurrency(selectedProductoCompleto.costo)}
+                      </p>
+                      <p>
+                        <span className="font-medium">Estado:</span>{" "}
+                        {selectedProductoCompleto.activo ? "Activo" : "Inactivo"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Información detallada */}
+                <div className="space-y-4">
+                  {/* Porciones */}
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-blue-800 mb-2">Información de Porciones</h4>
+                    <div className="grid grid-cols-1 gap-1 text-sm">
+                      <p>
+                        <span className="font-medium">Presentación:</span>{" "}
+                        {selectedProductoCompleto.presentacion || "N/A"}
+                      </p>
+                      <p>
+                        <span className="font-medium">Porción:</span> {selectedProductoCompleto.porcion || "N/A"}
+                      </p>
+                      <p>
+                        <span className="font-medium">Porción por envase:</span>{" "}
+                        {selectedProductoCompleto.porcionenvase || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Modo de Uso */}
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-green-800 mb-2">Modo de Uso</h4>
+                    <div className="grid grid-cols-1 gap-1 text-sm">
+                      <p>
+                        <span className="font-medium">Modo de uso:</span> {selectedProductoCompleto.modouso || "N/A"}
+                      </p>
+                      <p>
+                        <span className="font-medium">Categoría de uso:</span>{" "}
+                        {selectedProductoCompleto.categoriauso || "N/A"}
+                      </p>
+                      <p>
+                        <span className="font-medium">Edad mínima:</span> {selectedProductoCompleto.edadminima || "N/A"}{" "}
+                        años
+                      </p>
+                      <p>
+                        <span className="font-medium">Instrucciones:</span>{" "}
+                        {selectedProductoCompleto.instruccionesingesta || "N/A"}
+                      </p>
+                      <p>
+                        <span className="font-medium">Advertencias:</span>{" "}
+                        {selectedProductoCompleto.advertencia || "N/A"}
+                      </p>
+                      <p>
+                        <span className="font-medium">Almacenamiento:</span>{" "}
+                        {selectedProductoCompleto.condicionesalmacenamiento || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Detalles Adicionales */}
+                  <div className="bg-purple-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-purple-800 mb-2">Detalles Adicionales</h4>
+                    <div className="grid grid-cols-1 gap-1 text-sm">
+                      <p>
+                        <span className="font-medium">Vida de anaquel:</span>{" "}
+                        {selectedProductoCompleto.vidaanaquelmeses || "N/A"} meses
+                      </p>
+                      <p>
+                        <span className="font-medium">Propósito principal:</span>{" "}
+                        {selectedProductoCompleto.propositoprincipal || "N/A"}
+                      </p>
+                      <p>
+                        <span className="font-medium">Propuesta de valor:</span>{" "}
+                        {selectedProductoCompleto.propuestavalor || "N/A"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Mostrar detalles específicos de cada asociación con catálogo */}
-              {selectedProductoDetails.length > 0 && (
-                <div className="mt-4">
-                  <h4 className="text-lg font-semibold mb-2">Asociaciones con Catálogos:</h4>
+              {/* Fórmulas Asociadas */}
+              {selectedFormulasAsociadas.length > 0 && (
+                <div className="bg-emerald-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-emerald-800 mb-3">Fórmulas Asociadas</h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-emerald-200">
+                          <th className="text-left py-2 font-medium">Fórmula</th>
+                          <th className="text-left py-2 font-medium">Cantidad</th>
+                          <th className="text-left py-2 font-medium">Costo Parcial</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedFormulasAsociadas.map((formula, idx) => (
+                          <tr key={idx} className="border-b border-emerald-100">
+                            <td className="py-2">{formula.formula}</td>
+                            <td className="py-2">{formula.cantidad}</td>
+                            <td className="py-2">{formatCurrency(formula.costoparcial)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Ingredientes Asociados */}
+              {selectedIngredientesAsociados.length > 0 && (
+                <div className="bg-orange-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-orange-800 mb-3">Ingredientes Asociados</h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-orange-200">
+                          <th className="text-left py-2 font-medium">Ingrediente</th>
+                          <th className="text-left py-2 font-medium">Cantidad</th>
+                          <th className="text-left py-2 font-medium">Costo Parcial</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedIngredientesAsociados.map((ingrediente, idx) => (
+                          <tr key={idx} className="border-b border-orange-100">
+                            <td className="py-2">{ingrediente.ingrediente}</td>
+                            <td className="py-2">{ingrediente.cantidad}</td>
+                            <td className="py-2">{formatCurrency(ingrediente.costoparcial)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Asociaciones con Catálogos (mantener compatibilidad) */}
+              {selectedProductoDetails && selectedProductoDetails.length > 0 && (
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-3">Asociaciones con Catálogos</h4>
                   <div className="grid gap-3">
                     {selectedProductoDetails.map((detail, idx) => (
-                      <Card key={idx} className="p-3">
-                        <p className="text-sm">
-                          <span className="font-medium">Cliente:</span> {detail.Cliente}
-                        </p>
-                        <p className="text-sm">
-                          <span className="font-medium">Catálogo:</span> {detail.Catalogo}
-                        </p>
-                        <p className="text-sm">
-                          <span className="font-medium">Precio de Venta:</span> {formatCurrency(detail.precioventa)}
-                        </p>
-                        <p className="text-sm">
-                          <span className="font-medium">Margen de Utilidad:</span>{" "}
-                          {detail.margenutilidad !== null ? `${detail.margenutilidad}` : "N/A"}
-                        </p>
-                      </Card>
+                      <div key={idx} className="bg-white p-3 rounded border">
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <p>
+                            <span className="font-medium">Cliente:</span> {detail.Cliente}
+                          </p>
+                          <p>
+                            <span className="font-medium">Catálogo:</span> {detail.Catalogo}
+                          </p>
+                          <p>
+                            <span className="font-medium">Precio de Venta:</span> {formatCurrency(detail.precioventa)}
+                          </p>
+                          <p>
+                            <span className="font-medium">Margen:</span>{" "}
+                            {detail.margenutilidad !== null ? `${detail.margenutilidad}%` : "N/A"}
+                          </p>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>

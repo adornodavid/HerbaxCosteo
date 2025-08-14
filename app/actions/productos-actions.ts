@@ -33,6 +33,9 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
     - obtenerCostoTotalProducto / selCostoTotalProducto
     - obtenerProductoCompleto
     - finalizarProducto
+    - obtenerProductoDetalladoCompleto
+    - obtenerFormulasAsociadasProducto
+    - obtenerIngredientesAsociadosProducto
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
     - actualizarProductoEtapa1
@@ -939,6 +942,115 @@ export async function actualizarCostoProducto(productoId: number) {
     return { success: true }
   } catch (error) {
     console.error("Error en actualizarCostoProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: obtenerProductoDetalladoCompleto: función para obtener toda la información de un producto
+export async function obtenerProductoDetalladoCompleto(productoId: number) {
+  try {
+    const { data, error } = await supabaseAdmin.from("productos").select("*").eq("id", productoId).single()
+
+    if (error) {
+      console.error("Error obteniendo producto detallado:", error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en obtenerProductoDetalladoCompleto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: obtenerFormulasAsociadasProducto: función para obtener fórmulas asociadas a un producto
+export async function obtenerFormulasAsociadasProducto(productoId: number) {
+  try {
+    const { data, error } = await supabaseAdmin.rpc("obtener_formulas_producto", {
+      producto_id: productoId,
+    })
+
+    if (error) {
+      // If RPC doesn't exist, use manual query
+      const { data: manualData, error: manualError } = await supabaseAdmin
+        .from("productos")
+        .select(`
+          productosdetalles!inner(
+            cantidad,
+            costoparcial,
+            formulas!inner(
+              nombre
+            )
+          )
+        `)
+        .eq("id", productoId)
+        .eq("productosdetalles.tiposegmentoid", 1)
+
+      if (manualError) {
+        console.error("Error obteniendo fórmulas asociadas:", manualError)
+        return { success: false, error: manualError.message }
+      }
+
+      // Transform manual data to match expected format
+      const transformedData =
+        manualData[0]?.productosdetalles?.map((item: any) => ({
+          formula: item.formulas.nombre,
+          cantidad: item.cantidad,
+          costoparcial: item.costoparcial,
+        })) || []
+
+      return { success: true, data: transformedData }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en obtenerFormulasAsociadasProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: obtenerIngredientesAsociadosProducto: función para obtener ingredientes asociados a un producto
+export async function obtenerIngredientesAsociadosProducto(productoId: number) {
+  try {
+    const { data, error } = await supabaseAdmin.rpc("obtener_ingredientes_producto", {
+      producto_id: productoId,
+    })
+
+    if (error) {
+      // If RPC doesn't exist, use manual query
+      const { data: manualData, error: manualError } = await supabaseAdmin
+        .from("productos")
+        .select(`
+          productosdetalles!inner(
+            cantidad,
+            costoparcial,
+            ingredientes!inner(
+              nombre
+            )
+          )
+        `)
+        .eq("id", productoId)
+        .eq("productosdetalles.tiposegmentoid", 2)
+
+      if (manualError) {
+        console.error("Error obteniendo ingredientes asociados:", manualError)
+        return { success: false, error: manualError.message }
+      }
+
+      // Transform manual data to match expected format
+      const transformedData =
+        manualData[0]?.productosdetalles?.map((item: any) => ({
+          ingrediente: item.ingredientes.nombre,
+          cantidad: item.cantidad,
+          costoparcial: item.costoparcial,
+        })) || []
+
+      return { success: true, data: transformedData }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en obtenerIngredientesAsociadosProducto:", error)
     return { success: false, error: "Error interno del servidor" }
   }
 }
