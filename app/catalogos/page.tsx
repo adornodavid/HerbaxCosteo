@@ -700,208 +700,163 @@ export default function CatalogosPage() {
       </Card>
 
       <Dialog open={showRegistrationModal} onOpenChange={setShowRegistrationModal}>
-        <DialogContent className="sm:max-w-[650px] max-h-[95vh] overflow-hidden">
-          {/* Glass-liquid background with animated waves */}
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 via-blue-500/30 to-purple-600/20 backdrop-blur-2xl">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse" />
-            <div className="absolute top-0 left-0 w-full h-full">
-              <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-r from-cyan-300/30 to-blue-400/30 rounded-full blur-xl animate-bounce" />
-              <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-gradient-to-r from-purple-300/30 to-pink-400/30 rounded-full blur-xl animate-pulse" />
-              <div className="absolute top-1/2 left-1/2 w-16 h-16 bg-gradient-to-r from-teal-300/30 to-cyan-400/30 rounded-full blur-lg animate-ping" />
-            </div>
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm">
+            <div className="absolute inset-0 bg-white/60" />
           </div>
 
-          {/* Liquid border effect */}
-          <div className="absolute inset-0 rounded-lg border border-white/30 shadow-2xl">
-            <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 animate-pulse" />
-          </div>
+          <div className="absolute inset-0 rounded-lg border border-slate-200/60 shadow-lg" />
 
-          <div className="relative z-20 bg-white/5 backdrop-blur-sm rounded-lg p-1">
-            <DialogHeader className="pb-6 relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-purple-500/5 rounded-t-lg" />
+          <div className="relative z-20 bg-white/80 backdrop-blur-sm rounded-lg p-1">
+            <DialogHeader className="pb-4 relative">
               <div className="relative z-10">
-                <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 bg-clip-text text-transparent animate-pulse">
-                  ✨ Registrar Nuevo Catálogo
-                </DialogTitle>
-                <DialogDescription className="text-gray-700 font-medium">
-                  Complete la información para crear un catálogo único y especial.
+                <DialogTitle className="text-2xl font-semibold text-slate-800">Registrar Nuevo Catálogo</DialogTitle>
+                <DialogDescription className="text-slate-600">
+                  Complete la información para crear un nuevo catálogo.
                 </DialogDescription>
               </div>
             </DialogHeader>
 
-            <ScrollArea className="max-h-[65vh] pr-4">
-              <div className="space-y-8 p-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-4 max-h-[65vh] overflow-y-auto">
+              {/* Left column - Form inputs */}
+              <div className="space-y-4">
                 {/* Nombre del catálogo */}
-                <div className="space-y-3 relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-100/20 to-blue-100/20 rounded-lg blur-sm" />
-                  <div className="relative z-10 p-4 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30">
-                    <Label htmlFor="nombreCatalogo" className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 animate-pulse" />
-                      Nombre del Catálogo *
-                    </Label>
-                    <Input
-                      id="nombreCatalogo"
-                      value={registrationForm.nombre}
-                      onChange={(e) => setRegistrationForm({ ...registrationForm, nombre: e.target.value })}
-                      placeholder="Ingrese el nombre del catálogo"
-                      className="mt-2 bg-white/60 backdrop-blur-sm border-white/40 focus:border-cyan-400 focus:ring-cyan-400/30 text-gray-800 font-medium"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="nombreCatalogo" className="text-sm font-medium text-slate-700">
+                    Nombre del Catálogo *
+                  </Label>
+                  <Input
+                    id="nombreCatalogo"
+                    value={registrationForm.nombre}
+                    onChange={(e) => setRegistrationForm({ ...registrationForm, nombre: e.target.value })}
+                    placeholder="Ingrese el nombre del catálogo"
+                    className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                  />
                 </div>
 
                 {/* Cliente */}
-                <div className="space-y-3 relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-100/20 to-purple-100/20 rounded-lg blur-sm" />
-                  <div className="relative z-10 p-4 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30">
-                    <Label
-                      htmlFor="clienteCatalogo"
-                      className="text-sm font-bold text-gray-800 flex items-center gap-2"
-                    >
-                      <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 animate-pulse" />
-                      Cliente *
-                    </Label>
-                    <Select
-                      value={registrationForm.clienteId}
-                      onValueChange={(value) => setRegistrationForm({ ...registrationForm, clienteId: value })}
-                    >
-                      <SelectTrigger className="mt-2 bg-white/60 backdrop-blur-sm border-white/40 focus:border-blue-400">
-                        <SelectValue placeholder="Seleccione un cliente" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white/95 backdrop-blur-xl border border-white/30">
-                        {clientesRegistration.map((cliente) => (
-                          <SelectItem key={cliente.id} value={cliente.id} className="hover:bg-blue-100/50">
-                            {cliente.nombre}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="clienteCatalogo" className="text-sm font-medium text-slate-700">
+                    Cliente *
+                  </Label>
+                  <Select
+                    value={registrationForm.clienteId}
+                    onValueChange={(value) => setRegistrationForm({ ...registrationForm, clienteId: value })}
+                  >
+                    <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400">
+                      <SelectValue placeholder="Seleccione un cliente" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white/95 backdrop-blur-sm border border-slate-200/60">
+                      {clientesRegistration.map((cliente) => (
+                        <SelectItem key={cliente.id} value={cliente.id} className="hover:bg-slate-100/50">
+                          {cliente.nombre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Descripción */}
-                <div className="space-y-3 relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-100/20 to-pink-100/20 rounded-lg blur-sm" />
-                  <div className="relative z-10 p-4 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30">
-                    <Label
-                      htmlFor="descripcionCatalogo"
-                      className="text-sm font-bold text-gray-800 flex items-center gap-2"
-                    >
-                      <div className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 animate-pulse" />
-                      Descripción *
-                    </Label>
-                    <Textarea
-                      id="descripcionCatalogo"
-                      value={registrationForm.descripcion}
-                      onChange={(e) => setRegistrationForm({ ...registrationForm, descripcion: e.target.value })}
-                      placeholder="Ingrese la descripción del catálogo"
-                      rows={3}
-                      className="mt-2 bg-white/60 backdrop-blur-sm border-white/40 focus:border-purple-400 focus:ring-purple-400/30 text-gray-800"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="descripcionCatalogo" className="text-sm font-medium text-slate-700">
+                    Descripción *
+                  </Label>
+                  <Textarea
+                    id="descripcionCatalogo"
+                    value={registrationForm.descripcion}
+                    onChange={(e) => setRegistrationForm({ ...registrationForm, descripcion: e.target.value })}
+                    placeholder="Ingrese la descripción del catálogo"
+                    rows={4}
+                    className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20 resize-none"
+                  />
                 </div>
+              </div>
 
-                {/* Imagen del catálogo */}
-                <div className="space-y-4 relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-teal-100/20 to-cyan-100/20 rounded-lg blur-sm" />
-                  <div className="relative z-10 p-6 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30">
-                    <Label className="text-sm font-bold text-gray-800 flex items-center gap-2 mb-4">
-                      <div className="w-2 h-2 rounded-full bg-gradient-to-r from-teal-400 to-cyan-500 animate-pulse" />
-                      Imagen del Catálogo
-                    </Label>
+              {/* Right column - Image upload */}
+              <div className="space-y-4">
+                <Label className="text-sm font-medium text-slate-700">Imagen del Catálogo</Label>
 
-                    <div className="flex flex-col items-center space-y-6">
-                      {/* Preview de imagen */}
-                      <div className="relative">
-                        {imagePreview ? (
-                          <div className="relative w-56 h-36 rounded-xl overflow-hidden border-3 border-white/40 shadow-2xl">
-                            <Image
-                              src={imagePreview || "/placeholder.svg"}
-                              alt="Preview"
-                              fill
-                              className="object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-600 text-white rounded-full p-2 backdrop-blur-sm"
-                              onClick={() => {
-                                setSelectedImage(null)
-                                setImagePreview(null)
-                              }}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="w-56 h-36 border-3 border-dashed border-white/40 rounded-xl flex items-center justify-center bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm">
-                            <div className="text-center">
-                              <Camera className="h-12 w-12 mx-auto text-gray-500 mb-3 animate-bounce" />
-                              <p className="text-sm text-gray-600 font-medium">Vista previa de imagen</p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Botón de subir imagen mejorado */}
-                      <div className="relative">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                          id="imageUpload"
-                        />
+                <div className="flex flex-col items-center space-y-4">
+                  {/* Preview de imagen */}
+                  <div className="relative">
+                    {imagePreview ? (
+                      <div className="relative w-48 h-32 rounded-lg overflow-hidden border border-slate-200/60 shadow-sm">
+                        <Image src={imagePreview || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
                         <Button
                           type="button"
-                          className="relative bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white border-0 shadow-xl backdrop-blur-sm px-8 py-3 rounded-xl font-bold transition-all duration-300 hover:scale-105"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute top-1 right-1 bg-red-500/90 hover:bg-red-600 text-white rounded-full p-1 h-6 w-6"
+                          onClick={() => {
+                            setSelectedImage(null)
+                            setImagePreview(null)
+                          }}
                         >
-                          <Upload className="mr-3 h-5 w-5" />
-                          Seleccionar Imagen
+                          <X className="h-3 w-3" />
                         </Button>
                       </div>
-
-                      <p className="text-xs text-gray-600 text-center font-medium">
-                        Formatos soportados: JPG, PNG, GIF • Tamaño máximo: 5MB
-                      </p>
-                    </div>
+                    ) : (
+                      <div className="w-48 h-32 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center bg-slate-50/50">
+                        <div className="text-center">
+                          <Camera className="h-8 w-8 mx-auto text-slate-400 mb-2" />
+                          <p className="text-xs text-slate-500">Vista previa</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Botón de subir imagen */}
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      id="imageUpload"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="bg-white/80 border-slate-200/60 hover:bg-slate-50 text-slate-700 px-6 py-2"
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      Seleccionar Imagen
+                    </Button>
+                  </div>
+
+                  <p className="text-xs text-slate-500 text-center">JPG, PNG, GIF • Máx. 5MB</p>
                 </div>
               </div>
-            </ScrollArea>
+            </div>
 
             {/* Botones de acción */}
-            <div className="flex justify-end space-x-4 pt-8 border-t border-white/20 relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-b-lg" />
-              <div className="relative z-10 flex gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowRegistrationModal(false)}
-                  className="bg-white/30 border-white/40 hover:bg-white/40 text-gray-700 font-bold backdrop-blur-sm px-6 py-2 rounded-xl transition-all duration-300 hover:scale-105"
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="button"
-                  onClick={handleRegistrarCatalogo}
-                  disabled={registrationLoading}
-                  className="bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 hover:from-cyan-700 hover:via-blue-700 hover:to-purple-700 text-white border-0 shadow-xl font-bold px-8 py-2 rounded-xl transition-all duration-300 hover:scale-105 disabled:opacity-50"
-                >
-                  {registrationLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Registrando...
-                    </>
-                  ) : (
-                    <>
-                      <BookOpen className="mr-2 h-5 w-5" />
-                      Registrar Catálogo
-                    </>
-                  )}
-                </Button>
-              </div>
+            <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200/60">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowRegistrationModal(false)}
+                className="bg-white/80 border-slate-200/60 hover:bg-slate-50 text-slate-700 px-6"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                onClick={handleRegistrarCatalogo}
+                disabled={registrationLoading}
+                className="bg-sky-600 hover:bg-sky-700 text-white px-8"
+              >
+                {registrationLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Registrando...
+                  </>
+                ) : (
+                  <>
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    Registrar Catálogo
+                  </>
+                )}
+              </Button>
             </div>
           </div>
         </DialogContent>
