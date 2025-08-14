@@ -266,8 +266,8 @@ export default function ProductosPage() {
     if (!user) return
 
     try {
-      const rolId = Number.parseInt(user.RolId?.toString() || "0", 10)
-      const clienteIdParam = [1, 2, 3, 4].includes(rolId) ? -1 : Number.parseInt(user.ClienteId?.toString() || "-1", 10)
+      const rolId = Number.parseInt(user.RolId?.toString() || 0, 10)
+      const clienteIdParam = [1, 2, 3, 4].includes(rolId) ? -1 : Number.parseInt(user.ClienteId?.toString() || -1, 10)
 
       const productosResult = await obtenerProductosXFiltros("", clienteIdParam, -1, "true")
 
