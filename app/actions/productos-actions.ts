@@ -966,43 +966,45 @@ export async function obtenerProductoDetalladoCompleto(productoId: number) {
 // Función: obtenerFormulasAsociadasProducto: función para obtener fórmulas asociadas a un producto
 export async function obtenerFormulasAsociadasProducto(productoId: number) {
   try {
-    const { data, error } = await supabaseAdmin.rpc("obtener_formulas_producto", {
-      producto_id: productoId,
-    })
+    // First get productosdetalles records for formulas (tiposegmentoid = 1)
+    const { data: detallesData, error: detallesError } = await supabaseAdmin
+      .from("productosdetalles")
+      .select("elementoid, cantidad, costoparcial")
+      .eq("productoid", productoId)
+      .eq("tiposegmentoid", 1)
 
-    if (error) {
-      // If RPC doesn't exist, use manual query
-      const { data: manualData, error: manualError } = await supabaseAdmin
-        .from("productos")
-        .select(`
-          productosdetalles!inner(
-            cantidad,
-            costoparcial,
-            formulas!inner(
-              nombre
-            )
-          )
-        `)
-        .eq("id", productoId)
-        .eq("productosdetalles.tiposegmentoid", 1)
-
-      if (manualError) {
-        console.error("Error obteniendo fórmulas asociadas:", manualError)
-        return { success: false, error: manualError.message }
-      }
-
-      // Transform manual data to match expected format
-      const transformedData =
-        manualData[0]?.productosdetalles?.map((item: any) => ({
-          formula: item.formulas.nombre,
-          cantidad: item.cantidad,
-          costoparcial: item.costoparcial,
-        })) || []
-
-      return { success: true, data: transformedData }
+    if (detallesError) {
+      console.error("Error obteniendo detalles de fórmulas:", detallesError)
+      return { success: false, error: detallesError.message }
     }
 
-    return { success: true, data }
+    if (!detallesData || detallesData.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    // Get formula names using elementoid
+    const formulaIds = detallesData.map((item) => item.elementoid)
+    const { data: formulasData, error: formulasError } = await supabaseAdmin
+      .from("formulas")
+      .select("id, nombre")
+      .in("id", formulaIds)
+
+    if (formulasError) {
+      console.error("Error obteniendo nombres de fórmulas:", formulasError)
+      return { success: false, error: formulasError.message }
+    }
+
+    // Combine data
+    const transformedData = detallesData.map((detalle) => {
+      const formula = formulasData?.find((f) => f.id === detalle.elementoid)
+      return {
+        formula: formula?.nombre || "Fórmula no encontrada",
+        cantidad: detalle.cantidad,
+        costoparcial: detalle.costoparcial,
+      }
+    })
+
+    return { success: true, data: transformedData }
   } catch (error) {
     console.error("Error en obtenerFormulasAsociadasProducto:", error)
     return { success: false, error: "Error interno del servidor" }
@@ -1012,43 +1014,45 @@ export async function obtenerFormulasAsociadasProducto(productoId: number) {
 // Función: obtenerIngredientesAsociadosProducto: función para obtener ingredientes asociados a un producto
 export async function obtenerIngredientesAsociadosProducto(productoId: number) {
   try {
-    const { data, error } = await supabaseAdmin.rpc("obtener_ingredientes_producto", {
-      producto_id: productoId,
-    })
+    // First get productosdetalles records for ingredients (tiposegmentoid = 2)
+    const { data: detallesData, error: detallesError } = await supabaseAdmin
+      .from("productosdetalles")
+      .select("elementoid, cantidad, costoparcial")
+      .eq("productoid", productoId)
+      .eq("tiposegmentoid", 2)
 
-    if (error) {
-      // If RPC doesn't exist, use manual query
-      const { data: manualData, error: manualError } = await supabaseAdmin
-        .from("productos")
-        .select(`
-          productosdetalles!inner(
-            cantidad,
-            costoparcial,
-            ingredientes!inner(
-              nombre
-            )
-          )
-        `)
-        .eq("id", productoId)
-        .eq("productosdetalles.tiposegmentoid", 2)
-
-      if (manualError) {
-        console.error("Error obteniendo ingredientes asociados:", manualError)
-        return { success: false, error: manualError.message }
-      }
-
-      // Transform manual data to match expected format
-      const transformedData =
-        manualData[0]?.productosdetalles?.map((item: any) => ({
-          ingrediente: item.ingredientes.nombre,
-          cantidad: item.cantidad,
-          costoparcial: item.costoparcial,
-        })) || []
-
-      return { success: true, data: transformedData }
+    if (detallesError) {
+      console.error("Error obteniendo detalles de ingredientes:", detallesError)
+      return { success: false, error: detallesError.message }
     }
 
-    return { success: true, data }
+    if (!detallesData || detallesData.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    // Get ingredient names using elementoid
+    const ingredientIds = detallesData.map((item) => item.elementoid)
+    const { data: ingredientesData, error: ingredientesError } = await supabaseAdmin
+      .from("ingredientes")
+      .select("id, nombre")
+      .in("id", ingredientIds)
+
+    if (ingredientesError) {
+      console.error("Error obteniendo nombres de ingredientes:", ingredientesError)
+      return { success: false, error: ingredientesError.message }
+    }
+
+    // Combine data
+    const transformedData = detallesData.map((detalle) => {
+      const ingrediente = ingredientesData?.find((i) => i.id === detalle.elementoid)
+      return {
+        ingrediente: ingrediente?.nombre || "Ingrediente no encontrado",
+        cantidad: detalle.cantidad,
+        costoparcial: detalle.costoparcial,
+      }
+    })
+
+    return { success: true, data: transformedData }
   } catch (error) {
     console.error("Error en obtenerIngredientesAsociadosProducto:", error)
     return { success: false, error: "Error interno del servidor" }
