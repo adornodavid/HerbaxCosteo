@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, Upload, ArrowLeft, ArrowRight, FileImage, Loader2 } from "lucide-react"
+import { CheckCircle, Upload, ArrowLeft, ArrowRight, FileImage, Loader2, AlertTriangle } from "lucide-react"
 import {
   crearProducto,
   obtenerClientes,
@@ -181,6 +181,8 @@ export default function NuevoProducto() {
   const [deleteFormulaId, setDeleteFormulaId] = useState<number | null>(null)
   const [deleteIngredienteId, setDeleteIngredienteId] = useState<number | null>(null)
 
+  const [showStep1ValidationModal, setShowStep1ValidationModal] = useState(false)
+
   const steps = [
     { number: 1, title: "Información Básica", description: "Datos generales del producto" },
     { number: 2, title: "Agregar Elementos", description: "Ingredientes y fórmulas" },
@@ -323,9 +325,9 @@ export default function NuevoProducto() {
     console.log(currentStep)
     if (currentStep === 1) {
       console.log("etapa 1")
-      // Validate step 1
-      if (!formData.nombre.trim()) {
-        alert("El nombre del producto es requerido")
+
+      if (!formData.nombre.trim() || !formData.clienteid || !formData.catalogoid || !formData.zonaid) {
+        setShowStep1ValidationModal(true)
         return
       }
 
@@ -1749,6 +1751,33 @@ export default function NuevoProducto() {
           </div>
         </div>
       )}
+
+      <Dialog open={showStep1ValidationModal} onOpenChange={setShowStep1ValidationModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-amber-600">
+              <AlertTriangle className="h-5 w-5" />
+              Campos Requeridos
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-gray-600">
+              Faltan campos por llenar. Por favor complete los siguientes campos obligatorios:
+            </p>
+            <ul className="mt-2 text-sm text-gray-800 list-disc list-inside">
+              <li>Nombre del producto</li>
+              <li>Cliente</li>
+              <li>Catálogo</li>
+              <li>Zona</li>
+            </ul>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowStep1ValidationModal(false)} className="w-full">
+              Entendido
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
