@@ -330,6 +330,8 @@ export default function ProductosPage() {
           : (clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
 
         setClientes(clientesConTodos)
+        
+        [1, 2, 3, 4].includes(rolId) ? setFiltroCliente("-1") : setFiltroCliente(clientesData.id.toString())
         //setFiltroCliente("-1")
       } else {
         console.error("Error cargando clientes:", clientesError)
