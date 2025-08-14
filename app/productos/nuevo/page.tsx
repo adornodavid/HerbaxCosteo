@@ -1509,7 +1509,7 @@ export default function NuevoProducto() {
 
           {formulasAgregadas.length > 0 && (
             <div className="bg-gradient-to-br from-white to-emerald-50 p-3 border border-emerald-100 shadow-sm">
-              <h4 className="text-lg font-semibold text-emerald-800 mb-4 flex items-center gap-2">
+              <h4 className="text-lg font-semibold text-emerald-800 mb-2 flex items-center gap-2">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
                 Fórmulas Agregadas ({formulasAgregadas.length})
               </h4>
