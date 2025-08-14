@@ -14,7 +14,7 @@ import {
   PaginationLink,
   PaginationNext,
 } from "@/components/ui/pagination"
-import { BookOpen, Search, RotateCcw, Eye, Edit, PowerOff, Power } from "lucide-react"
+import { BookOpen, Search, RotateCcw, Eye, Edit, PowerOff, Power, Folder } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { getSession } from "@/app/actions/session-actions"
 import { useToast } from "@/components/ui/use-toast"
@@ -467,6 +467,14 @@ export default function CatalogosPage() {
                             onClick={() => handleViewCatalogoDetails(catalogo.id)}
                           >
                             <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="hover:bg-orange-100 hover:text-orange-700"
+                            onClick={() => router.push(`/catalogos/agregar?getCatalogoId=${catalogo.id}`)}
+                          >
+                            <Folder className="h-4 w-4" />
                           </Button>
                           <Button variant="ghost" size="sm" className="hover:bg-blue-100 hover:text-blue-700">
                             <Edit className="h-4 w-4" />

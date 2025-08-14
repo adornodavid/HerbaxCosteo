@@ -211,3 +211,148 @@ export async function listaDesplegableCatalogos(id = -1, nombre = "", clienteid 
     }
   }
 }
+
+//Función: obtenerProductosCatalogo: función para obtener productos relacionados a un catálogo
+export async function obtenerProductosCatalogo(catalogoId: string) {
+  const supabase = createClient()
+
+  try {
+    const { data, error } = await supabase
+      .from("catalogos")
+      .select(`
+        productosxcatalogo!inner(
+          productos!inner(
+            id,
+            nombre,
+            descripcion,
+            presentacion,
+            imgurl,
+            costo
+          )
+        )
+      `)
+      .eq("id", catalogoId)
+      .eq("productosxcatalogo.productos.activo", true)
+
+    if (error) throw error
+
+    // Aplanar los datos para obtener solo los productos
+    const productos = data.flatMap((catalogo) => catalogo.productosxcatalogo.map((px) => px.productos))
+
+    return {
+      data: productos.map((producto) => ({
+        id: String(producto.id),
+        nombre: producto.nombre,
+        descripcion: producto.descripcion,
+        presentacion: producto.presentacion,
+        imgurl: producto.imgurl,
+        costo: producto.costo,
+      })),
+      error: null,
+    }
+  } catch (error: any) {
+    console.error("Error en obtenerProductosCatalogo:", error.message)
+    return {
+      data: [],
+      error: error.message,
+    }
+  }
+}
+
+//Función: obtenerProductosDisponiblesParaCatalogo: función para obtener productos disponibles del cliente para agregar al catálogo
+export async function obtenerProductosDisponiblesParaCatalogo(catalogoId: string) {
+  const supabase = createClient()
+
+  try {
+    // Primero obtenemos los productos del cliente relacionado al catálogo
+    const { data: catalogoData, error: catalogoError } = await supabase
+      .from("catalogos")
+      .select(`
+        clientes!inner(
+          productos!inner(
+            id,
+            nombre,
+            descripcion,
+            presentacion,
+            imgurl,
+            costo
+          )
+        )
+      `)
+      .eq("id", catalogoId)
+      .eq("clientes.productos.activo", true)
+
+    if (catalogoError) throw catalogoError
+
+    // Obtenemos los productos ya asociados al catálogo
+    const { data: productosAsociados, error: asociadosError } = await supabase
+      .from("productosxcatalogo")
+      .select("productoid")
+      .eq("catalogoid", catalogoId)
+
+    if (asociadosError) throw asociadosError
+
+    const idsAsociados = productosAsociados.map((p) => p.productoid)
+
+    // Aplanar los productos del cliente
+    const todosProductos = catalogoData.flatMap((catalogo) => catalogo.clientes.productos)
+
+    // Filtrar productos que no estén ya asociados
+    const productosDisponibles = todosProductos.filter((producto) => !idsAsociados.includes(producto.id))
+
+    return {
+      data: productosDisponibles.map((producto) => ({
+        id: String(producto.id),
+        nombre: producto.nombre,
+        descripcion: producto.descripcion,
+        presentacion: producto.presentacion,
+        imgurl: producto.imgurl,
+        costo: producto.costo,
+      })),
+      error: null,
+    }
+  } catch (error: any) {
+    console.error("Error en obtenerProductosDisponiblesParaCatalogo:", error.message)
+    return {
+      data: [],
+      error: error.message,
+    }
+  }
+}
+
+//Función: asociarProductoACatalogo: función para asociar un producto a un catálogo
+export async function asociarProductoACatalogo(
+  catalogoId: string,
+  productoId: string,
+  precioVenta: number,
+  costoProducto: number,
+) {
+  const supabase = createClient()
+
+  try {
+    const margenUtilidad = precioVenta - costoProducto
+    const fechaHoy = new Date().toISOString()
+
+    const { data, error } = await supabase.from("productosxcatalogo").insert({
+      catalogoid: catalogoId,
+      productoid: productoId,
+      precioventa: precioVenta,
+      margenutilidad: margenUtilidad,
+      fechacreacion: fechaHoy,
+      activo: true,
+    })
+
+    if (error) throw error
+
+    return {
+      success: true,
+      error: null,
+    }
+  } catch (error: any) {
+    console.error("Error en asociarProductoACatalogo:", error.message)
+    return {
+      success: false,
+      error: error.message,
+    }
+  }
+}
