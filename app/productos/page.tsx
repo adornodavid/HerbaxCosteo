@@ -325,10 +325,10 @@ export default function ProductosPage() {
       )
 
       if (!clientesError) {
-        const clientesConTodos = [
-          { id: -1, nombre: "Todos" },
-          ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre })),
-        ]
+        const clientesConTodos = [1, 2, 3, 4].includes(Number(user.RolId))
+          ? [{ id: -1, nombre: "Todos" }, ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))]
+          : (clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
+
         setClientes(clientesConTodos)
         setFiltroCliente("-1")
       } else {
@@ -339,10 +339,13 @@ export default function ProductosPage() {
       const catalogosResult = await listaDesplegableCatalogos(-1, "", clienteIdParamCatalogos)
 
       if (!catalogosResult.error) {
-        const catalogosConTodos = [
-          { id: -1, nombre: "Todos" },
-          ...(catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre })),
-        ]
+        const catalogosConTodos = [1, 2, 3, 4].includes(Number(user.RolId))
+          ? [
+              { id: -1, nombre: "Todos" },
+              ...(catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre })),
+            ]
+          : (catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre }))
+
         setCatalogos(catalogosConTodos)
         setFiltroCatalogo("-1")
       } else {
