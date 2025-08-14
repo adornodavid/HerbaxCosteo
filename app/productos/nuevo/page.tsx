@@ -678,7 +678,7 @@ export default function NuevoProducto() {
               <Select
                 value={formData.catalogoid?.toString() || ""}
                 onValueChange={(value) => handleInputChange("catalogoid", value ? Number.parseInt(value) : null)}
-                //disabled={!formData.clienteid || catalogos.length === 0}
+                disabled={!formData.clienteid || catalogos.length === 0}
               >
                 <SelectTrigger className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20">
                   <SelectValue placeholder="Selecciona un catálogo" />
