@@ -449,7 +449,7 @@ export default function NuevoProducto() {
       alert("Error: No se encontró el ID del producto")
       return
     }
-
+    setIsSubmitting(true)
     try {
       const formula = formulas.find((f) => f.id === formData.formaid)
       if (!formula) {
@@ -486,6 +486,8 @@ export default function NuevoProducto() {
     } catch (error) {
       console.error("Error adding formula:", error)
       alert("Error al agregar la fórmula")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -1121,9 +1123,10 @@ export default function NuevoProducto() {
             <div className="flex justify-end">
               <Button
                 onClick={handleAgregarFormula}
-                disabled={!formData.formaid || formulaRangoCantidad <= 0}
+                disabled={!formData.formaid || formulaRangoCantidad <= 0 || isSubmitting}
                 className="bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600"
               >
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Agregar Fórmula
               </Button>
             </div>
