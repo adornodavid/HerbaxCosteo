@@ -312,7 +312,8 @@ export default function ProductosPage() {
       }
 
       // Ejecutar búsqueda inicial con todos los filtros en -1
-      await ejecutarBusquedaProductos("", -1, -1, "-1")
+      //await ejecutarBusquedaProductos("", -1, -1, "-1")
+      await obtenerProductos(clienteIdParam)
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error)
       toast.error("Error al cargar datos iniciales")
