@@ -219,6 +219,10 @@ export default function ProductosPage() {
         new Map(flattenedData.map((item: ProductoListado) => [item.ProductoId, item])).values(),
       )
 
+      setProductos(uniqueProducts)
+      setProductosFiltrados(uniqueProducts)
+      setTotalProductos(uniqueProducts.length)
+      
       /*
       if (resultado.success) {
         setProductos(resultado.data || [])
