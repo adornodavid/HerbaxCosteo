@@ -450,7 +450,7 @@ export default function CatalogosPage() {
         </Card>
       </div>*/}
 
-      <Card className="mb-6">
+      <Card className="rounded-xs border bg-card text-card-foreground shadow mb-6">
         <CardHeader>
           <CardTitle>Filtros de Búsqueda</CardTitle>
         </CardHeader>
