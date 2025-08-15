@@ -104,15 +104,13 @@ interface FormulaCompleta {
 }
 
 /* ==================================================
-  Principal - pagina
+  Componente Principal, Pagina
 ================================================== */
 export default function FormulasPage() {
+  // --- Variables especiales ---
   const router = useRouter()
-
-  /* ==================================================
-    Estados
-  ================================================== */
-  // Estados de sesión y carga
+  
+		// --- Estados ---
   const [sesion, setSesion] = useState<SessionData | null>(null)
   const [loading, setLoading] = useState(true)
   const [searching, setSearching] = useState(false)
