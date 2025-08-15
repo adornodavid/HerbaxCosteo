@@ -135,7 +135,7 @@ export default function DashboardPage() {
         <h1 className="text-4xl font-bold text-gray-900">Sistema de Costeo Healthylab</h1>
         <h2 className="text-2xl font-semibold text-gray-700">Dashboard</h2>
 
-        <div className="w-80 flex flex-col gap-2 p-8 shadow-xl sm:flex-row sm:items-center sm:gap-6 sm:py-4 ...">
+        {/*<div className="w-80 flex flex-col gap-2 p-8 shadow-xl sm:flex-row sm:items-center sm:gap-6 sm:py-4 ...">
           <img
             className="mx-auto block h-24 rounded-full sm:mx-0 sm:shrink-0"
             src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/quimico.png"
@@ -150,7 +150,7 @@ export default function DashboardPage() {
               Message
             </button>
           </div>
-        </div>
+        </div>*/}
       </div>
 
       {/* Sección de bienvenida */}

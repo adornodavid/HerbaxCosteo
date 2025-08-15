@@ -104,7 +104,7 @@ interface FormulaCompleta {
 }
 
 /* ==================================================
-  Componente Principal, Pagina
+  Principal - pagina
 ================================================== */
 export default function FormulasPage() {
   const router = useRouter()
