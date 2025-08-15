@@ -31,6 +31,7 @@ import {
   PillBottle,
   Pill,
   FlaskRound,
+  NotebookPen,
 } from "lucide-react"
 
 export const Icons = {
@@ -66,6 +67,7 @@ export const Icons = {
   PillBottle,
   Pill,
   FlaskRound,
+  NotebookPen,
 }
 
 export type Icon = keyof typeof Icons
