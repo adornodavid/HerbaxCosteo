@@ -6,7 +6,6 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
   DialogContent,
@@ -26,6 +25,8 @@ import {
   obtenerProductosDisponiblesParaCatalogo,
   asociarProductoACatalogo,
   obtenerDetalleCatalogo,
+  eliminarProductoDeCatalogo,
+  actualizarPrecioProductoCatalogo,
 } from "@/app/actions/catalogos-actions"
 import {
   obtenerProductoDetalladoCompleto,
@@ -118,6 +119,11 @@ export default function CatalogosAgregarPage() {
   const [selectedIngredientesAsociados, setSelectedIngredientesAsociados] = useState<IngredienteAsociado[]>([])
   const [selectedProductoDetails, setSelectedProductoDetails] = useState<ProductoDetail[] | null>(null)
   const [isDetailsLoading, setIsDetailsLoading] = useState(false)
+
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingProducto, setEditingProducto] = useState<Producto | null>(null)
+  const [editPrecioVenta, setEditPrecioVenta] = useState("")
+  const [updating, setUpdating] = useState(false)
 
   // Security validation
   useEffect(() => {
@@ -303,6 +309,94 @@ export default function CatalogosAgregarPage() {
     }
   }
 
+  const handleEliminarProducto = async (productoId: string) => {
+    if (!catalogoId) return
+
+    if (!confirm("¿Está seguro de que desea eliminar este producto del catálogo?")) {
+      return
+    }
+
+    try {
+      const { success, error } = await eliminarProductoDeCatalogo(catalogoId, productoId)
+
+      if (error) throw new Error(error)
+
+      toast({
+        title: "Éxito",
+        description: "Producto eliminado del catálogo correctamente",
+      })
+
+      // Refresh the products list
+      cargarDatos()
+    } catch (error: any) {
+      console.error("Error eliminando producto:", error.message)
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el producto del catálogo",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleEditarProducto = (producto: Producto) => {
+    setEditingProducto(producto)
+    setEditPrecioVenta(producto.precioventa?.toString() || "")
+    setShowEditModal(true)
+  }
+
+  const handleActualizarPrecio = async () => {
+    if (!editingProducto || !editPrecioVenta || !catalogoId) {
+      toast({
+        title: "Error",
+        description: "Por favor complete todos los campos",
+        variant: "destructive",
+      })
+      return
+    }
+
+    const precio = Number.parseFloat(editPrecioVenta)
+    if (isNaN(precio) || precio <= 0) {
+      toast({
+        title: "Error",
+        description: "Por favor ingrese un precio válido",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setUpdating(true)
+    try {
+      const { success, error } = await actualizarPrecioProductoCatalogo(
+        catalogoId,
+        editingProducto.id,
+        precio,
+        editingProducto.costo,
+      )
+
+      if (error) throw new Error(error)
+
+      toast({
+        title: "Éxito",
+        description: "Precio actualizado correctamente",
+      })
+
+      // Reset and refresh
+      setShowEditModal(false)
+      setEditingProducto(null)
+      setEditPrecioVenta("")
+      cargarDatos()
+    } catch (error: any) {
+      console.error("Error actualizando precio:", error.message)
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el precio",
+        variant: "destructive",
+      })
+    } finally {
+      setUpdating(false)
+    }
+  }
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-MX", {
       style: "currency",
@@ -383,11 +477,7 @@ export default function CatalogosAgregarPage() {
                     className="h-8 w-8 p-0 bg-blue-500/80 hover:bg-blue-600/90 text-white backdrop-blur-sm"
                     onClick={(e) => {
                       e.stopPropagation()
-                      // TODO: Implement edit functionality
-                      toast({
-                        title: "Función en desarrollo",
-                        description: "La función de editar estará disponible próximamente",
-                      })
+                      handleEditarProducto(producto)
                     }}
                   >
                     <Edit className="h-4 w-4" />
@@ -398,11 +488,7 @@ export default function CatalogosAgregarPage() {
                     className="h-8 w-8 p-0 bg-red-500/80 hover:bg-red-600/90 text-white backdrop-blur-sm"
                     onClick={(e) => {
                       e.stopPropagation()
-                      // TODO: Implement delete functionality
-                      toast({
-                        title: "Función en desarrollo",
-                        description: "La función de eliminar estará disponible próximamente",
-                      })
+                      handleEliminarProducto(producto.id)
                     }}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -420,7 +506,7 @@ export default function CatalogosAgregarPage() {
                       fill
                       className="object-cover transition-transform duration-300 group-hover:scale-110"
                     />
-                   {/* <div className="absolute top-2 right-2">
+                    {/* <div className="absolute top-2 right-2">
                       <Badge className="bg-green-500/80 text-white backdrop-blur-sm">
                         ${producto.costo.toFixed(2)}
                       </Badge>
@@ -782,6 +868,85 @@ export default function CatalogosAgregarPage() {
                 </Button>
               </DialogPrimitive.Close>
             </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Price Modal */}
+        <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+          <DialogContent className="sm:max-w-md backdrop-blur-md bg-white/10 border border-white/20">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold text-gray-900">Editar Precio del Producto</DialogTitle>
+            </DialogHeader>
+
+            {editingProducto && (
+              <div className="space-y-4">
+                <Card className="backdrop-blur-sm bg-white/20 border border-white/30">
+                  <CardContent className="p-4">
+                    <div className="flex items-start space-x-4">
+                      <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+                        <Image
+                          src={editingProducto.imgurl || "/placeholder.svg"}
+                          alt={editingProducto.nombre}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900 mb-1">{editingProducto.nombre}</h4>
+                        <p className="text-sm text-gray-600 mb-2">{editingProducto.descripcion}</p>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div>
+                            <span className="font-medium">Presentación:</span>
+                            <p className="text-gray-600">{editingProducto.presentacion}</p>
+                          </div>
+                          <div>
+                            <span className="font-medium">Costo:</span>
+                            <p className="text-gray-600">${editingProducto.costo.toFixed(2)}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Precio Venta</label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={editPrecioVenta}
+                    onChange={(e) => setEditPrecioVenta(e.target.value)}
+                    placeholder="Ingrese el nuevo precio de venta"
+                    className="backdrop-blur-sm bg-white/20 border border-white/30"
+                  />
+                </div>
+
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowEditModal(false)}
+                    className="backdrop-blur-sm bg-white/20 border border-white/30"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={handleActualizarPrecio}
+                    disabled={!editPrecioVenta || updating}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                  >
+                    {updating ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Actualizando...
+                      </>
+                    ) : (
+                      "Actualizar Precio"
+                    )}
+                  </Button>
+                </DialogFooter>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       </div>

@@ -418,3 +418,65 @@ export async function crearCatalogo(clienteId: string, nombre: string, descripci
     }
   }
 }
+
+//Función: eliminarProductoDeCatalogo: función para eliminar un producto de un catálogo
+export async function eliminarProductoDeCatalogo(catalogoId: string, productoId: string) {
+  const supabase = createClient()
+
+  try {
+    const { error } = await supabase
+      .from("productosxcatalogo")
+      .delete()
+      .eq("catalogoid", catalogoId)
+      .eq("productoid", productoId)
+
+    if (error) throw error
+
+    return {
+      success: true,
+      error: null,
+    }
+  } catch (error: any) {
+    console.error("Error en eliminarProductoDeCatalogo:", error.message)
+    return {
+      success: false,
+      error: error.message,
+    }
+  }
+}
+
+//Función: actualizarPrecioProductoCatalogo: función para actualizar el precio de venta de un producto en un catálogo
+export async function actualizarPrecioProductoCatalogo(
+  catalogoId: string,
+  productoId: string,
+  nuevoPrecioVenta: number,
+  costoProducto: number,
+) {
+  const supabase = createClient()
+
+  try {
+    const nuevoMargenUtilidad = nuevoPrecioVenta - costoProducto
+
+    const { error } = await supabase
+      .from("productosxcatalogo")
+      .update({
+        precioventa: nuevoPrecioVenta,
+        margenutilidad: nuevoMargenUtilidad,
+      })
+      .eq("catalogoid", catalogoId)
+      .eq("productoid", productoId)
+
+    if (error) throw error
+
+    return {
+      success: true,
+      error: null,
+    }
+  } catch (error: any) {
+    console.error("Error en actualizarPrecioProductoCatalogo:", error.message)
+    return {
+      success: false,
+      error: error.message,
+    }
+  }
+}
