@@ -61,6 +61,40 @@ const ChartTooltip = React.forwardRef<any, React.ComponentProps<typeof VictoryTo
 )
 ChartTooltip.displayName = "ChartTooltip"
 
+const ChartTooltipContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    active?: boolean
+    payload?: Array<{
+      color?: string
+      name?: string
+      value?: any
+      payload?: any
+    }>
+    label?: string
+  }
+>(({ className, active, payload, label, ...props }, ref) => {
+  if (active && payload && payload.length) {
+    return (
+      <div ref={ref} className={cn("rounded-lg border bg-background p-2 shadow-md", className)} {...props}>
+        {label && <div className="mb-2 font-medium text-foreground">{label}</div>}
+        <div className="grid gap-2">
+          {payload.map((entry, index) => (
+            <div key={index} className="flex items-center gap-2">
+              {entry.color && <div className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />}
+              <span className="text-sm text-muted-foreground">{entry.name}:</span>
+              <span className="text-sm font-medium text-foreground">{entry.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return null
+})
+ChartTooltipContent.displayName = "ChartTooltipContent"
+
 const ChartLegend = React.forwardRef<any, React.ComponentProps<typeof VictoryLegend>>(
   ({ className, ...props }, ref) => {
     return (
@@ -163,6 +197,7 @@ export {
   Chart,
   ChartContainer,
   ChartTooltip,
+  ChartTooltipContent,
   ChartLegend,
   ChartAxis,
   ChartBar,
