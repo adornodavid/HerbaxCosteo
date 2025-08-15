@@ -99,11 +99,11 @@ export default function LoginPage() {
           <div className="w-full lg:w-1/2 flex justify-center">
             <div className="relative w-full max-w-md">
               {/* Glass-liquid background layers */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-blue-50/30 to-slate-100/40 rounded-3xl backdrop-blur-2xl border border-white/30 shadow-2xl transform rotate-1"></div>
-              <div className="absolute inset-1 bg-gradient-to-tr from-white/50 via-slate-50/40 to-blue-50/30 rounded-3xl backdrop-blur-xl border border-white/40 shadow-xl transform -rotate-1"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-blue-50/30 to-slate-100/40 rounded-3xl border border-white/30 shadow-2xl transform rotate-1"></div>
+              <div className="absolute inset-1 bg-gradient-to-tr from-white/50 via-slate-50/40 to-blue-50/30 rounded-3xl border border-white/40 shadow-xl transform -rotate-1"></div>
 
               {/* Main content container */}
-              <div className="relative bg-[#E7F0F9]/15 backdrop-blur-3xl rounded-xs border border-white/50 shadow-2xl p-8">
+              <div className="relative bg-[#E7F0F9]/95 rounded-xs border border-white/50 shadow-2xl p-8">
                 {/* Header */}
                 <div className="text-center mb-8">
                   <div className="mb-6">
