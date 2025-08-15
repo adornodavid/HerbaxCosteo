@@ -168,9 +168,7 @@ export default function FormulasPage() {
     }
   }, [sesion])
 
-  /* ==================================================
-    Validaciones con session
-  ================================================== */
+  // ---  Validar sesión ---
   const cargarSesion = async () => {
     try {
       const datosSession = await getSession()
