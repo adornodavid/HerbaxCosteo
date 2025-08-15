@@ -705,7 +705,7 @@ export default function CatalogosPage() {
             <div className="absolute inset-0 bg-white/60" />
           </div>
 
-          <div className="absolute inset-0 rounded-lg border border-slate-200/60 shadow-lg" />
+          <div className="absolute inset-0 rounded-xs border border-slate-200/60 shadow-lg" />
 
           <div className="relative z-20 bg-white/80 backdrop-blur-sm rounded-lg p-1">
             <DialogHeader className="pb-4 relative">
