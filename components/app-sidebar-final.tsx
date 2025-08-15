@@ -150,7 +150,7 @@ export function AppSidebar() {
               boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3)",
             }}
           >
-            <img className="shrink-0 size-5 rounded-full" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/quimico.png" alt="Avatar" />
+            <img className="shrink-0 size-5 rounded-full" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/herbaxlogo.jpg" alt="Avatar" />
             {/*<Icons.User className="w-4 h-4 text-slate-600" />*/}
           </div>
           <span className="text-sm font-medium text-slate-700">{sessionData?.NombreCompleto || "Usuario"}</span>
