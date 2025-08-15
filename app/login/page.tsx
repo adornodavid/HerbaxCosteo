@@ -87,7 +87,7 @@ export default function LoginPage() {
   // Render, HTML
   return (
     <div className="min-h-screen relative overflow-hidden bg-[url('https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/1034899_6498.svg')] bg-cover bg-center">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/20 via-transparent to-purple-50/20 backdrop-blur-[1px]"></div>
+      {/*<div className="absolute inset-0 bg-gradient-to-br from-blue-50/20 via-transparent to-purple-50/20 backdrop-blur-[1px]"></div>*/}
 
       {/* Contenido principal */}
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
