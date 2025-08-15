@@ -589,7 +589,7 @@ export default function IngredientesPage() {
                         >
                           <Eye className="h-3 w-3" />
                         </Button>
-                        <Button
+                        {/*<Button
                           size="sm"
                           variant="outline"
                           onClick={() => router.push(`/ingredientes/editar?getIngredienteId=${ingrediente.Folio}`)}
@@ -606,7 +606,7 @@ export default function IngredientesPage() {
                           ) : (
                             <Power className="h-3 w-3 text-green-500" />
                           )}
-                        </Button>
+                        </Button>*/}
                       </div>
                     </TableCell>
                   </TableRow>
