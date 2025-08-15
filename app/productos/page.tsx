@@ -37,14 +37,15 @@ import {
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { Search, Eye, Edit, ToggleLeft, ToggleRight, Loader2, PlusCircle, RotateCcw } from "lucide-react"
 import {
-  getProductoDetailsForModal,
   obtenerProductoDetalladoCompleto,
   obtenerFormulasAsociadasProducto,
   obtenerIngredientesAsociadosProducto,
   obtenerProductosIniciales,
+  buscarProductosConFiltros,
 } from "@/app/actions/productos-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos-actions"
+import { getProductoDetailsForModal } from "@/app/actions/productos-actions" // Import the missing function
 
 /* ==================================================
   Interfaces, tipados, clases
@@ -186,36 +187,16 @@ export default function ProductosPage() {
     setPaginaActual(1)
 
     try {
-      let query = supabase.from("productos").select(`
-          id, nombre, descripcion, propositoprincipal, costo, activo, imgurl,
-          productosxcatalogo!left(
-            catalogos!left(
-              id, nombre,
-              clientes!left(id, nombre)
-            )
-          )
-        `)
+      const result = await buscarProductosConFiltros(nombre, clienteId, catalogoId, estatus, user.RolId, user.ClienteId)
 
-      if (nombre) query = query.ilike("nombre", `%${nombre}%`) // Cambiado a ilike para búsqueda insensible a mayúsculas/minúsculas
-
-      if (clienteId !== -1) {
-        query = query.eq("productosxcatalogo.catalogos.clientes.id", clienteId)
-      }
-      if (catalogoId !== -1) {
-        query = query.eq("productosxcatalogo.catalogos.id", catalogoId)
-      }
-      if (estatus !== "-1") {
-        query = query.eq("activo", estatus === "true")
-      }
-
-      const { data: queryData, error: queryError } = await query.order("nombre", { ascending: true })
-
-      if (queryError) {
-        console.error("Error en búsqueda:", queryError)
+      if (!result.success) {
+        console.error("Error en búsqueda:", result.error)
         toast.error("Error al buscar productos.")
         setProductos([])
         return
       }
+
+      const queryData = result.data || []
 
       // Transformar datos de la consulta para manejar productos sin asociación
       const flattenedData = queryData.flatMap((p: any) => {
@@ -229,9 +210,9 @@ export default function ProductosPage() {
             ProductoCosto: p.costo,
             ProductoActivo: p.activo,
             ProductoImagenUrl: p.imgurl,
-            ClienteId: -1, // O algún valor que indique "N/A"
+            ClienteId: -1,
             ClienteNombre: "N/A",
-            CatalogoId: -1, // O algún valor que indique "N/A"
+            CatalogoId: -1,
             CatalogoNombre: "N/A",
           }
         }
@@ -433,11 +414,11 @@ export default function ProductosPage() {
     setFiltroNombre("")
     setFiltroCliente("-1")
     setFiltroCatalogo("-1")
-    setFiltroEstatus("-1") // Limpiar también el filtro de estatus
-    handleClienteChange("-1") // Resetear también los catálogos
+    setFiltroEstatus("-1")
+    handleClienteChange("-1")
     toast.info("Filtros limpiados.")
-    // Volver a ejecutar la búsqueda con filtros limpios
-    ejecutarBusquedaProductos("", -1, -1, "-1")
+    // Use the same logic as initial loading
+    cargarDatosInicialesProductos()
   }
 
   const handleToggleStatusClickProducto = (id: number, activo: boolean) => {

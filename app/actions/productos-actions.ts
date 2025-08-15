@@ -37,6 +37,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
     - obtenerFormulasAsociadasProducto
     - obtenerIngredientesAsociadosProducto
     - obtenerProductosIniciales
+    - buscarProductosConFiltros
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
     - actualizarProductoEtapa1
@@ -1224,6 +1225,71 @@ export async function obtenerProductosIniciales(rolId: number, clienteId: number
     return { success: true, data }
   } catch (error) {
     console.error("Error en obtenerProductosIniciales:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: buscarProductosConFiltros: función para buscar productos con filtros que respeten RolId y todos los filtros
+export async function buscarProductosConFiltros(
+  nombre = "",
+  clienteId = -1,
+  catalogoId = -1,
+  estatus = "true",
+  rolId: number,
+  userClienteId: number,
+) {
+  try {
+    // Determine client filter based on RolId - same logic as initial loading
+    const clienteIdFiltro = [1, 2, 3].includes(rolId) ? -1 : userClienteId
+
+    let query = supabaseAdmin.from("productos").select(`
+      id, nombre, descripcion, propositoprincipal, costo, activo, imgurl,
+      productosxcatalogo!left(
+        catalogos!left(
+          id, nombre,
+          clientes!left(id, nombre)
+        )
+      )
+    `)
+
+    // Apply name filter
+    if (nombre !== "" && nombre !== null) {
+      query = query.ilike("nombre", `%${nombre}%`)
+    }
+
+    // Apply client filter based on RolId first, then user selection
+    if (clienteIdFiltro !== -1) {
+      // User has restricted access, filter by their client
+      query = query.eq("productosxcatalogo.catalogos.clientes.id", clienteIdFiltro)
+    } else if (clienteId > 0) {
+      // User has full access and selected a specific client
+      query = query.eq("productosxcatalogo.catalogos.clientes.id", clienteId)
+    }
+
+    // Apply catalog filter
+    if (catalogoId > 0) {
+      query = query.eq("productosxcatalogo.catalogos.id", catalogoId)
+    }
+
+    // Apply status filter
+    if (estatus === "false") {
+      query = query.eq("activo", false)
+    } else if (estatus === "true") {
+      query = query.eq("activo", true)
+    }
+
+    query = query.order("nombre", { ascending: true })
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error("Error buscando productos con filtros:", error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en buscarProductosConFiltros:", error)
     return { success: false, error: "Error interno del servidor" }
   }
 }
