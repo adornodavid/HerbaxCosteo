@@ -262,7 +262,7 @@ export default function CatalogosAgregarPage() {
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-100/20 to-blue-100/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                 <div className="relative z-10">
-                  <div className="aspect-square relative overflow-hidden rounded-t-lg">
+                  <div className="aspect-square relative overflow-hidden">
                     <Image
                       src={producto.imgurl || "/placeholder.svg?height=300&width=300&query=producto"}
                       alt={producto.nombre}
