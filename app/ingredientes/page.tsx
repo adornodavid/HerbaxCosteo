@@ -678,7 +678,7 @@ export default function IngredientesPage() {
               </Card>
 
               {/* Fórmulas que usan este ingrediente */}
-              <Card>
+              <Card className="rounded-xs border bg-card text-card-foreground shadow">
                 <CardHeader>
                   <CardTitle className="text-lg">Fórmulas que usan este ingrediente</CardTitle>
                 </CardHeader>
