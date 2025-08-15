@@ -725,7 +725,7 @@ export default function IngredientesPage() {
               </Card>
 
               {/* Productos relacionados */}
-              <Card>
+              <Card className="rounded-xs border bg-card text-card-foreground shadow">
                 <CardHeader>
                   <CardTitle className="text-lg">Productos relacionados</CardTitle>
                 </CardHeader>
