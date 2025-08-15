@@ -581,7 +581,7 @@ export default function CatalogosPage() {
                           className="object-cover transition-transform duration-300 group-hover:scale-110"
                         />
                         <div className="absolute top-2 right-2">
-                          <Badge variant={catalogo.activo ? "default" : "secondary"} className="backdrop-blur-sm">
+                          <Badge variant={catalogo.activo ? "default" : "secondary"} className="inline-flex items-center border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground hover:bg-primary/80 backdrop-blur-sm">
                             {catalogo.activo ? "Activo" : "Inactivo"}
                           </Badge>
                         </div>
