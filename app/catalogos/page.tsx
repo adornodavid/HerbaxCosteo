@@ -888,7 +888,7 @@ export default function CatalogosPage() {
           ) : selectedCatalogoDetails ? (
             <ScrollArea className="flex-1 pr-4 max-h-[60vh] overflow-y-auto">
               <div className="grid gap-6 py-4">
-                <Card className="shadow-lg border-l-4 border-[#986ec2]">
+                <Card className="rounded-xs border bg-card text-card-foreground shadow-lg border-l-4 border-[#986ec2]">
                   <CardHeader>
                     <CardTitle className="text-xl font-semibold text-[#986ec2]">Información General</CardTitle>
                   </CardHeader>
