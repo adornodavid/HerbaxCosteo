@@ -276,7 +276,7 @@ export default function ProductosPage() {
     try {
       const rolId = Number.parseInt(user.RolId?.toString() || 0, 10)
       const clienteId = Number.parseInt(user.ClienteId?.toString() || -1, 10)
-
+      console.log(clienteId)
       // Use new function with proper RolId filtering
       const productosResult = await obtenerProductosIniciales(rolId, clienteId)
 
