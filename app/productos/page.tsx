@@ -132,7 +132,9 @@ interface IngredienteAsociado {
   costoparcial: number
 }
 
-// --- Componente Principal ---
+/* ==================================================
+	  Componente Principal, Pagina
+	================================================== */
 export default function ProductosPage() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
