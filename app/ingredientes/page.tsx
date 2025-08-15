@@ -633,7 +633,7 @@ export default function IngredientesPage() {
           ) : detailsModal.ingrediente ? (
             <div className="space-y-6">
               {/* Información Básica */}
-              <Card>
+              <Card className="rounded-xs border bg-card text-card-foreground shadow">
                 <CardHeader>
                   <CardTitle className="text-lg">Información Básica</CardTitle>
                 </CardHeader>
