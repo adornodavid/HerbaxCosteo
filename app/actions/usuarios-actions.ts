@@ -5,7 +5,7 @@
 ================================================== */
 import { createClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
-import bcrypt from 'bcryptjs' // Asegúrate de que bcryptjs esté instalado: npm install bcryptjs
+import bcrypt from "bcryptjs" // Asegúrate de que bcryptjs esté instalado: npm install bcryptjs
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -13,6 +13,7 @@ import bcrypt from 'bcryptjs' // Asegúrate de que bcryptjs esté instalado: npm
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the supabase variable
 
 /* ==================================================
 	  Funciones
@@ -31,17 +32,17 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 //  Función: insUsuario
 export async function insUsuario(formData: FormData) {
   // Extraer los valores del FormData
-  const nombrecompleto = formData.get('nombrecompleto') as string;
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
-  const rolid = parseInt(formData.get('rolid') as string); // Convertir a número
+  const nombrecompleto = formData.get("nombrecompleto") as string
+  const email = formData.get("email") as string
+  const password = formData.get("password") as string
+  const rolid = Number.parseInt(formData.get("rolid") as string) // Convertir a número
 
   try {
     // Hashear la contraseña antes de insertarla
     const hashedPassword = await bcrypt.hash(password, 10)
 
     const { data, error } = await supabase
-      .from('usuarios')
+      .from("usuarios")
       .insert([
         {
           nombrecompleto: nombrecompleto,
@@ -54,14 +55,14 @@ export async function insUsuario(formData: FormData) {
       .select()
 
     if (error) {
-      console.error('Error inserting user:', error.message)
+      console.error("Error inserting user:", error.message)
       return { success: false, message: `Error al insertar usuario: ${error.message}` }
     }
 
-    revalidatePath('/pruebas/usuarios') // Revalidar la ruta de usuarios para mostrar el nuevo usuario
-    return { success: true, message: 'Usuario insertado exitosamente.' }
+    revalidatePath("/pruebas/usuarios") // Revalidar la ruta de usuarios para mostrar el nuevo usuario
+    return { success: true, message: "Usuario insertado exitosamente." }
   } catch (error: any) {
-    console.error('Error en insUsuario:', error.message)
+    console.error("Error en insUsuario:", error.message)
     return { success: false, message: `Error en el servidor: ${error.message}` }
   }
 }
@@ -106,39 +107,37 @@ export async function insUsuario2(
 }
 
 //Función: selUsuarioLogin: Función para autenticar un usuario
-export async function selUsuarioLogin(formData: FormData) {
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
-
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+export async function selUsuarioLogin(formData: FormData | any) {
+  const email = formData instanceof FormData ? (formData.get("email") as string) : formData.email
+  const password = formData instanceof FormData ? (formData.get("password") as string) : formData.password
 
   try {
     const { data: users, error: fetchError } = await supabase
-      .from('usuarios')
-      .select('id, email, password, activo')
-      .eq('email', email)
+      .from("usuarios")
+      .select("id, email, password, activo")
+      .eq("email", email)
       .single()
 
     if (fetchError || !users) {
-      console.error('Error fetching user or user not found:', fetchError?.message || 'User not found')
-      return { success: false, message: 'Credenciales inválidas.' }
+      console.error("Error fetching user or user not found:", fetchError?.message || "User not found")
+      return { success: false, message: "Credenciales inválidas." }
     }
 
     if (!users.activo) {
-      return { success: false, message: 'Usuario inactivo. Contacte al administrador.' }
+      return { success: false, message: "Usuario inactivo. Contacte al administrador." }
     }
 
     // Comparar la contraseña ingresada con el hash almacenado
     const passwordMatch = await bcrypt.compare(password, users.password)
 
     if (!passwordMatch) {
-      return { success: false, message: 'Credenciales inválidas.' }
+      return { success: false, message: "Credenciales inválidas." }
     }
 
     // Si las credenciales son correctas, puedes devolver información del usuario o un mensaje de éxito
-    return { success: true, message: 'Login exitoso.' }
+    return { success: true, message: "Login exitoso." }
   } catch (error: any) {
-    console.error('Error en selUsuarioLogin:', error.message)
+    console.error("Error en selUsuarioLogin:", error.message)
     return { success: false, message: `Error en el servidor: ${error.message}` }
   }
 }
