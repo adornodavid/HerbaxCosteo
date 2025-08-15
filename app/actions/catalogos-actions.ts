@@ -221,6 +221,7 @@ export async function obtenerProductosCatalogo(catalogoId: string) {
       .from("catalogos")
       .select(`
         productosxcatalogo!inner(
+        precioventa,
           productos!inner(
             id,
             nombre,
@@ -247,6 +248,7 @@ export async function obtenerProductosCatalogo(catalogoId: string) {
         presentacion: producto.presentacion,
         imgurl: producto.imgurl,
         costo: producto.costo,
+        precioventa: producto.precioventa,
       })),
       error: null,
     }
