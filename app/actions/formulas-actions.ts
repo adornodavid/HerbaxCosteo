@@ -773,40 +773,50 @@ export async function obtenerIngredientesDeFormula(formulaId: number) {
 //Función: obtenerProductosDeFormula: función para obtener productos asociados a la fórmula
 export async function obtenerProductosDeFormula(formulaId: number) {
   try {
-    const { data, error } = await supabase
-      .from("formulas")
-      .select(`
-        productosdetalles!inner(
-          cantidad,
-          costoparcial,
-          productos!inner(
-            imgurl,
-            nombre,
-            presentacion,
-            costo
-          )
-        )
-      `)
-      .eq("id", formulaId)
-      .eq("productosdetalles.tiposegmentoid", 1)
+    // Primero obtener los detalles de productos asociados a la fórmula
+    const { data: productosDetalles, error: detallesError } = await supabase
+      .from("productosdetalles")
+      .select("productoid, cantidad, costoparcial")
+      .eq("elementoid", formulaId)
+      .eq("tiposegmentoid", 1)
 
-    if (error) {
-      console.error("Error al obtener productos de fórmula:", error)
-      return { data: null, error: error.message }
+    if (detallesError) {
+      console.error("Error al obtener detalles de productos:", detallesError)
+      return { data: null, error: detallesError.message }
     }
 
-    // Aplanar los datos para obtener la estructura esperada
-    const productos =
-      data?.[0]?.productosdetalles?.map((item: any) => ({
-        imgurl: item.productos.imgurl,
-        Producto: item.productos.nombre,
-        presentacion: item.productos.presentacion,
-        costo: item.productos.costo,
-        cantidad: item.cantidad,
-        costoparcial: item.costoparcial,
-      })) || []
+    if (!productosDetalles || productosDetalles.length === 0) {
+      return { data: [], error: null }
+    }
 
-    return { data: productos, error: null }
+    // Obtener los IDs de productos
+    const productosIds = productosDetalles.map((detalle) => detalle.productoid)
+
+    // Luego obtener la información de los productos
+    const { data: productos, error: productosError } = await supabase
+      .from("productos")
+      .select("id, imgurl, nombre, presentacion, costo")
+      .in("id", productosIds)
+
+    if (productosError) {
+      console.error("Error al obtener productos:", productosError)
+      return { data: null, error: productosError.message }
+    }
+
+    // Combinar los datos manualmente
+    const productosCompletos = productosDetalles.map((detalle) => {
+      const producto = productos?.find((p) => p.id === detalle.productoid)
+      return {
+        imgurl: producto?.imgurl || "",
+        Producto: producto?.nombre || "N/A",
+        presentacion: producto?.presentacion || "N/A",
+        costo: producto?.costo || 0,
+        cantidad: detalle.cantidad,
+        costoparcial: detalle.costoparcial,
+      }
+    })
+
+    return { data: productosCompletos, error: null }
   } catch (error: any) {
     console.error("Error en obtenerProductosDeFormula:", error)
     return { data: null, error: error.message }
