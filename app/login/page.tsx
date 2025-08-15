@@ -93,21 +93,7 @@ export default function LoginPage() {
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
         <div className="flex items-center justify-center w-full max-w-6xl">
           {/* Left side - Decorative image */}
-          <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-8">
-            <div className="relative">
-              <div className="w-96 h-96 relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-blue-50/20 to-slate-100/30 rounded-[3rem] backdrop-blur-xl border border-white/20 shadow-2xl transform rotate-6"></div>
-                <div className="absolute inset-4 bg-gradient-to-tr from-blue-50/40 via-white/30 to-purple-50/20 rounded-[2.5rem] backdrop-blur-lg border border-white/30 shadow-xl transform -rotate-3"></div>
-                <div className="absolute inset-8 flex items-center justify-center">
-                  <img
-                    src="/placeholder.svg?height=300&width=300"
-                    alt="Sistema de Costeo"
-                    className="w-full h-full object-contain opacity-80"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+         
 
           {/* Right side - Login form */}
           <div className="w-full lg:w-1/2 flex justify-center">
