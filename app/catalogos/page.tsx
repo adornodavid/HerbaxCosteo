@@ -700,7 +700,7 @@ export default function CatalogosPage() {
       </Card>
 
       <Dialog open={showRegistrationModal} onOpenChange={setShowRegistrationModal}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden">
+        <DialogContent className="rounded-xs sm:max-w-[700px] max-h-[90vh] overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-slate-100/50 backdrop-blur-sm">
             <div className="absolute inset-0 bg-white/60" />
           </div>
