@@ -1,5 +1,8 @@
 "use client"
 
+/* ==================================================
+	  Imports
+	================================================== */
 import type React from "react"
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
@@ -43,7 +46,9 @@ import {
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos-actions"
 
-// --- Interfaces ---
+/* ==================================================
+  Interfaces, tipados, clases
+================================================== */
 interface DropdownItem {
   id: number
   nombre: string
