@@ -103,7 +103,7 @@ export default function LoginPage() {
               <div className="absolute inset-1 bg-gradient-to-tr from-white/50 via-slate-50/40 to-blue-50/30 rounded-3xl backdrop-blur-xl border border-white/40 shadow-xl transform -rotate-1"></div>
 
               {/* Main content container */}
-              <div className="relative bg-white/60 backdrop-blur-3xl rounded-xs border border-white/50 shadow-2xl p-8">
+              <div className="relative bg-[#E7F0F9]/30 backdrop-blur-3xl rounded-xs border border-white/50 shadow-2xl p-8">
                 {/* Header */}
                 <div className="text-center mb-8">
                   <div className="mb-6">
