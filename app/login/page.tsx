@@ -107,7 +107,7 @@ export default function LoginPage() {
                 {/* Header */}
                 <div className="text-center mb-8">
                   <div className="mb-6">
-                    <div className="inline-flex items-center justify-center w-64 h-32 bg-gradient-to-br backdrop-blur-sm mb-4">
+                    <div className="inline-flex items-center justify-center w-64 h-32 bg-gradient-to-br mb-4">
                       {/*<Icons.Utensils className="w-8 h-8 text-slate-700" />*/}
                       <img className="shrink-0 size-15 rounded-full" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/healthylab.png" alt="Avatar" />
                     </div>
