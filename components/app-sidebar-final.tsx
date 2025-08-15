@@ -63,7 +63,7 @@ export function AppSidebar() {
       hasSubmenu: true,
       submenu: [
         { name: "Ingredientes", href: "/ingredientes", icon: Icons.Pill },
-        /*{ name: "Categorías", href: "/categorias", icon: Icons.Package },*/
+        { name: "Categorías", href: "/categorias", icon: Icons.Package },
       ],
     },
     {
