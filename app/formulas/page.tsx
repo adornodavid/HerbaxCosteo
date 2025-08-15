@@ -32,6 +32,9 @@ import {
   obtenerFormulasPorFiltros,
   estatusActivoFormula,
   estadisticasFormulasTotales,
+  obtenerDetallesFormula,
+  obtenerIngredientesDeFormula,
+  obtenerProductosDeFormula,
 } from "@/app/actions/formulas-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 
@@ -63,31 +66,40 @@ interface Formula {
 }
 
 interface FormulaDetalle {
-  id: number
   nombre: string
-  costo: number
-  activo: boolean
-  fechacreacion: string
   imgurl: string | null
+  notaspreparacion: string
+  cantidad: number
+  activo: boolean
+  costo: number
+  tipounidadesmedida: {
+    descripcion: string
+  }
 }
 
 interface IngredienteFormula {
-  id: number
+  imgurl: string | null
   Ingrediente: string
+  Categoria: string
+  UnidadMedida: string
+  costo: number
   cantidad: number
   ingredientecostoparcial: number
 }
 
-interface PlatilloFormula {
-  id: number
-  Platillo: string
+interface ProductoFormula {
   imgurl: string | null
+  Producto: string
+  presentacion: string
+  costo: number
+  cantidad: number
+  costoparcial: number
 }
 
 interface FormulaCompleta {
   formula: FormulaDetalle | null
   ingredientes: IngredienteFormula[]
-  platillos: PlatilloFormula[]
+  productos: ProductoFormula[]
   error?: string
 }
 
@@ -418,19 +430,32 @@ export default function FormulasPage() {
     setLoadingDetails(true)
     setDetailsError(null)
     setSelectedFormulaDetails(null)
-    setShowDetailsDialog(true) // Abrir el diálogo inmediatamente para mostrar el estado de carga
+    setShowDetailsDialog(true)
 
     try {
-      // const result = await getFormulaDetails(formulaId)
-      // if (result.error) {
-      //   setDetailsError(result.error)
-      //   toast.error(result.error)
-      // } else {
-      //   setSelectedFormulaDetails(result)
-      // }
+      const [detallesResult, ingredientesResult, productosResult] = await Promise.all([
+        obtenerDetallesFormula(formulaId),
+        obtenerIngredientesDeFormula(formulaId),
+        obtenerProductosDeFormula(formulaId),
+      ])
 
-      // Placeholder until formulas-actions.ts is implemented
-      setDetailsError("Funcionalidad de detalles pendiente de implementación")
+      if (detallesResult.error) {
+        throw new Error(detallesResult.error)
+      }
+
+      if (ingredientesResult.error) {
+        throw new Error(ingredientesResult.error)
+      }
+
+      if (productosResult.error) {
+        throw new Error(productosResult.error)
+      }
+
+      setSelectedFormulaDetails({
+        formula: detallesResult.data,
+        ingredientes: ingredientesResult.data || [],
+        productos: productosResult.data || [],
+      })
     } catch (err: any) {
       console.error("Error al cargar detalles de la fórmula:", err)
       setDetailsError("Error al cargar los detalles de la fórmula.")
@@ -735,14 +760,14 @@ export default function FormulasPage() {
                       </div>
                     )}
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="font-medium">Folio:</div>
-                      <div>{selectedFormulaDetails.formula.id}</div>
-                      <div className="font-medium">Costo de Total:</div>
+                      <div className="font-medium">Cantidad:</div>
+                      <div>{selectedFormulaDetails.formula.cantidad}</div>
+                      <div className="font-medium">Unidad de Medida:</div>
+                      <div>{selectedFormulaDetails.formula.tipounidadesmedida?.descripcion || "N/A"}</div>
+                      <div className="font-medium">Costo Total:</div>
                       <div>${selectedFormulaDetails.formula.costo?.toFixed(2) || "0.00"}</div>
                       <div className="font-medium">Estatus:</div>
                       <div>{selectedFormulaDetails.formula.activo ? "Activa" : "Inactiva"}</div>
-                      <div className="font-medium">Fecha de Creación:</div>
-                      <div>{new Date(selectedFormulaDetails.formula.fechacreacion).toLocaleDateString()}</div>
                     </div>
                     <div className="mt-4">
                       <h3 className="font-semibold text-md mb-2">Notas de Preparación:</h3>
@@ -765,18 +790,32 @@ export default function FormulasPage() {
                         <Table>
                           <TableHeader>
                             <TableRow>
+                              <TableHead>Imagen</TableHead>
                               <TableHead>Ingrediente</TableHead>
-                              <TableHead className="text-right">Cantidad</TableHead>
-                              <TableHead className="text-right">Costo Parcial</TableHead>
+                              <TableHead>Categoría</TableHead>
+                              <TableHead>Unidad</TableHead>
+                              <TableHead className="text-right">Costo</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {selectedFormulaDetails.ingredientes.map((ingrediente) => (
-                              <TableRow key={ingrediente.id}>
+                            {selectedFormulaDetails.ingredientes.map((ingrediente, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  <div className="w-8 h-8">
+                                    <Image
+                                      src={ingrediente.imgurl || "/placeholder.svg?height=32&width=32"}
+                                      alt={ingrediente.Ingrediente}
+                                      width={32}
+                                      height={32}
+                                      className="rounded object-cover"
+                                    />
+                                  </div>
+                                </TableCell>
                                 <TableCell className="text-xs">{ingrediente.Ingrediente}</TableCell>
-                                <TableCell className="text-right">{ingrediente.cantidad}</TableCell>
-                                <TableCell className="text-right">
-                                  ${ingrediente.ingredientecostoparcial?.toFixed(2) || "0.00"}
+                                <TableCell className="text-xs">{ingrediente.Categoria}</TableCell>
+                                <TableCell className="text-xs">{ingrediente.UnidadMedida}</TableCell>
+                                <TableCell className="text-right text-xs">
+                                  ${ingrediente.costo?.toFixed(2) || "0.00"}
                                 </TableCell>
                               </TableRow>
                             ))}
@@ -789,36 +828,48 @@ export default function FormulasPage() {
                   </CardContent>
                 </Card>
 
-                {/* Sección de Platillos que usan esta Fórmula */}
+                {/* Sección de Productos que usan esta Fórmula */}
                 <Card className="lg:col-span-6 shadow-lg border-t-4 border-[#cfa661]">
                   <CardHeader>
-                    <CardTitle className="text-xl">Platillos que usan esta Fórmula</CardTitle>
-                    <CardDescription>Platillos donde se utiliza esta fórmula</CardDescription>
+                    <CardTitle className="text-xl">Productos que usan esta Fórmula</CardTitle>
+                    <CardDescription>Productos donde se utiliza esta fórmula</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {selectedFormulaDetails.platillos.length > 0 ? (
+                    {selectedFormulaDetails.productos.length > 0 ? (
                       <ScrollArea className="h-[200px] w-full rounded-md border">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 p-2">
-                          {selectedFormulaDetails.platillos.map((platillo) => (
-                            <Card key={platillo.id} className="flex flex-col items-center text-center p-2">
-                              <AspectRatio ratio={1 / 1} className="w-24 h-24 mb-2">
-                                <Image
-                                  src={platillo.imgurl || "/placeholder.svg?height=96&width=96&query=platillo"}
-                                  alt={`Imagen de ${platillo.Platillo}`}
-                                  fill
-                                  className="rounded-full object-cover border-2 border-gray-200"
-                                  onError={(e) => {
-                                    e.currentTarget.src = "/placeholder.svg?height=96&width=96"
-                                  }}
-                                />
-                              </AspectRatio>
-                              <p className="font-medium text-sm">{platillo.Platillo}</p>
-                            </Card>
-                          ))}
-                        </div>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Imagen</TableHead>
+                              <TableHead>Producto</TableHead>
+                              <TableHead>Presentación</TableHead>
+                              <TableHead className="text-right">Costo</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {selectedFormulaDetails.productos.map((producto, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  <div className="w-12 h-12">
+                                    <Image
+                                      src={producto.imgurl || "/placeholder.svg?height=48&width=48"}
+                                      alt={producto.Producto}
+                                      width={48}
+                                      height={48}
+                                      className="rounded object-cover"
+                                    />
+                                  </div>
+                                </TableCell>
+                                <TableCell className="font-medium">{producto.Producto}</TableCell>
+                                <TableCell>{producto.presentacion}</TableCell>
+                                <TableCell className="text-right">${producto.costo?.toFixed(2) || "0.00"}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
                       </ScrollArea>
                     ) : (
-                      <p className="text-sm text-muted-foreground">Ningún platillo utiliza esta fórmula.</p>
+                      <p className="text-sm text-muted-foreground">Ningún producto utiliza esta fórmula.</p>
                     )}
                   </CardContent>
                 </Card>

@@ -21,20 +21,23 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
     - obtenerFormulas / selFormulas
     - obtenerFormulasPorFiltros / selFormulasXFiltros
     - obtenerFormulaPorId / selFormulaXId
-    - obtenerIngredientesPorCliente***
-    - obtenerUnidadesMedida***
-    - obtenerIngredientesFormula***
-    - obtenerClientes***
-    - getIngredientDetails***
+    - obtenerIngredientesPorCliente
+    - obtenerUnidadesMedida
+    - obtenerIngredientesFormula
+    - obtenerClientes
+    - getIngredientDetails
     - obtenerFormulaCompleta
+    - obtenerDetallesFormula
+    - obtenerIngredientesDeFormula
+    - obtenerProductosDeFormula
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarFormula / updFormula
     - estatusActivoFormula / actFormula
     - actualizarFormulaEtapa1
   * DELETES-ELIMINAR (DELETES)
     - eliminarFormula / delFormula
-    - eliminarIngredienteFormula***
-    - eliminarRegistroIncompleto***
+    - eliminarIngredienteFormula
+    - eliminarRegistroIncompleto
   * SPECIALS-ESPECIALES ()
     - estadisticasFormulasTotales / statsFormlasTotales
     - verificarIngredienteDuplicado
@@ -690,6 +693,122 @@ export async function obtenerFormulaCompleta(formulaId: number) {
     return { data, error: null }
   } catch (error: any) {
     console.error("Error en obtenerFormulaCompleta:", error)
+    return { data: null, error: error.message }
+  }
+}
+
+//Función: obtenerDetallesFormula: función para obtener información básica de la fórmula
+export async function obtenerDetallesFormula(formulaId: number) {
+  try {
+    const { data, error } = await supabase
+      .from("formulas")
+      .select(`
+        nombre,
+        imgurl,
+        notaspreparacion,
+        cantidad,
+        activo,
+        costo,
+        tipounidadesmedida!inner(descripcion)
+      `)
+      .eq("id", formulaId)
+      .single()
+
+    if (error) {
+      console.error("Error al obtener detalles de fórmula:", error)
+      return { data: null, error: error.message }
+    }
+
+    return { data, error: null }
+  } catch (error: any) {
+    console.error("Error en obtenerDetallesFormula:", error)
+    return { data: null, error: error.message }
+  }
+}
+
+//Función: obtenerIngredientesDeFormula: función para obtener ingredientes que conforman la fórmula
+export async function obtenerIngredientesDeFormula(formulaId: number) {
+  try {
+    const { data, error } = await supabase
+      .from("formulas")
+      .select(`
+        ingredientesxformula!inner(
+          cantidad,
+          ingredientecostoparcial,
+          ingredientes!inner(
+            imgurl,
+            nombre,
+            categoriasingredientes!inner(descripcion),
+            tipounidadesmedida!inner(descripcion),
+            costo
+          )
+        )
+      `)
+      .eq("id", formulaId)
+
+    if (error) {
+      console.error("Error al obtener ingredientes de fórmula:", error)
+      return { data: null, error: error.message }
+    }
+
+    // Aplanar los datos para obtener la estructura esperada
+    const ingredientes =
+      data?.[0]?.ingredientesxformula?.map((item: any) => ({
+        imgurl: item.ingredientes.imgurl,
+        Ingrediente: item.ingredientes.nombre,
+        Categoria: item.ingredientes.categoriasingredientes.descripcion,
+        UnidadMedida: item.ingredientes.tipounidadesmedida.descripcion,
+        costo: item.ingredientes.costo,
+        cantidad: item.cantidad,
+        ingredientecostoparcial: item.ingredientecostoparcial,
+      })) || []
+
+    return { data: ingredientes, error: null }
+  } catch (error: any) {
+    console.error("Error en obtenerIngredientesDeFormula:", error)
+    return { data: null, error: error.message }
+  }
+}
+
+//Función: obtenerProductosDeFormula: función para obtener productos asociados a la fórmula
+export async function obtenerProductosDeFormula(formulaId: number) {
+  try {
+    const { data, error } = await supabase
+      .from("formulas")
+      .select(`
+        productosdetalles!inner(
+          cantidad,
+          costoparcial,
+          productos!inner(
+            imgurl,
+            nombre,
+            presentacion,
+            costo
+          )
+        )
+      `)
+      .eq("id", formulaId)
+      .eq("productosdetalles.tiposegmentoid", 1)
+
+    if (error) {
+      console.error("Error al obtener productos de fórmula:", error)
+      return { data: null, error: error.message }
+    }
+
+    // Aplanar los datos para obtener la estructura esperada
+    const productos =
+      data?.[0]?.productosdetalles?.map((item: any) => ({
+        imgurl: item.productos.imgurl,
+        Producto: item.productos.nombre,
+        presentacion: item.productos.presentacion,
+        costo: item.productos.costo,
+        cantidad: item.cantidad,
+        costoparcial: item.costoparcial,
+      })) || []
+
+    return { data: productos, error: null }
+  } catch (error: any) {
+    console.error("Error en obtenerProductosDeFormula:", error)
     return { data: null, error: error.message }
   }
 }
