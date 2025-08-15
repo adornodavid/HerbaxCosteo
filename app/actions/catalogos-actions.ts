@@ -248,7 +248,7 @@ export async function obtenerProductosCatalogo(catalogoId: string) {
         presentacion: producto.presentacion,
         imgurl: producto.imgurl,
         costo: producto.costo,
-        precioventa: producto.precioventa,
+        precioventa: productosxcatalogo.precioventa,
       })),
       error: null,
     }
