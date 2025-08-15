@@ -420,11 +420,11 @@ export default function CatalogosAgregarPage() {
                       fill
                       className="object-cover transition-transform duration-300 group-hover:scale-110"
                     />
-                    <div className="absolute top-2 right-2">
+                   {/* <div className="absolute top-2 right-2">
                       <Badge className="bg-green-500/80 text-white backdrop-blur-sm">
                         ${producto.costo.toFixed(2)}
                       </Badge>
-                    </div>
+                    </div>*/}
                   </div>
 
                   <CardContent className="p-4 space-y-3">

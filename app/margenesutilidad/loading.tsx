@@ -57,7 +57,7 @@ export default function Loading() {
 
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle className="text-2xl font-semibold text-gray-700">Márgenes de Utilidad de Platillos</CardTitle>
+          <CardTitle className="text-2xl font-semibold text-gray-700">M��rgenes de Utilidad de Platillos</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col space-y-4">
