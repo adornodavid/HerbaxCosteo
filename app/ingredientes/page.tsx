@@ -431,7 +431,7 @@ export default function IngredientesPage() {
           <h1 className="text-3xl font-bold">Ingredientes</h1>
           <p className="text-lg text-muted-foreground">Gestión de Ingredientes</p>
         </div>
-        <Button
+        {/*<Button
           id="btnIngredienteNuevo"
           name="btnIngredienteNuevo"
           type="button"
@@ -445,7 +445,7 @@ export default function IngredientesPage() {
         >
           <Package className="h-4 w-4 mr-2" />
           Nuevo Ingrediente
-        </Button>
+        </Button>*/}
       </div>
 
       {/* Estadísticas */}

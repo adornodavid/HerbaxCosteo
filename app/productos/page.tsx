@@ -136,7 +136,6 @@ interface IngredienteAsociado {
 	  Componente Principal, Pagina
 	================================================== */
 export default function ProductosPage() {
-  // --- Variables especiales ---
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
 
