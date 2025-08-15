@@ -565,7 +565,7 @@ export default function CatalogosPage() {
                 {catalogos.map((catalogo) => (
                   <Card
                     key={catalogo.id}
-                    className="group relative overflow-hidden backdrop-blur-sm bg-white/80 border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-white/90"
+                    className="rounded-xs text-card-foreground group relative overflow-hidden backdrop-blur-sm bg-white/80 border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-white/90"
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-100/20 to-blue-100/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
