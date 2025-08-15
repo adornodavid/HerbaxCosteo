@@ -290,6 +290,8 @@ export default function CatalogosAgregarPage() {
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-400 to-blue-400" />
                         <span className="text-sm font-medium text-gray-700">{producto.presentacion || "N/A"}</span>
+                        <span className="text-sm font-medium text-gray-700">{producto.precioventa || "N/A"}</span>
+                        
                       </div>
                     </div>
                   </CardContent>
