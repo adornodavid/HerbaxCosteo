@@ -547,7 +547,7 @@ export default function CatalogosPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
           <CardTitle>Listado de Catálogos</CardTitle>
         </CardHeader>
