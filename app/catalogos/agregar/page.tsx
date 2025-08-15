@@ -244,7 +244,7 @@ export default function CatalogosAgregarPage() {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 xl:grid-cols-6 gap-6">
           {productos.length === 0 ? (
             <div className="col-span-full text-center py-12">
               <div className="bg-white/30 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
