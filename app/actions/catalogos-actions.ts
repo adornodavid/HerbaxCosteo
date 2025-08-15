@@ -221,6 +221,7 @@ export async function obtenerProductosCatalogo(catalogoId: string) {
       .from("catalogos")
       .select(`
         productosxcatalogo!inner(
+          precioventa,
           productos!inner(
             id,
             nombre,
@@ -236,8 +237,13 @@ export async function obtenerProductosCatalogo(catalogoId: string) {
 
     if (error) throw error
 
-    // Aplanar los datos para obtener solo los productos
-    const productos = data.flatMap((catalogo) => catalogo.productosxcatalogo.map((px) => px.productos))
+    // Aplanar los datos para obtener productos con precio de venta
+    const productos = data.flatMap((catalogo) =>
+      catalogo.productosxcatalogo.map((px) => ({
+        ...px.productos,
+        precioventa: px.precioventa,
+      })),
+    )
 
     return {
       data: productos.map((producto) => ({
@@ -247,6 +253,7 @@ export async function obtenerProductosCatalogo(catalogoId: string) {
         presentacion: producto.presentacion,
         imgurl: producto.imgurl,
         costo: producto.costo,
+        precioventa: producto.precioventa, // Added precio venta to return data
       })),
       error: null,
     }

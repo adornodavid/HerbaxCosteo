@@ -7,18 +7,32 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useToast } from "@/components/ui/use-toast"
 import { getSession } from "@/app/actions/session-actions"
-import { ArrowLeft, Plus, ShoppingCart } from "lucide-react"
+import { ArrowLeft, Plus, ShoppingCart, Edit, Trash2 } from "lucide-react"
 import { Loader2 } from "@/components/ui/loader2"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
 import {
   obtenerProductosCatalogo,
   obtenerProductosDisponiblesParaCatalogo,
   asociarProductoACatalogo,
   obtenerDetalleCatalogo,
 } from "@/app/actions/catalogos-actions"
+import {
+  obtenerProductoDetalladoCompleto,
+  obtenerFormulasAsociadasProducto,
+  obtenerIngredientesAsociadosProducto,
+  getProductoDetailsForModal,
+} from "@/app/actions/productos-actions"
 
 interface Producto {
   id: string
@@ -27,6 +41,7 @@ interface Producto {
   presentacion: string
   imgurl: string | null
   costo: number
+  precioventa?: number // Added precio venta to interface
 }
 
 interface CatalogoInfo {
@@ -37,6 +52,46 @@ interface CatalogoInfo {
     id: string
     nombre: string
   } | null
+}
+
+interface ProductoDetalleCompleto {
+  id: number
+  nombre: string
+  descripcion: string
+  presentacion: string
+  porcion: string
+  porcionenvase: string
+  modouso: string
+  categoriauso: string
+  edadminima: number
+  instruccionesingesta: string
+  advertencia: string
+  condicionesalmacenamiento: string
+  vidaanaquelmeses: number
+  propositoprincipal: string
+  propuestavalor: string
+  costo: number
+  activo: boolean
+  imgurl: string
+}
+
+interface FormulaAsociada {
+  formula: string
+  cantidad: number
+  costoparcial: number
+}
+
+interface IngredienteAsociado {
+  ingrediente: string
+  cantidad: number
+  costoparcial: number
+}
+
+interface ProductoDetail {
+  Cliente: string
+  Catalogo: string
+  precioventa: number
+  margenutilidad: number | null
 }
 
 export default function CatalogosAgregarPage() {
@@ -56,6 +111,13 @@ export default function CatalogosAgregarPage() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [loadingModal, setLoadingModal] = useState(false)
   const [associating, setAssociating] = useState(false)
+
+  const [showProductoDetailsModal, setShowProductoDetailsModal] = useState(false)
+  const [selectedProductoCompleto, setSelectedProductoCompleto] = useState<ProductoDetalleCompleto | null>(null)
+  const [selectedFormulasAsociadas, setSelectedFormulasAsociadas] = useState<FormulaAsociada[]>([])
+  const [selectedIngredientesAsociados, setSelectedIngredientesAsociados] = useState<IngredienteAsociado[]>([])
+  const [selectedProductoDetails, setSelectedProductoDetails] = useState<ProductoDetail[] | null>(null)
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false)
 
   // Security validation
   useEffect(() => {
@@ -195,6 +257,59 @@ export default function CatalogosAgregarPage() {
     }
   }
 
+  const handleViewProductoDetails = async (productoId: string) => {
+    setIsDetailsLoading(true)
+    setShowProductoDetailsModal(true)
+    setSelectedProductoCompleto(null)
+    setSelectedFormulasAsociadas([])
+    setSelectedIngredientesAsociados([])
+    setSelectedProductoDetails(null)
+
+    try {
+      const productoIdNum = Number.parseInt(productoId)
+
+      // Get complete product information
+      const productoResult = await obtenerProductoDetalladoCompleto(productoIdNum)
+      if (productoResult.success && productoResult.data) {
+        setSelectedProductoCompleto(productoResult.data)
+      }
+
+      // Get associated formulas
+      const formulasResult = await obtenerFormulasAsociadasProducto(productoIdNum)
+      if (formulasResult.success && formulasResult.data) {
+        setSelectedFormulasAsociadas(formulasResult.data)
+      }
+
+      // Get associated ingredients
+      const ingredientesResult = await obtenerIngredientesAsociadosProducto(productoIdNum)
+      if (ingredientesResult.success && ingredientesResult.data) {
+        setSelectedIngredientesAsociados(ingredientesResult.data)
+      }
+
+      // Get catalog associations
+      const { success, data, error } = await getProductoDetailsForModal(productoIdNum)
+      if (success && data) {
+        setSelectedProductoDetails(data)
+      }
+    } catch (error) {
+      console.error("Error loading detailed product information:", error)
+      toast({
+        title: "Error",
+        description: "Error al cargar detalles del producto",
+        variant: "destructive",
+      })
+    } finally {
+      setIsDetailsLoading(false)
+    }
+  }
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("es-MX", {
+      style: "currency",
+      currency: "MXN",
+    }).format(amount)
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -261,8 +376,44 @@ export default function CatalogosAgregarPage() {
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-100/20 to-blue-100/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
+                <div className="absolute top-2 left-2 z-20 flex space-x-1">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 w-8 p-0 bg-blue-500/80 hover:bg-blue-600/90 text-white backdrop-blur-sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      // TODO: Implement edit functionality
+                      toast({
+                        title: "Función en desarrollo",
+                        description: "La función de editar estará disponible próximamente",
+                      })
+                    }}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 w-8 p-0 bg-red-500/80 hover:bg-red-600/90 text-white backdrop-blur-sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      // TODO: Implement delete functionality
+                      toast({
+                        title: "Función en desarrollo",
+                        description: "La función de eliminar estará disponible próximamente",
+                      })
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+
                 <div className="relative z-10">
-                  <div className="aspect-square relative overflow-hidden">
+                  <div
+                    className="aspect-square relative overflow-hidden cursor-pointer"
+                    onClick={() => handleViewProductoDetails(producto.id)}
+                  >
                     <Image
                       src={producto.imgurl || "/placeholder.svg?height=300&width=300&query=producto"}
                       alt={producto.nombre}
@@ -289,8 +440,9 @@ export default function CatalogosAgregarPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-400 to-blue-400" />
-                        <span className="text-sm font-medium text-gray-700">{producto.presentacion || "N/A"}</span>
-                        
+                        <span className="text-lg font-bold text-green-600">
+                          ${producto.precioventa?.toFixed(2) || "0.00"}
+                        </span>
                       </div>
                     </div>
                   </CardContent>
@@ -361,7 +513,7 @@ export default function CatalogosAgregarPage() {
                         <div className="flex items-start space-x-4">
                           <div className="relative w-20 h-20 rounded-lg overflow-hidden">
                             <Image
-                              src={selectedProducto.imgurl || "/placeholder.svg?height=80&width=80&query=producto"}
+                              src={selectedProducto.imgurl || "/placeholder.svg"}
                               alt={selectedProducto.nombre}
                               fill
                               className="object-cover"
@@ -369,7 +521,7 @@ export default function CatalogosAgregarPage() {
                           </div>
                           <div className="flex-1">
                             <h4 className="font-semibold text-gray-900 mb-2">{selectedProducto.nombre}</h4>
-                            <p className="text-sm text-gray-600 mb-2">{selectedProducto.descripcion}</p>
+                            <p className="text-gray-600 mb-2">{selectedProducto.descripcion}</p>
                             <div className="grid grid-cols-2 gap-2 text-sm">
                               <div>
                                 <span className="font-medium">Presentación:</span>
@@ -423,6 +575,213 @@ export default function CatalogosAgregarPage() {
                 )}
               </div>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showProductoDetailsModal} onOpenChange={setShowProductoDetailsModal}>
+          <DialogContent className="max-w-6xl overflow-y-auto max-h-[90vh]">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold">Detalles del Producto</DialogTitle>
+              <DialogDescription>Información completa del producto seleccionado.</DialogDescription>
+            </DialogHeader>
+            {isDetailsLoading ? (
+              <div className="flex items-center justify-center h-48">
+                <Loader2 className="h-8 w-8 animate-spin" />
+                <span className="ml-2">Cargando detalles...</span>
+              </div>
+            ) : selectedProductoCompleto ? (
+              <div className="grid gap-6 py-4">
+                {/* Información Principal */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Imagen y datos básicos */}
+                  <div className="space-y-4">
+                    {selectedProductoCompleto.imgurl && (
+                      <img
+                        src={selectedProductoCompleto.imgurl || "/placeholder.svg"}
+                        alt={selectedProductoCompleto.nombre}
+                        className="w-full h-64 object-cover rounded-xs shadow-md"
+                      />
+                    )}
+                    <div className="bg-gray-50 p-4 rounded-xs">
+                      <h3 className="text-xl font-bold mb-2">{selectedProductoCompleto.nombre}</h3>
+                      <p className="text-gray-600 mb-3">{selectedProductoCompleto.descripcion}</p>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <p>
+                          <span className="font-medium">Costo:</span> {formatCurrency(selectedProductoCompleto.costo)}
+                        </p>
+                        <p>
+                          <span className="font-medium">Estado:</span>{" "}
+                          {selectedProductoCompleto.activo ? "Activo" : "Inactivo"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Información detallada */}
+                  <div className="space-y-4">
+                    {/* Porciones */}
+                    <div className="bg-blue-50 p-4 rounded-xs">
+                      <h4 className="font-semibold text-blue-800 mb-2">Información de Porciones</h4>
+                      <div className="grid grid-cols-1 gap-1 text-sm">
+                        <p>
+                          <span className="font-medium">Presentación:</span>{" "}
+                          {selectedProductoCompleto.presentacion || "N/A"}
+                        </p>
+                        <p>
+                          <span className="font-medium">Porción:</span> {selectedProductoCompleto.porcion || "N/A"}
+                        </p>
+                        <p>
+                          <span className="font-medium">Porción por envase:</span>{" "}
+                          {selectedProductoCompleto.porcionenvase || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Modo de Uso */}
+                    <div className="bg-green-50 p-4 rounded-xs">
+                      <h4 className="font-semibold text-green-800 mb-2">Modo de Uso</h4>
+                      <div className="grid grid-cols-1 gap-1 text-sm">
+                        <p>
+                          <span className="font-medium">Modo de uso:</span> {selectedProductoCompleto.modouso || "N/A"}
+                        </p>
+                        <p>
+                          <span className="font-medium">Categoría de uso:</span>{" "}
+                          {selectedProductoCompleto.categoriauso || "N/A"}
+                        </p>
+                        <p>
+                          <span className="font-medium">Edad mínima:</span>{" "}
+                          {selectedProductoCompleto.edadminima || "N/A"} años
+                        </p>
+                        <p>
+                          <span className="font-medium">Instrucciones:</span>{" "}
+                          {selectedProductoCompleto.instruccionesingesta || "N/A"}
+                        </p>
+                        <p>
+                          <span className="font-medium">Advertencias:</span>{" "}
+                          {selectedProductoCompleto.advertencia || "N/A"}
+                        </p>
+                        <p>
+                          <span className="font-medium">Almacenamiento:</span>{" "}
+                          {selectedProductoCompleto.condicionesalmacenamiento || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Detalles Adicionales */}
+                    <div className="bg-purple-50 p-4 rounded-xs">
+                      <h4 className="font-semibold text-purple-800 mb-2">Detalles Adicionales</h4>
+                      <div className="grid grid-cols-1 gap-1 text-sm">
+                        <p>
+                          <span className="font-medium">Vida de anaquel:</span>{" "}
+                          {selectedProductoCompleto.vidaanaquelmeses || "N/A"} meses
+                        </p>
+                        <p>
+                          <span className="font-medium">Propósito principal:</span>{" "}
+                          {selectedProductoCompleto.propositoprincipal || "N/A"}
+                        </p>
+                        <p>
+                          <span className="font-medium">Propuesta de valor:</span>{" "}
+                          {selectedProductoCompleto.propuestavalor || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Fórmulas Asociadas */}
+                {selectedFormulasAsociadas.length > 0 && (
+                  <div className="bg-emerald-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-emerald-800 mb-3">Fórmulas Asociadas</h4>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-emerald-200">
+                            <th className="text-left py-2 font-medium">Fórmula</th>
+                            <th className="text-left py-2 font-medium">Cantidad</th>
+                            <th className="text-left py-2 font-medium">Costo Parcial</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedFormulasAsociadas.map((formula, idx) => (
+                            <tr key={idx} className="border-b border-emerald-100">
+                              <td className="py-2">{formula.formula}</td>
+                              <td className="py-2">{formula.cantidad}</td>
+                              <td className="py-2">{formatCurrency(formula.costoparcial)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Ingredientes Asociados */}
+                {selectedIngredientesAsociados.length > 0 && (
+                  <div className="bg-orange-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-orange-800 mb-3">Ingredientes Asociados</h4>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-orange-200">
+                            <th className="text-left py-2 font-medium">Ingrediente</th>
+                            <th className="text-left py-2 font-medium">Cantidad</th>
+                            <th className="text-left py-2 font-medium">Costo Parcial</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedIngredientesAsociados.map((ingrediente, idx) => (
+                            <tr key={idx} className="border-b border-orange-100">
+                              <td className="py-2">{ingrediente.ingrediente}</td>
+                              <td className="py-2">{ingrediente.cantidad}</td>
+                              <td className="py-2">{formatCurrency(ingrediente.costoparcial)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Asociaciones con Catálogos */}
+                {selectedProductoDetails && selectedProductoDetails.length > 0 && (
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-gray-800 mb-3">Asociaciones con Catálogos</h4>
+                    <div className="grid gap-3">
+                      {selectedProductoDetails.map((detail, idx) => (
+                        <div key={idx} className="bg-white p-3 rounded border">
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <p>
+                              <span className="font-medium">Cliente:</span> {detail.Cliente}
+                            </p>
+                            <p>
+                              <span className="font-medium">Catálogo:</span> {detail.Catalogo}
+                            </p>
+                            <p>
+                              <span className="font-medium">Precio de Venta:</span> {formatCurrency(detail.precioventa)}
+                            </p>
+                            <p>
+                              <span className="font-medium">Margen:</span>{" "}
+                              {detail.margenutilidad !== null ? `${detail.margenutilidad}%` : "N/A"}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No se encontraron detalles para este producto.
+              </div>
+            )}
+            <DialogFooter>
+              <DialogPrimitive.Close asChild>
+                <Button type="button" variant="secondary">
+                  Cerrar
+                </Button>
+              </DialogPrimitive.Close>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
