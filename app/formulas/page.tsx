@@ -109,7 +109,7 @@ interface FormulaCompleta {
 export default function FormulasPage() {
   // --- Variables especiales ---
   const router = useRouter()
-  
+
 		// --- Estados ---
   const [sesion, setSesion] = useState<SessionData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -153,9 +153,7 @@ export default function FormulasPage() {
     message: "",
   })
 
-  /* ==================================================
-    Al cargar la pagina
-  ================================================== */
+  // --- Carga Inicial ---
   // Cargar sesión al montar el componente
   useEffect(() => {
     cargarSesion()
