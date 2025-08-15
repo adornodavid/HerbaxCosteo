@@ -100,9 +100,9 @@ export function AppSidebar() {
 
     {
       name: "Cotizador",
-      icon: Icons.Hotel,
+      icon: Icons.NotebookPen,
       hasSubmenu: true,
-      submenu: [{ name: "Cotizacion", href: "", icon: Icons.Hotel }],
+      submenu: [{ name: "Cotizacion", href: "", icon: Icons.NotebookPen }],
     },
 
     {
