@@ -571,7 +571,7 @@ export default function CatalogosPage() {
 
                     <div className="relative z-10">
                       <div
-                        className="aspect-video relative overflow-hidden rounded-t-lg cursor-pointer"
+                        className="aspect-video relative overflow-hidde cursor-pointer"
                         onClick={() => handleViewCatalogoDetails(catalogo.id)}
                       >
                         <Image
