@@ -895,7 +895,7 @@ export default function CatalogosPage() {
                   <CardContent className="space-y-4">
                     {selectedCatalogoDetails.imgurl && (
                       <div className="flex justify-center">
-                        <div className="relative w-48 h-32 rounded-lg overflow-hidden">
+                        <div className="relative w-48 h-32 rounded-xs overflow-hidden">
                           <Image
                             src={selectedCatalogoDetails.imgurl || "/placeholder.svg"}
                             alt={selectedCatalogoDetails.nombre}
