@@ -99,6 +99,13 @@ export function AppSidebar() {
     },
 
     {
+      name: "Cotizador",
+      icon: Icons.Hotel,
+      hasSubmenu: true,
+      submenu: [{ name: "Cotizacion", href: "", icon: Icons.Hotel }],
+    },
+
+    {
       name: "Perfil",
       icon: Icons.User,
       hasSubmenu: true,
