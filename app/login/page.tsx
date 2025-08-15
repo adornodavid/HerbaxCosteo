@@ -114,7 +114,7 @@ export default function LoginPage() {
                     <h1 className="text-xl font-bold text-slate-800 leading-tight">
                       Sistema de Costeo
                       <br />
-                      Healthylab
+                      
                     </h1>
                   </div>
                   <h2 className="text-2xl font-bold text-slate-800">Iniciar Sesión</h2>
