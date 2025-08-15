@@ -36,6 +36,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
     - obtenerProductoDetalladoCompleto
     - obtenerFormulasAsociadasProducto
     - obtenerIngredientesAsociadosProducto
+    - obtenerProductosIniciales
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
     - actualizarProductoEtapa1
@@ -1189,3 +1190,40 @@ export async function getProductoDetailsForModal(productoId: number) {
 }
 
 export const getUnidadMedidaFormula = obtenerUnidadMedidaFormula
+
+export async function obtenerProductosIniciales(rolId: number, clienteId: number) {
+  try {
+    // Determine client filter based on RolId
+    const clienteIdFiltro = [1, 2, 3].includes(rolId) ? -1 : clienteId
+
+    let query = supabaseAdmin.from("productos").select(`
+        id, nombre, descripcion, costo, activo, imgurl,
+        productosxcatalogo!inner(
+          catalogoid,
+          catalogos!inner(
+            id, nombre,
+            clientes!inner(id, nombre)
+          )
+        )
+      `)
+
+    // Apply client filter based on RolId
+    if (clienteIdFiltro !== -1) {
+      query = query.eq("productosxcatalogo.catalogos.clientes.id", clienteIdFiltro)
+    }
+
+    query = query.eq("activo", true).order("nombre", { ascending: true })
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error("Error obteniendo productos iniciales:", error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en obtenerProductosIniciales:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}

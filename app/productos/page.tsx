@@ -37,11 +37,11 @@ import {
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { Search, Eye, Edit, ToggleLeft, ToggleRight, Loader2, PlusCircle, RotateCcw } from "lucide-react"
 import {
-  obtenerProductosXFiltros,
   getProductoDetailsForModal,
   obtenerProductoDetalladoCompleto,
   obtenerFormulasAsociadasProducto,
   obtenerIngredientesAsociadosProducto,
+  obtenerProductosIniciales,
 } from "@/app/actions/productos-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos-actions"
@@ -275,9 +275,10 @@ export default function ProductosPage() {
 
     try {
       const rolId = Number.parseInt(user.RolId?.toString() || 0, 10)
-      const clienteIdParam = [1, 2, 3, 4].includes(rolId) ? -1 : Number.parseInt(user.ClienteId?.toString() || -1, 10)
+      const clienteId = Number.parseInt(user.ClienteId?.toString() || -1, 10)
 
-      const productosResult = await obtenerProductosXFiltros("", clienteIdParam, -1, "true")
+      // Use new function with proper RolId filtering
+      const productosResult = await obtenerProductosIniciales(rolId, clienteId)
 
       if (productosResult.success && productosResult.data) {
         // Transformar datos de la consulta para manejar productos sin asociación
@@ -338,12 +339,11 @@ export default function ProductosPage() {
           : (clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
 
         setClientes(clientesConTodos)
-        
-        if ([1, 2, 3, 4].includes(Number(user.RolId))){
+
+        if ([1, 2, 3, 4].includes(Number(user.RolId))) {
           setFiltroCliente("-1")
-        }
-        else{
-        let aux = clientesData.id
+        } else {
+          const aux = clientesData.id
           setFiltroCliente(aux)
         }
         //setFiltroCliente("-1")
