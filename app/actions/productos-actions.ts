@@ -1241,10 +1241,10 @@ export async function buscarProductosConFiltros(
   try {
     let query = supabaseAdmin.from("productos").select(`
       id, nombre, descripcion, propositoprincipal, costo, activo, imgurl,
-      productosxcatalogo!left(
-        catalogos!left(
+      productosxcatalogo!inner(
+        catalogos!inner(
           id, nombre,
-          clientes!left(id, nombre)
+          clientes!inner(id, nombre)
         )
       )
     `)
