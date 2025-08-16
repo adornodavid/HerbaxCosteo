@@ -185,7 +185,7 @@ export default function ProductosPage() {
     if (!user) return
     setIsSearching(true)
     setPaginaActual(1)
-    console.log("rol:",user.RolId)
+    console.log("cli:",clienteId)
     try {
       const result = await buscarProductosConFiltros(nombre, clienteId, catalogoId, estatus, user.RolId, user.ClienteId)
 
