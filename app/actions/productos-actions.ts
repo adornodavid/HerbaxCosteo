@@ -1229,7 +1229,7 @@ export async function obtenerProductosIniciales(rolId: number, clienteId: number
   }
 }
 
-// Función: buscarProductosConFiltros: función para buscar productos con filtros que respeten RolId y todos los filtros
+// Función: buscarProductosConFiltros: función para buscar productos con filtros usando valores de inputs directamente
 export async function buscarProductosConFiltros(
   nombre = "",
   clienteId = -1,
@@ -1239,9 +1239,6 @@ export async function buscarProductosConFiltros(
   userClienteId: number,
 ) {
   try {
-    // Determine client filter based on RolId - same logic as initial loading
-    const clienteIdFiltro = [1, 2, 3].includes(rolId) ? -1 : userClienteId
-
     let query = supabaseAdmin.from("productos").select(`
       id, nombre, descripcion, propositoprincipal, costo, activo, imgurl,
       productosxcatalogo!left(
@@ -1257,12 +1254,7 @@ export async function buscarProductosConFiltros(
       query = query.ilike("nombre", `%${nombre}%`)
     }
 
-    // Apply client filter based on RolId first, then user selection
-    if (clienteIdFiltro !== -1) {
-      // User has restricted access, filter by their client
-      query = query.eq("productosxcatalogo.catalogos.clientes.id", clienteIdFiltro)
-    } else if (clienteId > 0) {
-      // User has full access and selected a specific client
+    if (clienteId > 0) {
       query = query.eq("productosxcatalogo.catalogos.clientes.id", clienteId)
     }
 
