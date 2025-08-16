@@ -344,7 +344,7 @@ export default function ProductosPage() {
           : (catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre }))
 
         setCatalogos(catalogosConTodos)
-        setFiltroCatalogo("-1")
+        //setFiltroCatalogo("-1")
       } else {
         console.error("Error cargando catálogos iniciales:", catalogosResult.error)
       }
