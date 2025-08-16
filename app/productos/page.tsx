@@ -647,7 +647,7 @@ export default function ProductosPage() {
               </label>
               <Select name="ddlCatalogo" value={filtroCatalogo} onValueChange={setFiltroCatalogo}>
                 <SelectTrigger id="ddlCatalogo">
-                  <SelectValue placeholder="Selecciona un catálogo" />
+                  {/*<SelectValue placeholder="Selecciona un catálogo" />*/}
                 </SelectTrigger>
                 <SelectContent>
                   {catalogos.map((c) => (
