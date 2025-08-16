@@ -185,7 +185,7 @@ export default function ProductosPage() {
     if (!user) return
     setIsSearching(true)
     setPaginaActual(1)
-    console.log("cli:",clienteId)
+    console.log("cli:", clienteId)
     try {
       const result = await buscarProductosConFiltros(nombre, clienteId, catalogoId, estatus, user.RolId, user.ClienteId)
 
@@ -331,7 +331,7 @@ export default function ProductosPage() {
       } else {
         console.error("Error cargando clientes:", clientesError)
       }
-      console.log("cat:",clienteIdParamCatalogos)
+      console.log("cat:", clienteIdParamCatalogos)
       // Cargar catálogos iniciales (todos, sin filtro de cliente al inicio)
       const catalogosResult = await listaDesplegableCatalogos(-1, "", clienteIdParamCatalogos)
 
@@ -344,7 +344,15 @@ export default function ProductosPage() {
           : (catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre }))
 
         setCatalogos(catalogosConTodos)
-        //setFiltroCatalogo("-1")
+
+        if ([1, 2, 3, 4].includes(Number(user.RolId))) {
+          setFiltroCatalogo("-1") // Set to "Todos" for admin roles
+        } else {
+          // Set to first available catalog for restricted users
+          if (catalogosResult.data && catalogosResult.data.length > 0) {
+            setFiltroCatalogo(catalogosResult.data[0].id.toString())
+          }
+        }
       } else {
         console.error("Error cargando catálogos iniciales:", catalogosResult.error)
       }
