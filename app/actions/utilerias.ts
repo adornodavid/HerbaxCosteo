@@ -53,4 +53,4 @@ export async function Desencrypt(textoEncriptado: string): Promise<string> {
   }
 }
 
-// Función: Desencrypt - (Crypto-js)
+// Función: Hashear - (Crypto-js)
