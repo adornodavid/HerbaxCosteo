@@ -248,7 +248,7 @@ export async function obtenerProductos(
     }
 
     //Ejecutar query
-    query = query.order("productonombre", { ascending: false })
+    query = query.order("productonombre", { ascending: true })
 
     //Varaible y resultados del query
     const { data, error } = await query
