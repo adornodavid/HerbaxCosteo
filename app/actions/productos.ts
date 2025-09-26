@@ -191,7 +191,7 @@ export async function obtenerProductos(
 ) {
   try {
     //Query principal
-    let query = supabaseAdmin
+    let query = supabase
       .from("productos")
       .select(`
         p.id as productoid, 
