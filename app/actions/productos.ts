@@ -3,13 +3,15 @@
 /* ==================================================
   Imports
 ================================================== */
-import { createClient } from '@/lib/supabase'
+import { createClient } from "@/lib/supabase"
+import { revalidatePath } from "next/cache"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
 ================================================== */
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey) // Declare the supabaseAdmin variable
 const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the supabase variable
 
 /* ==================================================
@@ -37,6 +39,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - obtenerIngredientesAsociadosProducto
     - obtenerProductosIniciales
     - buscarProductosConFiltros
+    - getProductoDetailsForModal
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
     - actualizarProductoEtapa1
@@ -179,28 +182,59 @@ export async function actualizarProducto(
 }
 
 //Función: obtenerProductos: función para obtener el listado de productos
-export async function obtenerProductos(productoid = -1, rolid = -1, clienteid = -1, zonaid = -1, activo = "Todos" ) {
+export async function obtenerProductos(productoid = -1, rolid = -1, clienteid = -1, zonaid = -1, activo = "Todos") {
   try {
     //Query principal
-    let query = supabaseAdmin.from("productos").select(`
-      id, nombre, descripcion, propositoprincipal, costo, activo, imgurl,
-      productosxcatalogo!left(
-        catalogos!left(
-          id, nombre,
-          clientes!left(id, nombre)
-        )
-      )
-    `)
+    let query = supabaseAdmin
+      .from("productos")
+      .select(`
+        p.id as productoid, 
+        p.codigo as productocodigo, 
+        p.clienteid as clienteid, 
+        c.nombre as clientenombre, 
+        p.zonaid as zonaid, 
+        z.nombre as zonanombre, 
+        p.nombre as productonombre, 
+        p.imgurl as productoimgurl, 
+        p.unidadmedidaid as productounidadmedidaid, 
+        u.descripcion as unidadmedida, 
+        p.costo as productocosto, 
+        pc.descripcion as productodescripcion, 
+        pc.presentacion as productopresentacion, 
+        pc.porcion as productoporcion, 
+        pc.modouso as productomodouso, 
+        pc.porcionenvase as productoporcionenvase, 
+        pc.categoriauso as productocategoriauso, 
+        pc.propositoprincipal as productopropositoprincipal, 
+        pc.propuestavalor as productopropuestavalor, 
+        pc.instruccionesingesta as productoinstruccionesingesta, 
+        pc.edadminima as productoedadminima, 
+        pc.advertencia as productoadvertencia, 
+        pc.condicionesalmacenamiento as productocondicionesalmacenamiento
+      `)
+      .from("productos", "p")
+      .leftJoin("productoscaracteristicas", "pc.productoid", "p.id")
+      .leftJoin("clientes", "c.id", "p.clienteid")
+      .leftJoin("zonas", "z.id", "p.zonaid")
+      .leftJoin("unidadesmedida", "u.id", "p.unidadmedidaid")
 
     //Filtros al query dependiendo parametros
-    if (clienteid > 0) {
-      query = query.eq("productosxcatalogo.catalogos.clientes.id", clienteid)
+    if (productoid !== -1) {
+      query = query.eq("p.id", productoid)
     }
-    if(activo <> "True"){
-      query.eq("activo", true)
+    if (clienteid !== -1) {
+      query = query.eq("p.clienteid", clienteid)
     }
-    if(activo <> "False"){
-      query.eq("activo", false)
+    if (zonaid !== -1) {
+      query = query.eq("p.zonaid", zonaid)
+    }
+    if (activo !== "Todos") {
+      if (activo === "True") {
+        query = query.eq("p.activo", true)
+      }
+      if (activo === "False") {
+        query = query.eq("p.activo", false)
+      }
     }
 
     //Ejecutar query
