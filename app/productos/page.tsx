@@ -37,6 +37,9 @@ import {
   buscarProductosConFiltros,
   getProductoDetailsForModal,
 } from "@/app/actions/productos-actions"
+import {
+  obtenerProductos,
+} from "@/app/actions/productos"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
 
