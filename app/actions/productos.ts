@@ -220,7 +220,7 @@ export async function obtenerProductos(productoid = -1, rolid = -1, clienteid = 
 //Función: obtenerProductoPorId: función para obtener un producto especifico por id
 export async function obtenerProductoPorId(id: number) {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from("productos")
       .select(`
         *,
