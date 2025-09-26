@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { getSession } from "@/app/actions/session-actions"
 import { useRouter } from "next/navigation"
-import { Encrypt, Desencrypt } from "@/app/actions/utilerias"
+import { Encrypt, Desencrypt, HashData } from "@/app/actions/utilerias"
 import Image from "next/image"
 
 /* ==================================================
@@ -46,6 +46,10 @@ export default function EncryptPage() {
   // Estados para desencriptación
   const [txtTextoD, setTxtTextoD] = useState("")
   const [txtResultadoD, setTxtResultadoD] = useState("")
+
+  // Estados para hash
+  const [txtTextoH, setTxtTextoH] = useState("")
+  const [txtResultadoH, setTxtResultadoH] = useState("")
 
   // --- Carga Inicial ---
   // Cargar sesión al montar el componente
@@ -112,6 +116,22 @@ export default function EncryptPage() {
     } catch (error) {
       console.error("Error desencriptando:", error)
       setError("Error al desencriptar el texto. Verifique que el texto esté correctamente encriptado.")
+    }
+  }
+
+  const btnAccionH = async () => {
+    try {
+      if (!txtTextoH.trim()) {
+        setError("Por favor ingrese un texto para hashear")
+        return
+      }
+
+      const textoHasheado = await HashData(txtTextoH)
+      setTxtResultadoH(textoHasheado)
+      setError(null)
+    } catch (error) {
+      console.error("Error hasheando:", error)
+      setError("Error al hashear el texto")
     }
   }
 
@@ -260,8 +280,53 @@ export default function EncryptPage() {
         </Card>
       </div>
 
-      
+      {/* Sección de Hash */}
+      <div className="flex justify-center">
+        <div className="w-full max-w-md">
+          <Card className="rounded-xs border bg-card text-card-foreground shadow">
+            <CardHeader className="text-center">
+              <CardTitle>Hash (bcrypt)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-center">
+                <Input
+                  id="txtTextoH"
+                  name="txtTextoH"
+                  type="text"
+                  value={txtTextoH}
+                  onChange={(e) => setTxtTextoH(e.target.value)}
+                  placeholder="Ingrese el texto a hashear"
+                  className="w-4/5"
+                />
+              </div>
 
+              <div className="flex justify-center">
+                <Button
+                  id="btnAccionH"
+                  name="btnAccionH"
+                  type="button"
+                  onClick={btnAccionH}
+                  className="bg-[#5d8f72] text-white hover:bg-[#44785a]"
+                >
+                  Hashear
+                </Button>
+              </div>
+
+              <div className="flex justify-center">
+                <Input
+                  id="txtResultadoH"
+                  name="txtResultadoH"
+                  type="text"
+                  value={txtResultadoH}
+                  readOnly
+                  placeholder="Resultado del hash"
+                  className="w-4/5"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 }
