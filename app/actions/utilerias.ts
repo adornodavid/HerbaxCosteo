@@ -52,3 +52,5 @@ export async function Desencrypt(textoEncriptado: string): Promise<string> {
     throw new Error("Failed to decrypt text")
   }
 }
+
+// Función: Desencrypt - (Crypto-js)
