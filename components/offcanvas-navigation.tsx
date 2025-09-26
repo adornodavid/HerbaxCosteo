@@ -23,7 +23,7 @@ export function OffcanvasNavigation({ isOpen, onClose }: OffcanvasNavigationProp
           onClick={onClose}
           className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
         >
-          <Icons.X className="w-5 h-5 text-white" />
+          <Icons.Plus className="w-5 h-5 text-white rotate-45" />
         </button>
         <AppSidebar />
       </div>
