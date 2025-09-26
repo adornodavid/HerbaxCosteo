@@ -44,7 +44,7 @@ import {
   buscarProductosConFiltros,
 } from "@/app/actions/productos-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
-import { listaDesplegableCatalogos } from "@/app/actions/catalogos-actions"
+import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
 import { getProductoDetailsForModal } from "@/app/actions/productos-actions" // Import the missing function
 
 /* ==================================================
