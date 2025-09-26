@@ -281,7 +281,7 @@ export default function EncryptPage() {
       </div>
 
       {/* Sección de Hash */}
-      <div className="flex justify-center bg-red">
+      <div className="flex justify-center">
         <div className="w-full max-w-md">
           <Card className="rounded-xs border bg-card text-card-foreground shadow">
             <CardHeader className="text-center">
