@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { getSession } from "@/app/actions/session-actions"
 import { useRouter } from "next/navigation"
-import { encryptData, decryptData } from "@/lib/encryption"
+import { Encrypt, Desencrypt } from "@/app/actions/utilerias"
 import Image from "next/image"
 
 /* ==================================================
@@ -82,7 +82,6 @@ export default function EncryptPage() {
   /* ==================================================
     Funciones
   ================================================== */
-  // Función: btnAccionE: función para encriptar texto
   const btnAccionE = async () => {
     try {
       if (!txtTextoE.trim()) {
@@ -90,7 +89,7 @@ export default function EncryptPage() {
         return
       }
 
-      const textoEncriptado = encryptData(txtTextoE)
+      const textoEncriptado = await Encrypt(txtTextoE)
       setTxtResultadoE(textoEncriptado)
       setTxtTextoD(textoEncriptado) // Colocar el resultado en el input de desencriptar
       setError(null)
@@ -100,7 +99,6 @@ export default function EncryptPage() {
     }
   }
 
-  // Función: btnAccionD: función para desencriptar texto
   const btnAccionD = async () => {
     try {
       if (!txtTextoD.trim()) {
@@ -108,7 +106,7 @@ export default function EncryptPage() {
         return
       }
 
-      const textoDesencriptado = decryptData(txtTextoD)
+      const textoDesencriptado = await Desencrypt(txtTextoD)
       setTxtResultadoD(textoDesencriptado)
       setError(null)
     } catch (error) {
