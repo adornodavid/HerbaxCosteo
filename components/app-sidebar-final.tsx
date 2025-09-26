@@ -58,22 +58,23 @@ export function AppSidebar() {
     },
 
     {
-      name: "Insumos",
+      name: "Materiales",
       icon: Icons.Pill,
       hasSubmenu: true,
       submenu: [
-        { name: "Ingredientes", href: "/ingredientes", icon: Icons.Pill },
+        { name: "Materia Prima", href: "/materiaprima", icon: Icons.Pill },
         { name: "Categorías", href: "/categorias", icon: Icons.Package },
+        { name: "Material de etiquetado", href: "/materialetiquetado", icon: Icons.Tag },
       ],
     },
     {
       name: "Productos",
       icon: Icons.PillBottle,
       hasSubmenu: true,
-      submenu: [{ name: "Productos", href: "/productos", icon: Icons.PillBottle },
-                { name: "Formulas", href: "/formulas", icon: Icons.FlaskRound }
-                ],
-      
+      submenu: [
+        { name: "Productos", href: "/productos", icon: Icons.PillBottle },
+        { name: "Formulas", href: "/formulas", icon: Icons.FlaskRound },
+      ],
     },
     {
       name: "Catalogos",
@@ -95,7 +96,10 @@ export function AppSidebar() {
       name: "Gestión",
       icon: Icons.Hotel,
       hasSubmenu: true,
-      submenu: [{ name: "Clientes", href: "/clientes", icon: Icons.Hotel }],
+      submenu: [
+        { name: "Clientes", href: "/clientes", icon: Icons.Hotel },
+        { name: "Zonas", href: "/zonas", icon: Icons.MapPin },
+      ],
     },
 
     {
