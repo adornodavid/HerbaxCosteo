@@ -5,6 +5,7 @@
 ================================================== */
 import { createClient } from "@/lib/supabase"
 import { encryptData, decryptData } from "@/lib/encryption"
+import bcrypt from "bcryptjs"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
