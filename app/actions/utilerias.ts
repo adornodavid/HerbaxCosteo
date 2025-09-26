@@ -33,7 +33,6 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 /* ==================================================
   Encryption Functions
 ================================================== */
-
 // Función: Encrypt
 export async function Encrypt(texto: string): Promise<string> {
   try {
