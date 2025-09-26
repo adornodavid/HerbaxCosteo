@@ -261,6 +261,10 @@ export default function ProductosPage() {
       if (productosResult.success && productosResult.data) {
         // Transformar datos de la consulta para manejar productos sin asociación
         const flattenedData = productosResult.data.flatMap((p: any) => {
+
+
+
+        
           if (p.productosxcatalogo.length === 0) {
             // Producto sin asociaciones, mostrarlo una vez
             return {
