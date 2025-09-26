@@ -1128,7 +1128,7 @@ export default function NuevaFormulaPage() {
                 {/* Flask body */}
                 <div>
                   <Image
-                    src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/matraz.gif"
+                    src="/images/design-mode/matraz.gif"
                     alt="matraz"
                     width={200}
                     height={200}

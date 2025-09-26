@@ -1835,7 +1835,7 @@ export default function NuevoProducto() {
             <div className="text-center space-y-6">
               <div className="relative mx-auto w-32 h-32">
                 <Image
-                  src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/productos.gif"
+                  src="/images/design-mode/productos.gif"
                   alt="matraz"
                   width={200}
                   height={200}

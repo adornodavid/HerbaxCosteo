@@ -109,7 +109,7 @@ export default function LoginPage() {
                   <div className="mb-6">
                     <div className="inline-flex items-center justify-center w-64 h-32 bg-gradient-to-br mb-4">
                       {/*<Icons.Utensils className="w-8 h-8 text-slate-700" />*/}
-                      <img className="shrink-0 size-15 rounded-full" src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/healthylab.png" alt="Avatar" />
+                      <img className="shrink-0 size-15 rounded-full" src="/images/design-mode/healthylab.png" alt="Avatar" />
                     </div>
                     <h1 className="text-xl font-bold text-slate-800 leading-tight">
                       Sistema de Costeo

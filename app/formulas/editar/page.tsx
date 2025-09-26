@@ -1086,7 +1086,7 @@ export default function EditarFormulaPage() {
               <div className="relative mx-auto w-32 h-32">
                 <div>
                   <Image
-                    src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/matraz.gif"
+                    src="/images/design-mode/matraz.gif"
                     alt="matraz"
                     width={200}
                     height={200}

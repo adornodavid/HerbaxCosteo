@@ -1447,7 +1447,7 @@ function EditarProductoContent() {
           <div className="flex flex-col items-center justify-center p-8">
             <div className="relative w-24 h-24 mb-4">
               <Image
-                src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/cargar.gif"
+                src="/images/design-mode/cargar.gif"
                 alt="Cargando..."
                 width={300}
                 height={300}
@@ -1638,7 +1638,7 @@ function EditarProductoContent() {
             <div className="text-center space-y-6">
               <div className="relative mx-auto w-32 h-32">
                 <Image
-                  src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/productos.gif"
+                  src="/images/design-mode/productos.gif"
                   alt="matraz"
                   width={200}
                   height={200}

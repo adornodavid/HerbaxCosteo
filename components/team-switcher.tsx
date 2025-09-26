@@ -102,7 +102,7 @@ export function TeamSwitcher({ hotels, selectedHotel, onSelectHotel }: TeamSwitc
               <>
                 <Avatar className="mr-2 h-5 w-5">
                   <AvatarImage
-                    src={`https://avatar.vercel.sh/${selectedHotel.id}.png`}
+                    src={`/images/design-mode/${selectedHotel.id}.png`}
                     alt={selectedHotel.nombre}
                     className="grayscale"
                   />
@@ -133,7 +133,7 @@ export function TeamSwitcher({ hotels, selectedHotel, onSelectHotel }: TeamSwitc
                   >
                     <Avatar className="mr-2 h-5 w-5">
                       <AvatarImage
-                        src={`https://avatar.vercel.sh/${hotel.id}.png`}
+                        src={`/images/design-mode/${hotel.id}.png`}
                         alt={hotel.nombre}
                         className="grayscale"
                       />

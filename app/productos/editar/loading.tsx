@@ -7,7 +7,7 @@ export default function Loading() {
         <div className="flex flex-col items-center justify-center p-8">
           <div className="relative w-24 h-24 mb-4">
             <Image
-              src="https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/AnimationGif/cargar.gif"
+              src="/images/design-mode/cargar.gif"
               alt="Cargando..."
               width={300}
               height={300}
