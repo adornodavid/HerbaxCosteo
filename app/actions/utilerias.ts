@@ -31,9 +31,9 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 //  Función: insUsuario
 
 /* ==================================================
-  Encryption Functions
+  Encryption Functions 
 ================================================== */
-// Función: Encrypt
+// Función: Encrypt - (Crypto-js)
 export async function Encrypt(texto: string): Promise<string> {
   try {
     return encryptData(texto)
@@ -43,7 +43,7 @@ export async function Encrypt(texto: string): Promise<string> {
   }
 }
 
-// Función: Desencrypt
+// Función: Desencrypt - (Crypto-js)
 export async function Desencrypt(textoEncriptado: string): Promise<string> {
   try {
     return decryptData(textoEncriptado)
