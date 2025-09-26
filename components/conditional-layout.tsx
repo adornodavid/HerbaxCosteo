@@ -1,8 +1,10 @@
 "use client"
 
 import type React from "react"
+import { useState } from "react"
 import { usePathname } from "next/navigation"
-import { AppSidebar } from "@/components/app-sidebar-final"
+import { IconSidebar } from "@/components/icon-sidebar"
+import { OffcanvasNavigation } from "@/components/offcanvas-navigation"
 
 interface ConditionalLayoutProps {
   children: React.ReactNode
@@ -10,6 +12,15 @@ interface ConditionalLayoutProps {
 
 export default function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname()
+  const [isNavigationOpen, setIsNavigationOpen] = useState(false)
+
+  const toggleNavigation = () => {
+    setIsNavigationOpen(!isNavigationOpen)
+  }
+
+  const closeNavigation = () => {
+    setIsNavigationOpen(false)
+  }
 
   // Páginas que no deben mostrar la navegación
   const noSidebarPages = ["/login", "/logout"]
@@ -22,8 +33,11 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
 
   return (
     <div className="flex min-h-screen flex-row items-stretch">
-      <AppSidebar />
-      <main className="flex-1 overflow-auto bg-gray-50">{children}</main>
+      <IconSidebar onToggleNavigation={toggleNavigation} />
+
+      <OffcanvasNavigation isOpen={isNavigationOpen} onClose={closeNavigation} />
+
+      <main className="flex-1 overflow-auto bg-gray-50 ml-[100px]">{children}</main>
     </div>
   )
 }
