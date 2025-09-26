@@ -212,7 +212,7 @@ export async function obtenerProductos(productoid = -1, rolid = -1, clienteid = 
     //Retorno de data
     return { success: true, data }
   } catch (error) {
-    console.error("Error en obtenerProductos:", error)
+    console.error("Error en app/actions/productos en obtenerProductos:", error)
     return { success: false, error: "Error interno del servidor" }
   }
 }
