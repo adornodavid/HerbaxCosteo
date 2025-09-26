@@ -282,7 +282,7 @@ export default function EncryptPage() {
 
       {/* Sección de Hash */}
       <div className="flex justify-center">
-        <div className="w-full max-w-md">
+        <div className="w-full">
           <Card className="rounded-xs border bg-card text-card-foreground shadow">
             <CardHeader className="text-center">
               <CardTitle>Hash (bcrypt)</CardTitle>
