@@ -179,7 +179,7 @@ export async function actualizarProducto(
 }
 
 //Función: obtenerProductos: función para obtener el listado de productos
-export async function obtenerProductos(productoid = -1, rolid = -1, clienteid = -1, zonaid = -1 ) {
+export async function obtenerProductos(productoid = -1, rolid = -1, clienteid = -1, zonaid = -1, activo = "Todos" ) {
   try {
     //Query principal
     let query = supabaseAdmin.from("productos").select(`
@@ -196,9 +196,15 @@ export async function obtenerProductos(productoid = -1, rolid = -1, clienteid = 
     if (clienteid > 0) {
       query = query.eq("productosxcatalogo.catalogos.clientes.id", clienteid)
     }
+    if(activo <> "True"){
+      query.eq("activo", true)
+    }
+    if(activo <> "False"){
+      query.eq("activo", false)
+    }
 
     //Ejecutar query
-    query = query.eq("activo", true).order("fechacreacion", { ascending: false })
+    query = query.order("fechacreacion", { ascending: false })
 
     //Varaible y resultados del query
     const { data, error } = await query
