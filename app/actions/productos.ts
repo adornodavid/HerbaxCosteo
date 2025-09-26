@@ -182,7 +182,7 @@ export async function actualizarProducto(
 }
 
 //Función: obtenerProductos: función para obtener el listado de productos
-export async function obtenerProductos(productoid = -1, rolid = -1, clienteid = -1, zonaid = -1, activo = "Todos") {
+export async function obtenerProductos(productoid = -1, productonombre = "", clienteid = -1, zonaid = -1, activo = "Todos") {
   try {
     //Query principal
     let query = supabaseAdmin
