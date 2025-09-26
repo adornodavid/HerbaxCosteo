@@ -1,0 +1,266 @@
+"use client"
+
+/* ==================================================
+  Imports
+================================================== */
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
+import { getSession } from "@/app/actions/session-actions"
+import { useRouter } from "next/navigation"
+import { encryptData, decryptData } from "@/lib/encryption"
+import Image from "next/image"
+
+/* ==================================================
+  Interfaces, tipados, clases
+================================================== */
+interface SessionData {
+  UsuarioId: string | null
+  Email: string | null
+  NombreCompleto: string | null
+  ClienteId: string | null
+  RolId: string | null
+  Permisos: string[] | null
+  SesionActiva: boolean | null
+}
+
+/* ==================================================
+  Componente Principal, Pagina
+================================================== */
+export default function EncryptPage() {
+  // --- Variables especiales ---
+  const router = useRouter()
+
+  // --- Estados ---
+  const [sesion, setSesion] = useState<SessionData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Estados para encriptación
+  const [txtTextoE, setTxtTextoE] = useState("")
+  const [txtResultadoE, setTxtResultadoE] = useState("")
+
+  // Estados para desencriptación
+  const [txtTextoD, setTxtTextoD] = useState("")
+  const [txtResultadoD, setTxtResultadoD] = useState("")
+
+  // --- Carga Inicial ---
+  // Cargar sesión al montar el componente
+  useEffect(() => {
+    cargarSesion()
+  }, [])
+
+  // ---  Validar sesión ---
+  const cargarSesion = async () => {
+    try {
+      const datosSession = await getSession()
+
+      // Validación de seguridad
+      if (!datosSession || datosSession.SesionActiva !== true) {
+        router.push("/dashboard")
+        return
+      }
+
+      const rolId = Number.parseInt(datosSession.RolId?.toString() || "0", 10)
+      if (rolId !== 1) {
+        router.push("/dashboard")
+        return
+      }
+
+      setSesion(datosSession)
+    } catch (error) {
+      console.error("Error cargando sesión:", error)
+      router.push("/dashboard")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  /* ==================================================
+    Funciones
+  ================================================== */
+  // Función: btnAccionE: función para encriptar texto
+  const btnAccionE = async () => {
+    try {
+      if (!txtTextoE.trim()) {
+        setError("Por favor ingrese un texto para encriptar")
+        return
+      }
+
+      const textoEncriptado = encryptData(txtTextoE)
+      setTxtResultadoE(textoEncriptado)
+      setTxtTextoD(textoEncriptado) // Colocar el resultado en el input de desencriptar
+      setError(null)
+    } catch (error) {
+      console.error("Error encriptando:", error)
+      setError("Error al encriptar el texto")
+    }
+  }
+
+  // Función: btnAccionD: función para desencriptar texto
+  const btnAccionD = async () => {
+    try {
+      if (!txtTextoD.trim()) {
+        setError("Por favor ingrese un texto para desencriptar")
+        return
+      }
+
+      const textoDesencriptado = decryptData(txtTextoD)
+      setTxtResultadoD(textoDesencriptado)
+      setError(null)
+    } catch (error) {
+      console.error("Error desencriptando:", error)
+      setError("Error al desencriptar el texto. Verifique que el texto esté correctamente encriptado.")
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center justify-center p-8">
+          <div className="relative w-24 h-24 mb-4">
+            <Image
+              src="/images/design-mode/cargando.gif"
+              alt="Procesando..."
+              width={300}
+              height={300}
+              unoptimized
+              className="absolute inset-0 animate-bounce-slow"
+            />
+          </div>
+          <p className="text-lg font-semibold text-gray-800">Cargando Pagina...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error && !sesion) {
+    return (
+      <div className="container mx-auto p-6">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
+
+  return (
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Título */}
+      <div className="text-center mb-6">
+        <h1 className="text-3xl font-bold">Encryp (bcrypt, crypto)</h1>
+      </div>
+
+      {/* Sección de resumen */}
+      <div className="text-center mb-6">
+        <p className="text-lg text-muted-foreground">
+          Esta es una herramienta relacionada con la encriptacion que se utiliza, aqui puedes encriptar o desencriptar
+          un texto.
+        </p>
+      </div>
+
+      {/* Mostrar errores */}
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Sección principal */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Primer div: Encriptar */}
+        <Card className="rounded-xs border bg-card text-card-foreground shadow">
+          <CardHeader className="text-center">
+            <CardTitle>Encriptar</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-center">
+              <Input
+                id="txtTextoE"
+                name="txtTextoE"
+                type="text"
+                value={txtTextoE}
+                onChange={(e) => setTxtTextoE(e.target.value)}
+                placeholder="Ingrese el texto a encriptar"
+                className="w-4/5"
+              />
+            </div>
+
+            <div className="flex justify-center">
+              <Button
+                id="btnAccionE"
+                name="btnAccionE"
+                type="button"
+                onClick={btnAccionE}
+                className="bg-[#5d8f72] text-white hover:bg-[#44785a]"
+              >
+                Encriptar
+              </Button>
+            </div>
+
+            <div className="flex justify-center">
+              <Input
+                id="txtResultadoE"
+                name="txtResultadoE"
+                type="text"
+                value={txtResultadoE}
+                readOnly
+                placeholder="Resultado de la encriptación"
+                className="w-4/5"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Segundo div: Desencriptar */}
+        <Card className="rounded-xs border bg-card text-card-foreground shadow">
+          <CardHeader className="text-center">
+            <CardTitle>Desencriptar</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-center">
+              <Input
+                id="txtTextoD"
+                name="txtTextoD"
+                type="text"
+                value={txtTextoD}
+                onChange={(e) => setTxtTextoD(e.target.value)}
+                placeholder="Ingrese el texto a desencriptar"
+                className="w-4/5"
+              />
+            </div>
+
+            <div className="flex justify-center">
+              <Button
+                id="btnAccionD"
+                name="btnAccionD"
+                type="button"
+                onClick={btnAccionD}
+                className="bg-[#5d8f72] text-white hover:bg-[#44785a]"
+              >
+                Desencriptar
+              </Button>
+            </div>
+
+            <div className="flex justify-center">
+              <Input
+                id="txtResultadoD"
+                name="txtResultadoD"
+                type="text"
+                value={txtResultadoD}
+                readOnly
+                placeholder="Resultado de la desencriptación"
+                className="w-4/5"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
