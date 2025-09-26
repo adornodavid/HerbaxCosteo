@@ -34,7 +34,7 @@ export function AppSidebar() {
   }, [])
 
   const toggleMenu = (menuName: string) => {
-    setOpenMenus((prev) => (prev.includes(menuName) ? prev.filter((name) => name !== menuName) : [...prev, menuName]))
+    setOpenMenus((prev) => (prev.includes(menuName) ? [] : [menuName]))
   }
 
   const isActive = (href: string) => pathname === href
@@ -64,7 +64,7 @@ export function AppSidebar() {
       submenu: [
         { name: "Materia Prima", href: "/materiaprima", icon: Icons.Pill },
         { name: "Categorías", href: "/categorias", icon: Icons.Package },
-        { name: "Material de etiquetado", href: "/materialetiquetado", icon: Icons.Package },
+        { name: "Etiquetado", href: "/materialetiquetado", icon: Icons.Package },
       ],
     },
     {
@@ -123,7 +123,7 @@ export function AppSidebar() {
   return (
     <div
       id="SideBar"
-      className="w-64 h-200 bg-[#F3F6F9] backdrop-blur-2xl border-r border-white/20 text-slate-800 flex flex-col relative shadow-2xl shadow-black/10"
+      className="fixed left-0 top-0 w-64 h-screen bg-[#F3F6F9] backdrop-blur-2xl border-r border-white/20 text-slate-800 flex flex-col relative shadow-2xl shadow-black/10 z-50"
       style={{
         background: "linear-gradient(135deg",
         boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2), 0 20px 40px rgba(0,0,0,0.1)",
@@ -168,7 +168,7 @@ export function AppSidebar() {
         </div>
       </div>
 
-      <nav className="relative flex-1 overflow-y-auto">
+      <nav className="relative flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
         <div className="p-4 space-y-3">
           {menuItems.map((item) => (
             <div key={item.name}>
