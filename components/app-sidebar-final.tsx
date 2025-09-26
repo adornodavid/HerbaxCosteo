@@ -64,7 +64,7 @@ export function AppSidebar() {
       submenu: [
         { name: "Materia Prima", href: "/materiaprima", icon: Icons.Pill },
         { name: "Categorías", href: "/categorias", icon: Icons.Package },
-        { name: "Material de etiquetado", href: "/materialetiquetado", icon: Icons.Tag },
+        { name: "Material de etiquetado", href: "/materialetiquetado", icon: Icons.Package },
       ],
     },
     {
@@ -98,7 +98,7 @@ export function AppSidebar() {
       hasSubmenu: true,
       submenu: [
         { name: "Clientes", href: "/clientes", icon: Icons.Hotel },
-        { name: "Zonas", href: "/zonas", icon: Icons.MapPin },
+        { name: "Zonas", href: "/zonas", icon: Icons.Building },
       ],
     },
 
