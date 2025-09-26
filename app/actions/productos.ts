@@ -204,7 +204,7 @@ export async function obtenerProductos(productoid = -1, rolid = -1, clienteid = 
     }
 
     //Ejecutar query
-    query = query.order("fechacreacion", { ascending: false })
+    query = query.order("productonombre", { ascending: false })
 
     //Varaible y resultados del query
     const { data, error } = await query
