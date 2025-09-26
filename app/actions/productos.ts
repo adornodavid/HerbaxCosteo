@@ -205,6 +205,7 @@ export async function obtenerProductos(
         p.unidadmedidaid as productounidadmedidaid, 
         u.descripcion as unidadmedida, 
         p.costo as productocosto, 
+        p.activo as productoactivo,
         pc.descripcion as productodescripcion, 
         pc.presentacion as productopresentacion, 
         pc.porcion as productoporcion, 
