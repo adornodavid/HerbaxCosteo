@@ -25,7 +25,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { Search, Eye, Edit, ToggleLeft, ToggleRight, Loader2, PlusCircle, RotateCcw } from "lucide-react"
 
@@ -33,13 +40,9 @@ import {
   obtenerProductoDetalladoCompleto,
   obtenerFormulasAsociadasProducto,
   obtenerIngredientesAsociadosProducto,
-  obtenerProductosIniciales,
-  buscarProductosConFiltros,
   getProductoDetailsForModal,
 } from "@/app/actions/productos-actions"
-import {
-  obtenerProductos,
-} from "@/app/actions/productos"
+import { obtenerProductos } from "@/app/actions/productos"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
 
@@ -183,7 +186,13 @@ export default function ProductosPage() {
     setPaginaActual(1)
     console.log("cli:", clienteId)
     try {
-      const result = await buscarProductosConFiltros(nombre, clienteId, catalogoId, estatus, user.RolId, user.ClienteId)
+      const result = await obtenerProductos(
+        -1, // productoid
+        nombre, // productonombre
+        clienteId === -1 ? -1 : clienteId, // clienteid
+        -1, // zonaid
+        estatus === "-1" ? "Todos" : estatus === "true" ? "Activo" : "Inactivo", // activo
+      )
 
       if (!result.success) {
         console.error("Error en búsqueda:", result.error)
@@ -194,49 +203,24 @@ export default function ProductosPage() {
 
       const queryData = result.data || []
 
-      // Transformar datos de la consulta para manejar productos sin asociación
-      const flattenedData = queryData.flatMap((p: any) => {
-        if (p.productosxcatalogo.length === 0) {
-          // Producto sin asociaciones, mostrarlo una vez
-          return {
-            ProductoId: p.id,
-            ProductoNombre: p.nombre,
-            ProductoDescripcion: p.descripcion,
-            ProductoTiempo: p.propositoprincipal,
-            ProductoCosto: p.costo,
-            ProductoActivo: p.activo,
-            ProductoImagenUrl: p.imgurl,
-            ClienteId: -1,
-            ClienteNombre: "N/A",
-            CatalogoId: -1,
-            CatalogoNombre: "N/A",
-          }
-        }
-        // Producto con asociaciones, aplanarlas
-        return p.productosxcatalogo.map((x: any) => ({
-          ProductoId: p.id,
-          ProductoNombre: p.nombre,
-          ProductoDescripcion: p.descripcion,
-          ProductoTiempo: p.propositoprincipal,
-          ProductoCosto: p.costo,
-          ProductoActivo: p.activo,
-          ProductoImagenUrl: p.imgurl,
-          ClienteId: x.catalogos?.clientes?.id || -1,
-          ClienteNombre: x.catalogos?.clientes?.nombre || "N/A",
-          CatalogoId: x.catalogos?.id || -1,
-          CatalogoNombre: x.catalogos?.nombre || "N/A",
-        }))
-      })
+      const transformedData = queryData.map((p: any) => ({
+        ProductoId: p.productoid,
+        ProductoNombre: p.productonombre,
+        ProductoDescripcion: p.productodescripcion || p.productonombre, // Use description or fallback to name
+        ProductoTiempo: p.productopropositoprincipal || "N/A",
+        ProductoCosto: p.productocosto,
+        ProductoActivo: p.productoactivo === true, // Ensure boolean
+        ProductoImagenUrl: p.productoimgurl,
+        ClienteId: p.clienteid || -1,
+        ClienteNombre: p.clientenombre || "N/A",
+        CatalogoId: -1, // Not available in new query structure
+        CatalogoNombre: "N/A", // Not available in new query structure
+      }))
 
-      // Eliminar duplicados si un producto aparece varias veces debido a múltiples asociaciones
-      const uniqueProducts = Array.from(
-        new Map(flattenedData.map((item: ProductoListado) => [item.ProductoId, item])).values(),
-      )
-
-      setProductos(uniqueProducts)
-      setProductosFiltrados(uniqueProducts)
-      setTotalProductos(uniqueProducts.length)
-      toast.success(`Búsqueda completada. Se encontraron ${uniqueProducts.length} resultados.`)
+      setProductos(transformedData)
+      setProductosFiltrados(transformedData)
+      setTotalProductos(transformedData.length)
+      toast.success(`Búsqueda completada. Se encontraron ${transformedData.length} resultados.`)
     } catch (error) {
       console.error("Error inesperado al buscar productos:", error)
       toast.error("Error inesperado al buscar productos")
@@ -255,56 +239,31 @@ export default function ProductosPage() {
       const clienteId = Number.parseInt(user.ClienteId?.toString() || -1, 10)
       console.log(clienteId)
       // Use new function with proper RolId filtering
-      //const productosResult = await obtenerProductosIniciales(rolId, clienteId)
-      const productosResult = await obtenerProductos(productoid = -1, productonombre = "", clienteid = -1, zonaid = -1, activo = "Todos")
+      const productoid = -1
+      const productonombre = ""
+      const clienteid = -1
+      const zonaid = -1
+      const activo = "Todos"
+      const productosResult = await obtenerProductos(productoid, productonombre, clienteid, zonaid, activo)
 
       if (productosResult.success && productosResult.data) {
-        // Transformar datos de la consulta para manejar productos sin asociación
-        const flattenedData = productosResult.data.flatMap((p: any) => {
+        const transformedData = productosResult.data.map((p: any) => ({
+          ProductoId: p.productoid,
+          ProductoNombre: p.productonombre,
+          ProductoDescripcion: p.productodescripcion || p.productonombre, // Use description or fallback to name
+          ProductoTiempo: p.productopropositoprincipal || "N/A",
+          ProductoCosto: p.productocosto,
+          ProductoActivo: p.productoactivo === true, // Ensure boolean
+          ProductoImagenUrl: p.productoimgurl,
+          ClienteId: p.clienteid || -1,
+          ClienteNombre: p.clientenombre || "N/A",
+          CatalogoId: -1, // Not available in new query structure
+          CatalogoNombre: "N/A", // Not available in new query structure
+        }))
 
-
-
-        
-          if (p.productosxcatalogo.length === 0) {
-            // Producto sin asociaciones, mostrarlo una vez
-            return {
-              ProductoId: p.id,
-              ProductoNombre: p.nombre,
-              ProductoDescripcion: p.descripcion,
-              ProductoTiempo: p.propositoprincipal,
-              ProductoCosto: p.costo,
-              ProductoActivo: p.activo,
-              ProductoImagenUrl: p.imgurl,
-              ClienteId: -1, // O algún valor que indique "N/A"
-              ClienteNombre: "N/A",
-              CatalogoId: -1, // O algún valor que indique "N/A"
-              CatalogoNombre: "N/A",
-            }
-          }
-          // Producto con asociaciones, aplanarlas
-          return p.productosxcatalogo.map((x: any) => ({
-            ProductoId: p.id,
-            ProductoNombre: p.nombre,
-            ProductoDescripcion: p.descripcion,
-            ProductoTiempo: p.propositoprincipal,
-            ProductoCosto: p.costo,
-            ProductoActivo: p.activo,
-            ProductoImagenUrl: p.imgurl,
-            ClienteId: x.catalogos?.clientes?.id || -1,
-            ClienteNombre: x.catalogos?.clientes?.nombre || "N/A",
-            CatalogoId: x.catalogos?.id || -1,
-            CatalogoNombre: x.catalogos?.nombre || "N/A",
-          }))
-        })
-
-        // Eliminar duplicados si un producto aparece varias veces debido a múltiples asociaciones
-        const uniqueProducts = Array.from(
-          new Map(flattenedData.map((item: ProductoListado) => [item.ProductoId, item])).values(),
-        )
-
-        setProductos(uniqueProducts)
-        setProductosFiltrados(uniqueProducts)
-        setTotalProductos(uniqueProducts.length)
+        setProductos(transformedData)
+        setProductosFiltrados(transformedData)
+        setTotalProductos(transformedData.length)
       }
 
       // Cargar clientes
