@@ -222,6 +222,7 @@ export async function obtenerProductos(productoid = -1, productonombre = "", cli
     if (productoid !== -1) {
       query = query.eq("p.id", productoid)
     }
+    
     if (clienteid !== -1) {
       query = query.eq("p.clienteid", clienteid)
     }
