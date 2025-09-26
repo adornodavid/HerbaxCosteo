@@ -54,3 +54,6 @@ export async function Desencrypt(textoEncriptado: string): Promise<string> {
 }
 
 // Función: Hashear - (Bcrypt-js) : Hashear o encriptar texto, utilizado para contraseñas
+export async function HashData(texto: string): Promise<string>{
+  const hashedPassword = await bcrypt.hash(password, 10)
+}
