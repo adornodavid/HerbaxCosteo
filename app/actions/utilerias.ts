@@ -53,4 +53,4 @@ export async function Desencrypt(textoEncriptado: string): Promise<string> {
   }
 }
 
-// Función: Hashear - (Crypto-js)
+// Función: Hashear - (Bcrypt-js) : Hashear o encriptar texto, utilizado para contraseñas
