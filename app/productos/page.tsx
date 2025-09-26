@@ -26,25 +26,21 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog"
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { Search, Eye, Edit, ToggleLeft, ToggleRight, Loader2, PlusCircle, RotateCcw } from "lucide-react"
+
 import {
   obtenerProductoDetalladoCompleto,
   obtenerFormulasAsociadasProducto,
   obtenerIngredientesAsociadosProducto,
   obtenerProductosIniciales,
   buscarProductosConFiltros,
+  getProductoDetailsForModal,
 } from "@/app/actions/productos-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
-import { getProductoDetailsForModal } from "@/app/actions/productos-actions" // Import the missing function
+//import { getProductoDetailsForModal } from "@/app/actions/productos-actions" // Import the missing function
 
 /* ==================================================
   Interfaces, tipados, clases
