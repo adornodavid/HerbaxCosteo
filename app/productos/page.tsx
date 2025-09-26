@@ -255,7 +255,8 @@ export default function ProductosPage() {
       const clienteId = Number.parseInt(user.ClienteId?.toString() || -1, 10)
       console.log(clienteId)
       // Use new function with proper RolId filtering
-      const productosResult = await obtenerProductosIniciales(rolId, clienteId)
+      //const productosResult = await obtenerProductosIniciales(rolId, clienteId)
+      const productosResult = await obtenerProductos()
 
       if (productosResult.success && productosResult.data) {
         // Transformar datos de la consulta para manejar productos sin asociación
