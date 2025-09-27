@@ -191,76 +191,73 @@ export async function obtenerProductos(
   activo = "Todos",
 ) {
   try {
-    //Query principal
-    let query = supabase
-      .from("productos")
-      .select(`
-        p.id as productoid, 
-        p.codigo as productocodigo, 
-        p.clienteid as clienteid, 
-        c.nombre as clientenombre, 
-        p.zonaid as zonaid, 
-        z.nombre as zonanombre, 
-        p.nombre as productonombre, 
-        p.imgurl as productoimgurl, 
-        p.unidadmedidaid as productounidadmedidaid, 
-        u.descripcion as unidadmedida, 
-        p.costo as productocosto, 
-        p.activo as productoactivo,
-        pc.descripcion as productodescripcion, 
-        pc.presentacion as productopresentacion, 
-        pc.porcion as productoporcion, 
-        pc.modouso as productomodouso, 
-        pc.porcionenvase as productoporcionenvase, 
-        pc.categoriauso as productocategoriauso, 
-        pc.propositoprincipal as productopropositoprincipal, 
-        pc.propuestavalor as productopropuestavalor, 
-        pc.instruccionesingesta as productoinstruccionesingesta, 
-        pc.edadminima as productoedadminima, 
-        pc.advertencia as productoadvertencia, 
-        pc.condicionesalmacenamiento as productocondicionesalmacenamiento
-        cat.id as catalogoid,
-        cat.nombre as catalogonombre,
-        cat.descripcion as catalogodescripcion,
-        pxc.precioventa as productocatalogoprecioventa,
-        pxc.margenutilidad as productocatalogomargenutilidad
+    let query = supabase.from("productos").select(`
+        id,
+        codigo,
+        clienteid,
+        zonaid,
+        nombre,
+        imgurl,
+        unidadmedidaid,
+        costo,
+        activo,
+        clientes!clienteid(nombre),
+        zonas!zonaid(nombre),
+        unidadesmedida!unidadmedidaid(descripcion),
+        productoscaracteristicas!productoid(
+          descripcion,
+          presentacion,
+          porcion,
+          modouso,
+          porcionenvase,
+          categoriauso,
+          propositoprincipal,
+          propuestavalor,
+          instruccionesingesta,
+          edadminima,
+          advertencia,
+          condicionesalmacenamiento
+        ),
+        productosxcatalogo!productoid(
+          catalogoid,
+          precioventa,
+          margenutilidad,
+          catalogos!catalogoid(
+            id,
+            nombre,
+            descripcion
+          )
+        )
       `)
-      .from("productos", "p")
-      .leftJoin("productoscaracteristicas", "pc.productoid", "p.id")
-      .leftJoin("clientes", "c.id", "p.clienteid")
-      .leftJoin("zonas", "z.id", "p.zonaid")
-      .leftJoin("unidadesmedida", "u.id", "p.unidadmedidaid")
-      .leftJoin("productosxcatalogo", "pxc.productoid", "p.id")
-      .leftJoin("catalogos", "cat.id", "pxc.catalogoid")
 
     //Filtros al query dependiendo parametros
     if (productoid !== -1) {
-      query = query.eq("p.id", productoid)
+      query = query.eq("id", productoid)
     }
 
     if (clienteid !== -1) {
-      query = query.eq("p.clienteid", clienteid)
+      query = query.eq("clienteid", clienteid)
     }
     if (zonaid !== -1) {
-      query = query.eq("p.zonaid", zonaid)
+      query = query.eq("zonaid", zonaid)
     }
     if (catalogoid !== -1) {
-      query = query.eq("cat.id", zonaid)
+      query = query.eq("productosxcatalogo.catalogoid", catalogoid)
     }
     if (productonombre !== "") {
-      query = query.ilike("p.nombre", `%${productonombre}%`)
+      query = query.ilike("nombre", `%${productonombre}%`)
     }
     if (activo !== "Todos") {
       if (activo === "True") {
-        query = query.eq("p.activo", true)
+        query = query.eq("activo", true)
       }
       if (activo === "False") {
-        query = query.eq("p.activo", false)
+        query = query.eq("activo", false)
       }
     }
 
     //Ejecutar query
-    query = query.order("productonombre", { ascending: true })
+    query = query.order("nombre", { ascending: true })
 
     //Varaibles y resultados del query
     const { data, error } = await query
