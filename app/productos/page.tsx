@@ -78,6 +78,8 @@ interface Producto{
   CatalogoId: number
   CatalogoNombre: string
   CatalogoDescripcion: string
+  ProductoCatalogoPrecioVenta: number
+  ProductoCatalogoMargenUtilidad: number
 }
 interface DropdownItem {
   id: number
