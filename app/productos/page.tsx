@@ -50,7 +50,17 @@ import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
   Interfaces, tipados, clases
 ================================================== */
 interface Producto{
-  
+  ProductoId: number
+  ProductoNombre: string
+  ProductoDescripcion: string
+  ProductoTiempo: string
+  ProductoCosto: number
+  ProductoActivo: boolean
+  ProductoImagenUrl: string | null
+  ClienteId: number
+  ClienteNombre: string
+  CatalogoId: number
+  CatalogoNombre: string
 }
 interface DropdownItem {
   id: number
