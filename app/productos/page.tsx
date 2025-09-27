@@ -49,7 +49,7 @@ import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
 /* ==================================================
   Interfaces, tipados, clases
 ================================================== */
-interface Producto{
+interface Producto {
   ProductoId: number
   ProductoCodigo: string
   ClienteId: number
@@ -74,7 +74,7 @@ interface Producto{
   ProductoEdadMinima: string
   ProductoAdvertencia: string
   ProductoCondicionesAlmacenamiento: string
-  
+
   CatalogoId: number
   CatalogoNombre: string
   CatalogoDescripcion: string
@@ -235,18 +235,35 @@ export default function ProductosPage() {
 
       const queryData = result.data || []
 
-      const transformedData = queryData.map((p: any) => ({
+      const transformedData: Producto[] = queryData.map((p: any) => ({
         ProductoId: p.productoid,
-        ProductoNombre: p.productonombre,
-        ProductoDescripcion: p.productodescripcion || p.productonombre, // Use description or fallback to name
-        ProductoTiempo: p.productopropositoprincipal || "N/A",
-        ProductoCosto: p.productocosto,
-        ProductoActivo: p.productoactivo === true, // Ensure boolean
-        ProductoImagenUrl: p.productoimgurl,
+        ProductoCodigo: p.productocodigo || "",
         ClienteId: p.clienteid || -1,
         ClienteNombre: p.clientenombre || "N/A",
+        ZonaId: p.zonaid || -1,
+        ZonaNombre: p.zonanombre || "N/A",
+        UnidadMeidaId: p.productounidadmedidaid || -1,
+        UnidadMedidaDescripcion: p.unidadmedida || "N/A",
+        ProductoNombre: p.productonombre,
+        ProductoImgUrl: p.productoimgurl,
+        ProductoCosto: p.productocosto,
+        ProductoActivo: p.productoactivo === true,
+        ProductoDescripcion: p.productodescripcion || p.productonombre, // Use description or fallback to name
+        ProductoPorcion: p.productoporcion || "N/A",
+        ProductoModoUso: p.productomodouso || "N/A",
+        ProductoPorcionEnvase: p.productoporcionenvase || "N/A",
+        ProductoCategoriaUso: p.productocategoriauso || "N/A",
+        ProductoPropositoPrincipal: p.productopropositoprincipal || "N/A",
+        ProductoPropuestaValor: p.productopropuestavalor || "N/A",
+        ProductoInstruccionesIngesta: p.productoinstruccionesingesta || "N/A",
+        ProductoEdadMinima: p.productoedadminima || "N/A",
+        ProductoAdvertencia: p.productoadvertencia || "N/A",
+        ProductoCondicionesAlmacenamiento: p.productocondicionesalmacenamientoFROM || "N/A",
         CatalogoId: -1, // Not available in new query structure
         CatalogoNombre: "N/A", // Not available in new query structure
+        CatalogoDescripcion: "N/A", // Not available in new query structure
+        ProductoCatalogoPrecioVenta: 0, // Not available in new query structure
+        ProductoCatalogoMargenUtilidad: 0, // Not available in new query structure
       }))
 
       setProductos(transformedData)
@@ -281,21 +298,38 @@ export default function ProductosPage() {
       const activo = "Todos"
       const productosResult = await obtenerProductos(productoid, productonombre, clienteid, zonaid, catalogoid, activo)
 
-      console.log(productosResult.success + " - " + productosResult.data )
+      console.log(productosResult.success + " - " + productosResult.data)
 
       if (productosResult.success && productosResult.data) {
-        const transformedData = productosResult.data.map((p: any) => ({
+        const transformedData: Producto[] = productosResult.data.map((p: any) => ({
           ProductoId: p.productoid,
-          ProductoNombre: p.productonombre,
-          ProductoDescripcion: p.productodescripcion || p.productonombre, // Use description or fallback to name
-          ProductoTiempo: p.productopropositoprincipal || "N/A",
-          ProductoCosto: p.productocosto,
-          ProductoActivo: p.productoactivo === true, // Ensure boolean
-          ProductoImagenUrl: p.productoimgurl,
+          ProductoCodigo: p.productocodigo || "",
           ClienteId: p.clienteid || -1,
           ClienteNombre: p.clientenombre || "N/A",
+          ZonaId: p.zonaid || -1,
+          ZonaNombre: p.zonanombre || "N/A",
+          UnidadMeidaId: p.productounidadmedidaid || -1,
+          UnidadMedidaDescripcion: p.unidadmedida || "N/A",
+          ProductoNombre: p.productonombre,
+          ProductoImgUrl: p.productoimgurl,
+          ProductoCosto: p.productocosto,
+          ProductoActivo: p.productoactivo === true, // Ensure boolean
+          ProductoDescripcion: p.productodescripcion || p.productonombre, // Use description or fallback to name
+          ProductoPorcion: p.productoporcion || "N/A",
+          ProductoModoUso: p.productomodouso || "N/A",
+          ProductoPorcionEnvase: p.productoporcionenvase || "N/A",
+          ProductoCategoriaUso: p.productocategoriauso || "N/A",
+          ProductoPropositoPrincipal: p.productopropositoprincipal || "N/A",
+          ProductoPropuestaValor: p.productopropuestavalor || "N/A",
+          ProductoInstruccionesIngesta: p.productoinstruccionesingesta || "N/A",
+          ProductoEdadMinima: p.productoedadminima || "N/A",
+          ProductoAdvertencia: p.productoadvertencia || "N/A",
+          ProductoCondicionesAlmacenamiento: p.productocondicionesalmacenamientoFROM || "N/A",
           CatalogoId: -1, // Not available in new query structure
           CatalogoNombre: "N/A", // Not available in new query structure
+          CatalogoDescripcion: "N/A", // Not available in new query structure
+          ProductoCatalogoPrecioVenta: 0, // Not available in new query structure
+          ProductoCatalogoMargenUtilidad: 0, // Not available in new query structure
         }))
 
         setProductos(transformedData)
@@ -733,7 +767,7 @@ export default function ProductosPage() {
                     title="Ver detalles del producto"
                   >
                     <Image
-                      src={p.ProductoImagenUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
+                      src={p.ProductoImgUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
                       alt={p.ProductoNombre}
                       layout="fill"
                       objectFit="cover"
