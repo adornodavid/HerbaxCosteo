@@ -245,6 +245,7 @@ export default function ProductosPage() {
       const productonombre = ""
       const clienteid = -1
       const zonaid = -1
+      const catalogo = -1
       const activo = "Todos"
       const productosResult = await obtenerProductos(productoid, productonombre, clienteid, zonaid, activo)
 
