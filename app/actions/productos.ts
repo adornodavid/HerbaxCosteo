@@ -192,7 +192,7 @@ export async function obtenerProductos(
 ) {
   try {
     let query = supabase.from("productos").select(`
-        id,
+        id as productoid,
         codigo,
         clienteid,
         zonaid,
