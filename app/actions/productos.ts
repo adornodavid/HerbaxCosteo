@@ -244,6 +244,9 @@ export async function obtenerProductos(
     if (zonaid !== -1) {
       query = query.eq("p.zonaid", zonaid)
     }
+    if (catalogoid !== -1) {
+      query = query.eq("cat.id", zonaid)
+    }
     if (productonombre !== "") {
       query = query.ilike("p.nombre", `%${productonombre}%`)
     }
