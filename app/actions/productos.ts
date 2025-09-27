@@ -218,12 +218,19 @@ export async function obtenerProductos(
         pc.edadminima as productoedadminima, 
         pc.advertencia as productoadvertencia, 
         pc.condicionesalmacenamiento as productocondicionesalmacenamiento
+        cat.id as catalogoid,
+        cat.nombre as catalogonombre,
+        cat.descripcion as catalogodescripcion,
+        pxc.precioventa as productocatalogoprecioventa,
+        pxc.margenutilidad as productocatalogomargenutilidad
       `)
       .from("productos", "p")
       .leftJoin("productoscaracteristicas", "pc.productoid", "p.id")
       .leftJoin("clientes", "c.id", "p.clienteid")
       .leftJoin("zonas", "z.id", "p.zonaid")
       .leftJoin("unidadesmedida", "u.id", "p.unidadmedidaid")
+      .leftJoin("productosxcatalogo", "pxc.productoid", "p.id")
+      .leftJoin("catalogos", "cat.id", "pxc.catalogoid")
 
     //Filtros al query dependiendo parametros
     if (productoid !== -1) {
