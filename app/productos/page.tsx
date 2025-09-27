@@ -64,11 +64,20 @@ interface Producto{
   ProductoCosto: number
   ProductoActivo: boolean
   ProductoDescripcion: string
-  ProductoTiempo: string
-    
+  ProductoPorcion: string
+  ProductoModoUso: string
+  ProductoPorcionEnvase: string
+  ProductoCategoriaUso: string
+  ProductoPropositoPrincipal: string
+  ProductoPropuestaValor: string
+  ProductoInstruccionesIngesta: string
+  ProductoEdadMinima: string
+  ProductoAdvertencia: string
+  ProductoCondicionesAlmacenamiento: string
   
   CatalogoId: number
   CatalogoNombre: string
+  CatalogoDescripcion: string
 }
 interface DropdownItem {
   id: number
