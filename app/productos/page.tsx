@@ -51,14 +51,22 @@ import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
 ================================================== */
 interface Producto{
   ProductoId: number
-  ProductoNombre: string
-  ProductoDescripcion: string
-  ProductoTiempo: string
-  ProductoCosto: number
-  ProductoActivo: boolean
-  ProductoImagenUrl: string | null
+  ProductoCodigo: string
   ClienteId: number
   ClienteNombre: string
+  ZonaId: number
+  ZonaNombre: string
+  UnidadMeidaId: number
+  UnidadMedidaDescripcion: string
+
+  ProductoNombre: string
+  ProductoImgUrl: string | null
+  ProductoCosto: number
+  ProductoActivo: boolean
+  ProductoDescripcion: string
+  ProductoTiempo: string
+    
+  
   CatalogoId: number
   CatalogoNombre: string
 }
