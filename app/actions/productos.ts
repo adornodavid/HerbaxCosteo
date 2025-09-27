@@ -187,6 +187,7 @@ export async function obtenerProductos(
   productonombre = "",
   clienteid = -1,
   zonaid = -1,
+  catalogoid = -1,
   activo = "Todos",
 ) {
   try {
