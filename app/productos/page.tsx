@@ -49,6 +49,9 @@ import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
 /* ==================================================
   Interfaces, tipados, clases
 ================================================== */
+interface Producto{
+  
+}
 interface DropdownItem {
   id: number
   nombre: string
