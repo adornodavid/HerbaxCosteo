@@ -51,6 +51,27 @@ import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
 ================================================== */
 
 interface Producto {
+  id: number
+  codigo: string
+  clienteid: number
+  zonaid: number
+  nombre: string
+  imgurl: string | null
+  unidadmedidaid: number
+  costo: number
+  activo: boolean
+  clientes: {
+    nombre: string
+  }
+  zonas: {
+    nombre: string
+  }
+  unidadesmedida: {
+    descripcion: string
+  }
+  productoscaracteristicas: any[]
+  productosxcatalogo: any[]
+  /*
   ProductoId: number
   ProductoCodigo: string
   ClienteId: number
@@ -81,6 +102,7 @@ interface Producto {
   CatalogoDescripcion: string
   ProductoCatalogoPrecioVenta: number
   ProductoCatalogoMargenUtilidad: number
+  */
 }
 interface DropdownItem {
   id: number
