@@ -69,63 +69,26 @@ interface Producto {
   }
   costo: number | null
   activo: boolean | null
-  productoscaracteristicas: {
-    descripcion: string | null
-    presentacion: string | null
-    porcion: string | null
-    modouso: string | null
-    porcionenvase: string | null
-    categoriauso: string | null
-    propositoprincipal: string | null
-    propuestavalor: string | null
-    instruccionesingesta: string | null
-    edadminima: number | null
-    advertencia: string | null
-    condicionesalmacenamiento: string | null
-  }
-  productosxcatalogo: {
-    catalogoid: number | null
-    precioventa: number | null
-    margenutilidad: number | null
-    catalogos: {
-      id: number | null
-      nombre: string | null
-      descripcion: string | null
-    }
-  }
-  /*
-  ProductoId: number
-  ProductoCodigo: string
-  ClienteId: number
-  ClienteNombre: string
-  ZonaId: number
-  ZonaNombre: string
-  UnidadMeidaId: number
-  UnidadMedidaDescripcion: string
-
-  ProductoNombre: string
-  ProductoImgUrl: string | null
-  ProductoCosto: number
-  ProductoActivo: boolean
-  ProductoDescripcion: string
-  ProductoPorcion: string
-  ProductoModoUso: string
-  ProductoPorcionEnvase: string
-  ProductoCategoriaUso: string
-  ProductoPropositoPrincipal: string
-  ProductoPropuestaValor: string
-  ProductoInstruccionesIngesta: string
-  ProductoEdadMinima: string
-  ProductoAdvertencia: string
-  ProductoCondicionesAlmacenamiento: string
-
-  CatalogoId: number
-  CatalogoNombre: string
-  CatalogoDescripcion: string
-  ProductoCatalogoPrecioVenta: number
-  ProductoCatalogoMargenUtilidad: number
-  */
+  productoscaracteristicas: ProductoCaracteristica[]
+  productosxcatalogo: ProductoCatalogo[]
 }
+
+interface ProductoCaracteristica {
+  caracteristica: string
+  valor: string | null
+}
+
+interface ProductoCatalogo {
+  catalogoid: number | null
+  precioventa: number | null
+  margenutilidad: number | null
+  catalogos: {
+    id: number | null
+    nombre: string | null
+    descripcion: string | null
+  }
+}
+
 interface DropdownItem {
   id: number
   nombre: string
@@ -303,43 +266,21 @@ export default function ProductosPage() {
 
       const queryData = result.data || []
 
-      const transformedData: Producto[] = queryData.map((p: ProductoQueryData) => ({
+      const transformedData: ProductoListado[] = queryData.map((p: ProductoQueryData) => ({
         ProductoId: p.id,
-        ProductoCodigo: p.codigo || "",
-        ClienteId: p.clienteid || -1,
-        ClienteNombre: p.clientes.nombre || "N/A",
-        ZonaId: p.zonaid || -1,
-        ZonaNombre: p.zonas.nombre || "N/A",
-        UnidadMeidaId: p.unidadmedidaid || -1,
-        UnidadMedidaDescripcion: p.unidadesmedida.descripcion || "N/A",
-        ProductoNombre: p.nombre,
-        ProductoImgUrl: p.imgurl,
-        ProductoCosto: p.costo,
-        ProductoActivo: p.activo === true,
+        ProductoNombre: p.nombre || "Sin nombre",
         ProductoDescripcion:
-          p.productoscaracteristicas.find((pc) => pc.caracteristica === "descripcion")?.valor || p.nombre, // Use description or fallback to name
-        ProductoPorcion: p.productoscaracteristicas.find((pc) => pc.caracteristica === "porcion")?.valor || "N/A",
-        ProductoModoUso: p.productoscaracteristicas.find((pc) => pc.caracteristica === "modouso")?.valor || "N/A",
-        ProductoPorcionEnvase:
-          p.productoscaracteristicas.find((pc) => pc.caracteristica === "porcionenvase")?.valor || "N/A",
-        ProductoCategoriaUso:
-          p.productoscaracteristicas.find((pc) => pc.caracteristica === "categoriauso")?.valor || "N/A",
-        ProductoPropositoPrincipal:
-          p.productoscaracteristicas.find((pc) => pc.caracteristica === "propositoprincipal")?.valor || "N/A",
-        ProductoPropuestaValor:
-          p.productoscaracteristicas.find((pc) => pc.caracteristica === "propuestavalor")?.valor || "N/A",
-        ProductoInstruccionesIngesta:
-          p.productoscaracteristicas.find((pc) => pc.caracteristica === "instruccionesingesta")?.valor || "N/A",
-        ProductoEdadMinima: p.productoscaracteristicas.find((pc) => pc.caracteristica === "edadminima")?.valor || "N/A",
-        ProductoAdvertencia:
-          p.productoscaracteristicas.find((pc) => pc.caracteristica === "advertencia")?.valor || "N/A",
-        ProductoCondicionesAlmacenamiento:
-          p.productoscaracteristicas.find((pc) => pc.caracteristica === "condicionesalmacenamiento")?.valor || "N/A",
-        CatalogoId: -1, // Not available in new query structure
-        CatalogoNombre: "N/A", // Not available in new query structure
-        CatalogoDescripcion: "N/A", // Not available in new query structure
-        ProductoCatalogoPrecioVenta: 0, // Not available in new query structure
-        ProductoCatalogoMargenUtilidad: 0, // Not available in new query structure
+          p.productoscaracteristicas.find((pc: any) => pc.caracteristica === "descripcion")?.valor ||
+          p.nombre ||
+          "Sin descripción",
+        ProductoTiempo: "N/A", // Not available in current query structure
+        ProductoCosto: p.costo || 0,
+        ProductoActivo: p.activo === true,
+        ProductoImagenUrl: p.imgurl,
+        ClienteId: p.clienteid || -1,
+        ClienteNombre: p.clientes?.nombre || "N/A",
+        CatalogoId: p.productosxcatalogo[0]?.catalogoid || -1,
+        CatalogoNombre: p.productosxcatalogo[0]?.catalogos?.nombre || "N/A",
       }))
 
       setProductos(transformedData)
@@ -383,37 +324,21 @@ export default function ProductosPage() {
       if (productosResult.success && productosResult.data) {
         console.log("[v0] Primer registro raw:", productosResult.data[0])
 
-        const transformedData: Producto[] = productosResult.data.map((p: Producto) => ({
-          id: p.id,
-          codigo: p.codigo || "",
-          clienteid: p.clienteid || -1,
-          clientenombre: p.clientes.nombre || "N/A",
-          zonaid: p.zonaid || -1,
-          zonanombre: p.zonas.nombre || "N/A",
-          unidadmedidaid: p.unidadmedidaid || -1,
-          unidadmedidadescripcion: p.unidadesmedida.descripcion || "N/A",
-          nombre: p.nombre,
-          imgurl: p.imgurl,
-          costo: p.costo,
-          activo: p.activo === true,
-          productoscaractristicas.descripcion: p.productoscaractristicas.descripcion || "N/A"
-          productoscaractristicas.presentacion: p.productoscaractristicas.presentacion || "N/A"
-          productoscaractristicas.porcion: p.productoscaractristicas.porcion || "N/A"
-          productoscaractristicas.modouso: p.productoscaractristicas.modouso || "N/A"
-          productoscaractristicas.porcionenvase: p.productoscaractristicas.porcionenvase || "N/A"
-          productoscaractristicas.categoriauso: p.productoscaractristicas.categoriauso || "N/A"
-          productoscaractristicas.propositoprincipal: p.productoscaractristicas.propositoprincipal || "N/A"
-          productoscaractristicas.propuestavalor: p.productoscaractristicas.propuestavalor || "N/A"
-          productoscaractristicas.instruccionesingesta: p.productoscaractristicas.instruccionesingesta || "N/A"
-          productoscaractristicas.edadminima: p.productoscaractristicas.edadminima || 0
-          productoscaractristicas.advertencia: p.productoscaractristicas.advertencia || "N/A"
-          productoscaractristicas.condicionesalmacenamiento: p.productoscaractristicas.condicionesalmacenamiento || "N/A"
-          productosxcatalogo.catalogoid: p.productosxcatalogo.catalogoid || 0
-          productosxcatalogo.precioventa: p.productosxcatalogo.precioventa || 0
-          productosxcatalogo.margenutilidad: p.productosxcatalogo.margenutilidad || 0
-          productosxcatalogo.catalogo.id: productosxcatalogo.catalogo.id || 0
-          productosxcatalogo.catalogo.nombre: productosxcatalogo.catalogo.nombre || "N/A"
-          productosxcatalogo.catalogo.descripcion: productosxcatalogo.catalogo.descripcion || "N/A"
+        const transformedData: ProductoListado[] = productosResult.data.map((p: ProductoQueryData) => ({
+          ProductoId: p.id,
+          ProductoNombre: p.nombre || "Sin nombre",
+          ProductoDescripcion:
+            p.productoscaracteristicas.find((pc: any) => pc.caracteristica === "descripcion")?.valor ||
+            p.nombre ||
+            "Sin descripción",
+          ProductoTiempo: "N/A", // Not available in current query structure
+          ProductoCosto: p.costo || 0,
+          ProductoActivo: p.activo === true,
+          ProductoImagenUrl: p.imgurl,
+          ClienteId: p.clienteid || -1,
+          ClienteNombre: p.clientes?.nombre || "N/A",
+          CatalogoId: p.productosxcatalogo[0]?.catalogoid || -1,
+          CatalogoNombre: p.productosxcatalogo[0]?.catalogos?.nombre || "N/A",
         }))
 
         console.log("[v0] Primer registro transformado:", transformedData[0])
@@ -860,7 +785,7 @@ export default function ProductosPage() {
                     title="Ver detalles del producto"
                   >
                     <Image
-                      src={p.ProductoImgUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
+                      src={p.ProductoImagenUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
                       alt={p.ProductoNombre}
                       layout="fill"
                       objectFit="cover"
