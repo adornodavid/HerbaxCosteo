@@ -408,6 +408,14 @@ export default function ProductosPage() {
           productoscaractristicas.edadminima: p.productoscaractristicas.edadminima || 0
           productoscaractristicas.advertencia: p.productoscaractristicas.advertencia || "N/A"
           productoscaractristicas.condicionesalmacenamiento: p.productoscaractristicas.condicionesalmacenamiento || "N/A"
+          productosxcatalogo.catalogoid: p.productosxcatalogo.catalogoid || 0
+          productosxcatalogo.precioventa: p.productosxcatalogo.precioventa || 0
+          productosxcatalogo.margenutilidad: p.productosxcatalogo.margenutilidad || 0
+          productosxcatalogo.catalogo.id: productosxcatalogo.catalogo.id || 0
+          productosxcatalogo.catalogo.nombre: productosxcatalogo.catalogo.nombre || "N/A"
+          productosxcatalogo.catalogo.descripcion: productosxcatalogo.catalogo.descripcion || "N/A"
+
+
 
 
 
