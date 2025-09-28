@@ -69,7 +69,7 @@ interface Producto {
   }
   costo: number | null
   activo: boolean | null
-  productoscaracteristicas: {
+  productocaracteristicas: {
     descripcion: string | null
     presentacion: string | null
     porcion: string | null
@@ -396,6 +396,7 @@ export default function ProductosPage() {
           imgurl: p.imgurl,
           costo: p.costo,
           activo: p.activo === true,
+          productocaractristicas
 
 
 
