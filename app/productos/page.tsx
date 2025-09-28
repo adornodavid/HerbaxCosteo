@@ -54,22 +54,25 @@ interface Producto {
   id: number
   codigo: string
   clienteid: number
-  zonaid: number
-  nombre: string
-  imgurl: string | null
-  unidadmedidaid: number
-  costo: number
-  activo: boolean
   clientes: {
     nombre: string
   }
+  zonaid: number
   zonas: {
     nombre: string
   }
+  nombre: string
+  imgurl: string | null
+  unidadmedidaid: number
   unidadesmedida: {
     descripcion: string
   }
-  productoscaracteristicas: any[]
+  costo: number
+  activo: boolean
+  productoscaracteristicas: {
+    
+  }
+
   productosxcatalogo: any[]
   /*
   ProductoId: number
