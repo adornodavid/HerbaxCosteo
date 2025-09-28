@@ -85,7 +85,6 @@ interface Producto {
   }
   productosxcatalogo: ProductoCatalogo[]
 }
-
 interface ProductoCatalogo {
   catalogoid: number | null
   precioventa: number | null
