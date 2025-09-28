@@ -427,6 +427,7 @@ export default function ProductosPage() {
         console.error("Error cargando clientes:", clientesError)
       }
       console.log("cat:", clienteIdParamCatalogos)
+      
       // Cargar catálogos iniciales (todos, sin filtro de cliente al inicio)
       const catalogosResult = await listaDesplegableCatalogos(-1, "", clienteIdParamCatalogos)
 
