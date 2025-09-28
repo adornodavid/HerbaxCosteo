@@ -46,6 +46,8 @@ import { obtenerProductos } from "@/app/actions/productos"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
 
+import type { Producto, ProductoCatalogo, ProductoListado } from "@/types/productos"
+
 /* ==================================================
   Interfaces, tipados, clases
 ================================================== */
@@ -110,7 +112,6 @@ interface ProductoListado {
   CatalogoNombre: string
 }
 */
-
 interface DropdownItem {
   id: number
   nombre: string
@@ -428,7 +429,7 @@ export default function ProductosPage() {
         console.error("Error cargando clientes:", clientesError)
       }
       console.log("cat:", clienteIdParamCatalogos)
-      
+
       // Cargar catálogos iniciales (todos, sin filtro de cliente al inicio)
       const catalogosResult = await listaDesplegableCatalogos(-1, "", clienteIdParamCatalogos)
 
