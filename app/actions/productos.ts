@@ -262,6 +262,8 @@ export async function obtenerProductos(
     //Varaibles y resultados del query
     const { data, error } = await query
 
+    console.log("server: " + data)
+
     //Error en query
     if (error) {
       console.error("Error obteniendo productos:", error)
