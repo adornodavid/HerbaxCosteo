@@ -70,10 +70,29 @@ interface Producto {
   costo: number
   activo: boolean
   productoscaracteristicas: {
-    
+    descripcion: string
+    presentacion: string
+    porcion: string
+    modouso: string
+    porcionenvase: string
+    categoriauso: string
+    propositoprincipal: string
+    propuestavalor: string
+    instruccionesingesta: string
+    edadminima: number
+    advertencia: string
+    condicionesalmacenamiento: string
   }
-
-  productosxcatalogo: any[]
+  productosxcatalogo: {
+    catalogoid: number
+    precioventa: number
+    margenutilidad: number
+    catalogos: {
+      id: number
+      nombre: string
+      descripcion: string
+    }
+  }
   /*
   ProductoId: number
   ProductoCodigo: string
