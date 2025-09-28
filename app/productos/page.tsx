@@ -86,11 +86,6 @@ interface Producto {
   productosxcatalogo: ProductoCatalogo[]
 }
 
-interface ProductoCaracteristicas {
-  caracteristica: string
-  valor: string | null
-}
-
 interface ProductoCatalogo {
   catalogoid: number | null
   precioventa: number | null
