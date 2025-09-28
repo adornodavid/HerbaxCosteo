@@ -298,8 +298,15 @@ export default function ProductosPage() {
       const activo = "Todos"
       const productosResult = await obtenerProductos(productoid, productonombre, clienteid, zonaid, catalogoid, activo)
 
+      console.log("[v0] Resultado completo de obtenerProductos:", productosResult)
+      console.log("[v0] Datos raw del query:", productosResult.data)
+      console.log("[v0] Cantidad de registros:", productosResult.data?.length)
+      console.log("[v0] Success status:", productosResult.success)
+      console.log("[v0] Error (if any):", productosResult.error)
+
       if (productosResult.success && productosResult.data) {
-      console.log("resultados del query: " + productosResult.data.id)
+        console.log("[v0] Primer registro raw:", productosResult.data[0])
+
         const transformedData: Producto[] = productosResult.data.map((p: any) => ({
           ProductoId: p.productoid,
           ProductoCodigo: p.productocodigo || "",
@@ -331,9 +338,18 @@ export default function ProductosPage() {
           ProductoCatalogoMargenUtilidad: 0, // Not available in new query structure
         }))
 
+        console.log("[v0] Primer registro transformado:", transformedData[0])
+        console.log(
+          "[v0] Campos undefined encontrados:",
+          Object.entries(transformedData[0]).filter(([key, value]) => value === undefined),
+        )
+        console.log("[v0] Total registros transformados:", transformedData.length)
+
         setProductos(transformedData)
         setProductosFiltrados(transformedData)
         setTotalProductos(transformedData.length)
+      } else {
+        console.log("[v0] No hay datos o la consulta falló")
       }
 
       // Cargar clientes
@@ -753,13 +769,11 @@ export default function ProductosPage() {
               <Loader2 className="mx-auto h-8 w-8 animate-spin" />
               <span className="ml-2 text-lg">Cargando productos...</span>
             </div>
-          ) : productosPaginados.length > 0 ? ( 
+          ) : productosPaginados.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {productosPaginados.map((p, index) => (
                 <Card
                   key={`${p.ProductoId}-${p.CatalogoId}-${index}`}
-                  { console.log("cantidad de productospaginados: " + productosPaginados.length) }
-                  { console.log("Id: " + p.ProductoId) }
                   className="border bg-card text-card-foreground relative flex flex-col overflow-hidden rounded-xs shadow-lg hover:shadow-xl transition-shadow duration-300 group"
                 >
                   <div
