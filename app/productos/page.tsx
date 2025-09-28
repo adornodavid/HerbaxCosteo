@@ -50,7 +50,6 @@ import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
   Interfaces, tipados, clases
 ================================================== */
 
-
 interface Producto {
   ProductoId: number
   ProductoCodigo: string
@@ -166,6 +165,29 @@ interface IngredienteAsociado {
   costoparcial: number
 }
 
+interface ProductoQueryData {
+  id: number
+  codigo: string
+  clienteid: number
+  zonaid: number
+  nombre: string
+  imgurl: string | null
+  unidadmedidaid: number
+  costo: number
+  activo: boolean
+  clientes: {
+    nombre: string
+  }
+  zonas: {
+    nombre: string
+  }
+  unidadesmedida: {
+    descripcion: string
+  }
+  productoscaracteristicas: any[]
+  productosxcatalogo: any[]
+}
+
 /* ==================================================
 	  Componente Principal, Pagina
 	================================================== */
@@ -237,30 +259,38 @@ export default function ProductosPage() {
 
       const queryData = result.data || []
 
-      const transformedData: Producto[] = queryData.map((p: any) => ({
-        ProductoId: p.productoid,
-        ProductoCodigo: p.productocodigo || "",
+      const transformedData: Producto[] = queryData.map((p: ProductoQueryData) => ({
+        ProductoId: p.id,
+        ProductoCodigo: p.codigo || "",
         ClienteId: p.clienteid || -1,
-        ClienteNombre: p.clientenombre || "N/A",
+        ClienteNombre: p.clientes.nombre || "N/A",
         ZonaId: p.zonaid || -1,
-        ZonaNombre: p.zonanombre || "N/A",
-        UnidadMeidaId: p.productounidadmedidaid || -1,
-        UnidadMedidaDescripcion: p.unidadmedida || "N/A",
-        ProductoNombre: p.productonombre,
-        ProductoImgUrl: p.productoimgurl,
-        ProductoCosto: p.productocosto,
-        ProductoActivo: p.productoactivo === true,
-        ProductoDescripcion: p.productodescripcion || p.productonombre, // Use description or fallback to name
-        ProductoPorcion: p.productoporcion || "N/A",
-        ProductoModoUso: p.productomodouso || "N/A",
-        ProductoPorcionEnvase: p.productoporcionenvase || "N/A",
-        ProductoCategoriaUso: p.productocategoriauso || "N/A",
-        ProductoPropositoPrincipal: p.productopropositoprincipal || "N/A",
-        ProductoPropuestaValor: p.productopropuestavalor || "N/A",
-        ProductoInstruccionesIngesta: p.productoinstruccionesingesta || "N/A",
-        ProductoEdadMinima: p.productoedadminima || "N/A",
-        ProductoAdvertencia: p.productoadvertencia || "N/A",
-        ProductoCondicionesAlmacenamiento: p.productocondicionesalmacenamientoFROM || "N/A",
+        ZonaNombre: p.zonas.nombre || "N/A",
+        UnidadMeidaId: p.unidadmedidaid || -1,
+        UnidadMedidaDescripcion: p.unidadesmedida.descripcion || "N/A",
+        ProductoNombre: p.nombre,
+        ProductoImgUrl: p.imgurl,
+        ProductoCosto: p.costo,
+        ProductoActivo: p.activo === true,
+        ProductoDescripcion:
+          p.productoscaracteristicas.find((pc) => pc.caracteristica === "descripcion")?.valor || p.nombre, // Use description or fallback to name
+        ProductoPorcion: p.productoscaracteristicas.find((pc) => pc.caracteristica === "porcion")?.valor || "N/A",
+        ProductoModoUso: p.productoscaracteristicas.find((pc) => pc.caracteristica === "modouso")?.valor || "N/A",
+        ProductoPorcionEnvase:
+          p.productoscaracteristicas.find((pc) => pc.caracteristica === "porcionenvase")?.valor || "N/A",
+        ProductoCategoriaUso:
+          p.productoscaracteristicas.find((pc) => pc.caracteristica === "categoriauso")?.valor || "N/A",
+        ProductoPropositoPrincipal:
+          p.productoscaracteristicas.find((pc) => pc.caracteristica === "propositoprincipal")?.valor || "N/A",
+        ProductoPropuestaValor:
+          p.productoscaracteristicas.find((pc) => pc.caracteristica === "propuestavalor")?.valor || "N/A",
+        ProductoInstruccionesIngesta:
+          p.productoscaracteristicas.find((pc) => pc.caracteristica === "instruccionesingesta")?.valor || "N/A",
+        ProductoEdadMinima: p.productoscaracteristicas.find((pc) => pc.caracteristica === "edadminima")?.valor || "N/A",
+        ProductoAdvertencia:
+          p.productoscaracteristicas.find((pc) => pc.caracteristica === "advertencia")?.valor || "N/A",
+        ProductoCondicionesAlmacenamiento:
+          p.productoscaracteristicas.find((pc) => pc.caracteristica === "condicionesalmacenamiento")?.valor || "N/A",
         CatalogoId: -1, // Not available in new query structure
         CatalogoNombre: "N/A", // Not available in new query structure
         CatalogoDescripcion: "N/A", // Not available in new query structure
@@ -309,30 +339,39 @@ export default function ProductosPage() {
       if (productosResult.success && productosResult.data) {
         console.log("[v0] Primer registro raw:", productosResult.data[0])
 
-        const transformedData: Producto[] = productosResult.data.map((p: any) => ({
-          ProductoId: p.productoid,
-          ProductoCodigo: p.productocodigo || "",
+        const transformedData: Producto[] = productosResult.data.map((p: ProductoQueryData) => ({
+          ProductoId: p.id,
+          ProductoCodigo: p.codigo || "",
           ClienteId: p.clienteid || -1,
-          ClienteNombre: p.clientenombre || "N/A",
+          ClienteNombre: p.clientes.nombre || "N/A",
           ZonaId: p.zonaid || -1,
-          ZonaNombre: p.zonanombre || "N/A",
-          UnidadMeidaId: p.productounidadmedidaid || -1,
-          UnidadMedidaDescripcion: p.unidadmedida || "N/A",
-          ProductoNombre: p.productonombre,
-          ProductoImgUrl: p.productoimgurl,
-          ProductoCosto: p.productocosto,
-          ProductoActivo: p.productoactivo === true, // Ensure boolean
-          ProductoDescripcion: p.productodescripcion || p.productonombre, // Use description or fallback to name
-          ProductoPorcion: p.productoporcion || "N/A",
-          ProductoModoUso: p.productomodouso || "N/A",
-          ProductoPorcionEnvase: p.productoporcionenvase || "N/A",
-          ProductoCategoriaUso: p.productocategoriauso || "N/A",
-          ProductoPropositoPrincipal: p.productopropositoprincipal || "N/A",
-          ProductoPropuestaValor: p.productopropuestavalor || "N/A",
-          ProductoInstruccionesIngesta: p.productoinstruccionesingesta || "N/A",
-          ProductoEdadMinima: p.productoedadminima || "N/A",
-          ProductoAdvertencia: p.productoadvertencia || "N/A",
-          ProductoCondicionesAlmacenamiento: p.productocondicionesalmacenamientoFROM || "N/A",
+          ZonaNombre: p.zonas.nombre || "N/A",
+          UnidadMeidaId: p.unidadmedidaid || -1,
+          UnidadMedidaDescripcion: p.unidadesmedida.descripcion || "N/A",
+          ProductoNombre: p.nombre,
+          ProductoImgUrl: p.imgurl,
+          ProductoCosto: p.costo,
+          ProductoActivo: p.activo === true, // Ensure boolean
+          ProductoDescripcion:
+            p.productoscaracteristicas.find((pc) => pc.caracteristica === "descripcion")?.valor || p.nombre, // Use description or fallback to name
+          ProductoPorcion: p.productoscaracteristicas.find((pc) => pc.caracteristica === "porcion")?.valor || "N/A",
+          ProductoModoUso: p.productoscaracteristicas.find((pc) => pc.caracteristica === "modouso")?.valor || "N/A",
+          ProductoPorcionEnvase:
+            p.productoscaracteristicas.find((pc) => pc.caracteristica === "porcionenvase")?.valor || "N/A",
+          ProductoCategoriaUso:
+            p.productoscaracteristicas.find((pc) => pc.caracteristica === "categoriauso")?.valor || "N/A",
+          ProductoPropositoPrincipal:
+            p.productoscaracteristicas.find((pc) => pc.caracteristica === "propositoprincipal")?.valor || "N/A",
+          ProductoPropuestaValor:
+            p.productoscaracteristicas.find((pc) => pc.caracteristica === "propuestavalor")?.valor || "N/A",
+          ProductoInstruccionesIngesta:
+            p.productoscaracteristicas.find((pc) => pc.caracteristica === "instruccionesingesta")?.valor || "N/A",
+          ProductoEdadMinima:
+            p.productoscaracteristicas.find((pc) => pc.caracteristica === "edadminima")?.valor || "N/A",
+          ProductoAdvertencia:
+            p.productoscaracteristicas.find((pc) => pc.caracteristica === "advertencia")?.valor || "N/A",
+          ProductoCondicionesAlmacenamiento:
+            p.productoscaracteristicas.find((pc) => pc.caracteristica === "condicionesalmacenamiento")?.valor || "N/A",
           CatalogoId: -1, // Not available in new query structure
           CatalogoNombre: "N/A", // Not available in new query structure
           CatalogoDescripcion: "N/A", // Not available in new query structure
