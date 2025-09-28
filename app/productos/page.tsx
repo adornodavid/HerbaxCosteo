@@ -69,7 +69,20 @@ interface Producto {
   }
   costo: number | null
   activo: boolean | null
-  productoscaracteristicas: ProductoCaracteristicas[]
+  productoscaracteristicas: {
+    descripcion: string | null
+    presentacion: string | null
+    porcion: string | null
+    modouso: string | null
+    porcionenvase: string | null
+    categoriauso: string | null
+    propositoprincipal: string | null
+    propuestavalor: string | null
+    instruccionesingesta: string | null
+    edadminima: number | null
+    advertencia: string | null
+    condicionesalmacenamiento: string | null
+  }
   productosxcatalogo: ProductoCatalogo[]
 }
 
@@ -121,7 +134,7 @@ interface ProductoDetail {
   Cliente: string
   Catalogo: string
   Producto: string
-  descripcion: string
+  descripcion: string | null
   instruccionespreparacion: string | null
   propositoprincipal: string | null
   imgurl: string | null
@@ -269,10 +282,7 @@ export default function ProductosPage() {
       const transformedData: ProductoListado[] = queryData.map((p: ProductoQueryData) => ({
         ProductoId: p.id,
         ProductoNombre: p.nombre || "Sin nombre",
-        ProductoDescripcion:
-          p.productoscaracteristicas.find((pc: any) => pc.caracteristica === "descripcion")?.valor ||
-          p.nombre ||
-          "Sin descripción",
+        ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
         ProductoTiempo: "N/A", // Not available in current query structure
         ProductoCosto: p.costo || 0,
         ProductoActivo: p.activo === true,
@@ -327,10 +337,7 @@ export default function ProductosPage() {
         const transformedData: ProductoListado[] = productosResult.data.map((p: ProductoQueryData) => ({
           ProductoId: p.id,
           ProductoNombre: p.nombre || "Sin nombre",
-          ProductoDescripcion:
-            p.productoscaracteristicas.find((pc: any) => pc.caracteristica === "descripcion")?.valor ||
-            p.nombre ||
-            "Sin descripción",
+          ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
           ProductoTiempo: "N/A", // Not available in current query structure
           ProductoCosto: p.costo || 0,
           ProductoActivo: p.activo === true,
