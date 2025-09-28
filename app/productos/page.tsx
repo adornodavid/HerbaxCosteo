@@ -299,6 +299,7 @@ export default function ProductosPage() {
       const productosResult = await obtenerProductos(productoid, productonombre, clienteid, zonaid, catalogoid, activo)
 
       if (productosResult.success && productosResult.data) {
+      console.log("resultados del query" + p.id)
         const transformedData: Producto[] = productosResult.data.map((p: any) => ({
           ProductoId: p.productoid,
           ProductoCodigo: p.productocodigo || "",
