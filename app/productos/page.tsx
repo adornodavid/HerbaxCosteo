@@ -69,11 +69,11 @@ interface Producto {
   }
   costo: number | null
   activo: boolean | null
-  productoscaracteristicas: ProductoCaracteristica[]
+  productoscaracteristicas: ProductoCaracteristicas[]
   productosxcatalogo: ProductoCatalogo[]
 }
 
-interface ProductoCaracteristica {
+interface ProductoCaracteristicas {
   caracteristica: string
   valor: string | null
 }
