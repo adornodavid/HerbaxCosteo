@@ -405,7 +405,7 @@ export default function ProductosPage() {
           productoscaractristicas.propositoprincipal: p.productoscaractristicas.propositoprincipal || "N/A"
           productoscaractristicas.propuestavalor: p.productoscaractristicas.propuestavalor || "N/A"
           productoscaractristicas.instruccionesingesta: p.productoscaractristicas.instruccionesingesta || "N/A"
-          productoscaractristicas.edadminima: p.productoscaractristicas.edadminima || "N/A"
+          productoscaractristicas.edadminima: p.productoscaractristicas.edadminima || 0
           productoscaractristicas.advertencia: p.productoscaractristicas.advertencia || "N/A"
           productoscaractristicas.condicionesalmacenamiento: p.productoscaractristicas.condicionesalmacenamiento || "N/A"
 
