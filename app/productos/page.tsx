@@ -69,7 +69,7 @@ interface Producto {
   }
   costo: number | null
   activo: boolean | null
-  productocaracteristicas: {
+  productoscaracteristicas: {
     descripcion: string | null
     presentacion: string | null
     porcion: string | null
