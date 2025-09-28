@@ -383,7 +383,7 @@ export default function ProductosPage() {
       if (productosResult.success && productosResult.data) {
         console.log("[v0] Primer registro raw:", productosResult.data[0])
 
-        const transformedData: Producto[] = productosResult.data.map((p: ProductoQueryData) => ({
+        const transformedData: Producto[] = productosResult.data.map((p: Producto) => ({
           id: p.id,
           codigo: p.codigo || "",
           clienteid: p.clienteid || -1,
@@ -398,7 +398,7 @@ export default function ProductosPage() {
           activo: p.activo === true,
 
 
-          
+
           ProductoDescripcion:
             p.productoscaracteristicas.find((pc) => pc.caracteristica === "descripcion")?.valor || p.nombre, // Use description or fallback to name
           ProductoPorcion: p.productoscaracteristicas.find((pc) => pc.caracteristica === "porcion")?.valor || "N/A",
