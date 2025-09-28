@@ -385,17 +385,17 @@ export default function ProductosPage() {
 
         const transformedData: Producto[] = productosResult.data.map((p: ProductoQueryData) => ({
           id: p.id,
-          ProductoCodigo: p.codigo || "",
-          ClienteId: p.clienteid || -1,
-          ClienteNombre: p.clientes.nombre || "N/A",
-          ZonaId: p.zonaid || -1,
-          ZonaNombre: p.zonas.nombre || "N/A",
-          UnidadMeidaId: p.unidadmedidaid || -1,
-          UnidadMedidaDescripcion: p.unidadesmedida.descripcion || "N/A",
-          ProductoNombre: p.nombre,
-          ProductoImgUrl: p.imgurl,
-          ProductoCosto: p.costo,
-          ProductoActivo: p.activo === true, // Ensure boolean
+          codigo: p.codigo || "",
+          clienteid: p.clienteid || -1,
+          clientenombre: p.clientes.nombre || "N/A",
+          zonaid: p.zonaid || -1,
+          zonanombre: p.zonas.nombre || "N/A",
+          unidadmedidaid: p.unidadmedidaid || -1,
+          unidadmedidadescripcion: p.unidadesmedida.descripcion || "N/A",
+          nombre: p.nombre,
+          imgurl: p.imgurl,
+          costo: p.costo,
+          activo: p.activo === true, // Ensure boolean
           ProductoDescripcion:
             p.productoscaracteristicas.find((pc) => pc.caracteristica === "descripcion")?.valor || p.nombre, // Use description or fallback to name
           ProductoPorcion: p.productoscaracteristicas.find((pc) => pc.caracteristica === "porcion")?.valor || "N/A",
