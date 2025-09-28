@@ -384,7 +384,7 @@ export default function ProductosPage() {
         console.log("[v0] Primer registro raw:", productosResult.data[0])
 
         const transformedData: Producto[] = productosResult.data.map((p: ProductoQueryData) => ({
-          ProductoId: p.id,
+          id: p.id,
           ProductoCodigo: p.codigo || "",
           ClienteId: p.clienteid || -1,
           ClienteNombre: p.clientes.nombre || "N/A",
