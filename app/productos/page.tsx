@@ -96,11 +96,6 @@ interface ProductoCatalogo {
   }
 }
 
-interface DropdownItem {
-  id: number
-  nombre: string
-}
-
 interface ProductoListado {
   ProductoId: number
   ProductoNombre: string
@@ -113,6 +108,11 @@ interface ProductoListado {
   ClienteNombre: string
   CatalogoId: number
   CatalogoNombre: string
+}
+
+interface DropdownItem {
+  id: number
+  nombre: string
 }
 
 interface EstadisticasProductos {
