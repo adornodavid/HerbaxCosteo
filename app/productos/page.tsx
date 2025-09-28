@@ -329,7 +329,7 @@ export default function ProductosPage() {
       if (productosResult.success && productosResult.data) {
         console.log("[v0] Primer registro raw:", productosResult.data[0])
 
-        const transformedData: Producto[] = productosResult.data.map((p: ProductoQueryData) => ({
+        const transformedData: Producto[] = productosResult.data.map((p: Producto) => ({
           id: p.id,
           codigo: p.codigo,
           clienteid: p.clienteid,
