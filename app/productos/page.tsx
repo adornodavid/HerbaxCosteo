@@ -329,18 +329,50 @@ export default function ProductosPage() {
       if (productosResult.success && productosResult.data) {
         console.log("[v0] Primer registro raw:", productosResult.data[0])
 
-        const transformedData: ProductoListado[] = productosResult.data.map((p: ProductoQueryData) => ({
-          ProductoId: p.id,
-          ProductoNombre: p.nombre || "Sin nombre",
-          ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
-          ProductoTiempo: "N/A", // Not available in current query structure
-          ProductoCosto: p.costo || 0,
-          ProductoActivo: p.activo === true,
-          ProductoImagenUrl: p.imgurl,
-          ClienteId: p.clienteid || -1,
-          ClienteNombre: p.clientes?.nombre || "N/A",
-          CatalogoId: p.productosxcatalogo[0]?.catalogoid || -1,
-          CatalogoNombre: p.productosxcatalogo[0]?.catalogos?.nombre || "N/A",
+        const transformedData: Producto[] = productosResult.data.map((p: ProductoQueryData) => ({
+          id: p.id,
+          codigo: p.codigo,
+          clienteid: p.clienteid,
+          clientes: {
+            nombre: p.clientes?.nombre || null,
+          },
+          zonaid: p.zonaid,
+          zonas: {
+            nombre: p.zonas?.nombre || null,
+          },
+          nombre: p.nombre,
+          imgurl: p.imgurl,
+          unidadmedidaid: p.unidadmedidaid,
+          unidadesmedida: {
+            descripcion: p.unidadesmedida?.descripcion || null,
+          },
+          costo: p.costo,
+          activo: p.activo,
+          productoscaracteristicas: {
+            descripcion: p.productoscaracteristicas?.[0]?.descripcion || null,
+            presentacion: p.productoscaracteristicas?.[0]?.presentacion || null,
+            porcion: p.productoscaracteristicas?.[0]?.porcion || null,
+            modouso: p.productoscaracteristicas?.[0]?.modouso || null,
+            porcionenvase: p.productoscaracteristicas?.[0]?.porcionenvase || null,
+            categoriauso: p.productoscaracteristicas?.[0]?.categoriauso || null,
+            propositoprincipal: p.productoscaracteristicas?.[0]?.propositoprincipal || null,
+            propuestavalor: p.productoscaracteristicas?.[0]?.propuestavalor || null,
+            instruccionesingesta: p.productoscaracteristicas?.[0]?.instruccionesingesta || null,
+            edadminima: p.productoscaracteristicas?.[0]?.edadminima || null,
+            advertencia: p.productoscaracteristicas?.[0]?.advertencia || null,
+            condicionesalmacenamiento: p.productoscaracteristicas?.[0]?.condicionesalmacenamiento || null,
+          },
+          productosxcatalogo:
+            p.productosxcatalogo?.map((cat: any) => ({
+              catalogoid: cat.catalogoid || null,
+              precioventa: cat.precioventa || null,
+              margenutilidad: cat.margenutilidad || null,
+              catalogos: {
+                id: cat.catalogos?.id || null,
+                nombre: cat.catalogos?.nombre || null,
+                descripcion: cat.catalogos?.descripcion || null,
+              },
+            })) || [],
         }))
 
         console.log("[v0] Primer registro transformado:", transformedData[0])
@@ -350,9 +382,23 @@ export default function ProductosPage() {
         )
         console.log("[v0] Total registros transformados:", transformedData.length)
 
-        setProductos(transformedData)
-        setProductosFiltrados(transformedData)
-        setTotalProductos(transformedData.length)
+        const productosListado: ProductoListado[] = transformedData.map((p: Producto) => ({
+          ProductoId: p.id,
+          ProductoNombre: p.nombre || "Sin nombre",
+          ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
+          ProductoTiempo: "N/A",
+          ProductoCosto: p.costo || 0,
+          ProductoActivo: p.activo === true,
+          ProductoImagenUrl: p.imgurl,
+          ClienteId: p.clienteid || -1,
+          ClienteNombre: p.clientes?.nombre || "N/A",
+          CatalogoId: p.productosxcatalogo[0]?.catalogoid || -1,
+          CatalogoNombre: p.productosxcatalogo[0]?.catalogos?.nombre || "N/A",
+        }))
+
+        setProductos(productosListado)
+        setProductosFiltrados(productosListado)
+        setTotalProductos(productosListado.length)
       } else {
         console.log("[v0] No hay datos o la consulta falló")
       }
