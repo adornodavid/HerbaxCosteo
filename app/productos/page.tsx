@@ -476,7 +476,7 @@ export default function ProductosPage() {
     }
   }, [authLoading, user, router, esAdmin])
 
-  // --- Handles de Eventos ---
+  // --- Handles - Manejo de Eventos ---
   const handleClienteChange = async (value: string) => {
     setFiltroCliente(value)
     setFiltroCatalogo("-1") // Resetear catálogo al cambiar cliente
