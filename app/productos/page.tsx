@@ -414,36 +414,6 @@ export default function ProductosPage() {
           productosxcatalogo.catalogo.id: productosxcatalogo.catalogo.id || 0
           productosxcatalogo.catalogo.nombre: productosxcatalogo.catalogo.nombre || "N/A"
           productosxcatalogo.catalogo.descripcion: productosxcatalogo.catalogo.descripcion || "N/A"
-
-
-
-
-
-          ProductoDescripcion:
-            p.productoscaracteristicas.find((pc) => pc.caracteristica === "descripcion")?.valor || p.nombre, // Use description or fallback to name
-          ProductoPorcion: p.productoscaracteristicas.find((pc) => pc.caracteristica === "porcion")?.valor || "N/A",
-          ProductoModoUso: p.productoscaracteristicas.find((pc) => pc.caracteristica === "modouso")?.valor || "N/A",
-          ProductoPorcionEnvase:
-            p.productoscaracteristicas.find((pc) => pc.caracteristica === "porcionenvase")?.valor || "N/A",
-          ProductoCategoriaUso:
-            p.productoscaracteristicas.find((pc) => pc.caracteristica === "categoriauso")?.valor || "N/A",
-          ProductoPropositoPrincipal:
-            p.productoscaracteristicas.find((pc) => pc.caracteristica === "propositoprincipal")?.valor || "N/A",
-          ProductoPropuestaValor:
-            p.productoscaracteristicas.find((pc) => pc.caracteristica === "propuestavalor")?.valor || "N/A",
-          ProductoInstruccionesIngesta:
-            p.productoscaracteristicas.find((pc) => pc.caracteristica === "instruccionesingesta")?.valor || "N/A",
-          ProductoEdadMinima:
-            p.productoscaracteristicas.find((pc) => pc.caracteristica === "edadminima")?.valor || "N/A",
-          ProductoAdvertencia:
-            p.productoscaracteristicas.find((pc) => pc.caracteristica === "advertencia")?.valor || "N/A",
-          ProductoCondicionesAlmacenamiento:
-            p.productoscaracteristicas.find((pc) => pc.caracteristica === "condicionesalmacenamiento")?.valor || "N/A",
-          CatalogoId: -1, // Not available in new query structure
-          CatalogoNombre: "N/A", // Not available in new query structure
-          CatalogoDescripcion: "N/A", // Not available in new query structure
-          ProductoCatalogoPrecioVenta: 0, // Not available in new query structure
-          ProductoCatalogoMargenUtilidad: 0, // Not available in new query structure
         }))
 
         console.log("[v0] Primer registro transformado:", transformedData[0])
