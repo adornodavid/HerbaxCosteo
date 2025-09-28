@@ -757,7 +757,10 @@ export default function ProductosPage() {
               {productosPaginados.map((p, index) => (
                 <Card
                   key={`${p.ProductoId}-${p.CatalogoId}-${index}`}
-                  {console.log("cantidad de productospaginados: " + productosPaginados.length)}
+                  {
+                  console.log("cantidad de productospaginados: " + productosPaginados.length)
+                  console.log("Id: " + p.ProductoId)
+                  }
                   className="border bg-card text-card-foreground relative flex flex-col overflow-hidden rounded-xs shadow-lg hover:shadow-xl transition-shadow duration-300 group"
                 >
                   <div
