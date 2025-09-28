@@ -395,7 +395,10 @@ export default function ProductosPage() {
           nombre: p.nombre,
           imgurl: p.imgurl,
           costo: p.costo,
-          activo: p.activo === true, // Ensure boolean
+          activo: p.activo === true,
+
+
+          
           ProductoDescripcion:
             p.productoscaracteristicas.find((pc) => pc.caracteristica === "descripcion")?.valor || p.nombre, // Use description or fallback to name
           ProductoPorcion: p.productoscaracteristicas.find((pc) => pc.caracteristica === "porcion")?.valor || "N/A",
