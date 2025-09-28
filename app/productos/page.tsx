@@ -752,7 +752,7 @@ export default function ProductosPage() {
               <Loader2 className="mx-auto h-8 w-8 animate-spin" />
               <span className="ml-2 text-lg">Cargando productos...</span>
             </div>
-          ) : productosPaginados.length > 0 ? (
+          ) : productosPaginados.length > 0 ? ( console.log("cantidad de productospaginados: " + productosPaginados.length)
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {productosPaginados.map((p, index) => (
                 <Card
