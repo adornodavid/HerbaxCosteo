@@ -52,45 +52,45 @@ import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
 
 interface Producto {
   id: number
-  codigo: string
-  clienteid: number
+  codigo: string | null
+  clienteid: number | null
   clientes: {
-    nombre: string
+    nombre: string | null
   }
-  zonaid: number
+  zonaid: number | null
   zonas: {
-    nombre: string
+    nombre: string | null
   }
-  nombre: string
+  nombre: string | null
   imgurl: string | null
   unidadmedidaid: number
   unidadesmedida: {
-    descripcion: string
+    descripcion: string | null
   }
-  costo: number
-  activo: boolean
+  costo: number | null
+  activo: boolean | null
   productoscaracteristicas: {
-    descripcion: string
-    presentacion: string
-    porcion: string
-    modouso: string
-    porcionenvase: string
-    categoriauso: string
-    propositoprincipal: string
-    propuestavalor: string
-    instruccionesingesta: string
-    edadminima: number
-    advertencia: string
-    condicionesalmacenamiento: string
+    descripcion: string | null
+    presentacion: string | null
+    porcion: string | null
+    modouso: string | null
+    porcionenvase: string | null
+    categoriauso: string | null
+    propositoprincipal: string | null
+    propuestavalor: string | null
+    instruccionesingesta: string | null
+    edadminima: number | null
+    advertencia: string | null
+    condicionesalmacenamiento: string | null
   }
   productosxcatalogo: {
-    catalogoid: number
-    precioventa: number
-    margenutilidad: number
+    catalogoid: number | null
+    precioventa: number | null
+    margenutilidad: number | null
     catalogos: {
-      id: number
-      nombre: string
-      descripcion: string
+      id: number | null
+      nombre: string | null
+      descripcion: string | null
     }
   }
   /*
