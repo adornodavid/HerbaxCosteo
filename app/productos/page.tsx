@@ -396,7 +396,18 @@ export default function ProductosPage() {
           imgurl: p.imgurl,
           costo: p.costo,
           activo: p.activo === true,
-          productocaractristicas
+          productoscaractristicas.descripcion: p.productoscaractristicas.descripcion || "N/A"
+          productoscaractristicas.presentacion: p.productoscaractristicas.presentacion || "N/A"
+          productoscaractristicas.porcion: p.productoscaractristicas.porcion || "N/A"
+          productoscaractristicas.modouso: p.productoscaractristicas.modouso || "N/A"
+          productoscaractristicas.porcionenvase: p.productoscaractristicas.porcionenvase || "N/A"
+          productoscaractristicas.categoriauso: p.productoscaractristicas.categoriauso || "N/A"
+          productoscaractristicas.propositoprincipal: p.productoscaractristicas.propositoprincipal || "N/A"
+          productoscaractristicas.propuestavalor: p.productoscaractristicas.propuestavalor || "N/A"
+          productoscaractristicas.instruccionesingesta: p.productoscaractristicas.instruccionesingesta || "N/A"
+          productoscaractristicas.edadminima: p.productoscaractristicas.edadminima || "N/A"
+          productoscaractristicas.advertencia: p.productoscaractristicas.advertencia || "N/A"
+          productoscaractristicas.condicionesalmacenamiento: p.productoscaractristicas.condicionesalmacenamiento || "N/A"
 
 
 
