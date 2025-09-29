@@ -327,6 +327,7 @@ export default function ProductosPage() {
             advertencia: p.productoscaracteristicas?.advertencia || null,
             condicionesalmacenamiento: p.productoscaracteristicas?.condicionesalmacenamiento || null,
           },
+          /*
           productosxcatalogo:
             p.productosxcatalogo?.map((cat: any) => ({
               catalogoid: cat.catalogoid || null,
@@ -338,6 +339,16 @@ export default function ProductosPage() {
                 descripcion: cat.catalogos?.descripcion || null,
               },
             })) || [],
+            */
+          productosxcatalogo: p.productosxcatalogo?.map((cat) => ({
+            catalogoid: cat.catalogoid || null,
+            precioventa: cat.precioventa || null,
+            margenutilidad: cat.margenutilidad || null,
+            catalogos: {
+              nombre: cat.catalogos?.nombre || null,
+              descripcion: cat.catalogos?.descripcion || null,
+            },
+          })) || [],
         }))
 
         console.log("[v0] Primer registro transformado:", transformedData[0])
