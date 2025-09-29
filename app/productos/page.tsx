@@ -330,14 +330,14 @@ export default function ProductosPage() {
         console.log("[v0] No hay datos o la consulta falló")
       }
 
-
-
-
       if (!result.success) {
-        console.error("Error en búsqueda:", result.error)
+        console.error("Error en búsqueda del filtro de búsqueda:", result.error)
         setProductos([])
         return
       }
+
+
+
 
       const queryData = result.data || []
       const transformedData: ProductoListado[] = queryData.map((p: ProductoQueryData) => ({
