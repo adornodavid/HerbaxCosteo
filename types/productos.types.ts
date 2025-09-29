@@ -40,6 +40,7 @@ interface Producto {
       descripcion: string | null
     } | null
   }> | null
+  
 }
 
 interface ProductoCatalogo {
