@@ -512,8 +512,7 @@ export default function ProductosPage() {
     setFiltroCatalogo("-1")
     setFiltroEstatus("-1")
     handleClienteChange("-1")
-    toast.info("Filtros limpiados.")
-    // Use the same logic as initial loading
+    
     cargarDatosInicialesProductos()
   }
 
