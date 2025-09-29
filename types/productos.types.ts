@@ -31,7 +31,15 @@ interface Producto {
     advertencia: string | null
     condicionesalmacenamiento: string | null
   }
-  productosxcatalogo: ProductoCatalogo[]
+  productosxcatalogo: Array<{
+    catalogoid: number | null
+    precioventa: number | null
+    margenutilidad: number | null
+    catalogos: {
+      nombre: string | null
+      descripcion: string | null
+    } | null
+  }> | null
 }
 interface ProductoCatalogo {
   catalogoid: number | null
