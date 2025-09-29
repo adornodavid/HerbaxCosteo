@@ -249,7 +249,7 @@ export default function ProductosPage() {
   const esAdmin = useMemo(() => user && [1, 2, 3, 4].includes(user.RolId), [user])
 
   // --- Función de búsqueda SIN dependencias automáticas ---
-  const ejecutarBusquedaProductos = async (productonombre: string, clienteId: number, catalogoId: number, estatus: string) => {
+  const ejecutarBusquedaProductos = async (productonombre: string, clienteid: number, catalogoid: number, estatus: string) => {
     if (!user) return
     setIsSearching(true)
     setPaginaActual(1)
