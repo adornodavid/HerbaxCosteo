@@ -114,10 +114,7 @@ interface ProductoListado {
 
 
 */
-interface DropdownItem {
-  id: number
-  nombre: string
-}
+
 
 
 

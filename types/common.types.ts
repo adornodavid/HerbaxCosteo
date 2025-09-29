@@ -24,3 +24,8 @@ export interface FilterParams {
   fechaInicio?: Date
   fechaFin?: Date
 }
+
+interface DropdownItem {
+  id: number
+  nombre: string
+}
