@@ -38,7 +38,6 @@ interface ProductoCatalogo {
   precioventa: number | null
   margenutilidad: number | null
   catalogos: {
-    id: number | null
     nombre: string | null
     descripcion: string | null
   }
