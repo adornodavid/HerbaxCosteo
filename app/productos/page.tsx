@@ -300,6 +300,7 @@ export default function ProductosPage() {
           costo: p.costo,
           activo: p.activo,
           productoscaracteristicas: {
+            /*
             descripcion: p.productoscaracteristicas?.[0]?.descripcion || null,
             presentacion: p.productoscaracteristicas?.[0]?.presentacion || null,
             porcion: p.productoscaracteristicas?.[0]?.porcion || null,
@@ -312,6 +313,19 @@ export default function ProductosPage() {
             edadminima: p.productoscaracteristicas?.[0]?.edadminima || null,
             advertencia: p.productoscaracteristicas?.[0]?.advertencia || null,
             condicionesalmacenamiento: p.productoscaracteristicas?.[0]?.condicionesalmacenamiento || null,
+            */
+            descripcion: p.productoscaracteristicas?.descripcion || null,
+            presentacion: p.productoscaracteristicas?.presentacion || null,
+            porcion: p.productoscaracteristicas?.porcion || null,
+            modouso: p.productoscaracteristicas?.modouso || null,
+            porcionenvase: p.productoscaracteristicas?.porcionenvase || null,
+            categoriauso: p.productoscaracteristicas?.categoriauso || null,
+            propositoprincipal: p.productoscaracteristicas?.propositoprincipal || null,
+            propuestavalor: p.productoscaracteristicas?.propuestavalor || null,
+            instruccionesingesta: p.productoscaracteristicas?.instruccionesingesta || null,
+            edadminima: p.productoscaracteristicas?.edadminima || null,
+            advertencia: p.productoscaracteristicas?.advertencia || null,
+            condicionesalmacenamiento: p.productoscaracteristicas?.condicionesalmacenamiento || null,
           },
           productosxcatalogo:
             p.productosxcatalogo?.map((cat: any) => ({
