@@ -248,10 +248,10 @@ export async function obtenerProductos(
       query = query.ilike("nombre", `%${productonombre}%`)
     }
     if (activo !== "Todos") {
-      if (activo === "True") {
+      if (activo === "True") || (activo === "true") {
         query = query.eq("activo", true)
       }
-      if (activo === "False") {
+      if (activo === "False") || (activo === "false") {
         query = query.eq("activo", false)
       }
     }
