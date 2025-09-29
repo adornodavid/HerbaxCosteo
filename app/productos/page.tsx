@@ -211,7 +211,6 @@ export default function ProductosPage() {
   // --- Variables especiales ---
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
-  console.log("user: " + user.RolId)
 
   // --- Estados ---
   const [productos, setProductos] = useState<ProductoListado[]>([])
