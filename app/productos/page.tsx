@@ -704,7 +704,7 @@ export default function ProductosPage() {
       </div>
 
       {/* 2. Estadísticas */}
-      {/*<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Productos</CardTitle>
@@ -737,7 +737,7 @@ export default function ProductosPage() {
             <div className="text-2xl font-bold">{estadisticas.tiempoPromedio}</div>
           </CardContent>
         </Card>
-      </div>*/}
+      </div>}
 
       {/* 3. Filtros */}
 
