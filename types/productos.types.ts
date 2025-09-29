@@ -40,7 +40,19 @@ interface Producto {
       descripcion: string | null
     } | null
   }> | null
-  
+  formulasxproducto: Array<{
+    formulaid: number | null
+    formulas:{
+      codigo: string | null
+      nombre: string | null
+      unidadmedidaid: number | null
+
+      costo: number | null
+      materiasprimasxformula: Array<{
+        
+      }> | null
+    }
+  }> | null
 }
 
 interface ProductoCatalogo {
