@@ -402,7 +402,6 @@ export default function ProductosPage() {
       // -- Cargar clientes
       //const clienteIdParamCatalogos = [1, 2, 3, 4].includes(Number(user.RolId)) ? -1 : Number(user.ClienteId)
       const userClienteId = [1, 2, 3, 4].includes(Number(user.RolId)) ? -1 : Number(user.ClienteId)
-
       const { data: clientesData, error: clientesError } = await listaDesplegableClientes(userClienteId.toString(),"")
 
       if (!clientesError) {
@@ -422,6 +421,7 @@ export default function ProductosPage() {
         console.error("Error cargando clientes:", clientesError)
       }
 
+      // -- Cargar catalogos
       // Cargar catálogos iniciales (todos, sin filtro de cliente al inicio)
       const catalogosResult = await listaDesplegableCatalogos(-1, "", clienteIdParamCatalogos)
 
