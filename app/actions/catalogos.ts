@@ -20,6 +20,7 @@ import { createClient } from "@/lib/supabase"
 		- delXXXXX
 	* SPECIALS
 		- xxxXXXXX
+    - listaDesplegableCatalogos / ddlCatalogos
 ================================================== */
 //Función: selCatalogosXFiltros / obtenerCatalogosFiltrados: funcio que ejecuta el bloque de busqueda en la pagina de listado
 export async function obtenerCatalogosFiltrados(
