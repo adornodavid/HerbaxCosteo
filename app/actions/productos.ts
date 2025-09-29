@@ -231,12 +231,12 @@ export async function obtenerProductos(
         formulasxproducto!productoid(
           formulaid,
           materiaprimaid,
+          cantidad,
+          costoparcial
           materiasprimas!materiaprimaid(
             codigo, 
             nombre
           ),
-          cantidad,
-          costoparcial
         )
       `)
 
