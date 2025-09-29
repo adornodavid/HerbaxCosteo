@@ -256,7 +256,6 @@ export default function ProductosPage() {
 
     console.log("filtros: productonombre: " + productonombre + " _ clienteid: " + clienteid + " _ catalogoid: " + catalogoid + " _ estatus: " + estatus)
     try {
-      console.log("Busqueda por filtros: " + productonombre + " - " + clienteid + " - " + catalogoid + " - " + estatus)
       const result = await obtenerProductos(
         -1, // productoid
         productonombre, // productonombre
