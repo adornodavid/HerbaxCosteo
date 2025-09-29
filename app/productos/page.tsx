@@ -45,7 +45,7 @@ import {
 import { obtenerProductos } from "@/app/actions/productos"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
-import type { Producto, ProductoListado } from "@/types/productos"
+import type { Producto, ProductoCatalogo, ProductoListado } from "@/types/productos"
 
 /* ==================================================
   Interfaces, tipados, clases
