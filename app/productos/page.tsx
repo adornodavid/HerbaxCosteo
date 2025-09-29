@@ -309,13 +309,6 @@ export default function ProductosPage() {
             })) || [],
         }))
 
-        console.log("[v0] Primer registro transformado:", transformedData[0])
-        console.log(
-          "[v0] Campos undefined encontrados:",
-          Object.entries(transformedData[0]).filter(([key, value]) => value === undefined),
-        )
-        console.log("[v0] Total registros transformados:", transformedData.length)
-
         const productosListado: ProductoListado[] = transformedData.map((p: Producto) => ({
           ProductoId: p.id,
           ProductoNombre: p.nombre || "Sin nombre",
