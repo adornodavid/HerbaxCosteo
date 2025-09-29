@@ -401,7 +401,6 @@ export default function ProductosPage() {
 
       const userClienteId = [1, 2, 3, 4].includes(Number(user.RolId)) ? -1 : Number(user.ClienteId)
       // -- Cargar clientes
-      //const clienteIdParamCatalogos = [1, 2, 3, 4].includes(Number(user.RolId)) ? -1 : Number(user.ClienteId)
       const { data: clientesData, error: clientesError } = await listaDesplegableClientes(userClienteId.toString(),"")
 
       if (!clientesError) {
