@@ -49,7 +49,16 @@ interface Producto {
 
       costo: number | null
       materiasprimasxformula: Array<{
-        
+        materiaprimaid: number | null
+        cantidad: number | null
+        costoparcial: number | null
+        materiasprima:{
+          codigo: string | null
+          nombre: string | null
+          unidadmedidaid: number | null
+
+          costo: number | null
+        }
       }> | null
     }
   }> | null
