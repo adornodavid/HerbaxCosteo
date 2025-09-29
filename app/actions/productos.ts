@@ -228,6 +228,23 @@ export async function obtenerProductos(
             descripcion
           )
         )
+        formulasxproducto!productoid(
+          formulaid,
+          formulas!formulaid(
+            codigo,
+            nombre,
+            costo
+          )
+          materiaprimaid,
+          materiasprimas!materiaprimaid(
+            codigo,
+            nombre,
+            costo,
+            unidadmedidaid
+          )
+          cantidad,
+          costoparcial
+        )
       `)
 
     //Filtros al query dependiendo parametros
