@@ -232,11 +232,11 @@ export async function obtenerProductos(
           formulaid,
           materiaprimaid,
           cantidad,
-          costoparcial
+          costoparcial,
           materiasprimas!materiaprimaid(
             codigo, 
             nombre
-          ),
+          )
         )
       `)
 
