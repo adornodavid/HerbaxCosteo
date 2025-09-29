@@ -304,9 +304,8 @@ export default function ProductosPage() {
     if (!user) return
 
     try {
-      const rolId = Number.parseInt(user.RolId?.toString() || 0, 10)
-      const clienteId = Number.parseInt(user.ClienteId?.toString() || -1, 10)
-      console.log(clienteId)
+      //const rolId = Number.parseInt(user.RolId?.toString() || 0, 10)
+      //const clienteId = Number.parseInt(user.ClienteId?.toString() || -1, 10)
 
       // Carga inicial de listado de productos
       /*const productoid = -1
