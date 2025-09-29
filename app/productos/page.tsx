@@ -421,7 +421,6 @@ export default function ProductosPage() {
       }
 
       // -- Cargar catalogos
-      // Cargar catálogos iniciales (todos, sin filtro de cliente al inicio)
       const catalogosResult = await listaDesplegableCatalogos(-1, "", userClienteId)
 
       if (!catalogosResult.error) {
