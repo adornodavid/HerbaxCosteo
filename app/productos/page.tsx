@@ -260,7 +260,7 @@ export default function ProductosPage() {
       const result = await obtenerProductos(
         -1, // productoid
         productonombre, // productonombre
-        clienteId === -1 ? -1 : clienteId, // clienteid
+        clienteid, // clienteid
         -1, // zonaid
         estatus === "-1" ? "Todos" : estatus === "true" ? "Activo" : "Inactivo", // activo
       )
