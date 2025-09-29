@@ -399,7 +399,7 @@ export default function ProductosPage() {
         console.log("[v0] No hay datos o la consulta falló")
       }
 
-      // Cargar clientes
+      // -- Cargar clientes
       //const clienteIdParamCatalogos = [1, 2, 3, 4].includes(Number(user.RolId)) ? -1 : Number(user.ClienteId)
       const userClienteId = [1, 2, 3, 4].includes(Number(user.RolId)) ? -1 : Number(user.ClienteId)
 
