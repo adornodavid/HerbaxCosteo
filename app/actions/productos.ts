@@ -234,7 +234,7 @@ export async function obtenerProductos(
             codigo,
             nombre,
             unidadmedidaid,
-            costo
+            costo,
             materiasprimasxformula!formulaid(
               materiaprimaid,
               cantidad,
