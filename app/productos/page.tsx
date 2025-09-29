@@ -208,14 +208,14 @@ export default function ProductosPage() {
             condicionesalmacenamiento: p.productoscaracteristicas?.[0]?.condicionesalmacenamiento || null,
           },
           productosxcatalogo:
-            p.productosxcatalogo?.map((cat: any) => ({
-              catalogoid: cat.catalogoid || null,
-              precioventa: cat.precioventa || null,
-              margenutilidad: cat.margenutilidad || null,
+            p.productosxcatalogo?.map((x: any) => ({
+              catalogoid: x.catalogoid || null,
+              precioventa: x.precioventa || null,
+              margenutilidad: x.margenutilidad || null,
               catalogos: {
-                id: cat.catalogos?.id || null,
-                nombre: cat.catalogos?.nombre || null,
-                descripcion: cat.catalogos?.descripcion || null,
+                id: x.catalogos?.id || null,
+                nombre: x.catalogos?.nombre || null,
+                descripcion: x.catalogos?.descripcion || null,
               },
             })) || [],
         }))
