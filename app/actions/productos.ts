@@ -227,7 +227,7 @@ export async function obtenerProductos(
             nombre,
             descripcion
           )
-        )
+        ),
         formulasxproducto!productoid(
           formulaid,
           formulas!formulaid(
