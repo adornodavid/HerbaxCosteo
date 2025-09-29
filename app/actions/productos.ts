@@ -248,10 +248,12 @@ export async function obtenerProductos(
       query = query.ilike("nombre", `%${productonombre}%`)
     }
     if (activo !== "Todos") {
-      if ((activo === "True") || (activo === "true"))  {
+      const isActive = ["True", "true", "Activo", "1", true].includes(activo)
+      const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
+
+      if (isActive) {
         query = query.eq("activo", true)
-      }
-      if ((activo === "False") || (activo === "false")) {
+      } else if (isInactive) {
         query = query.eq("activo", false)
       }
     }
