@@ -46,7 +46,7 @@ import { obtenerProductos } from "@/app/actions/productos"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
 // -- Interfaces, Tipado, Clases, Objetos
-import type { Producto, ProductoCatalogo, ProductoListado } from "@/types/productos"
+import type { Producto, ProductoCatalogo, ProductoListado, ProductosEstadisticas } from "@/types/productos"
 
 /* ==================================================
   Interfaces, tipados, clases
@@ -111,6 +111,8 @@ interface ProductoListado {
   CatalogoId: number
   CatalogoNombre: string
 }
+
+
 */
 interface DropdownItem {
   id: number
@@ -209,7 +211,7 @@ export default function ProductosPage() {
 
   // --- Estados ---
   const [productos, setProductos] = useState<ProductoListado[]>([])
-  const [estadisticas, setEstadisticas] = useState<EstadisticasProductos>({
+  const [estadisticas, setEstadisticas] = useState<ProductosEstadisticas>({
     totalProductos: 0,
     costoPromedio: 0,
     costoTotal: 0, // Inicializado a 0
