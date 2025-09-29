@@ -41,6 +41,7 @@ interface Producto {
     } | null
   }> | null
 }
+
 interface ProductoCatalogo {
   catalogoid: number | null
   precioventa: number | null
