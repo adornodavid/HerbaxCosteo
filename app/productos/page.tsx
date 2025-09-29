@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/dialog"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { Search, Eye, Edit, ToggleLeft, ToggleRight, Loader2, PlusCircle, RotateCcw } from "lucide-react"
-//-- Backend
+// -- Backend
 import {
   obtenerProductoDetalladoCompleto,
   obtenerFormulasAsociadasProducto,
@@ -45,6 +45,7 @@ import {
 import { obtenerProductos } from "@/app/actions/productos"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
+// -- Interfaces, Tipado, Clases, Objetos
 import type { Producto, ProductoCatalogo, ProductoListado } from "@/types/productos"
 
 /* ==================================================
