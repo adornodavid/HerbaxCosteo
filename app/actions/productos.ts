@@ -21,6 +21,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - crearProducto / insProducto
   * READS-OBTENER (SELECTS)
     - obtenerProductos / selProductos
+    
     - obtenerProductosPorFiltros / selProductosXFiltros
     - obtenerProductoPorId / selProductoXId
     - obtenerClientes / ddlClientes
