@@ -335,28 +335,6 @@ export default function ProductosPage() {
         setProductos([])
         return
       }
-
-
-
-
-      const queryData = result.data || []
-      const transformedData: ProductoListado[] = queryData.map((p: ProductoQueryData) => ({
-        ProductoId: p.id,
-        ProductoNombre: p.nombre || "Sin nombre",
-        ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
-        ProductoTiempo: "N/A", // Not available in current query structure
-        ProductoCosto: p.costo || 0,
-        ProductoActivo: p.activo === true,
-        ProductoImagenUrl: p.imgurl,
-        ClienteId: p.clienteid || -1,
-        ClienteNombre: p.clientes?.nombre || "N/A",
-        CatalogoId: p.productosxcatalogo[0]?.catalogoid || -1,
-        CatalogoNombre: p.productosxcatalogo[0]?.catalogos?.nombre || "N/A",
-      }))
-
-      setProductos(transformedData)
-      setProductosFiltrados(transformedData)
-      setTotalProductos(transformedData.length)
     } catch (error) {
       console.error("Error inesperado al buscar productos:", error)
       setProductos([])
