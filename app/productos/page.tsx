@@ -262,6 +262,7 @@ export default function ProductosPage() {
         productonombre, // productonombre
         clienteid, // clienteid
         -1, // zonaid
+        catalogoid,
         estatus === "-1" ? "Todos" : estatus === "true" ? "Activo" : "Inactivo", // activo
       )
 
