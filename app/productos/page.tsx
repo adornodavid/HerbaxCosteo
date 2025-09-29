@@ -218,6 +218,7 @@ export default function ProductosPage() {
                 descripcion: x.catalogos?.descripcion || null,
               },
             })) || [],
+          
         }))
 
         const productosListado: ProductoListado[] = transformedData.map((p: Producto) => ({
