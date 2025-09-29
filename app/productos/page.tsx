@@ -253,11 +253,10 @@ export default function ProductosPage() {
     if (!user) return
     setIsSearching(true)
     setPaginaActual(1)
-    console.log("cli:", clienteId)
     try {
       const result = await obtenerProductos(
         -1, // productoid
-        nombre, // productonombre
+        productonombre, // productonombre
         clienteId === -1 ? -1 : clienteId, // clienteid
         -1, // zonaid
         estatus === "-1" ? "Todos" : estatus === "true" ? "Activo" : "Inactivo", // activo
