@@ -109,29 +109,6 @@ interface IngredienteAsociado {
   costoparcial: number
 }
 
-interface ProductoQueryData {
-  id: number
-  codigo: string
-  clienteid: number
-  zonaid: number
-  nombre: string
-  imgurl: string | null
-  unidadmedidaid: number
-  costo: number
-  activo: boolean
-  clientes: {
-    nombre: string
-  }
-  zonas: {
-    nombre: string
-  }
-  unidadesmedida: {
-    descripcion: string
-  }
-  productoscaracteristicas: any[]
-  productosxcatalogo: any[]
-}
-
 /* ==================================================
 	  Componente Principal, Pagina
 	================================================== */
