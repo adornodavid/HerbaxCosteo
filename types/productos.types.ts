@@ -66,3 +66,10 @@ export interface ProductoCrear {
   UnidadMedidaId: number
   ProductoCosto: number
 }
+
+interface ProductosEstadisticas {
+  totalProductos: number
+  costoPromedio: number
+  costoTotal: number // Cambiado de 'costo' a 'costoTotal' para mayor claridad
+  tiempoPromedio: string
+}

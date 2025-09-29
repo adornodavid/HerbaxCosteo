@@ -117,12 +117,7 @@ interface DropdownItem {
   nombre: string
 }
 
-interface EstadisticasProductos {
-  totalProductos: number
-  costoPromedio: number
-  costoTotal: number // Cambiado de 'costo' a 'costoTotal' para mayor claridad
-  tiempoPromedio: string
-}
+
 
 // Nueva interfaz para los detalles del producto en el modal
 interface ProductoDetail {
