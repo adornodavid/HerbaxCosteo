@@ -309,13 +309,13 @@ export default function ProductosPage() {
       console.log(clienteId)
 
       // Carga inicial de listado de productos
-      const productoid = -1
+      /*const productoid = -1
       const productonombre = ""
       const clienteid = -1
       const zonaid = -1
       const catalogoid = -1
-      const activo = "True"
-      const productosResult = await obtenerProductos(productoid, productonombre, clienteid, zonaid, catalogoid, activo)
+      const activo = "True"*/
+      const productosResult = await obtenerProductos(-1, "", -1, -1, -1, "True")
 
       console.log("[v0] Resultado completo de obtenerProductos:", productosResult)
       console.log("[v0] Datos raw del query:", productosResult.data)
