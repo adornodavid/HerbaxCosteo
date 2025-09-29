@@ -254,6 +254,7 @@ export default function ProductosPage() {
     setIsSearching(true)
     setPaginaActual(1)
     try {
+      console.log("Busqueda por filtros: " + productonombre + " - " + clienteid + " - " + catalogoid + " - " + estatus)
       const result = await obtenerProductos(
         -1, // productoid
         productonombre, // productonombre
