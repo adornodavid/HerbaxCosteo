@@ -409,7 +409,6 @@ export default function ProductosPage() {
         const clientesConTodos = [1, 2, 3, 4].includes(Number(user.RolId))
           ? [{ id: -1, nombre: "Todos" }, ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))]
           : (clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
-
         setClientes(clientesConTodos)
 
         if ([1, 2, 3, 4].includes(Number(user.RolId))) {
