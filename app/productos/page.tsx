@@ -264,13 +264,11 @@ export default function ProductosPage() {
 
       if (!result.success) {
         console.error("Error en búsqueda:", result.error)
-        toast.error("Error al buscar productos.")
         setProductos([])
         return
       }
 
       const queryData = result.data || []
-
       const transformedData: ProductoListado[] = queryData.map((p: ProductoQueryData) => ({
         ProductoId: p.id,
         ProductoNombre: p.nombre || "Sin nombre",
@@ -288,10 +286,8 @@ export default function ProductosPage() {
       setProductos(transformedData)
       setProductosFiltrados(transformedData)
       setTotalProductos(transformedData.length)
-      toast.success(`Búsqueda completada. Se encontraron ${transformedData.length} resultados.`)
     } catch (error) {
       console.error("Error inesperado al buscar productos:", error)
-      toast.error("Error inesperado al buscar productos")
       setProductos([])
     } finally {
       setIsSearching(false)
