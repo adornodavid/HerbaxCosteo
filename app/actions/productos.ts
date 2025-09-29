@@ -223,7 +223,6 @@ export async function obtenerProductos(
           precioventa,
           margenutilidad,
           catalogos!catalogoid(
-            id,
             nombre,
             descripcion
           )
