@@ -184,11 +184,9 @@ export async function listaDesplegableCatalogos(id = -1, nombre = "", clienteid 
     if (id > 0) {
       query = query.eq("id", id)
     }
-
     if (nombre && nombre !== "" && nombre !== null) {
       query = query.eq("nombre", nombre)
     }
-
     if (clienteid > 0) {
       query = query.eq("clienteid", clienteid)
     }
