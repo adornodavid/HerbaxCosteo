@@ -194,6 +194,77 @@ export default function ProductosPage() {
           costo: p.costo,
           activo: p.activo,
           productoscaracteristicas: {
+            descripcion: p.productoscaracteristicas?.descripcion || null,
+            presentacion: p.productoscaracteristicas?.presentacion || null,
+            porcion: p.productoscaracteristicas?.porcion || null,
+            modouso: p.productoscaracteristicas?.modouso || null,
+            porcionenvase: p.productoscaracteristicas?.porcionenvase || null,
+            categoriauso: p.productoscaracteristicas?.categoriauso || null,
+            propositoprincipal: p.productoscaracteristicas?.propositoprincipal || null,
+            propuestavalor: p.productoscaracteristicas?.propuestavalor || null,
+            instruccionesingesta: p.productoscaracteristicas?.instruccionesingesta || null,
+            edadminima: p.productoscaracteristicas?.edadminima || null,
+            advertencia: p.productoscaracteristicas?.advertencia || null,
+            condicionesalmacenamiento: p.productoscaracteristicas?.condicionesalmacenamiento || null,
+          },
+          productosxcatalogo: p.productosxcatalogo?.map((cat) => ({
+            catalogoid: cat.catalogoid || null,
+            precioventa: cat.precioventa || null,
+            margenutilidad: cat.margenutilidad || null,
+            catalogos: {
+              nombre: cat.catalogos?.nombre || null,
+              descripcion: cat.catalogos?.descripcion || null,
+            },
+          })) || [],
+
+          formulasxproducto: p.formulasxproducto?.map((fxp) => ({
+            formulaid: fxp.formulaid || null,
+            formulas: {
+              codigo: fxp.formulas?.codigo || null,
+              nombre: fxp.formulas?.nombre || null,
+              unidadmedidaid: fxp.formulas?.unidadmedidaid || null,
+              unidadesmedida: {
+                descripcion: fxp.unidadesmedida?.descripcion || null,
+              },
+              costo: fxp.formulas?.costo || null,
+              materiasprimasxformula: fxp.materiasprimasxformula?.map((mxf) => ({
+                materiaprimaid: mxf.materiaprimaid || null,
+                cantidad: mxf.cantidad || null,
+                costoparcial: mxf.costoparcial || null,
+                materiasprima: {
+                  codigo: mxf.materiasprima?.codigo || null,
+                  nombre: mxf.materiasprima?.nombre || null,
+                  unidadmedidaid: mxf.materiasprima?.codigo || null,
+                  unidadesmedida: {
+                    descripcion: mxf.unidadesmedida?.descripcion || null,
+                  },
+                  costo: mxf.materiasprima?.codigo || null,
+                },
+              })) || [],
+            } || null,
+          })) || [],
+        }))
+        /*
+        const transformedData: Producto[] = result.data.map((p: Producto) => ({
+          id: p.id,
+          codigo: p.codigo,
+          clienteid: p.clienteid,
+          clientes: {
+            nombre: p.clientes?.nombre || null,
+          },
+          zonaid: p.zonaid,
+          zonas: {
+            nombre: p.zonas?.nombre || null,
+          },
+          nombre: p.nombre,
+          imgurl: p.imgurl,
+          unidadmedidaid: p.unidadmedidaid,
+          unidadesmedida: {
+            descripcion: p.unidadesmedida?.descripcion || null,
+          },
+          costo: p.costo,
+          activo: p.activo,
+          productoscaracteristicas: {
             descripcion: p.productoscaracteristicas?.[0]?.descripcion || null,
             presentacion: p.productoscaracteristicas?.[0]?.presentacion || null,
             porcion: p.productoscaracteristicas?.[0]?.porcion || null,
@@ -220,6 +291,7 @@ export default function ProductosPage() {
             })) || [],
           
         }))
+        */
 
         const productosListado: ProductoListado[] = transformedData.map((p: Producto) => ({
           ProductoId: p.id,
