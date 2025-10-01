@@ -359,10 +359,13 @@ export default function ProductosPage() {
               unidadmedidaid: fxp.formulas?.unidadmedidaid || null,
               costo: fxp.formulas?.costo || null,
               materiasprimasxformula: fxp.materiasprimasxformula?.map((mxf) => ({
-                materiaprimaid: mxf.materiaprimaid || null
-                cantidad: mxf.cantidad || null
-                costoparcial: mxf.costoparcial || null
-              })) || []
+                materiaprimaid: mxf.materiaprimaid || null,
+                cantidad: mxf.cantidad || null,
+                costoparcial: mxf.costoparcial || null,
+                materiasprima: {
+                  codigo
+                },
+              })) || [],
             } || null,
           })) || [],
         }))
