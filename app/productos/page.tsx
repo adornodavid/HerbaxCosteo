@@ -363,7 +363,10 @@ export default function ProductosPage() {
                 cantidad: mxf.cantidad || null,
                 costoparcial: mxf.costoparcial || null,
                 materiasprima: {
-                  codigo
+                  codigo: mxf.materiasprima?.codigo || null,
+                  nombre: mxf.materiasprima?.nombre || null,
+                  unidadmedidaid: mxf.materiasprima?.codigo || null,
+                  costo: mxf.materiasprima?.codigo || null,
                 },
               })) || [],
             } || null,
