@@ -342,7 +342,7 @@ export default function ProductosPage() {
       const zonaid = -1
       const catalogoid = -1
       const activo = "True"*/
-      const productosResult = await obtenerProductos(-1, "", -1, -1, -1, "True")
+      const productosResult = await obtenerProductos(-1, "", -1, -1, 1, "True")
 
       console.log("[v0] Resultado completo de obtenerProductos:", productosResult)
       console.log("[v0] Datos raw del query:", productosResult.data)
