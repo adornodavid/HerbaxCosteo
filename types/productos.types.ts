@@ -49,7 +49,6 @@ interface Producto {
       unidadesmedida: {
         descripcion: string | null
       }
-
       costo: number | null
       materiasprimasxformula: Array<{
         materiaprimaid: number | null
