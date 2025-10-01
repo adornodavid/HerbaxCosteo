@@ -252,7 +252,7 @@ export async function obtenerProductos(
         )
       `)
 
-    //Filtros al query dependiendo parametros
+    //Filtros en query, dependiendo parametros
     if (productoid !== -1) {
       query = query.eq("id", productoid)
     }
