@@ -351,7 +351,7 @@ export default function ProductosPage() {
             },
           })) || [],
 
-          //formulasxproducto:[],
+          formulasxproducto:[],
         }))
 
         console.log("[v0] Primer registro transformado:", transformedData[0])
