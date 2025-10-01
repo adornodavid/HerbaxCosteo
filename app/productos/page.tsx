@@ -353,8 +353,13 @@ export default function ProductosPage() {
 
           formulasxproducto: p.formulasxproducto?.map((fxp) => ({
             formulaid: fxp.formulaid || null
-            formula: null,
-            //{} || null,
+            formulas: {
+              codigo: fxp.formulas?.codigo || null
+              nombre: fxp.formulas?.nombre || null
+              unidadmedidaid: fxp.formulas?.unidadmedidaid || null
+              costo: fxp.formulas?.costo || null
+              materiasprimasXformula: []
+            } || null,
           })) || [],
         }))
 
