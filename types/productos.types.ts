@@ -46,6 +46,9 @@ interface Producto {
       codigo: string | null
       nombre: string | null
       unidadmedidaid: number | null
+      unidadesmedida: {
+        descripcion: string | null
+      }
 
       costo: number | null
       materiasprimasxformula: Array<{
@@ -56,7 +59,9 @@ interface Producto {
           codigo: string | null
           nombre: string | null
           unidadmedidaid: number | null
-
+          unidadesmedida: {
+            descripcion: string | null
+          }
           costo: number | null
         }
       }> | null
