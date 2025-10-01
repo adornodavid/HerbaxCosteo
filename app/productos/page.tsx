@@ -350,6 +350,8 @@ export default function ProductosPage() {
               descripcion: cat.catalogos?.descripcion || null,
             },
           })) || [],
+
+          formulasxproducto:[],
         }))
 
         console.log("[v0] Primer registro transformado:", transformedData[0])
