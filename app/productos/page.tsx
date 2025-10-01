@@ -357,6 +357,9 @@ export default function ProductosPage() {
               codigo: fxp.formulas?.codigo || null,
               nombre: fxp.formulas?.nombre || null,
               unidadmedidaid: fxp.formulas?.unidadmedidaid || null,
+              unidadesmedida: {
+                descripcion: fxp.unidadesmedida?.descripcion || null,
+              },
               costo: fxp.formulas?.costo || null,
               materiasprimasxformula: fxp.materiasprimasxformula?.map((mxf) => ({
                 materiaprimaid: mxf.materiaprimaid || null,
@@ -366,6 +369,9 @@ export default function ProductosPage() {
                   codigo: mxf.materiasprima?.codigo || null,
                   nombre: mxf.materiasprima?.nombre || null,
                   unidadmedidaid: mxf.materiasprima?.codigo || null,
+                  unidadesmedida: {
+                    descripcion: mxf.unidadesmedida?.descripcion || null,
+                  },
                   costo: mxf.materiasprima?.codigo || null,
                 },
               })) || [],
