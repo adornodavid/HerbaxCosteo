@@ -192,6 +192,7 @@ export async function obtenerProductos(
   activo = "Todos",
 ) {
   try {
+    // Primero obtener ids de filtro por caso especial de relacion de tablas
     let Ids = [];
     if (catalogoid > 0) {
       const { data, error } = await supabase
@@ -204,6 +205,7 @@ export async function obtenerProductos(
       }
     }
     
+    // Query principal
     let query = supabase.from("productos").select(`
         id,
         codigo,
