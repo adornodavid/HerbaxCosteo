@@ -82,6 +82,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 export async function crearProducto(formData: FormData) {
   try {
     //Primero validar con la funcion obtenerProducto, parametros: nombre, clienteid, zonaid
+
+    //Variables auxiliares
     let imgUrl = ""
 
     // Handle image upload if present
