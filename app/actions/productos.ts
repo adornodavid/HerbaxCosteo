@@ -45,6 +45,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
+
     - actualizarProductoEtapa1
     - actualizarCostoProducto
 
