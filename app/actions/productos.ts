@@ -192,11 +192,16 @@ export async function obtenerProductos(
   activo = "Todos",
 ) {
   try {
-    const Ids = ""
-    if (catalogoid !== -1) {
-      let queryIds= supabase.from("productosxcatalogo").select("productoid").eq("productosxcatalogo.catalogoid", catalogoid)
+    let Ids = [];
+    if (catalogoid > 0) {
+      const { data, error } = await supabase
+        .from("productosxcatalogo")
+        .select("productoid")
+        .eq("catalogoid", catalogoid);
 
-      Ids =""
+      if (!error && data) {
+        Ids = data.map(item => item.productoid);
+      }
     }
     
     let query = supabase.from("productos").select(`
@@ -274,6 +279,9 @@ export async function obtenerProductos(
     }
     if (productonombre !== "") {
       query = query.ilike("nombre", `%${productonombre}%`)
+    }
+    if (Ids.length > 0) {
+      query = query.in("id", zonaid)
     }
     if (activo !== "Todos") {
       const isActive = ["True", "true", "Activo", "1", true].includes(activo)
