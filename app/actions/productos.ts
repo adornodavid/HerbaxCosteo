@@ -27,6 +27,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     
     - obtenerFormulas / ddlFormulas
     - obtenerZonas / ddlZonas
+    
     - obtenerCatalogosPorCliente / selCatalogosXCliente
     - obtenerFormulasAgregadas / selFormulasAgregadas
     - obtenerIngredientes / selIngredientes
