@@ -3,16 +3,15 @@
 /* ==================================================
   Imports
 ================================================== */
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { createClient } from "@/lib/supabase"
+import { revalidatePath } from "next/cache"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
 ================================================== */
-// Helper para crear el cliente Supabase con cookies
-function createServerSupabaseClientWrapper(cookieStore: ReturnType<typeof cookies>) {
-  return createServerComponentClient({ cookies: () => cookieStore })
-}
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the supabase variable
 
 /* ==================================================
   Funciones
@@ -96,6 +95,26 @@ export async function obtenerTotalClientes() {
 }
 
 // Función: listaDesplegableClientes: función que se utiliza para los dropdownlist y puede contener id y / o nombre
+// Función: obtenerClientes: función para obtener el listado de clientes para dropdown
+export async function obtenerClientes() {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("clientes")
+      .select("id, nombre")
+      .eq("activo", true)
+      .order("nombre", { ascending: true })
+
+    if (error) {
+      console.error("Error obteniendo clientes:", error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en obtenerClientes:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
 export async function listaDesplegableClientes(id = "-1", nombre = "") {
   const supabase = createServerSupabaseClientWrapper(cookies())
 
