@@ -155,47 +155,7 @@ export async function crearProducto(formData: FormData) {
 /*==================================================
 READS-OBTENER (SELECTS)
 ================================================== */
-//Funcion: obtenerProductos / selProductos: Funcion para obtener el o los productos
-
-//Función: actualizarProducto: función para actualizar un producto
-export async function actualizarProducto(
-  id: number,
-  productoData: {
-    nombre?: string
-    descripcion?: string | null
-    instruccionespreparacion?: string | null
-    tiempopreparacion?: string | null
-    costototal?: number | null
-    imgurl?: string | null
-    activo?: boolean
-  },
-) {
-  try {
-    const { data, error } = await supabaseAdmin
-      .from("productos")
-      .update({
-        ...productoData,
-        fechaactualizacion: new Date().toISOString(),
-      })
-      .eq("id", id)
-      .select()
-      .single()
-
-    if (error) {
-      console.error("Error actualizando producto:", error)
-      return { success: false, error: error.message }
-    }
-
-    revalidatePath("/productos")
-    revalidatePath(`/productos/${id}`)
-    return { success: true, data }
-  } catch (error) {
-    console.error("Error en actualizarProducto:", error)
-    return { success: false, error: "Error interno del servidor" }
-  }
-}
-
-//Función: obtenerProductos: función para obtener el listado de productos
+//Funcion: obtenerProductos / selProductos: Funcion para obtener el o los productos, puede ser individual o listado
 export async function obtenerProductos(
   productoid = -1,
   productonombre = "",
@@ -328,6 +288,46 @@ export async function obtenerProductos(
     return { success: false, error: "Error interno del servidor" }
   }
 }
+
+//Función: actualizarProducto: función para actualizar un producto
+export async function actualizarProducto(
+  id: number,
+  productoData: {
+    nombre?: string
+    descripcion?: string | null
+    instruccionespreparacion?: string | null
+    tiempopreparacion?: string | null
+    costototal?: number | null
+    imgurl?: string | null
+    activo?: boolean
+  },
+) {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("productos")
+      .update({
+        ...productoData,
+        fechaactualizacion: new Date().toISOString(),
+      })
+      .eq("id", id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error actualizando producto:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/productos")
+    revalidatePath(`/productos/${id}`)
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en actualizarProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+
 
 
 // Función: obtenerFormulas: función para obtener el listado de formulas para dropdown
