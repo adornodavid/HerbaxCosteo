@@ -153,7 +153,7 @@ export async function crearProducto(formData: FormData) {
 }
 
 /*==================================================
-READS-OBTENER (SELECTS)
+  READS-OBTENER (SELECTS)
 ================================================== */
 //Funcion: obtenerProductos / selProductos: Funcion para obtener el o los productos, puede ser individual o listado
 export async function obtenerProductos(
@@ -288,6 +288,11 @@ export async function obtenerProductos(
     return { success: false, error: "Error interno del servidor" }
   }
 }
+
+/*==================================================
+  UPDATES-ACTUALIZAR (UPDATES)
+================================================== */
+//Funcion: actualizarProducto / updProducto: Actualizar información del producto, basica?
 
 //Función: actualizarProducto: función para actualizar un producto
 export async function actualizarProducto(
