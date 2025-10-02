@@ -305,8 +305,6 @@ export async function obtenerProductos(
   UPDATES-ACTUALIZAR (UPDATES)
 ================================================== */
 //Funcion: actualizarProducto / updProducto: Actualizar información del producto, basica?
-
-//Función: actualizarProducto: función para actualizar un producto
 export async function actualizarProducto(
   id: number,
   productoData: {
