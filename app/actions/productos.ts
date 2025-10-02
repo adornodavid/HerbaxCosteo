@@ -316,41 +316,6 @@ export async function obtenerProductos(
   }
 }
 
-//Función: obtenerProductoPorId: función para obtener un producto especifico por id
-export async function obtenerProductoPorId(id: number) {
-  try {
-    const { data, error } = await supabase
-      .from("productos")
-      .select(`
-        *,
-        productos_ingredientes (
-          id,
-          cantidad,
-          ingredientes (
-            id,
-            nombre,
-            costo,
-            tipounidadmedida (
-              descripcion
-            )
-          )
-        )
-      `)
-      .eq("id", id)
-      .single()
-
-    if (error) {
-      console.error("Error obteniendo producto:", error)
-      return { success: false, error: error.message }
-    }
-
-    return { success: true, data }
-  } catch (error) {
-    console.error("Error en obtenerProductoPorId:", error)
-    return { success: false, error: "Error interno del servidor" }
-  }
-}
-
 // Función: obtenerClientes: función para obtener el listado de clientes para dropdown
 export async function obtenerClientes() {
   try {
