@@ -97,11 +97,31 @@ export async function obtenerTotalClientes() {
 // Función: listaDesplegableClientes: función que se utiliza para los dropdownlist y puede contener id y / o nombre
 export async function listaDesplegableClientes(id = -1, nombre = "", activo = "Todos") {
   try {
-    const { data, error } = await supabase
-      .from("clientes")
-      .select("id, nombre")
-      .eq("activo", true)
-      .order("nombre", { ascending: true })
+    // Query principal
+    let query = supabase.from("clientes").select("id, nombre")
+
+    //Filtros en query, dependiendo parametros
+    if (id !== -1) {
+      query = query.eq("id", id)
+    }
+    if (nombre !== "") {
+      query = query.ilike("nombre", `%${nombre}%`)
+    }
+    if (activo !== "Todos") {
+      const isActive = ["True", "true", "Activo", "1", true].includes(activo)
+      const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
+      if (isActive) {
+        query = query.eq("activo", true)
+      } else if (isInactive) {
+        query = query.eq("activo", false)
+      }
+    }
+
+    //Ejecutar query
+    query = query.order("nombre", { ascending: true })
+
+    //Varaibles y resultados del query
+    const { data, error } = await query
 
     if (error) {
       console.error("Error obteniendo la lista desplegable de clientes:", error)
