@@ -95,27 +95,26 @@ export async function obtenerTotalClientes() {
 }
 
 // Función: listaDesplegableClientes: función que se utiliza para los dropdownlist y puede contener id y / o nombre
-// Función: obtenerClientes: función para obtener el listado de clientes para dropdown
-export async function obtenerClientes() {
+export async function listaDesplegableClientes(id = -1, nombre = "", activo = "Todos") {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from("clientes")
       .select("id, nombre")
       .eq("activo", true)
       .order("nombre", { ascending: true })
 
     if (error) {
-      console.error("Error obteniendo clientes:", error)
+      console.error("Error obteniendo la lista desplegable de clientes:", error)
       return { success: false, error: error.message }
     }
 
     return { success: true, data }
   } catch (error) {
-    console.error("Error en obtenerClientes:", error)
+    console.error("Error en listaDesplegableClientes:", error)
     return { success: false, error: "Error interno del servidor" }
   }
 }
-export async function listaDesplegableClientes(id = "-1", nombre = "") {
+export async function listaDesplegableClientes2(id = "-1", nombre = "") {
   const supabase = createServerSupabaseClientWrapper(cookies())
 
   try {
