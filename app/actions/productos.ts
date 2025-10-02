@@ -192,7 +192,12 @@ export async function obtenerProductos(
   activo = "Todos",
 ) {
   try {
-    
+    const Ids = ""
+    if (catalogoid !== -1) {
+      let queryIds= supabase.from("productosxcatalogo").select("productoid").eq("productosxcatalogo.catalogoid", catalogoid)
+
+      Ids =""
+    }
     
     let query = supabase.from("productos").select(`
         id,
@@ -266,9 +271,6 @@ export async function obtenerProductos(
     }
     if (zonaid !== -1) {
       query = query.eq("zonaid", zonaid)
-    }
-    if (catalogoid !== -1) {
-      query = query.eq("productosxcatalogo.catalogoid", catalogoid)
     }
     if (productonombre !== "") {
       query = query.ilike("nombre", `%${productonombre}%`)
