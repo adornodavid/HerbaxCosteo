@@ -24,7 +24,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     
     - obtenerProductosPorFiltros / selProductosXFiltros
     - obtenerProductoPorId / selProductoXId
-    - obtenerClientes / ddlClientes
+    
     - obtenerFormulas / ddlFormulas
     - obtenerZonas / ddlZonas
     - obtenerCatalogosPorCliente / selCatalogosXCliente
@@ -316,26 +316,6 @@ export async function obtenerProductos(
   }
 }
 
-// Función: obtenerClientes: función para obtener el listado de clientes para dropdown
-export async function obtenerClientes() {
-  try {
-    const { data, error } = await supabaseAdmin
-      .from("clientes")
-      .select("id, nombre")
-      .eq("activo", true)
-      .order("nombre", { ascending: true })
-
-    if (error) {
-      console.error("Error obteniendo clientes:", error)
-      return { success: false, error: error.message }
-    }
-
-    return { success: true, data }
-  } catch (error) {
-    console.error("Error en obtenerClientes:", error)
-    return { success: false, error: "Error interno del servidor" }
-  }
-}
 
 // Función: obtenerFormulas: función para obtener el listado de formulas para dropdown
 export async function obtenerFormulas() {
