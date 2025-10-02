@@ -283,7 +283,7 @@ export async function obtenerProductos(
       query = query.ilike("nombre", `%${productonombre}%`)
     }
     if (Ids.length > 0) {
-      query = query.in("id", zonaid)
+      query = query.in("id", Ids)
     }
     if (activo !== "Todos") {
       const isActive = ["True", "true", "Activo", "1", true].includes(activo)
