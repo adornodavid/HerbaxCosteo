@@ -27,7 +27,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     
     - obtenerFormulas / ddlFormulas
     - obtenerZonas / ddlZonas
-    
+
     - obtenerCatalogosPorCliente / selCatalogosXCliente
     - obtenerFormulasAgregadas / selFormulasAgregadas
     - obtenerIngredientes / selIngredientes
@@ -40,7 +40,6 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - obtenerFormulasAsociadasProducto
     - obtenerIngredientesAsociadosProducto
     - obtenerProductosIniciales
-    - buscarProductosConFiltros
     - getProductoDetailsForModal
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
