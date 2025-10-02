@@ -192,6 +192,8 @@ export async function obtenerProductos(
   activo = "Todos",
 ) {
   try {
+    
+    
     let query = supabase.from("productos").select(`
         id,
         codigo,
