@@ -19,9 +19,13 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   --------------------
 	* CREATES-CREAR (INSERTS)
     - crearProducto / insProducto
+    - crearProductoCaracteristicas / insProductoCaracteristicas
+    - crearProductoXCatalogo / insProductoXCatelogo
 
   * READS-OBTENER (SELECTS)
     - obtenerProductos / selProductos
+    - obtenerProductosCaracteristicas / selProductosCaracteristicas
+    - obtenerProductosXCatalogos / selProductosXCatalogos
     
     - obtenerProductosPorFiltros / selProductosXFiltros
     - obtenerProductoPorId / selProductoXId
@@ -45,12 +49,18 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
+    - actualizarProductoCaracteristicas / updProductoCaracteristicas
+    - actualizarProductoXCatalogo / updProductoXCatalogo
 
     - actualizarProductoEtapa1
     - actualizarCostoProducto
 
   * DELETES-ELIMINAR (DELETES)
     - eliminarProducto / delProducto
+    - eliminarProductoCaracteristicas / delProductoCaracteristicas
+    - eliminarProductoXCatalogo / delProductoXCatalogo
+
+
     - eliminarFormulaDeProducto / delFormulaDeProducto
     - eliminarIngredienteDeProducto / delIngredienteDeProducto
     - eliminarProductoIncompleto
@@ -58,6 +68,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   * SPECIALS-ESPECIALES ()
     - estatusActivoProducto / actProducto
     - listaDesplegableProductos / ddlProductos
+
+    
     - obtenerUnidadMedidaFormula / selUnidadMedidaFormula
     - listaDesplegableClientesProductos
     - verificarFormulaEnProducto
