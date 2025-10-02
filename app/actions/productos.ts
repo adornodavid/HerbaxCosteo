@@ -282,7 +282,7 @@ export async function obtenerProductos(
     if (productonombre !== "") {
       query = query.ilike("nombre", `%${productonombre}%`)
     }
-    if (Ids.length > 0) {
+    if (catalogoid > 0) {
       query = query.in("id", Ids)
     }
     if (activo !== "Todos") {
