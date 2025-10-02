@@ -53,13 +53,17 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - eliminarFormulaDeProducto / delFormulaDeProducto
     - eliminarIngredienteDeProducto / delIngredienteDeProducto
     - eliminarProductoIncompleto
-    
+
   * SPECIALS-ESPECIALES ()
     - estatusActivoProducto / actProducto
     - listaDesplegableProductos / ddlProductos
     - obtenerUnidadMedidaFormula / selUnidadMedidaFormula
     - listaDesplegableClientesProductos
     - verificarFormulaEnProducto
+================================================== */
+
+/*==================================================
+    CREATES-CREAR (INSERTS)
 ================================================== */
 //Función: crearProducto: función para crear un producto
 export async function crearProducto(formData: FormData) {
@@ -147,6 +151,11 @@ export async function crearProducto(formData: FormData) {
     return { success: false, error: "Error interno del servidor" }
   }
 }
+
+/*==================================================
+READS-OBTENER (SELECTS)
+================================================== */
+//Funcion: obtenerProductos / selProductos: Funcion para obtener el o los productos
 
 //Función: actualizarProducto: función para actualizar un producto
 export async function actualizarProducto(
