@@ -1,3 +1,11 @@
+/* ==================================================
+  Interfaces:
+    - ApiResponse
+    - PaginationParams
+    - PaginatedResponse
+    - FilterParams
+    - DropdownItem
+================================================== */
 export interface ApiResponse<T> {
   success: boolean
   data?: T
