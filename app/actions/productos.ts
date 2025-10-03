@@ -624,10 +624,10 @@ export async function eliminarProductoIncompleto(productoId: number) {
 /*==================================================
   * SPECIALS-ESPECIALES ()
 ================================================== */
-// Función: estatusActivoProducto:
+// Función: estatusActivoProducto / actProducto: Funcion que cambia la columna activo a true(activo) o false(inactivo) del producto
 
 
-// Función: listaDesplegableProductos:
+// Función: listaDesplegableProductos / ddlProductos
 
 
 
