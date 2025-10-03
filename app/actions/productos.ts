@@ -626,6 +626,14 @@ export async function eliminarProductoIncompleto(productoId: number) {
 ================================================== */
 // Función: listaDesplegableProductos:
 
+
+// Función: listaDesplegableProductos:
+
+
+
+
+
+
 // Función: obtenerCostoTotalProducto: función para obtener el costo total de un producto
 export async function obtenerCostoTotalProducto(productoId: number) {
   try {
