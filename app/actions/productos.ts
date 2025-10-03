@@ -6,6 +6,7 @@
 import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
 import type { Producto } from "@/types/productos.types"
+import { imagenSubir } from "@/app/actions/utilerias"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -134,79 +135,44 @@ export async function crearProducto(formData: FormData) {
     })()
 
     if (existe) {
-      return { success: false, error: "El producto ya existe" }
+      return { success: false, error: "El producto que se intenta ingresar ya existe y no se puede proceder" }
     }
 
-    //Variables auxiliares
-    let imgUrl = ""
-
-    // Handle image upload if present
+    let imagenurl = ""
     const imagen = formData.get("imagen") as File
     if (imagen && imagen.size > 0) {
-      const fileName = `${Date.now()}-${imagen.name}`
+      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "productos")
 
-      // Upload image to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
-        .from("herbax")
-        .upload(`productos/${fileName}`, imagen)
-
-      if (uploadError) {
-        console.error("Error uploading image:", uploadError)
-        return { success: false, error: "Error al subir la imagen" }
+      if (!resultadoImagen.success) {
+        return { success: false, error: resultadoImagen.error || "Error al subir la imagen" }
       }
 
-      // Get public URL
-      const { data: urlData } = supabaseAdmin.storage.from("herbax").getPublicUrl(`productos/${fileName}`)
-
-      imgUrl = urlData.publicUrl
+      imagenurl = resultadoImagen.url || ""
     }
 
-    // Extract form data
-    const nombre = formData.get("nombre") as string
-    const descripcion = formData.get("descripcion") as string
+    const codigo = formData.get("codigo") as string
     const clienteid = Number.parseInt(formData.get("clienteid") as string)
-    const presentacion = formData.get("presentacion") as string
-    const porcion = formData.get("porcion") as string
-    const modouso = formData.get("modouso") as string
-    const porcionenvase = formData.get("porcionenvase") as string
-    const formaid = Number.parseInt(formData.get("formaid") as string) || null
-    const categoriauso = formData.get("categoriauso") as string
-    const propositoprincipal = formData.get("propositoprincipal") as string
-    const propuestavalor = formData.get("propuestavalor") as string
-    const instruccionesingesta = formData.get("instruccionesingesta") as string
-    const edadminima = Number.parseInt(formData.get("edadminima") as string)
-    const advertencia = formData.get("advertencia") as string
-    const condicionesalmacenamiento = formData.get("condicionesalmacenamiento") as string
-    const vidaanaquelmeses = Number.parseInt(formData.get("vidaanaquelmeses") as string)
-    const activo = formData.get("activo") === "true"
     const zonaid = Number.parseInt(formData.get("zonaid") as string) || null
+    const nombre = formData.get("nombre") as string
+    const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || null
+    const costo = 0.0
+    const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
+    const activo = true
 
-    // Insert into productos table
     const { data, error } = await supabaseAdmin
       .from("productos")
       .insert({
-        nombre,
-        descripcion,
+        codigo,
         clienteid,
-        presentacion,
-        porcion,
-        modouso,
-        porcionenvase,
-        formaid,
-        categoriauso,
-        propositoprincipal,
-        propuestavalor,
-        instruccionesingesta,
-        edadminima,
-        advertencia,
-        condicionesalmacenamiento,
-        vidaanaquelmeses,
-        imgurl: imgUrl,
-        fechacreacion: new Date().toISOString(),
-        activo,
         zonaid,
+        nombre,
+        unidadmedidaid,
+        costo,
+        imgurl: imagenurl,
+        fechacreacion: fecha,
+        activo,
       })
-      .select()
+      .select("id")
       .single()
 
     if (error) {
@@ -215,7 +181,7 @@ export async function crearProducto(formData: FormData) {
     }
 
     revalidatePath("/productos")
-    return { success: true, data }
+    return { success: true, data: data.id }
   } catch (error) {
     console.error("Error en crearProducto:", error)
     return { success: false, error: "Error interno del servidor" }
