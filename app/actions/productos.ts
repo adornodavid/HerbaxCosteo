@@ -122,6 +122,7 @@ export async function objetoProductos(
 //Función: crearProducto: función para crear un producto, información basica
 export async function crearProducto(formData: FormData) {
   try {
+    //Validar si no existe
     const existe: boolean = await (async () => {
       const resultado = await obtenerProductos(
         -1,
@@ -138,6 +139,7 @@ export async function crearProducto(formData: FormData) {
       return { success: false, error: "El producto que se intenta ingresar ya existe y no se puede proceder" }
     }
 
+    //Subir imagen para obtener su url
     let imagenurl = ""
     const imagen = formData.get("imagen") as File
     if (imagen && imagen.size > 0) {
@@ -150,6 +152,7 @@ export async function crearProducto(formData: FormData) {
       imagenurl = resultadoImagen.url || ""
     }
 
+    //Pasar datos del formData a variables con tipado de datos
     const codigo = formData.get("codigo") as string
     const clienteid = Number.parseInt(formData.get("clienteid") as string)
     const zonaid = Number.parseInt(formData.get("zonaid") as string) || null
