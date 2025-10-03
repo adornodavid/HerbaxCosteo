@@ -174,10 +174,6 @@ export function textoLimpiarParaProceder(texto: string): string {
   return textoLimpio
 }
 
-//Función: textoEliminarCaracter / textDeleteChart: Quitar caracter de texto
-
-//Función: textoSustituirCaracter / textoReplaceChart: Sustituir un caracter de texto
-
 /* ==================================================
   Funciones: Encryption
 ================================================== */
