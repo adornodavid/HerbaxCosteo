@@ -331,6 +331,25 @@ export async function obtenerProductos(
   }
 }
 
+//Funcion: obtenerProductos / selProductos: Funcion para obtener el o los productos, puede ser individual o listado
+export async function obtenerProductosCaracteristicas(
+  idrec = -1,
+  productoid = -1,
+  descripcion = "",
+  presentacion = "",
+  porcion = "",
+  modouso = "",
+  porcionenvase = "",
+  categoriauso = "",
+  propositoprincipal = "",
+  propuestavalor = "",
+  instruccionesingesta = "",
+  edadminima = -1,
+  advertencia = ""
+) {
+
+}
+
 //Función: obtenerProductosXCatalogos / selProductosXCatalogos, funcion para obtener en un array el listado de los ids de productos
 export async function obtenerProductosXCatalogos(
   catalogoid = -1,
