@@ -45,7 +45,29 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 ================================================== */
 //Función: imagenSubir / imageUpload: Subir una imagen a un repositorio/folder
 export async function imagenSubir(formData: FormData) {
+  //Variables auxiliares
+    let imgUrl = ""
 
+    // Handle image upload if present
+    const imagen = formData.get("imagen") as File
+    if (imagen && imagen.size > 0) {
+      const fileName = `${Date.now()}-${imagen.name}`
+
+      // Upload image to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+        .from("herbax")
+        .upload(`productos/${fileName}`, imagen)
+
+      if (uploadError) {
+        console.error("Error uploading image:", uploadError)
+        return { success: false, error: "Error al subir la imagen" }
+      }
+
+      // Get public URL
+      const { data: urlData } = supabaseAdmin.storage.from("herbax").getPublicUrl(`productos/${fileName}`)
+
+      imgUrl = urlData.publicUrl
+    }
 }
 
 //Función: imagenBorrar / imageDelete: Eliminar una imagen de un repositorio/folder
