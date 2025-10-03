@@ -55,7 +55,7 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
     const fileName = `${Date.now()}-${imagen.name}`
 
     // Upload image to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from("herbax")
       .upload(`productos/${fileName}`, imagen)
 
