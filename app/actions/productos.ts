@@ -413,6 +413,10 @@ export async function eliminarProductoIncompleto(productoId: number) {
 // Función: listaDesplegableProductos: 
 
 
+
+
+
+
 // Función: obtenerCostoTotalProducto: función para obtener el costo total de un producto
 export async function obtenerCostoTotalProducto(productoId: number) {
   try {
@@ -435,9 +439,6 @@ export async function obtenerCostoTotalProducto(productoId: number) {
     return { success: false, error: "Error interno del servidor", total: 0 }
   }
 }
-
-
-
 
 // Función: finalizarProducto: función para finalizar un producto con insert a productoxcatalogo y update de costo
 export async function finalizarProducto(productoId: number, catalogoId: number) {
