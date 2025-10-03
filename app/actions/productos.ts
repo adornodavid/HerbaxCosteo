@@ -638,6 +638,11 @@ export async function eliminarProductoXCatalogo(productoid: number, catalogoid: 
   }
 }
 
+
+
+
+
+
 // Función: eliminarProductoIncompleto: función para eliminar un producto incompleto y sus detalles
 export async function eliminarProductoIncompleto(productoId: number) {
   try {
