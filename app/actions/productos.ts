@@ -223,6 +223,7 @@ export async function obtenerProductos(
   try {
     // Primero obtener ids de filtro por caso especial de relacion de tablas
     let Ids = []
+    /*
     if (catalogoid > 0) {
       const { data, error } = await supabase
         .from("productosxcatalogo")
@@ -233,6 +234,7 @@ export async function obtenerProductos(
         Ids = data.map((item) => item.productoid)
       }
     }
+    */
 
     let query = supabase.from("productos").select(`
         id,
