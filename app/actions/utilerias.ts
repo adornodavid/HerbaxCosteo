@@ -66,7 +66,7 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
     }
 
     // Obtener URL
-    const { data: urlData } = supabaseAdmin.storage.from("herbax").getPublicUrl(`productos/${fileName}`)
+    const { data: urlData } = supabaseAdmin.storage.from("healthylab").getPublicUrl(`${folder}/${fileName}`)
 
     imgUrl = urlData.publicUrl
   }
