@@ -36,8 +36,6 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - crearProducto / insProducto
     - crearProductoCaracteristicas / insProductoCaracteristicas
     - crearProductoXCatalogo / insProductoXCatalogo
-    
-    - finalizarProducto
 
   * READS-OBTENER (SELECTS)
     - obtenerProductos / selProductos
@@ -51,6 +49,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 
     - actualizarProductoEtapa1
     - actualizarCostoProducto
+
+    - finalizarProducto (actualizar costo de producto)
 
   * DELETES-ELIMINAR (DELETES)
     - eliminarProducto / delProducto
