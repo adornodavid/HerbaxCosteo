@@ -201,6 +201,9 @@ export async function crearProducto(formData: FormData) {
 }
 
 //Función: crearProductoCaracteristicas: función para crear las caracteristicas de un producto, información secundaria
+export async function crearProductoCaracteristicas(productoid: number) {
+  
+}
 
 //Función: crearProductoXCatalogo: función para crear la relacion de un producto con un catalogo
 
