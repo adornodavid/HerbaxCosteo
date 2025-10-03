@@ -35,7 +35,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 	* CREATES-CREAR (INSERTS)
     - crearProducto / insProducto
     - crearProductoCaracteristicas / insProductoCaracteristicas
-    - crearProductoXCatalogo / insProductoXCatelogo
+    - crearProductoXCatalogo / insProductoXCatalogo
 
   * READS-OBTENER (SELECTS)
     - obtenerProductos / selProductos
