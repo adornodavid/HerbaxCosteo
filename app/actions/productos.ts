@@ -625,16 +625,27 @@ export async function eliminarProductoIncompleto(productoId: number) {
   * SPECIALS-ESPECIALES ()
 ================================================== */
 // Función: estatusActivoProducto / actProducto: Funcion que cambia la columna activo a true(activo) o false(inactivo) del producto
-export async function estatusActivoProducto(productoId: number, activo: boolean) {
+export async function estatusActivoProducto(productoid: number, activo: boolean): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("productos").update({ activo }).eq("id", productoid)
 
+    if (error) {
+      console.error(
+        "Error actualizando estatus activo del producto en app/actions/productos en estatusActivoProducto:",
+        error,
+      )
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en app/actions/productos en estatusActivoProducto:", error)
+    return false
+  }
 }
 
 // Función: listaDesplegableProductos / ddlProductos: Lista desplegable de productos para agregar
-
-
-
-
-
 
 // Función: obtenerCostoTotalProducto: función para obtener el costo total de un producto
 export async function obtenerCostoTotalProducto(productoId: number) {
