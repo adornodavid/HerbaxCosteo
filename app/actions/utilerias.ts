@@ -20,7 +20,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   *
     - imagenSubir / imageUpload
     - imagenBorrar / imageDelete
-    - imagenSustituir / imageOverwrite ?
+    - imagenSustituir / imageReplace ?
     - imagenUrl / imageUrl ?
 
   --------------------
@@ -29,7 +29,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   *
     - textoLimpiarParaProceder / textCleanToProcess
     - textoEliminarCaracter / textDeleteChart
-    - textoCambiarCaracter / textChangeChart
+    - textoCambiarCaracter / textReplaceChart
 
   --------------------
   Funciones: Encryption
@@ -48,10 +48,14 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 
 //Función: imagenBorrar / imageDelete: Eliminar una imagen de un repositorio/folder
 
+
+//Función: imagenSustituir / imageOverwrite: Sustituir una imagen de un repositorio/folder, mismo nombre
+
+
 /* ==================================================
   Funciones: Textos
 ================================================== */
-
+//Función: textoLimpiarParaProceder / textCleanToProcess: Quitar caracteres que pueden afectar proceso, evitar inyecciones SQL
 
 /* ==================================================
   Funciones: Encryption
