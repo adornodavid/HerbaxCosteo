@@ -57,6 +57,13 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 ================================================== */
 //Función: textoLimpiarParaProceder / textCleanToProcess: Quitar caracteres que pueden afectar proceso, evitar inyecciones SQL
 
+
+//Función: textoEliminarCaracter / textDeleteChart: Quitar caracter de texto
+
+
+//Función: textoSustituirCaracter / textoReplaceChart: Sustituir un caracter de texto
+
+
 /* ==================================================
   Funciones: Encryption
 ================================================== */
