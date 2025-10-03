@@ -162,7 +162,7 @@ export async function crearProducto(formData: FormData) {
     const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
     const activo = true
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from("productos")
       .insert({
         codigo,
