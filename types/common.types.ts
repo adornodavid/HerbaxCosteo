@@ -4,7 +4,7 @@
     - PaginationParams
     - PaginatedResponse
     - FilterParams
-    - DropdownItem
+    - ddlItem
 ================================================== */
 export interface ApiResponse<T> {
   success: boolean
