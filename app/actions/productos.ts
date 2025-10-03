@@ -20,7 +20,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   --------------------
   * Objetos
     - objetoProducto / oProducto (Individual)
-    - ObjetoProductos / oProductos (Listado / Array)
+    - objetoProductos / oProductos (Listado / Array)
   
   --------------------
   Funciones
@@ -59,10 +59,28 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     OBJETOS / CLASES
 ================================================== */
 //Función: objetoProducto / oProducto (Individual): Esta funcion crea un objeto/clase de un producto de manera individual
+export async function objetoProducto(
+  productoid = -1,
+  productonombre = "",
+  clienteid = -1,
+  zonaid = -1,
+  catalogoid = -1,
+  activo = "Todos",
+){
 
+}
 
 //Función: objetoProductos / oProductos (Listado): Esta funcion crea un objeto/clase de un listado de productos, es un array
+export async function objetoProductos(
+  productoid = -1,
+  productonombre = "",
+  clienteid = -1,
+  zonaid = -1,
+  catalogoid = -1,
+  activo = "Todos",
+){
 
+}
 
 /*==================================================
     CREATES-CREAR (INSERTS)
