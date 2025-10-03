@@ -236,8 +236,31 @@ export async function crearProductoCaracteristicas(productoid: number): Promise<
 }
 
 //Función: crearProductoXCatalogo: función para crear la relacion de un producto con un catalogo
-export async function crearProductoXCatalogo(productiid:number, catalogoid:number){
+export async function crearProductoXCatalogo(productoid: number, catalogoid: number): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("productosxcatalogo").insert({
+      productoid,
+      catalogoid,
+      precioventa: null,
+      margenutilidad: null,
+      fechacreacion: new Date().toISOString(),
+      activo: true,
+    })
 
+    if (error) {
+      console.error(
+        "Error creando relación producto-catálogo en app/actions/productos en crearProductoXCatalogo:",
+        error,
+      )
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en app/actions/productos en crearProductoXCatalogo:", error)
+    return false
+  }
 }
 
 /*==================================================
