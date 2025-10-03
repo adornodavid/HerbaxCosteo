@@ -559,6 +559,13 @@ export async function actualizarProducto(
 /*==================================================
   * DELETES-ELIMINAR (DELETES)
 ================================================== */
+// Función: eliminarProducto / delProducto: Eliminar el registro de la tabla productos por productoid
+
+
+// Función: eliminarProductoCaracteristicas / delProductoCaracteristicas: Eliminar registro por productoid
+
+
+// Función: eliminarProductoXCatalogo / delProductoXCatalogo: Eliminar registro por productoid y catalogoid
 
 
 /*==================================================
