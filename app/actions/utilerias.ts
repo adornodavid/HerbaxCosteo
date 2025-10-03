@@ -29,8 +29,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 	--------------------
   *
     - textoLimpiarParaProceder / textCleanToProcess
-    - textoEliminarCaracter / textDeleteChart ?
-    - textoCambiarCaracter / textReplaceChart ?
+    - textoEliminarCaracter / textDeleteChart ? usar funcion JS .replacce
+    - textoCambiarCaracter / textReplaceChart ? usar funcion JS .replacce
 
   --------------------
   Funciones: Encryption
