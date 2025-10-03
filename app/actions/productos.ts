@@ -313,7 +313,7 @@ export async function obtenerProductos(
 }
 
 //Función: obtenerProductosXCatalogos / selProductosXCatalogos, funcion para obtener en un array el listado de los ids de productos
-export async function objetoProductosXCatalogo(catalogoid = -1){
+export async function obtenerProductosXCatalogos(catalogoid = -1){
   try{
     let Ids = [];
     if (catalogoid > 0) {
