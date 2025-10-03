@@ -87,6 +87,7 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
 
 //Función: imagenBorrar / imageDelete: Eliminar una imagen de un repositorio/folder
 
+
 //Función: imagenSustituir / imageRepalce: Sustituir una imagen de un repositorio/folder, mismo nombre
 
 /* ==================================================
