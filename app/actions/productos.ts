@@ -408,9 +408,9 @@ export async function eliminarProductoIncompleto(productoId: number) {
 }
 
 /*==================================================
-  UPDATES-ACTUALIZAR (UPDATES)
+  * SPECIALS-ESPECIALES ()
 ================================================== */
-
+//
 
 
 // Función: obtenerCostoTotalProducto: función para obtener el costo total de un producto
