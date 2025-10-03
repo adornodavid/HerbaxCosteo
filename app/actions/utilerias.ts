@@ -45,7 +45,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   Funciones: Imagenes
 ================================================== */
 //Función: imagenSubir / imageUpload: Subir una imagen a un repositorio/folder
-export async function imagenSubir(imageFile, folder: string) {
+export async function imagenSubir(imageFile: File, folder: string) {
   //Variables auxiliares
     let imgUrl = ""
 
