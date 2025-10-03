@@ -121,7 +121,21 @@ export async function objetoProductos(
 //Función: crearProducto: función para crear un producto, información basica
 export async function crearProducto(formData: FormData) {
   try {
-    //Primero validar con la funcion obtenerProducto, parametros: nombre, clienteid, zonaid
+    const existe: boolean = await (async () => {
+      const resultado = await obtenerProductos(
+        -1,
+        formData.get("nombre") as string,
+        Number.parseInt(formData.get("clienteid") as string),
+        Number.parseInt(formData.get("zonaid") as string) || -1,
+        -1,
+        "Todos",
+      )
+      return resultado.success && resultado.data && resultado.data.length >= 1
+    })()
+
+    if (existe) {
+      return { success: false, error: "El producto ya existe" }
+    }
 
     //Variables auxiliares
     let imgUrl = ""
@@ -210,9 +224,7 @@ export async function crearProducto(formData: FormData) {
 
 //Función: crearProductoCaracteristicas: función para crear las caracteristicas de un producto, información secundaria
 
-
 //Función: crearProductoXCatalogo: función para crear la relaacion de un producto con un catalogo
-
 
 /*==================================================
   READS-OBTENER (SELECTS)
