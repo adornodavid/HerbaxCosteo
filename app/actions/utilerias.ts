@@ -49,7 +49,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 //Función: imagenBorrar / imageDelete: Eliminar una imagen de un repositorio/folder
 
 
-//Función: imagenSustituir / imageOverwrite: Sustituir una imagen de un repositorio/folder, mismo nombre
+//Función: imagenSustituir / imageRepalce: Sustituir una imagen de un repositorio/folder, mismo nombre
 
 
 /* ==================================================
