@@ -118,7 +118,7 @@ export async function objetoProductos(
 /*==================================================
     CREATES-CREAR (INSERTS)
 ================================================== */
-//Función: crearProducto: función para crear un producto
+//Función: crearProducto: función para crear un producto, información basica
 export async function crearProducto(formData: FormData) {
   try {
     //Primero validar con la funcion obtenerProducto, parametros: nombre, clienteid, zonaid
