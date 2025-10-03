@@ -36,13 +36,12 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - crearProducto / insProducto
     - crearProductoCaracteristicas / insProductoCaracteristicas
     - crearProductoXCatalogo / insProductoXCatalogo
+    - finalizarProducto
 
   * READS-OBTENER (SELECTS)
     - obtenerProductos / selProductos
     - obtenerProductosCaracteristicas / selProductosCaracteristicas
     - obtenerProductosXCatalogos / selProductosXCatalogos
-    
-    - finalizarProducto
     
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
