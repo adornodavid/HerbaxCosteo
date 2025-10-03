@@ -67,7 +67,11 @@ export async function objetoProducto(
   catalogoid = -1,
   activo = "Todos",
 ){
+  try{
 
+  }catch{
+  
+  }  
 }
 
 //Función: objetoProductos / oProductos (Listado): Esta funcion crea un objeto/clase de un listado de productos, es un array
@@ -79,7 +83,11 @@ export async function objetoProductos(
   catalogoid = -1,
   activo = "Todos",
 ){
+  try{
 
+  }catch{
+
+  }
 }
 
 /*==================================================
