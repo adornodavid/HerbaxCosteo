@@ -47,16 +47,16 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - actualizarProductoCaracteristicas / updProductoCaracteristicas
     - actualizarProductoXCatalogo / updProductoXCatalogo ? 
 
-    - actualizarProductoEtapa1
-    - actualizarCostoProducto
-    - finalizarProducto (actualizar costo de producto)
+    x actualizarProductoEtapa1
+    x actualizarCostoProducto
+    x finalizarProducto (actualizar costo de producto)
 
   * DELETES-ELIMINAR (DELETES)
     - eliminarProducto / delProducto
     - eliminarProductoCaracteristicas / delProductoCaracteristicas
     - eliminarProductoXCatalogo / delProductoXCatalogo
 
-    - eliminarProductoIncompleto
+    x eliminarProductoIncompleto
 
   * SPECIALS-ESPECIALES ()
     - estatusActivoProducto / actProducto
