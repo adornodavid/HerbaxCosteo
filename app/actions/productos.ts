@@ -49,7 +49,6 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 
     - actualizarProductoEtapa1
     - actualizarCostoProducto
-
     - finalizarProducto (actualizar costo de producto)
 
   * DELETES-ELIMINAR (DELETES)
