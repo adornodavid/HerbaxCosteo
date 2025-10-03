@@ -7,6 +7,11 @@ import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
 import type { Producto } from "@/types/productos.types"
 import { imagenSubir } from "@/app/actions/utilerias"
+/*
+import { crearFormulaXProducto, obtenerFormulasXProducto, actualizarFormulaXProducto, eliminarFormulaXProducto } from "@/app/actions/formulas"
+import { crearMateriaPrimaXProducto, obtenerMatriasPrimasXProducto, actualizarMateriaPrimaXProducto, eliminarMateriaPrimaXProductoubir } from "@/app/actions/materiasprimas"
+import { crearMaterialEtiquetadoXProducto, obtenerMaterialesEtiquetadoXProducto, actualizarMaterialEtiquetadoXProducto, eliminarMaterialEtiquetadoXProducto } from "@/app/actions/materialesetiquetado"
+*/
 
 /* ==================================================
   Conexion a la base de datos: Supabase
