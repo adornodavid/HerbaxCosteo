@@ -45,30 +45,31 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   Funciones: Imagenes
 ================================================== */
 //Función: imagenSubir / imageUpload: Subir una imagen a un repositorio/folder
-export async function imagenSubir(imageFile: File, folder: string) {
+export async function imagenSubir(imageFile: File, name: string, folder: string) {
   //Variables auxiliares
-    let imgUrl = ""
+  let imgUrl = ""
 
-    // Handle image upload if present
-    const imagen = formData.get("imagen") as File
-    if (imagen && imagen.size > 0) {
-      const fileName = `${Date.now()}-${imagen.name}`
+  // Handle image upload if present
+  const imagen = formData.get("imagen") as File
+  if (imagen && imagen.size > 0) {
+    const fileName = `${Date.now()}-${imagen.name}`
 
-      // Upload image to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
-        .from("herbax")
-        .upload(`productos/${fileName}`, imagen)
+    // Upload image to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+      .from("herbax")
+      .upload(`productos/${fileName}`, imagen)
 
-      if (uploadError) {
-        console.error("Error uploading image:", uploadError)
-        return { success: false, error: "Error al subir la imagen" }
-      }
-
-      // Get public URL
-      const { data: urlData } = supabaseAdmin.storage.from("herbax").getPublicUrl(`productos/${fileName}`)
-
-      imgUrl = urlData.publicUrl
+    //Si se presento un error
+    if (uploadError) {
+      console.error("Error subiendo imagen en actions/utilerias imagenSubir:", uploadError)
+      return { success: false, error: "Error al subir la imagen" }
     }
+
+    // Obtener URL
+    const { data: urlData } = supabaseAdmin.storage.from("herbax").getPublicUrl(`productos/${fileName}`)
+
+    imgUrl = urlData.publicUrl
+  }
 }
 
 //Función: imagenBorrar / imageDelete: Eliminar una imagen de un repositorio/folder
