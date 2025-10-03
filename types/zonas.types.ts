@@ -6,6 +6,8 @@ export interface Zona {
   fechamodificacion?: Date
 }
 
+
+
 export interface ZonaCrear {
   nombre: string
 }
