@@ -409,7 +409,7 @@ export async function obtenerProductosCaracteristicas(
     const { data, error } = await query
 
     if (error) {
-      console.error("Error obteniendo características de productos:", error)
+      console.error("Error obteniendo características de productos en app/actions/productos en obtenerProductosCaracteristicas:", error)
       return { success: false, error: error.message }
     }
 
