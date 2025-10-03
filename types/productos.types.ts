@@ -1,3 +1,11 @@
+/* ==================================================
+  Interfaces:
+    - Producto
+    - ProductoCaracteristicas
+    - ProductoListado
+    - ProductoXCatalogo
+    - ProductoXCliente
+================================================== */
 interface Producto {
   id: number
   codigo: string | null
