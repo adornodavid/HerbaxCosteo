@@ -54,7 +54,7 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
   if (imagen && imagen.size > 0) {
     const fileName = `${name}-${Date.now()}`
 
-    // Subier imagen a repositorio
+    // Subir imagen a repositorio
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from("healthylab")
       .upload(`${folder}/${fileName}`, imagen)
@@ -75,21 +75,16 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
 
 //Función: imagenBorrar / imageDelete: Eliminar una imagen de un repositorio/folder
 
-
 //Función: imagenSustituir / imageRepalce: Sustituir una imagen de un repositorio/folder, mismo nombre
-
 
 /* ==================================================
   Funciones: Textos
 ================================================== */
 //Función: textoLimpiarParaProceder / textCleanToProcess: Quitar caracteres que pueden afectar proceso, evitar inyecciones SQL
 
-
 //Función: textoEliminarCaracter / textDeleteChart: Quitar caracter de texto
 
-
 //Función: textoSustituirCaracter / textoReplaceChart: Sustituir un caracter de texto
-
 
 /* ==================================================
   Funciones: Encryption
@@ -115,7 +110,7 @@ export async function Desencrypt(textoEncriptado: string): Promise<string> {
 }
 
 // Función: Hashear - (Bcrypt-js) : Hashear o encriptar texto, utilizado para contraseñas
-export async function HashData(texto: string): Promise<string>{
+export async function HashData(texto: string): Promise<string> {
   try {
     return bcrypt.hash(texto, 10)
   } catch (error) {
