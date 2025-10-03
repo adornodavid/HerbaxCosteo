@@ -560,13 +560,19 @@ export async function actualizarProducto(
   * DELETES-ELIMINAR (DELETES)
 ================================================== */
 // Función: eliminarProducto / delProducto: Eliminar el registro de la tabla productos por productoid
+export async function eliminarProducto(productoid: number): Promise<boolean> {
 
+}
 
 // Función: eliminarProductoCaracteristicas / delProductoCaracteristicas: Eliminar registro por productoid
-
+export async function eliminarProductoCaracteristicas(productoid: number): Promise<boolean> {
+  
+}
 
 // Función: eliminarProductoXCatalogo / delProductoXCatalogo: Eliminar registro por productoid y catalogoid
-
+export async function eliminarProductoXCatalogo(productoid: number, catalogoid: number): Promise<boolean> {
+  
+}
 
 /*==================================================
   * SPECIALS-ESPECIALES ()
