@@ -197,7 +197,6 @@ export async function crearProducto(formData: FormData) {
 
 //Función: crearProductoCaracteristicas: función para crear las caracteristicas de un producto, información secundaria
 
-
 //Función: crearProductoXCatalogo: función para crear la relaacion de un producto con un catalogo
 
 /*==================================================
@@ -331,7 +330,7 @@ export async function obtenerProductos(
   }
 }
 
-//Funcion: obtenerProductos / selProductos: Funcion para obtener el o los productos, puede ser individual o listado
+//Funcion: obtenerProductosCaracteristicas / selProductosCaracteristicas: Funcion para obtener las características de un producto
 export async function obtenerProductosCaracteristicas(
   idrec = -1,
   productoid = -1,
@@ -345,9 +344,80 @@ export async function obtenerProductosCaracteristicas(
   propuestavalor = "",
   instruccionesingesta = "",
   edadminima = -1,
-  advertencia = ""
+  advertencia = "",
+  condicionesalmacenamiento = "",
 ) {
+  try {
+    let query = supabase.from("productoscaracteristicas").select("*")
 
+    if (idrec !== -1) {
+      query = query.eq("id", idrec)
+    }
+
+    if (productoid !== -1) {
+      query = query.eq("productoid", productoid)
+    }
+
+    if (descripcion !== "") {
+      query = query.eq("descripcion", descripcion)
+    }
+
+    if (presentacion !== "") {
+      query = query.eq("presentacion", presentacion)
+    }
+
+    if (porcion !== "") {
+      query = query.eq("porcion", porcion)
+    }
+
+    if (modouso !== "") {
+      query = query.eq("modouso", modouso)
+    }
+
+    if (porcionenvase !== "") {
+      query = query.eq("porcionenvase", porcionenvase)
+    }
+
+    if (categoriauso !== "") {
+      query = query.eq("categoriauso", categoriauso)
+    }
+
+    if (propositoprincipal !== "") {
+      query = query.eq("propositoprincipal", propositoprincipal)
+    }
+
+    if (propuestavalor !== "") {
+      query = query.eq("propuestavalor", propuestavalor)
+    }
+
+    if (instruccionesingesta !== "") {
+      query = query.eq("instruccionesingesta", instruccionesingesta)
+    }
+
+    if (edadminima !== -1) {
+      query = query.eq("edadminima", edadminima)
+    }
+
+    if (advertencia !== "") {
+      query = query.eq("advertencia", advertencia)
+    }
+
+    if (condicionesalmacenamiento !== "") {
+      query = query.eq("condicionesalmacenamiento", condicionesalmacenamiento)
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error("Error obteniendo características de productos:", error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en app/actions/productos en obtenerProductosCaracteristicas:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
 }
 
 //Función: obtenerProductosXCatalogos / selProductosXCatalogos, funcion para obtener en un array el listado de los ids de productos
