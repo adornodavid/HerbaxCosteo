@@ -56,8 +56,8 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
 
     // Upload image to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from("herbax")
-      .upload(`productos/${fileName}`, imagen)
+      .from("healthylab")
+      .upload(`${folder}/${fileName}`, imagen)
 
     //Si se presento un error
     if (uploadError) {
