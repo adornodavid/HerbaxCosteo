@@ -176,7 +176,7 @@ export async function crearProducto(formData: FormData) {
       .single()
 
     if (error) {
-      console.error("Error creating producto:", error)
+      console.error("Error creando producto en app/Actions/productos en crearProducto:", error)
       return { success: false, error: error.message }
     }
 
