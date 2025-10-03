@@ -26,6 +26,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   Funciones: Textos
 	--------------------
   *
+    - textoLimpiarParaProceder / textCleanToProcess
     - textoEliminarCaracter / textDeleteChart
     - textoCambiarCaracter / textChangeChart
 
