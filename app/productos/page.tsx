@@ -125,8 +125,8 @@ export default function ProductosPage() {
     costoTotal: 0, // Inicializado a 0
     tiempoPromedio: "N/A",
   })
-  const [clientes, setClientes] = useState<DropdownItem[]>([])
-  const [catalogos, setCatalogos] = useState<DropdownItem[]>([])
+  const [clientes, setClientes] = useState<ddlItem[]>([])
+  const [catalogos, setCatalogos] = useState<ddlItem[]>([])
   const [pageLoading, setPageLoading] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
