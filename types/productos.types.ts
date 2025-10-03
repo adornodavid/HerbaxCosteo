@@ -76,16 +76,6 @@ interface Producto {
   }> | null
 }
 
-interface ProductoCatalogo {
-  catalogoid: number | null
-  precioventa: number | null
-  margenutilidad: number | null
-  catalogos: {
-    nombre: string | null
-    descripcion: string | null
-  }
-}
-
 interface ProductoListado {
   ProductoId: number
   ProductoNombre: string
@@ -100,6 +90,23 @@ interface ProductoListado {
   CatalogoNombre: string
 }
 
+interface ProductosEstadisticas {
+  totalProductos: number
+  costoPromedio: number
+  costoTotal: number // Cambiado de 'costo' a 'costoTotal' para mayor claridad
+  tiempoPromedio: string
+}
+
+interface ProductoCatalogo {
+  catalogoid: number | null
+  precioventa: number | null
+  margenutilidad: number | null
+  catalogos: {
+    nombre: string | null
+    descripcion: string | null
+  }
+}
+
 export interface ProductoCrear {
   ProductoCodigo: string
   ClienteId: number
@@ -108,11 +115,4 @@ export interface ProductoCrear {
   ProductoImgUrl?: string
   UnidadMedidaId: number
   ProductoCosto: number
-}
-
-interface ProductosEstadisticas {
-  totalProductos: number
-  costoPromedio: number
-  costoTotal: number // Cambiado de 'costo' a 'costoTotal' para mayor claridad
-  tiempoPromedio: string
 }
