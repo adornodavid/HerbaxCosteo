@@ -343,7 +343,7 @@ export async function actualizarProducto(
 }
 
 /*==================================================
-  UPDATES-ACTUALIZAR (UPDATES)
+  * DELETES-ELIMINAR (DELETES)
 ================================================== */
 // Función: eliminarProductoIncompleto: función para eliminar un producto incompleto y sus detalles
 export async function eliminarProductoIncompleto(productoId: number) {
@@ -407,7 +407,9 @@ export async function eliminarProductoIncompleto(productoId: number) {
   }
 }
 
-
+/*==================================================
+  UPDATES-ACTUALIZAR (UPDATES)
+================================================== */
 
 
 
