@@ -50,7 +50,7 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
   let imgUrl = ""
 
   // Handle image upload if present
-  const imagen = formData.get("imagen") as File
+  const imagen = imageFile
   if (imagen && imagen.size > 0) {
     const fileName = `${Date.now()}-${imagen.name}`
 
