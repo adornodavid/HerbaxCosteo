@@ -18,6 +18,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   Funciones: Imagenes
   --------------------
   *
+    - imagenValidaciones / imageValidations
     - imagenSubir / imageUpload
     - imagenBorrar / imageDelete
     - imagenSustituir / imageReplace ?
