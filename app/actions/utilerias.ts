@@ -21,6 +21,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - imagenValidaciones / imageValidations
     - imagenSubir / imageUpload
     - imagenBorrar / imageDelete
+    - imagenBuscar / imageSearch ?
     - imagenSustituir / imageReplace ?
     - imagenUrl / imageUrl ?
 
