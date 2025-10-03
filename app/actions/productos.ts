@@ -15,6 +15,12 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey) // Declare t
 const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the supabase variable
 
 /* ==================================================
+  --------------------
+  Objetos / Clases
+  --------------------
+  
+  
+  --------------------
   Funciones
   --------------------
 	* CREATES-CREAR (INSERTS)
@@ -27,21 +33,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - obtenerProductosCaracteristicas / selProductosCaracteristicas
     - obtenerProductosXCatalogos / selProductosXCatalogos
     
-
-
-    - obtenerCatalogosPorCliente / selCatalogosXCliente
-    - obtenerFormulasAgregadas / selFormulasAgregadas
-    - obtenerIngredientes / selIngredientes
-    - getIngredientDetails / selIngredienteDetalles
-    - obtenerIngredientesAgregados / selIngredientesAgregados
-    - obtenerCostoTotalProducto / selCostoTotalProducto
-    - obtenerProductoCompleto
     - finalizarProducto
-    - obtenerProductoDetalladoCompleto
-    - obtenerFormulasAsociadasProducto
-    - obtenerIngredientesAsociadosProducto
-    - obtenerProductosIniciales
-    - getProductoDetailsForModal
     
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
@@ -56,19 +48,9 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - eliminarProductoCaracteristicas / delProductoCaracteristicas
     - eliminarProductoXCatalogo / delProductoXCatalogo
 
-
-    - eliminarFormulaDeProducto / delFormulaDeProducto
-    - eliminarIngredienteDeProducto / delIngredienteDeProducto
-    - eliminarProductoIncompleto
-
   * SPECIALS-ESPECIALES ()
     - estatusActivoProducto / actProducto
     - listaDesplegableProductos / ddlProductos
-
-    
-    - obtenerUnidadMedidaFormula / selUnidadMedidaFormula
-    - listaDesplegableClientesProductos
-    - verificarFormulaEnProducto
 ================================================== */
 
 /*==================================================
