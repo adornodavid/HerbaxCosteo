@@ -236,6 +236,9 @@ export async function crearProductoCaracteristicas(productoid: number): Promise<
 }
 
 //Función: crearProductoXCatalogo: función para crear la relacion de un producto con un catalogo
+export async function crearProductoXCatalogo(productiid:number, catalogoid:number){
+
+}
 
 /*==================================================
   READS-OBTENER (SELECTS)
