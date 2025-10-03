@@ -201,8 +201,38 @@ export async function crearProducto(formData: FormData) {
 }
 
 //Función: crearProductoCaracteristicas: función para crear las caracteristicas de un producto, información secundaria
-export async function crearProductoCaracteristicas(productoid: number) {
-  
+export async function crearProductoCaracteristicas(productoid: number): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("productoscaracteristicas").insert({
+      productoid,
+      descripcion: null,
+      presentacion: null,
+      porcion: null,
+      modouso: null,
+      porcionenvase: null,
+      categoriauso: null,
+      propositoprincipal: null,
+      propuestavalor: null,
+      instruccionesingesta: null,
+      edadminima: null,
+      advertencia: null,
+      condicionesalmacenamiento: null,
+    })
+
+    if (error) {
+      console.error(
+        "Error creando características del producto en app/actions/productos en crearProductoCaracteristicas:",
+        error,
+      )
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en app/actions/productos en crearProductoCaracteristicas:", error)
+    return false
+  }
 }
 
 //Función: crearProductoXCatalogo: función para crear la relacion de un producto con un catalogo
@@ -417,7 +447,10 @@ export async function obtenerProductosCaracteristicas(
     const { data, error } = await query
 
     if (error) {
-      console.error("Error obteniendo características de productos en app/actions/productos en obtenerProductosCaracteristicas:", error)
+      console.error(
+        "Error obteniendo características de productos en app/actions/productos en obtenerProductosCaracteristicas:",
+        error,
+      )
       return { success: false, error: error.message }
     }
 
