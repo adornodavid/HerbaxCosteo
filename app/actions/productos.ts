@@ -342,6 +342,70 @@ export async function actualizarProducto(
   }
 }
 
+/*==================================================
+  UPDATES-ACTUALIZAR (UPDATES)
+================================================== */
+// Función: eliminarProductoIncompleto: función para eliminar un producto incompleto y sus detalles
+export async function eliminarProductoIncompleto(productoId: number) {
+  try {
+    // First, get the product info to delete the image if it exists
+    const { data: producto, error: productoError } = await supabaseAdmin
+      .from("productos")
+      .select("imgurl")
+      .eq("id", productoId)
+      .single()
+
+    if (productoError && productoError.code !== "PGRST116") {
+      console.error("Error obteniendo producto para eliminar:", productoError)
+      return { success: false, error: productoError.message }
+    }
+
+    // Delete image from storage if it exists
+    if (producto?.imgurl) {
+      try {
+        // Extract filename from URL
+        const urlParts = producto.imgurl.split("/")
+        const fileName = urlParts[urlParts.length - 1]
+
+        if (fileName && urlParts.includes("productos")) {
+          const filePath = `productos/${fileName}`
+
+          const { error: deleteImageError } = await supabaseAdmin.storage.from("herbax").remove([filePath])
+
+          if (deleteImageError) {
+            console.error("Error eliminando imagen:", deleteImageError)
+            // Continue with deletion even if image deletion fails
+          }
+        }
+      } catch (imageError) {
+        console.error("Error procesando eliminación de imagen:", imageError)
+        // Continue with deletion even if image deletion fails
+      }
+    }
+
+    // Delete from productosdetalles first (foreign key constraint)
+    const { error: detallesError } = await supabaseAdmin.from("productosdetalles").delete().eq("productoid", productoId)
+
+    if (detallesError) {
+      console.error("Error eliminando detalles del producto:", detallesError)
+      return { success: false, error: detallesError.message }
+    }
+
+    // Delete from productos table
+    const { error: productoDeleteError } = await supabaseAdmin.from("productos").delete().eq("id", productoId)
+
+    if (productoDeleteError) {
+      console.error("Error eliminando producto:", productoDeleteError)
+      return { success: false, error: productoDeleteError.message }
+    }
+
+    revalidatePath("/productos")
+    return { success: true }
+  } catch (error) {
+    console.error("Error en eliminarProductoIncompleto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
 
 
 
@@ -445,67 +509,7 @@ export async function finalizarProducto(productoId: number, catalogoId: number) 
   }
 }
 
-// Función: eliminarProductoIncompleto: función para eliminar un producto incompleto y sus detalles
-export async function eliminarProductoIncompleto(productoId: number) {
-  try {
-    // First, get the product info to delete the image if it exists
-    const { data: producto, error: productoError } = await supabaseAdmin
-      .from("productos")
-      .select("imgurl")
-      .eq("id", productoId)
-      .single()
 
-    if (productoError && productoError.code !== "PGRST116") {
-      console.error("Error obteniendo producto para eliminar:", productoError)
-      return { success: false, error: productoError.message }
-    }
-
-    // Delete image from storage if it exists
-    if (producto?.imgurl) {
-      try {
-        // Extract filename from URL
-        const urlParts = producto.imgurl.split("/")
-        const fileName = urlParts[urlParts.length - 1]
-
-        if (fileName && urlParts.includes("productos")) {
-          const filePath = `productos/${fileName}`
-
-          const { error: deleteImageError } = await supabaseAdmin.storage.from("herbax").remove([filePath])
-
-          if (deleteImageError) {
-            console.error("Error eliminando imagen:", deleteImageError)
-            // Continue with deletion even if image deletion fails
-          }
-        }
-      } catch (imageError) {
-        console.error("Error procesando eliminación de imagen:", imageError)
-        // Continue with deletion even if image deletion fails
-      }
-    }
-
-    // Delete from productosdetalles first (foreign key constraint)
-    const { error: detallesError } = await supabaseAdmin.from("productosdetalles").delete().eq("productoid", productoId)
-
-    if (detallesError) {
-      console.error("Error eliminando detalles del producto:", detallesError)
-      return { success: false, error: detallesError.message }
-    }
-
-    // Delete from productos table
-    const { error: productoDeleteError } = await supabaseAdmin.from("productos").delete().eq("id", productoId)
-
-    if (productoDeleteError) {
-      console.error("Error eliminando producto:", productoDeleteError)
-      return { success: false, error: productoDeleteError.message }
-    }
-
-    revalidatePath("/productos")
-    return { success: true }
-  } catch (error) {
-    console.error("Error en eliminarProductoIncompleto:", error)
-    return { success: false, error: "Error interno del servidor" }
-  }
-}
 
 // Función: actualizarCostoProducto: función para actualizar solo el costo de un producto
 export async function actualizarCostoProducto(productoId: number) {
