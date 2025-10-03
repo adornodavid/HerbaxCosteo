@@ -314,16 +314,21 @@ export async function obtenerProductos(
 
 //Función: obtenerProductosXCatalogos / selProductosXCatalogos, funcion para obtener en un array el listado de los ids de productos
 export async function objetoProductosXCatalogo(catalogoid = -1){
-  let Ids = [];
-  if (catalogoid > 0) {
-    const { data, error } = await supabase
-      .from("productosxcatalogo")
-      .select("productoid")
-      .eq("catalogoid", catalogoid);
+  try{
+    let Ids = [];
+    if (catalogoid > 0) {
+      const { data, error } = await supabase
+        .from("productosxcatalogo")
+        .select("productoid")
+        .eq("catalogoid", catalogoid);
 
-    if (!error && data) {
-      Ids = data.map(item => item.productoid);
+      if (!error && data) {
+        Ids = data.map(item => item.productoid);
+      }
     }
+  } catch (error) {
+    console.error("Error en objetoProductosXCatalogo:", error)
+    return { success: false, error: "Error interno del servidor" }
   }
 }
 
