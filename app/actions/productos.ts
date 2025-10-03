@@ -436,36 +436,6 @@ export async function obtenerCostoTotalProducto(productoId: number) {
   }
 }
 
-// Función: listaDesplegableClientesProductos: función similar a listaDesplegableClientes para productos
-export async function listaDesplegableClientesProductos(id: string, nombre: string) {
-  try {
-    let query = supabaseAdmin.from("clientes").select("id, nombre").eq("activo", true)
-
-    // Apply filters conditionally
-    if (nombre && nombre.trim() !== "") {
-      query = query.ilike("nombre", `%${nombre}%`)
-    }
-
-    if (id && id !== "-1") {
-      query = query.eq("id", Number.parseInt(id))
-    }
-
-    query = query.order("nombre", { ascending: true })
-
-    const { data, error } = await query
-
-    if (error) {
-      console.error("Error obteniendo clientes para dropdown:", error)
-      return { success: false, error: error.message }
-    }
-
-    return { success: true, data }
-  } catch (error) {
-    console.error("Error en listaDesplegableClientesProductos:", error)
-    return { success: false, error: "Error interno del servidor" }
-  }
-}
-
 // Función: finalizarProducto: función para finalizar un producto con insert a productoxcatalogo y update de costo
 export async function finalizarProducto(productoId: number, catalogoId: number) {
   try {
