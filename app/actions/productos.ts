@@ -5,6 +5,7 @@
 ================================================== */
 import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
+import type { Producto } from "@/types/productos.types"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -50,6 +51,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - eliminarProductoCaracteristicas / delProductoCaracteristicas
     - eliminarProductoXCatalogo / delProductoXCatalogo
 
+    - eliminarProductoIncompleto
+
   * SPECIALS-ESPECIALES ()
     - estatusActivoProducto / actProducto
     - listaDesplegableProductos / ddlProductos
@@ -66,16 +69,25 @@ export async function objetoProducto(
   zonaid = -1,
   catalogoid = -1,
   activo = "Todos",
-){
-  try{
-    //Ejecutar función: obtenerProducto enviando los parametros recibidos
+): Promise<{ success: boolean; data?: Producto; error?: string }> {
+  try {
+    const resultado = await obtenerProductos(productoid, productonombre, clienteid, zonaid, catalogoid, activo)
 
-    //Retorno de data
+    if (!resultado.success || !resultado.data) {
+      return { success: false, error: resultado.error || "No se encontraron datos" }
+    }
 
-  }catch{
+    if (resultado.data.length === 0) {
+      return { success: false, error: "Producto no encontrado" }
+    }
+
+    const producto: Producto = resultado.data[0] as Producto
+
+    return { success: true, data: producto }
+  } catch (error) {
     console.error("Error en app/actions/productos en objetoProducto (Individual):", error)
     return { success: false, error: "Error interno del servidor" }
-  }  
+  }
 }
 
 //Función: objetoProductos / oProductos (Listado): Esta funcion crea un objeto/clase de un listado de productos, es un array
@@ -86,16 +98,21 @@ export async function objetoProductos(
   zonaid = -1,
   catalogoid = -1,
   activo = "Todos",
-){
-  try{
-    //Ejecutar función: obtenerProducto enviando los parametros recibidos
+): Promise<{ success: boolean; data?: Producto[]; error?: string }> {
+  try {
+    const resultado = await obtenerProductos(productoid, productonombre, clienteid, zonaid, catalogoid, activo)
 
-    //Retorno de data
+    if (!resultado.success || !resultado.data) {
+      return { success: false, error: resultado.error || "No se encontraron datos" }
+    }
 
-  }catch{
+    const productos: Producto[] = resultado.data as Producto[]
+
+    return { success: true, data: productos }
+  } catch (error) {
     console.error("Error en app/actions/productos en objetoProductos (Listado/Array):", error)
     return { success: false, error: "Error interno del servidor" }
-  } 
+  }
 }
 
 /*==================================================
@@ -205,19 +222,18 @@ export async function obtenerProductos(
 ) {
   try {
     // Primero obtener ids de filtro por caso especial de relacion de tablas
-    let Ids = [];
+    let Ids = []
     if (catalogoid > 0) {
       const { data, error } = await supabase
         .from("productosxcatalogo")
         .select("productoid")
-        .eq("catalogoid", catalogoid);
+        .eq("catalogoid", catalogoid)
 
       if (!error && data) {
-        Ids = data.map(item => item.productoid);
+        Ids = data.map((item) => item.productoid)
       }
     }
-    
-    // Query principal
+
     let query = supabase.from("productos").select(`
         id,
         codigo,
@@ -329,26 +345,30 @@ export async function obtenerProductos(
 }
 
 //Función: obtenerProductosXCatalogos / selProductosXCatalogos, funcion para obtener en un array el listado de los ids de productos
-export async function obtenerProductosXCatalogos(catalogoid = -1){
-  try{
-    let Ids = [];
-    if (catalogoid > 0) {
-      // Query principal
-      const { data, error } = await supabase
-        .from("productosxcatalogo")
-        .select("productoid")
-        .eq("catalogoid", catalogoid);
-
-      //Asignar resultados a variable que retorna
-      if (!error && data) {
-        Ids = data.map(item => item.productoid);
-      }
-
-      //Retorno de data
-      return { success: true, Ids }
+export async function obtenerProductosXCatalogos(
+  catalogoid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (catalogoid <= 0) {
+      return { success: false, error: "ID de catálogo inválido" }
     }
+
+    const { data, error } = await supabase.from("productosxcatalogo").select("productoid").eq("catalogoid", catalogoid)
+
+    if (error) {
+      console.error("Error en query obtenerProductosXCatalogos:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const productosIds: number[] = data.map((item) => item.productoid)
+
+    return { success: true, data: productosIds }
   } catch (error) {
-    console.error("Error en objetoProductosXCatalogo:", error)
+    console.error("Error en obtenerProductosXCatalogos:", error)
     return { success: false, error: "Error interno del servidor" }
   }
 }
@@ -462,12 +482,7 @@ export async function eliminarProductoIncompleto(productoId: number) {
 /*==================================================
   * SPECIALS-ESPECIALES ()
 ================================================== */
-// Función: listaDesplegableProductos: 
-
-
-
-
-
+// Función: listaDesplegableProductos:
 
 // Función: obtenerCostoTotalProducto: función para obtener el costo total de un producto
 export async function obtenerCostoTotalProducto(productoId: number) {
