@@ -561,30 +561,40 @@ export async function actualizarProducto(
 ================================================== */
 // Función: eliminarProducto / delProducto: Eliminar el registro de la tabla productos por productoid
 export async function eliminarProducto(productoid: number): Promise<boolean> {
+  try {
+    if (productoid <= 0) {
+      console.error("Error en eliminarProducto: productoid debe ser mayor a 0")
+      return false
+    }
 
+    const { error } = await supabase.from("productos").delete().eq("id", productoid)
+
+    if (error) {
+      console.error("Error eliminando producto en app/actions/productos en eliminarProducto:", error)
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en app/actions/productos en eliminarProducto:", error)
+    return false
+  }
 }
 
 // Función: eliminarProductoCaracteristicas / delProductoCaracteristicas: Eliminar registro por productoid
 export async function eliminarProductoCaracteristicas(productoid: number): Promise<boolean> {
-  
-}
-
-// Función: eliminarProductoXCatalogo / delProductoXCatalogo: Eliminar registro por productoid y catalogoid
-export async function eliminarProductoXCatalogo(productoid: number, catalogoid: number): Promise<boolean> {
-  
-}
-
-/*==================================================
-  * SPECIALS-ESPECIALES ()
-================================================== */
-// Función: estatusActivoProducto / actProducto: Funcion que cambia la columna activo a true(activo) o false(inactivo) del producto
-export async function estatusActivoProducto(productoid: number, activo: boolean): Promise<boolean> {
   try {
-    const { error } = await supabase.from("productos").update({ activo: activo }).eq("id", productoid)
+    if (productoid <= 0) {
+      console.error("Error en eliminarProductoCaracteristicas: productoid debe ser mayor a 0")
+      return false
+    }
+
+    const { error } = await supabase.from("productoscaracteristicas").delete().eq("productoid", productoid)
 
     if (error) {
       console.error(
-        "Error actualizando estatus activo del producto en app/actions/productos en estatusActivoProducto:",
+        "Error eliminando características del producto en app/actions/productos en eliminarProductoCaracteristicas:",
         error,
       )
       return false
@@ -593,16 +603,40 @@ export async function estatusActivoProducto(productoid: number, activo: boolean)
     revalidatePath("/productos")
     return true
   } catch (error) {
-    console.error("Error en app/actions/productos en estatusActivoProducto:", error)
+    console.error("Error en app/actions/productos en eliminarProductoCaracteristicas:", error)
     return false
   }
 }
 
-// Función: listaDesplegableProductos / ddlProductos: Lista desplegable de productos para agregar
+// Función: eliminarProductoXCatalogo / delProductoXCatalogo: Eliminar registro por productoid y catalogoid
+export async function eliminarProductoXCatalogo(productoid: number, catalogoid: number): Promise<boolean> {
+  try {
+    if (productoid <= 0 || catalogoid <= 0) {
+      console.error("Error en eliminarProductoXCatalogo: productoid y catalogoid deben ser mayores a 0")
+      return false
+    }
 
+    const { error } = await supabase
+      .from("productosxcatalogo")
+      .delete()
+      .eq("productoid", productoid)
+      .eq("catalogoid", catalogoid)
 
+    if (error) {
+      console.error(
+        "Error eliminando relación producto-catálogo en app/actions/productos en eliminarProductoXCatalogo:",
+        error,
+      )
+      return false
+    }
 
-
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en app/actions/productos en eliminarProductoXCatalogo:", error)
+    return false
+  }
+}
 
 // Función: eliminarProductoIncompleto: función para eliminar un producto incompleto y sus detalles
 export async function eliminarProductoIncompleto(productoId: number) {
@@ -763,3 +797,29 @@ export async function actualizarCostoProducto(productoId: number) {
     return { success: false, error: "Error interno del servidor" }
   }
 }
+
+/*==================================================
+  * SPECIALS-ESPECIALES ()
+================================================== */
+// Función: estatusActivoProducto / actProducto: Funcion que cambia la columna activo a true(activo) o false(inactivo) del producto
+export async function estatusActivoProducto(productoid: number, activo: boolean): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("productos").update({ activo: activo }).eq("id", productoid)
+
+    if (error) {
+      console.error(
+        "Error actualizando estatus activo del producto en app/actions/productos en estatusActivoProducto:",
+        error,
+      )
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en app/actions/productos en estatusActivoProducto:", error)
+    return false
+  }
+}
+
+// Función: listaDesplegableProductos / ddlProductos: Lista desplegable de productos para agregar
