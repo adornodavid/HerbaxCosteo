@@ -317,14 +317,19 @@ export async function objetoProductosXCatalogo(catalogoid = -1){
   try{
     let Ids = [];
     if (catalogoid > 0) {
+      // Query principal
       const { data, error } = await supabase
         .from("productosxcatalogo")
         .select("productoid")
         .eq("catalogoid", catalogoid);
 
+      //Asignar resultados a variable que retorna
       if (!error && data) {
         Ids = data.map(item => item.productoid);
       }
+
+      //Retorno de data
+      return { success: true, Ids }
     }
   } catch (error) {
     console.error("Error en objetoProductosXCatalogo:", error)
