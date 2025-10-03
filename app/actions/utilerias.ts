@@ -86,8 +86,36 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
 }
 
 //Función: imagenBorrar / imageDelete: Eliminar una imagen de un repositorio/folder
-export async function imagenSubir(url:string, folder: string) {
+export async function imagenBorrar(imageUrl: string, folder: string) {
+  // Validar que se recibió la URL
+  if (!imageUrl || imageUrl.trim() === "") {
+    return { success: false, error: "No se proporcionó una URL válida" }
+  }
 
+  try {
+    // Extraer el nombre del archivo de la URL
+    // La URL tiene formato: https://...supabase.co/storage/v1/object/public/healthylab/folder/filename.ext
+    const urlParts = imageUrl.split("/")
+    const fileName = urlParts[urlParts.length - 1]
+
+    // Construir la ruta completa del archivo en el bucket
+    const filePath = `${folder}/${fileName}`
+
+    // Eliminar la imagen del bucket de Supabase
+    const { data, error } = await supabase.storage.from("healthylab").remove([filePath])
+
+    // Si se presentó un error
+    if (error) {
+      console.error("Error borrando imagen en actions/utilerias imagenBorrar:", error)
+      return { success: false, error: "Error al borrar la imagen" }
+    }
+
+    // Retorno de resultado exitoso
+    return { success: true, message: "Imagen eliminada correctamente" }
+  } catch (error) {
+    console.error("Error procesando la eliminación de imagen:", error)
+    return { success: false, error: "Error al procesar la eliminación de la imagen" }
+  }
 }
 
 //Función: imagenSustituir / imageRepalce: Sustituir una imagen de un repositorio/folder, mismo nombre
