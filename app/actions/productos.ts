@@ -7,11 +7,6 @@ import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
 import type { Producto } from "@/types/productos.types"
 import { imagenSubir } from "@/app/actions/utilerias"
-/*
-import { crearFormulaXProducto, obtenerFormulasXProducto, actualizarFormulaXProducto, eliminarFormulaXProducto } from "@/app/actions/formulas"
-import { crearMateriaPrimaXProducto, obtenerMatriasPrimasXProducto, actualizarMateriaPrimaXProducto, eliminarMateriaPrimaXProductoubir } from "@/app/actions/materiasprimas"
-import { crearMaterialEtiquetadoXProducto, obtenerMaterialesEtiquetadoXProducto, actualizarMaterialEtiquetadoXProducto, eliminarMaterialEtiquetadoXProducto } from "@/app/actions/materialesetiquetado"
-*/
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -235,7 +230,12 @@ export async function crearProductoCaracteristicas(productoid: number): Promise<
 }
 
 //Función: crearProductoXCatalogo: función para crear la relacion de un producto con un catalogo
-export async function crearProductoXCatalogo(productoid: number, catalogoid: number, precioventa:number, margenutilidad:number): Promise<boolean> {
+export async function crearProductoXCatalogo(
+  productoid: number,
+  catalogoid: number,
+  precioventa: number,
+  margenutilidad: number,
+): Promise<boolean> {
   try {
     const { error } = await supabase.from("productosxcatalogo").insert({
       productoid,
@@ -519,40 +519,115 @@ export async function obtenerProductosXCatalogos(
   UPDATES-ACTUALIZAR (UPDATES)
 ================================================== */
 //Funcion: actualizarProducto / updProducto: Actualizar información del producto, basica?
-export async function actualizarProducto(
-  id: number,
-  productoData: {
-    nombre?: string
-    descripcion?: string | null
-    instruccionespreparacion?: string | null
-    tiempopreparacion?: string | null
-    costototal?: number | null
-    imgurl?: string | null
-    activo?: boolean
-  },
-) {
+export async function actualizarProducto(formData: FormData) {
   try {
-    const { data, error } = await supabaseAdmin
-      .from("productos")
-      .update({
-        ...productoData,
-        fechaactualizacion: new Date().toISOString(),
-      })
-      .eq("id", id)
-      .select()
-      .single()
+    const productoid = Number.parseInt(formData.get("productoid") as string)
+
+    if (!productoid || productoid <= 0) {
+      return {
+        success: false,
+        message: "no se recibio el productoid a actualizar",
+      }
+    }
+
+    const updateData: any = {}
+
+    if (formData.get("codigo")) updateData.codigo = formData.get("codigo") as string
+    if (formData.get("nombre")) updateData.nombre = formData.get("nombre") as string
+    if (formData.get("clienteid")) updateData.clienteid = Number.parseInt(formData.get("clienteid") as string)
+    if (formData.get("zonaid")) updateData.zonaid = Number.parseInt(formData.get("zonaid") as string)
+    if (formData.get("unidadmedidaid"))
+      updateData.unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string)
+    if (formData.get("costo")) updateData.costo = Number.parseFloat(formData.get("costo") as string)
+    if (formData.get("activo") !== null) updateData.activo = formData.get("activo") === "true"
+
+    const imagen = formData.get("imagen") as File
+    if (imagen && imagen.size > 0) {
+      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "productos")
+
+      if (resultadoImagen.success && resultadoImagen.url) {
+        updateData.imgurl = resultadoImagen.url
+      }
+    }
+
+    updateData.fechaactualizacion = new Date().toISOString()
+
+    const { error } = await supabase.from("productos").update(updateData).eq("id", productoid)
 
     if (error) {
-      console.error("Error actualizando producto:", error)
-      return { success: false, error: error.message }
+      console.error("Error actualizando producto en app/actions/productos en actualizarProducto:", error)
+      return {
+        success: false,
+        message: error.message,
+      }
     }
 
     revalidatePath("/productos")
-    revalidatePath(`/productos/${id}`)
-    return { success: true, data }
+    return {
+      success: true,
+      message: "se actualizo correctamente",
+    }
   } catch (error) {
-    console.error("Error en actualizarProducto:", error)
-    return { success: false, error: "Error interno del servidor" }
+    console.error("Error en app/actions/productos en actualizarProducto:", error)
+    return {
+      success: false,
+      message: "Error interno del servidor",
+    }
+  }
+}
+
+//Función: actualizarProductoCaracteristicas / updProductoCaracteristicas: Actualizar características de un producto
+export async function actualizarProductoCaracteristicas(
+  productoid: number,
+  caracteristicasData: any,
+): Promise<boolean> {
+  try {
+    const { error } = await supabaseAdmin
+      .from("productoscaracteristicas")
+      .update(caracteristicasData)
+      .eq("productoid", productoid)
+
+    if (error) {
+      console.error("Error actualizando características del producto:", error)
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en actualizarProductoCaracteristicas:", error)
+    return false
+  }
+}
+
+//Función: actualizarProductoXCatalogo / updProductoXCatalogo: Actualizar relación de un producto con un catálogo
+export async function actualizarProductoXCatalogo(
+  productoid: number,
+  catalogoid: number,
+  precioventa: number,
+  margenutilidad: number,
+): Promise<boolean> {
+  try {
+    const { error } = await supabaseAdmin
+      .from("productosxcatalogo")
+      .update({
+        precioventa,
+        margenutilidad,
+        fechaactualizacion: new Date().toISOString(),
+      })
+      .eq("productoid", productoid)
+      .eq("catalogoid", catalogoid)
+
+    if (error) {
+      console.error("Error actualizando relación producto-catálogo:", error)
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en actualizarProductoXCatalogo:", error)
+    return false
   }
 }
 
@@ -637,11 +712,6 @@ export async function eliminarProductoXCatalogo(productoid: number, catalogoid: 
     return false
   }
 }
-
-
-
-
-
 
 // Función: eliminarProductoIncompleto: función para eliminar un producto incompleto y sus detalles
 export async function eliminarProductoIncompleto(productoId: number) {
