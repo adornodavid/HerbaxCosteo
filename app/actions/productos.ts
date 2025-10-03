@@ -436,6 +436,9 @@ export async function obtenerCostoTotalProducto(productoId: number) {
   }
 }
 
+
+
+
 // Función: finalizarProducto: función para finalizar un producto con insert a productoxcatalogo y update de costo
 export async function finalizarProducto(productoId: number, catalogoId: number) {
   try {
@@ -480,8 +483,6 @@ export async function finalizarProducto(productoId: number, catalogoId: number) 
     return { success: false, error: "Error interno del servidor" }
   }
 }
-
-
 
 // Función: actualizarCostoProducto: función para actualizar solo el costo de un producto
 export async function actualizarCostoProducto(productoId: number) {
