@@ -124,7 +124,55 @@ export async function imagenBorrar(imageUrl: string, folder: string) {
   Funciones: Textos
 ================================================== */
 //Función: textoLimpiarParaProceder / textCleanToProcess: Quitar caracteres que pueden afectar proceso, evitar inyecciones SQL
+export function textoLimpiarParaProceder(texto: string): string {
+  // Validar que se recibió un string válido
+  if (!texto || typeof texto !== "string") {
+    return ""
+  }
 
+  // Eliminar espacios al inicio y final
+  let textoLimpio = texto.trim()
+
+  // Eliminar caracteres peligrosos para SQL y caracteres especiales
+  // Reemplazar comillas simples por comillas dobles para evitar SQL injection
+  textoLimpio = textoLimpio.replace(/'/g, "''")
+
+  // Eliminar caracteres de control y caracteres no imprimibles
+  textoLimpio = textoLimpio.replace(/[\x00-\x1F\x7F]/g, "")
+
+  // Eliminar secuencias peligrosas de SQL
+  const sqlPatterns = [
+    /--/g, // Comentarios SQL
+    /;/g, // Separador de comandos SQL
+    /\/\*/g, // Inicio de comentario multilinea
+    /\*\//g, // Fin de comentario multilinea
+    /xp_/gi, // Procedimientos extendidos
+    /sp_/gi, // Procedimientos del sistema
+  ]
+
+  sqlPatterns.forEach((pattern) => {
+    textoLimpio = textoLimpio.replace(pattern, "")
+  })
+
+  // Eliminar palabras clave peligrosas de SQL (case insensitive)
+  const sqlKeywords = [
+    /\bDROP\b/gi,
+    /\bDELETE\b/gi,
+    /\bTRUNCATE\b/gi,
+    /\bEXEC\b/gi,
+    /\bEXECUTE\b/gi,
+    /\bSCRIPT\b/gi,
+    /\bUNION\b/gi,
+    /\bINSERT\b/gi,
+    /\bUPDATE\b/gi,
+  ]
+
+  sqlKeywords.forEach((keyword) => {
+    textoLimpio = textoLimpio.replace(keyword, "")
+  })
+
+  return textoLimpio
+}
 
 //Función: textoEliminarCaracter / textDeleteChart: Quitar caracter de texto
 
