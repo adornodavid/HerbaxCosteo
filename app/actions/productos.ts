@@ -56,6 +56,15 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 ================================================== */
 
 /*==================================================
+    OBJETOS / CLASES
+================================================== */
+//Función: objetoProducto / oProducto (Individual): Esta funcion crea un objeto/clase de un producto de manera individual
+
+
+//Función: objetoProductos / oProductos (Listado): Esta funcion crea un objeto/clase de un listado de productos, es un array
+
+
+/*==================================================
     CREATES-CREAR (INSERTS)
 ================================================== */
 //Función: crearProducto: función para crear un producto
