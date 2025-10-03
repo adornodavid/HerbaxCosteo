@@ -624,7 +624,7 @@ export async function eliminarProductoIncompleto(productoId: number) {
 /*==================================================
   * SPECIALS-ESPECIALES ()
 ================================================== */
-// Función: listaDesplegableProductos:
+// Función: estatusActivoProducto:
 
 
 // Función: listaDesplegableProductos:
