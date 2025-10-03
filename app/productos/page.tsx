@@ -47,7 +47,7 @@ import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
 // -- Interfaces, Tipado, Clases, Objetos
 import type { Producto, ProductoCatalogo, ProductoListado, ProductosEstadisticas } from "@/types/productos"
-import type { DropdownItem } from "@/types/common"
+import type { ddlItem } from "@/types/common"
 
 /* ==================================================
   Interfaces, tipados, clases
