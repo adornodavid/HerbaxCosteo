@@ -2,9 +2,9 @@
   Interfaces:
     - Producto
     - ProductoCaracteristicas
-    - ProductoListado
-    - ProductoXCatalogo
-    - ProductoXCliente
+    - ProductosListado
+    - ProductosXCatalogo
+    - ProductosEstadisticas
 ================================================== */
 interface Producto {
   id: number
