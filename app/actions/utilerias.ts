@@ -54,7 +54,7 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
   if (imagen && imagen.size > 0) {
     const fileName = `${Date.now()}-${imagen.name}`
 
-    // Upload image to Supabase Storage
+    // Subier imagen a repositorio
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from("healthylab")
       .upload(`${folder}/${fileName}`, imagen)
