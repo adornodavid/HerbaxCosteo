@@ -18,7 +18,9 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   --------------------
   Objetos / Clases
   --------------------
-  
+  * Objetos
+    - objetoProducto / oProducto (Individual)
+    - ObjetoProductos / oProductos (Listado / Array)
   
   --------------------
   Funciones
