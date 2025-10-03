@@ -42,7 +42,10 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 /* ==================================================
   Funciones: Imagenes
 ================================================== */
+//Función: imagenSubir / imageUpload: Subir una imagen a un repositorio/folder
 
+
+//Función: imagenBorrar / imageDelete: Eliminar una imagen de un repositorio/folder
 
 /* ==================================================
   Funciones: Textos
