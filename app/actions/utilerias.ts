@@ -52,7 +52,7 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
   // Handle image upload if present
   const imagen = imageFile
   if (imagen && imagen.size > 0) {
-    const fileName = `${Date.now()}-${imagen.name}`
+    const fileName = `${name}-${Date.now()}`
 
     // Subier imagen a repositorio
     const { data: uploadData, error: uploadError } = await supabase.storage
