@@ -23,6 +23,13 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - imagenBorrar / imageDelete
 
   --------------------
+  Funciones: Textos
+	--------------------
+  *
+    - textoEliminarCaracter / textDeleteChart
+    - textoCambiarCaracter / textChangeChart
+
+  --------------------
   Funciones: Encryption
 	--------------------
 	* 
