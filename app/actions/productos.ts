@@ -162,6 +162,7 @@ export async function crearProducto(formData: FormData) {
     const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
     const activo = true
 
+    //Ejecutar Query
     const { data, error } = await supabase
       .from("productos")
       .insert({
@@ -178,15 +179,18 @@ export async function crearProducto(formData: FormData) {
       .select("id")
       .single()
 
+    //Return error
     if (error) {
       console.error("Error creando producto en app/Actions/productos en crearProducto:", error)
       return { success: false, error: error.message }
     }
 
     revalidatePath("/productos")
+
+    //Return resultados
     return { success: true, data: data.id }
   } catch (error) {
-    console.error("Error en crearProducto:", error)
+    console.error("Error en actions/productos en crearProducto:", error)
     return { success: false, error: "Error interno del servidor" }
   }
 }
