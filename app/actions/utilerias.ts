@@ -44,7 +44,9 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   Funciones: Imagenes
 ================================================== */
 //Función: imagenSubir / imageUpload: Subir una imagen a un repositorio/folder
-
+export async function crearProducto(formData: FormData) {
+  
+}
 
 //Función: imagenBorrar / imageDelete: Eliminar una imagen de un repositorio/folder
 
