@@ -160,6 +160,8 @@ export async function objetoProducto(
     //Varaibles y resultados del query
     const { data, error } = await query
 
+    //Llenar interface, sera retorno
+
     //Error en query
     if (error) {
       console.error("Error obteniendo productos:", error)
@@ -167,9 +169,9 @@ export async function objetoProducto(
     }
 
     //Retorno de data
-    
+
   }catch{
-    console.error("Error en app/actions/productos en obtenerProductos:", error)
+    console.error("Error en app/actions/productos en objetoProducto:", error)
     return { success: false, error: "Error interno del servidor" }
   }  
 }
