@@ -33,7 +33,7 @@ export interface FilterParams {
   fechaFin?: Date
 }
 
-interface DropdownItem {
+interface ddlItem {
   id: number
   nombre: string
 }
