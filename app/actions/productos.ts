@@ -68,9 +68,109 @@ export async function objetoProducto(
   activo = "Todos",
 ){
   try{
+    // Query principal
+    let query = supabase.from("productos").select(`
+        id,
+        codigo,
+        clienteid,
+        clientes!clienteid(nombre),
+        zonaid,
+        zonas!zonaid(nombre),
+        nombre,
+        imgurl,
+        unidadmedidaid,
+        unidadesmedida!unidadmedidaid(descripcion),
+        costo,
+        activo,
+        productoscaracteristicas!productoid(
+          descripcion,
+          presentacion,
+          porcion,
+          modouso,
+          porcionenvase,
+          categoriauso,
+          propositoprincipal,
+          propuestavalor,
+          instruccionesingesta,
+          edadminima,
+          advertencia,
+          condicionesalmacenamiento
+        ),
+        productosxcatalogo!productoid(
+          catalogoid,
+          precioventa,
+          margenutilidad,
+          catalogos!catalogoid(
+            nombre,
+            descripcion
+          )
+        ),
+        formulasxproducto!productoid(
+          formulaid,
+          formulas!formulaid(
+            codigo,
+            nombre,
+            unidadmedidaid,
+            unidadesmedida!unidadmedidaid(descripcion),
+            costo,
+            materiasprimasxformula!formulaid(
+              materiaprimaid,
+              cantidad,
+              costoparcial,
+              materiasprima!materiaprimaid(
+                codigo, 
+                nombre,
+                unidadmedidaid,
+                unidadesmedida!unidadmedidaid(descripcion),
+                costo
+              )
+            )
+          ),
+          cantidad,
+          costoparcial
+        )
+      `)
 
+    //Filtros en query, dependiendo parametros
+    if (productoid !== -1) {
+      query = query.eq("id", productoid)
+    }
+    if (clienteid !== -1) {
+      query = query.eq("clienteid", clienteid)
+    }
+    if (zonaid !== -1) {
+      query = query.eq("zonaid", zonaid)
+    }
+    if (productonombre !== "") {
+      query = query.ilike("nombre", `%${productonombre}%`)
+    }
+    if (activo !== "Todos") {
+      const isActive = ["True", "true", "Activo", "1", true].includes(activo)
+      const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
+      if (isActive) {
+        query = query.eq("activo", true)
+      } else if (isInactive) {
+        query = query.eq("activo", false)
+      }
+    }
+
+    //Ejecutar query
+    query = query.order("nombre", { ascending: true })
+
+    //Varaibles y resultados del query
+    const { data, error } = await query
+
+    //Error en query
+    if (error) {
+      console.error("Error obteniendo productos:", error)
+      return { success: false, error: error.message }
+    }
+
+    //Retorno de data
+    
   }catch{
-  
+    console.error("Error en app/actions/productos en obtenerProductos:", error)
+    return { success: false, error: "Error interno del servidor" }
   }  
 }
 
