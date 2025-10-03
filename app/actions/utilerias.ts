@@ -15,24 +15,24 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the supabase variable
 
 /* ==================================================
-	  Funciones
-	  --------------------
-		* CREATES/CREAR/INSERTS
-			- crearUsuario / insUsuario
-		* READS/OBTENER/SELECTS
-			- selXXXXX
-		* UPDATES/ACTUALIZAR/UPDATES
-			- updXXXXX
-		* DELETES/ELIMINAR/DELETES
-			- delXXXXX
-		* SPECIALS/ESPECIALES
-			- xxxXXXXX
+  Funciones: Imagenes
+  --------------------
+  *
+    - imagenSubir / imageUpload
+    - imagenUrl / imageUrl
+    - imagenBorrar / imageDelete
+
+  --------------------
+  Funciones: Encryption
+	--------------------
+	* 
+    - Encrypt - (Crypto-js)
+    - Desencrypt - (Crypto-js)
+    - HashData - (Bcrypt-js)
 	================================================== */
 
-//  Función: insUsuario
-
 /* ==================================================
-  Encryption Functions 
+  Funciones: Encryption
 ================================================== */
 // Función: Encrypt - (Crypto-js)
 export async function Encrypt(texto: string): Promise<string> {
