@@ -17,6 +17,9 @@
     - ProductosEstadisticas
 ================================================== */
 
+// Objetos / Clases
+
+
 // CRUD
 export interface Producto {
   id: number
