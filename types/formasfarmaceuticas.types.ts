@@ -1,12 +1,10 @@
 /* ==================================================
   Interfaces:
-    - Producto
-    - ProductoCaracteristicas
-    - ProductosListado
-    - ProductoXCatalogo
-    - ProductosEstadisticas
+    - FormaFarmaceutica
+    - FormaFarmaceuticaCrear
+    - FormaFarmaceuticaActualizar
 ================================================== */
-export interface Zona {
+export interface FormaFarmaceutica {
   id: number
   nombre: string
   activo: boolean
@@ -16,11 +14,11 @@ export interface Zona {
 
 
 
-export interface ZonaCrear {
+export interface FormaFarmaceuticaCrear {
   nombre: string
 }
 
-export interface ZonaActualizar {
+export interface FormaFarmaceuticaActualizar {
   id: number
   nombre?: string
   activo?: boolean
