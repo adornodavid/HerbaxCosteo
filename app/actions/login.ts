@@ -96,6 +96,7 @@ export async function procesarInicioSesion(email: string, password: string): Pro
     const sessionEncrypted = await Encrypt(sessionString)
 
     // Paso 5: Crear cookies de sesión
+    /*
     await setSessionCookies({
       UsuarioId: userData.id,
       Email: userData.email,
@@ -105,6 +106,7 @@ export async function procesarInicioSesion(email: string, password: string): Pro
       Permisos: permisosString,
       SesionActiva: true,
     })
+    */
 
     return {
       success: true,
