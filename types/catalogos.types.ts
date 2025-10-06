@@ -19,13 +19,22 @@ export interface Catalogo {
 }
 
 export interface CatalogoCrear {
-  nombre: string
+  clienteid: number | null
+  zonaid: number | null
+  nombre: string | null
+  descripcion: string | null
+  imgurl: string | null
+  fechacreacion: Date | null
 }
 
 export interface CatalogoActualizar {
-  id: number
-  nombre?: string
-  activo?: boolean
+  id: number | null
+  clienteid: number | null
+  zonaid: number | null
+  nombre: string | null
+  descripcion: string | null
+  imgurl: string | null
+  activo: boolean | null
 }
 
 // Especiales
