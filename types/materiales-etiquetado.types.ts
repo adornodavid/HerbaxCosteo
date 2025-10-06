@@ -38,3 +38,6 @@ export interface MaterialEtiquetadoActualizar {
 }
 
 // Especiales
+export interface MaterialEtiquetadoXProducto {
+  
+}
