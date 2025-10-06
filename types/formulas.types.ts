@@ -3,9 +3,9 @@
     - Formula
     - FormulaCrear
     - FormulaActualizar
-    - FormulasXProducto
-    - FormulasXProductoCrear
-    - FormulasXProductoActualizar
+    - FormulaXProducto
+    - FormulaXProductoCrear
+    - FormulaXProductoActualizar
   * Especiales:
 ================================================== */
 
@@ -40,7 +40,7 @@ export interface FormulaActualizar {
   activo: boolean | null
 }
 
-export interface FormulasXProducto {
+export interface FormulaXProducto {
   idrec: number | null
   productoid: number | null
   materialetiquetadodid: numbre | null
@@ -49,14 +49,14 @@ export interface FormulasXProducto {
   fechacreacion: Date | null
   activo: boolean | null
 }
-export interface FormulasXProductoCrear {
+export interface FormulaXProductoCrear {
   productoid: number | null
   materialetiquetadodid: numbre | null
   cantidad: number | null
   costoparcial: number | null
   fechacreacion: Date | null
 }
-export interface FormulasXProductoActualizar {
+export interface FormulaXProductoActualizar {
   productoid: number | null
   materialetiquetadodid: numbre | null
   cantidad: number | null
