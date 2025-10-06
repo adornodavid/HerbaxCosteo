@@ -55,6 +55,9 @@ export interface Producto {
       descripcion: string | null
     } | null
   }> | null
+  materialesetiquetadoxproducto: Array{
+    
+  }
   formulasxproducto: Array<{
     formulaid: number | null
     formulas:{
