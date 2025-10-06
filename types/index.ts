@@ -1,10 +1,12 @@
 /* ==================================================
-  Interfaces:
+  Catalogos:
     * CRUD:
       - Formula
       - FormulaCrear
       - FormulaActualizar
     * Especiales
+  
+  Principales
 ================================================== */
 
 // Usuarios
