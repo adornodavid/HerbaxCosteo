@@ -173,15 +173,3 @@ export interface ProductosEstadisticas {
   costoTotal: number // Cambiado de 'costo' a 'costoTotal' para mayor claridad
   tiempoPromedio: string
 }
-
-
-
-export interface ProductoCrear {
-  ProductoCodigo: string
-  ClienteId: number
-  ZonaId: number
-  ProductoNombre: string
-  ProductoImgUrl?: string
-  UnidadMedidaId: number
-  ProductoCosto: number
-}
