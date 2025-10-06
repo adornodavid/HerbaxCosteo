@@ -1,8 +1,14 @@
 /* ==================================================
+  Auxiliares
+    - configuraciones
+    - common
+  Gestión de usuarios y login:
+    - usuarios
+    - roles
+    - permisos
   Catalogos:
     - unidadesmedida
-    - formasfarmaceuticas
-  
+    - formasfarmaceuticas  
   Principales
 ================================================== */
 
