@@ -319,19 +319,7 @@ export async function obtenerProductos(
             descripcion
           )
         ),
-        materialesetiquetadoxproducto!productoid(
-          materialetiquetadoid,
-          materialesetiquetado!materialetiquetadoid(
-            codigo,
-            nombre,
-            imgurl,
-            unidadmedidaid,
-            unidadesmedida!unidadmedidaid(descripcion),
-            costo
-          ),
-          cantidad,
-          costoparcial
-        ),
+        
         formulasxproducto!productoid(
           formulaid,
           formulas!formulaid(
