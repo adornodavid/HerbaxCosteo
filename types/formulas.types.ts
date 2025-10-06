@@ -8,21 +8,33 @@
 
 // CRUD
 export interface Formula {
-  id: number
-  nombre: string
-  activo: boolean
-  fechacreacion?: Date
-  fechamodificacion?: Date
+  id: number | null
+  codigo: string | null
+  nombre: string | null
+  imgurl: string | null
+  unidadmedidaid: number | null
+  costo: number | null
+  fechacreacion: Date | null
+  activo: boolean | null
 }
 
 export interface FormulaCrear {
-  nombre: string
+  codigo: string | null
+  nombre: string | null
+  imgurl: string | null
+  unidadmedidaid: number | null
+  costo: number | null
+  fechacreacion: Date | null
 }
 
 export interface FormulaActualizar {
-  id: number
-  nombre?: string
-  activo?: boolean
+  id: number | null
+  codigo: string | null
+  nombre: string | null
+  imgurl: string | null
+  unidadmedidaid: number | null
+  costo: number | null
+  activo: boolean | null
 }
 
 // Especiales
