@@ -1,4 +1,10 @@
-export interface Cliente {
+/* ==================================================
+  Interfaces:
+    - Formula
+    - FormulaCrear
+    - FormulaActualizar
+================================================== */
+export interface Formula {
   id: number
   nombre: string
   activo: boolean
@@ -6,11 +12,11 @@ export interface Cliente {
   fechamodificacion?: Date
 }
 
-export interface ClienteCrear {
+export interface FormulaCrear {
   nombre: string
 }
 
-export interface ClienteActualizar {
+export interface FormulaActualizar {
   id: number
   nombre?: string
   activo?: boolean
