@@ -9,10 +9,12 @@
   Catalogos:
     - unidadesmedida
     - formasfarmaceuticas
-    - segmentos  
+    - segmentos  ?
+    - tipos ?
   Principales:
     - clientes
     - zonas
+    - catalogos
     - productos
     - materialesetiquetado
     - formulas
