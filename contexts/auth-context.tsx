@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { getSession } from "@/app/actions/session-actions"
 import type { DatosSesion } from "@/lib/types-sistema-costeo"
+import type { Session } from "@/types/usuarios"
 
 interface AuthContextType {
   user: DatosSesion | null
