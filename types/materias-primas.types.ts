@@ -3,6 +3,9 @@
     - MateriaPrima
     - MateriaPrimaCrear
     - MateriaPrimaActualizar
+    - MateriaPrimaXFormula
+    - MateriaPrimaXFormulaCrear
+    - MateriaPrimaXFormulaActualizar
   * Especiales:
 ================================================== */
 
@@ -37,4 +40,27 @@ export interface MateriaPrimaActualizar {
   activo: boolean | null
 }
 
+export interface MateriaPrimaXFormula {
+  idrec: number | null
+  productoid: number | null
+  formulaid: numbre | null
+  cantidad: number | null
+  costoparcial: number | null
+  fechacreacion: Date | null
+  activo: boolean | null
+}
+export interface MateriaPrimaXFormulaCrear {
+  productoid: number | null
+  formulaid: numbre | null
+  cantidad: number | null
+  costoparcial: number | null
+  fechacreacion: Date | null
+}
+export interface MateriaPrimaXFormulaActualizar {
+  productoid: number | null
+  formulaid: numbre | null
+  cantidad: number | null
+  costoparcial: number | null
+  activo: boolean | null
+}
 // Especiales
