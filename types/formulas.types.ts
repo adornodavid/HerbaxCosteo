@@ -1,8 +1,10 @@
 /* ==================================================
   Interfaces:
-    - Formula
-    - FormulaCrear
-    - FormulaActualizar
+    * CRUD:
+      - Formula
+      - FormulaCrear
+      - FormulaActualizar
+    * Especiales
 ================================================== */
 export interface Formula {
   id: number
