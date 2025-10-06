@@ -43,7 +43,7 @@ export interface UsuarioLogin {
 }
 
 // Especiales
-interface SessionData {
+interface Session {
   UsuarioId: string | null
   Email: string | null
   NombreCompleto: string | null
