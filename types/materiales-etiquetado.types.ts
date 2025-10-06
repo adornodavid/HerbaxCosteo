@@ -19,13 +19,22 @@ export interface MaterialEtiquetado {
 }
 
 export interface MaterialEtiquetadoCrear {
-  nombre: string
+  codigo: string | null
+  nombre: string | null
+  imgurl: string | null
+  unidadmedidaid: number | null
+  costo: number | null
+  fechacreacion: Date | null
 }
 
 export interface MaterialEtiquetadoActualizar {
-  id: number
-  nombre?: string
-  activo?: boolean
+  id: number | null
+  codigo: string | null
+  nombre: string | null
+  imgurl: string | null
+  unidadmedidaid: number | null
+  costo: number | null
+  activo: boolean | null
 }
 
 // Especiales
