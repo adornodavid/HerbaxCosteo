@@ -18,9 +18,6 @@
 ================================================== */
 
 // Objetos / Clases
-
-
-// CRUD
 export interface Producto {
   id: number
   codigo: string | null
@@ -105,6 +102,9 @@ export interface Producto {
     }
   }> | null
 }
+
+// CRUD
+
 
 export interface ProductoCaracteristicas{
   id: number
