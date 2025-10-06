@@ -1,11 +1,19 @@
 /* ==================================================
   Interfaces:
-    - Producto
-    - ProductoCaracteristicas
-    - ProductosListado
-    - ProductoXCatalogo
-    - ProductosEstadisticas
+    * CRUD
+      - Producto
+      - ProductoCaracteristicas
+      - ProductoCrear
+      - ProductoCaracteristicasCrear
+      - ProductoActualizar
+      - ProductoCaracteristicasActualizar
+    * Especiales
+      - ProductosListado
+      - ProductoXCatalogo
+      - ProductosEstadisticas
 ================================================== */
+
+// CRUD
 export interface Producto {
   id: number
   codigo: string | null
