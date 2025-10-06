@@ -4,7 +4,7 @@
   Imports
 ================================================== */
 import { cookies } from "next/headers"
-
+import type { Session } from "@/types/usuarios"
 /* ==================================================
   Interfaces, clases, objetos
 ================================================== */
@@ -31,7 +31,7 @@ export interface SessionData {
     - setSessionCookies
 ================================================== */
 // Función: getSession: función para obtener las cookies de la sesion creada
-export async function getSession(): Promise<SessionData | null> {
+export async function getSession(): Promise<Session | null> {
   try {
     const cookieStore = cookies()
 
@@ -63,7 +63,7 @@ export async function getSession(): Promise<SessionData | null> {
 }
 
 // Función: setSessionCookies: función para definir variables de sesion
-export async function setSessionCookies(sessionData: SessionData): Promise<void> {
+export async function setSessionCookies(sessionData: Session): Promise<void> {
   const cookieStore = cookies()
 
   // Configurar cookies con duración de 20 días
@@ -74,13 +74,13 @@ export async function setSessionCookies(sessionData: SessionData): Promise<void>
     sameSite: "lax" as const,
   }
 
-  cookieStore.set("UsuarioId", sessionData.UsuarioId.toString(), cookieOptions)
-  cookieStore.set("Email", sessionData.Email, cookieOptions)
-  cookieStore.set("NombreCompleto", sessionData.NombreCompleto, cookieOptions)
-  cookieStore.set("ClienteId", sessionData.ClienteId.toString(), cookieOptions)
-  cookieStore.set("RolId", sessionData.RolId.toString(), cookieOptions)
-  cookieStore.set("Permisos", sessionData.Permisos, cookieOptions)
-  cookieStore.set("SesionActiva", sessionData.SesionActiva.toString(), cookieOptions)
+  cookieStore.set("UsuarioId", Session.UsuarioId.toString(), cookieOptions)
+  cookieStore.set("Email", Session.Email, cookieOptions)
+  cookieStore.set("NombreCompleto", Session.NombreCompleto, cookieOptions)
+  cookieStore.set("ClienteId", Session.ClienteId.toString(), cookieOptions)
+  cookieStore.set("RolId", Session.RolId.toString(), cookieOptions)
+  cookieStore.set("Permisos", Session.Permisos, cookieOptions)
+  cookieStore.set("SesionActiva", Session.SesionActiva.toString(), cookieOptions)
 }
 
 // Función: clearSession: función para limpiar las cookies de la sesion creada
