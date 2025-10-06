@@ -109,7 +109,7 @@ export async function procesarInicioSesion(email: string, password: string): Pro
       redirect: "/dashboard",
     }
   } catch (error) {
-    console.error("Error en procesarInicioSesion:", error)
+    console.error("Error en actions/login en procesarInicioSesion:", error)
     return {
       success: false,
       message: "Error inesperado. Intenta nuevamente.",
