@@ -1,9 +1,12 @@
 /* ==================================================
   Interfaces:
-    - FormaFarmaceutica
-    - FormaFarmaceuticaCrear
-    - FormaFarmaceuticaActualizar
+    * CRUD
+      - FormaFarmaceutica
+      - FormaFarmaceuticaCrear
+      - FormaFarmaceuticaActualizar
 ================================================== */
+
+// CRUD
 export interface FormaFarmaceutica {
   id: number
   nombre: string
