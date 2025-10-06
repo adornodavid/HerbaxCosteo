@@ -39,6 +39,7 @@ export interface MaterialEtiquetadoActualizar {
 
 // Especiales
 export interface MaterialEtiquetadoXProducto {
+  idrec: number | null
   materialetiquetadodid: numbre | null
   cantidad: number | null
   costoparcial: number | null
