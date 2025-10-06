@@ -1,10 +1,9 @@
 /* ==================================================
-  Interfaces:
-    * CRUD
-      - Cliente
-      - ClienteCrear
-      - ClienteActualizar
-    * Especiales
+  * CRUD:
+    - Cliente
+    - ClienteCrear
+    - ClienteActualizar
+  * Especiales:
 ================================================== */
 
 // CRUD

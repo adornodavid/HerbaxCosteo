@@ -1,10 +1,9 @@
 /* ==================================================
-  Interfaces:
-    * CRUD
-      - MateriaPrima
-      - MateriaPrimaCrear
-      - MateriaPrimaActualizar
-    * Especiales
+  * CRUD:
+    - MateriaPrima
+    - MateriaPrimaCrear
+    - MateriaPrimaActualizar
+  * Especiales:
 ================================================== */
 
 // CRUD

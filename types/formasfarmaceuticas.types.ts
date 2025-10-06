@@ -1,9 +1,8 @@
 /* ==================================================
-  Interfaces:
-    * CRUD
-      - FormaFarmaceutica
-      - FormaFarmaceuticaCrear
-      - FormaFarmaceuticaActualizar
+  * CRUD
+    - FormaFarmaceutica
+    - FormaFarmaceuticaCrear
+    - FormaFarmaceuticaActualizar
 ================================================== */
 
 // CRUD

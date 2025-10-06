@@ -1,10 +1,9 @@
 /* ==================================================
-  Interfaces:
-    * CRUD
-      - Usuario
-      - UsuarioCrear
-      - UsuarioActualizar
-    * Especiales
+  * CRUD:
+    - Usuario
+    - UsuarioCrear
+    - UsuarioActualizar
+  * Especiales:
 ================================================== */
 
 // CRUD

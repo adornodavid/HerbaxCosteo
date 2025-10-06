@@ -1,10 +1,9 @@
 /* ==================================================
-  Interfaces:
-    * CRUD
-      - Zona
-      - ZonaCrear
-      - ZonaActualizar
-    * Especiales
+  * CRUD:
+    - Zona
+    - ZonaCrear
+    - ZonaActualizar
+  * Especiales:
 ================================================== */
 
 // CRUD

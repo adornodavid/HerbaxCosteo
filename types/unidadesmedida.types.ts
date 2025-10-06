@@ -1,10 +1,9 @@
 /* ==================================================
-  Interfaces:
-    * CRUD
-      - UnidadMedida
-      - UnidadMedidaCrear
-      - UnidadMedidaActualizar
-    * Especiales
+  * CRUD:
+    - UnidadMedida
+    - UnidadMedidaCrear
+    - UnidadMedidaActualizar
+  * Especiales:
 ================================================== */
 
 // CRUD

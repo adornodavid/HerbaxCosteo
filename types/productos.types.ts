@@ -1,16 +1,15 @@
 /* ==================================================
-  Interfaces:
-    * CRUD
-      - Producto
-      - ProductoCaracteristicas
-      - ProductoCrear
-      - ProductoCaracteristicasCrear
-      - ProductoActualizar
-      - ProductoCaracteristicasActualizar
-    * Especiales
-      - ProductosListado
-      - ProductoXCatalogo
-      - ProductosEstadisticas
+  * CRUD:
+    - Producto
+    - ProductoCaracteristicas
+    - ProductoCrear
+    - ProductoCaracteristicasCrear
+    - ProductoActualizar
+    - ProductoCaracteristicasActualizar
+  * Especiales:
+    - ProductosListado
+    - ProductoXCatalogo
+    - ProductosEstadisticas
 ================================================== */
 
 // CRUD

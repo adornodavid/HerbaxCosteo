@@ -1,10 +1,9 @@
 /* ==================================================
-  Interfaces:
-    * CRUD
-      - Catalogo
-      - CatalogoCrear
-      - CatalogoActualizar
-    * Especiales
+  * CRUD:
+    - Catalogo
+    - CatalogoCrear
+    - CatalogoActualizar
+  * Especiales:
 ================================================== */
 
 // CRUD
