@@ -118,6 +118,34 @@ export interface ProductoCaracteristicas{
   condicionesalmacenamiento: string | null
 }
 
+export interface ProductoXCatalogo {
+  idrec: number | null
+  catalogoid: number | null
+  productoid: numbre | null
+  cantidad: number | null
+  precioventa: number | null
+  margenutilidad: number | null
+  fechacreacion: Date | null
+  activo: boolean | null
+}
+export interface ProductoXCatalogoCrear {
+  catalogoid: number | null
+  productoid: numbre | null
+  cantidad: number | null
+  precioventa: number | null
+  margenutilidad: number | null
+  fechacreacion: Date | null
+}
+export interface ProductoXCatalogoActualizar {
+  catalogoid: number | null
+  productoid: numbre | null
+  cantidad: number | null
+  precioventa: number | null
+  margenutilidad: number | null
+  activo: boolean | null
+}
+
+// Especiales
 export interface ProductosListado {
   ProductoId: number
   ProductoNombre: string
@@ -139,15 +167,7 @@ export interface ProductosEstadisticas {
   tiempoPromedio: string
 }
 
-export interface ProductoXCatalogo {
-  catalogoid: number | null
-  precioventa: number | null
-  margenutilidad: number | null
-  catalogos: {
-    nombre: string | null
-    descripcion: string | null
-  }
-}
+
 
 export interface ProductoCrear {
   ProductoCodigo: string
