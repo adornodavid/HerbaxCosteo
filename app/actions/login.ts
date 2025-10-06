@@ -7,12 +7,26 @@ import { supabase } from "@/lib/supabase"
 import { setSessionCookies } from "./session-actions"
 import { cerrarSesion } from "./session-actions-with-expiration" // Importar cerrarSesion
 
-export interface LoginResult {
-  success: boolean
-  message: string
-  redirect?: string
-}
+/* ==================================================
+	  Funciones
+	  --------------------
+		* Inicio
+      - procesarInicioSesion
+    * Cerrar
+      - procesarCerrarSesion
 
+      - getSession
+      - setSessionCookies
+      - clearSession
+      - crearSesionConExpiracion
+      - obtenerVariablesSesion
+      - cerrarSesion
+      - obtenerTiempoRestanteSesion
+      - renovarSesion
+      - 
+	================================================== */
+
+// procesarInicioSesion: funcion para iniciar sesion en el sistema
 export async function procesarInicioSesion(email: string, password: string): Promise<LoginResult> {
   try {
     // Paso 1: Validar credenciales
@@ -91,6 +105,9 @@ export async function procesarInicioSesion(email: string, password: string): Pro
     }
   }
 }
+
+// Funcion: procesarCerrarSesion
+
 
 // Nueva función para cerrar sesión
 export async function logout(): Promise<void> {
