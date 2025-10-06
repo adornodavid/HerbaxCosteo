@@ -51,6 +51,14 @@ export interface SessionData {
 // Función: obtenerSesion / getSession: función para obtener las cookies de la sesion creada
 export async function obtenerSesion(): Promise<Session | null> {
   try {
+    // Paso 1: Obtener la cooki desencriptada
+
+    // Paso 2: dividir string de cookie desencriptada, dividir por | y guardar en un array
+
+    // Paso 3: recorrer array y volver a dividir cada 1 por : y crear su variable de acuerdo al caso, excepto permisos, alli se vuelve a dividir por _ y se crea otro array para guardar en su variable 
+
+
+    
     const cookieStore = cookies()
 
     const usuarioId = cookieStore.get("UsuarioId")?.value
