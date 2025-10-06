@@ -7,12 +7,9 @@
 export interface FormaFarmaceutica {
   id: number
   nombre: string
-  activo: boolean
-  fechacreacion?: Date
-  fechamodificacion?: Date
+  descripcion: string
+  
 }
-
-
 
 export interface FormaFarmaceuticaCrear {
   nombre: string
