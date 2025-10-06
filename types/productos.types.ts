@@ -6,7 +6,7 @@
     - ProductoXCatalogo
     - ProductosEstadisticas
 ================================================== */
-interface Producto {
+export interface Producto {
   id: number
   codigo: string | null
   clienteid: number | null
@@ -76,7 +76,7 @@ interface Producto {
   }> | null
 }
 
-interface ProductoCaracteristicas{
+export interface ProductoCaracteristicas{
   id: number
   productoid: number
   descripcion: string | null
@@ -93,7 +93,7 @@ interface ProductoCaracteristicas{
   condicionesalmacenamiento: string | null
 }
 
-interface ProductosListado {
+export interface ProductosListado {
   ProductoId: number
   ProductoNombre: string
   ProductoDescripcion: string
@@ -107,14 +107,14 @@ interface ProductosListado {
   CatalogoNombre: string
 }
 
-interface ProductosEstadisticas {
+export interface ProductosEstadisticas {
   totalProductos: number
   costoPromedio: number
   costoTotal: number // Cambiado de 'costo' a 'costoTotal' para mayor claridad
   tiempoPromedio: string
 }
 
-interface ProductoXCatalogo {
+export interface ProductoXCatalogo {
   catalogoid: number | null
   precioventa: number | null
   margenutilidad: number | null
