@@ -104,9 +104,77 @@ export interface oProducto {
 }
 
 // CRUD
-
+export interface Producto{
+  id: number | null
+  codigo: string | null
+  clienteid: number | null
+  zonaid: number | null
+  nombre: string | null
+  imgurl: string | null
+  unidadmedidaid: number | null
+  costo: number | null
+  fechacreacion: date | null
+  activo: boolean | null
+}
+export interface ProductoCrear{
+  codigo: string | null
+  clienteid: number | null
+  zonaid: number | null
+  nombre: string | null
+  imgurl: string | null
+  unidadmedidaid: number | null
+  costo: number | null
+  fechacreacion: date | null
+}
+export interface ProductoActualizar{
+  id: number | null
+  codigo: string | null
+  clienteid: number | null
+  zonaid: number | null
+  nombre: string | null
+  imgurl: string | null
+  unidadmedidaid: number | null
+  costo: number | null
+  activo: boolean | null
+}
 
 export interface ProductoCaracteristicas{
+  id: number
+  productoid: number
+  descripcion: string | null
+  presentacion: string | null
+  porcion: string | null
+  modouso: string | null
+  porcionenvase: string | null
+  categoriauso: string | null
+  propositoprincipal: string | null
+  propuestavalor: string | null
+  instruccionesingesta: string | null
+  edadminima: number | null
+  advertencia: string | null
+  condicionesalmacenamiento: string | null
+  fechacreacion: Date | null
+  activo: boolean | null
+}
+export interface ProductoCaracteristicasCrear{
+  id: number
+  productoid: number
+  descripcion: string | null
+  presentacion: string | null
+  porcion: string | null
+  modouso: string | null
+  porcionenvase: string | null
+  categoriauso: string | null
+  propositoprincipal: string | null
+  propuestavalor: string | null
+  instruccionesingesta: string | null
+  edadminima: number | null
+  advertencia: string | null
+  condicionesalmacenamiento: string | null
+  fechacreacion: Date | null
+  activo: boolean | null
+}
+export interface ProductoCaracteristicasActualizar{
   id: number
   productoid: number
   descripcion: string | null
