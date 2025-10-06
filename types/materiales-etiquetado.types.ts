@@ -3,6 +3,9 @@
     - MaterialEtiquetado
     - MaterialEtiquetadoCrear
     - MaterialEtiquetadoActualizar
+    - MaterialEtiquetadoXProducto
+    - MaterialEtiquetadoXProductoCrear
+    - MaterialEtiquetadoXProductoActualizar
   * Especiales:
 ================================================== */
 
@@ -37,7 +40,6 @@ export interface MaterialEtiquetadoActualizar {
   activo: boolean | null
 }
 
-// Especiales
 export interface MaterialEtiquetadoXProducto {
   idrec: number | null
   productoid: number | null
@@ -47,3 +49,5 @@ export interface MaterialEtiquetadoXProducto {
   fechacreacion: Date | null
   activo: boolean | null
 }
+
+// Especiales
