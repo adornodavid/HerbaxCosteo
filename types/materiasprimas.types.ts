@@ -1,3 +1,13 @@
+/* ==================================================
+  Interfaces:
+    * CRUD
+      - MateriaPrima
+      - MateriaPrimaCrear
+      - MateriaPrimaActualizar
+    * Especiales
+================================================== */
+
+// CRUD
 export interface Cliente {
   id: number
   nombre: string
