@@ -15,6 +15,8 @@ import { cerrarSesion } from "./session-actions-with-expiration" // Importar cer
     * Cerrar
       - procesarCerrarSesion
 
+      - validateLoginBackend
+      
 
 
 
@@ -34,6 +36,9 @@ import { cerrarSesion } from "./session-actions-with-expiration" // Importar cer
 // procesarInicioSesion: funcion para iniciar sesion en el sistema
 export async function procesarInicioSesion(email: string, password: string): Promise<LoginResult> {
   try {
+    // Paso 1: Hastear el password introducido
+
+    
     // Paso 1: Validar credenciales
     const { data: usuarios, error: loginError } = await supabase
       .from("usuarios")
