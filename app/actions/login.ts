@@ -41,7 +41,7 @@ export async function procesarInicioSesion(email: string, password: string): Pro
     // Paso 1: Encriptar el password introducido
     const PasswordHash = await HashData(password)
 
-    // Paso 1: Validar credenciales
+    // Paso 2: Validar credenciales
     const { data: usuarios, error: loginError } = await supabase
       .from("usuarios")
       .select("*")
@@ -50,13 +50,12 @@ export async function procesarInicioSesion(email: string, password: string): Pro
       .eq("activo", true)
 
     if (loginError) {
-      console.error("Error en consulta de login:", loginError)
+      console.error("Error en app/actions/login, en paso 2 de consulta de usuario en tabla:", loginError)
       return {
         success: false,
         message: "Error en el servidor. Intenta nuevamente.",
       }
     }
-
     if (!usuarios || usuarios.length === 0) {
       return {
         success: false,
