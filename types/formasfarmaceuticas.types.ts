@@ -1,0 +1,6 @@
+/* ==================================================
+  Interfaces:
+    - FormaFarmaceutica
+    - FormaFarmaceuticaCrear
+    - FormaFarmaceuticaActualizar
+================================================== */
