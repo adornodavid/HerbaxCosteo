@@ -104,7 +104,7 @@ export async function obtenerSesion(): Promise<Session | null> {
       NombreCompleto: NombreCompleto || "",
       ClienteId: Number.parseInt(ClienteId || "0"),
       RolId: Number.parseInt(RolId || "0"),
-      Permisos: Permisos.join("_") || "",
+      Permisos: Permisos || "",
       SesionActiva: SesionActiva === "true",
     }
   } catch (error) {
