@@ -14,8 +14,8 @@ export interface Catalogo {
   nombre: string | null
   descripcion: string | null
   imgurl: string | null
-  activo: boolean
-  fechacreacion?: Date
+  activo: boolean | null
+  fechacreacion: Date | null
 }
 
 export interface CatalogoCrear {
