@@ -1,10 +1,6 @@
 /* ==================================================
   Catalogos:
-    * CRUD:
-      - Formula
-      - FormulaCrear
-      - FormulaActualizar
-    * Especiales
+    - unidadesmedida
   
   Principales
 ================================================== */
@@ -25,7 +21,7 @@ export * from "./zonas.types"
 export * from "./categorias.types"
 
 // Unidades de Medida
-export * from "./unidades-medida.types"
+export * from "./unidadesmedida.types"
 
 // Common types
 export * from "./common.types"
