@@ -16,7 +16,7 @@ export interface SessionData {
   NombreCompleto: string
   ClienteId: number
   RolId: number
-  Permisos: string
+  Permisos: string[]
   SesionActiva: boolean
 }
 
@@ -104,7 +104,7 @@ export async function obtenerSesion(): Promise<Session | null> {
       NombreCompleto: NombreCompleto || "",
       ClienteId: Number.parseInt(ClienteId || "0"),
       RolId: Number.parseInt(RolId || "0"),
-      Permisos: Permisos || "",
+      Permisos: Permisos || [],
       SesionActiva: SesionActiva === "true",
     }
   } catch (error) {
@@ -169,7 +169,7 @@ export async function setSessionCookies(sessionData: Session): Promise<void> {
   cookieStore.set("NombreCompleto", sessionData.NombreCompleto, cookieOptions)
   cookieStore.set("ClienteId", sessionData.ClienteId.toString(), cookieOptions)
   cookieStore.set("RolId", sessionData.RolId.toString(), cookieOptions)
-  cookieStore.set("Permisos", sessionData.Permisos, cookieOptions)
+  cookieStore.set("Permisos", sessionData.Permisos.join("_"), cookieOptions)
   cookieStore.set("SesionActiva", sessionData.SesionActiva.toString(), cookieOptions)
 }
 
