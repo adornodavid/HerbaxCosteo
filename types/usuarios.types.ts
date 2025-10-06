@@ -8,13 +8,14 @@
 
 // CRUD
 export interface Usuario {
-  id: number
-  nombre: string
-  email: string
-  password?: string
-  activo: boolean
-  fechacreacion?: Date
-  fechamodificacion?: Date
+  id: number | null
+  nombrecompleto: string | null
+  email: string | null
+  password: string | null
+  rolid: number  | null
+  clienteid: number | null
+  fechacreacion: Date | null
+  activo: boolean | null
 }
 
 export interface UsuarioCrear {
