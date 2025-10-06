@@ -155,8 +155,8 @@ export async function obtenerSesionCookies(): Promise<string | null> {
   }
 }
 
-// Función: borrarCookies / deleteCookies: función para limpiar las cookies de la sesion creada
-export async function borrarCookies(): Promise<void> {
+// Función: eliminarSesionCookies / deleteSessionCookies: función para limpiar las cookies de la sesion creada
+export async function eliminarSesionCookies(): Promise<void> {
   const cookieStore = cookies()
 
   cookieStore.delete("HealthyLabCosteo")
