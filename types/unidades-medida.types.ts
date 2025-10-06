@@ -8,21 +8,20 @@
 
 // CRUD
 export interface UnidadMedida {
-  id: number
-  descripcion: string
-  activo: boolean
-  fechacreacion?: Date
-  fechamodificacion?: Date
+  id: number | null
+  descripcion: string | null
+  calculoconversion: number | null
 }
 
 export interface UnidadMedidaCrear {
-  descripcion: string
+  descripcion: string | null
+  calculoconversion: number | null
 }
 
 export interface UnidadMedidaActualizar {
-  id: number
-  descripcion?: string
-  activo?: boolean
+  id: number | null
+  descripcion: string | null
+  calculoconversion: number | null
 }
 
 // Especiales
