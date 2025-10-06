@@ -5,6 +5,8 @@
 ================================================== */
 import { cookies } from "next/headers"
 import type { Session } from "@/types/usuarios"
+import { Encrypt, Desencrypt } from "./utilerias"
+
 /* ==================================================
   Interfaces, clases, objetos
 ================================================== */
@@ -23,6 +25,7 @@ export interface SessionData {
   --------------------
   * SESSION
     - obtenerSesion / getSession
+    - crearSesion / setSession
     - establecerSesionCookies / setSessionCookies
     - limpiarSesion / clearSession
     - crearSesionConExpiracion
