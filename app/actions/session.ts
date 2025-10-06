@@ -79,6 +79,9 @@ export async function getSession(): Promise<Session | null> {
   }
 }
 
+// Funcion: establecerSesionCookies / setSessionCookies: Función donde se crea la cookie/ticket
+
+
 // Función: setSessionCookies: función para definir variables de sesion
 export async function setSessionCookies(sessionData: Session): Promise<void> {
   const cookieStore = cookies()
