@@ -43,3 +43,13 @@ export interface UsuarioLogin {
 }
 
 // Especiales
+interface SessionData {
+  UsuarioId: string | null
+  Email: string | null
+  NombreCompleto: string | null
+  HotelId: string | null
+  RolId: string | null
+  Permisos: string[] | null
+  SesionActiva: boolean | null
+  ClienteId: string | null // Added ClienteId to SessionData
+}
