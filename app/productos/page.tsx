@@ -174,7 +174,7 @@ export default function ProductosPage() {
       )
 
       if (result.success && result.data) {
-        const transformedData: Producto[] = result.data.map((p: Producto) => ({
+        const transformedData: oProducto[] = result.data.map((p: oProducto) => ({
           id: p.id,
           codigo: p.codigo,
           clienteid: p.clienteid,
@@ -293,7 +293,7 @@ export default function ProductosPage() {
         }))
         */
 
-        const productosListado: ProductoListado[] = transformedData.map((p: Producto) => ({
+        const productosListado: ProductoListado[] = transformedData.map((p: oProducto) => ({
           ProductoId: p.id,
           ProductoNombre: p.nombre || "Sin nombre",
           ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
@@ -353,7 +353,7 @@ export default function ProductosPage() {
       if (productosResult.success && productosResult.data) {
         console.log("[v0] Primer registro raw:", productosResult.data[0])
 
-        const transformedData: Producto[] = productosResult.data.map((p: Producto) => ({
+        const transformedData: oProducto[] = productosResult.data.map((p: oProducto) => ({
           id: p.id,
           codigo: p.codigo,
           clienteid: p.clienteid,
@@ -458,7 +458,7 @@ export default function ProductosPage() {
         )
         console.log("[v0] Total registros transformados:", transformedData.length)
 
-        const productosListado: ProductoListado[] = transformedData.map((p: Producto) => ({
+        const productosListado: ProductoListado[] = transformedData.map((p: oProducto) => ({
           ProductoId: p.id,
           ProductoNombre: p.nombre || "Sin nombre",
           ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
