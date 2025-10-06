@@ -8,21 +8,23 @@
 
 // CRUD
 export interface Zona {
-  id: number
-  nombre: string
-  activo: boolean
-  fechacreacion?: Date
-  fechamodificacion?: Date
+  id: number | null
+  nombre: string | null
+  clave: string | null
+  imgurl: string | null
 }
 
 export interface ZonaCrear {
-  nombre: string
+  nombre: string | null
+  clave: string | null
+  imgurl: string | null
 }
 
 export interface ZonaActualizar {
-  id: number
-  nombre?: string
-  activo?: boolean
+  id: number | null
+  nombre: string | null
+  clave: string | null
+  imgurl: string | null
 }
 
 // Especiales
