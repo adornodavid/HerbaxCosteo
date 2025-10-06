@@ -4,11 +4,11 @@ import type React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { getSession } from "@/app/actions/session-actions"
-import type { DatosSesion } from "@/lib/types-sistema-costeo"
+//import type { DatosSesion } from "@/lib/types-sistema-costeo"
 import type { Session } from "@/types/usuarios"
 
 interface AuthContextType {
-  user: DatosSesion | null
+  user: Session | null
   isLoading: boolean
   selectedHotel: number | null
   setSelectedHotel: (hotelId: number | null) => void
@@ -18,7 +18,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<DatosSesion | null>(null)
+  const [user, setUser] = useState<Session | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedHotel, setSelectedHotel] = useState<number | null>(null)
   const router = useRouter()
@@ -33,7 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (session) {
           setUser(session)
-          setSelectedHotel(session.HotelId || null)
+          setSelectedHotel(session.ClienteId || null)
         } else if (!publicRoutes.includes(pathname)) {
           router.push("/login")
         }
