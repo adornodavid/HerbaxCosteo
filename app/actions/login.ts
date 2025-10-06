@@ -15,9 +15,14 @@ import { cerrarSesion } from "./session-actions-with-expiration" // Importar cer
     * Cerrar
       - procesarCerrarSesion
 
-      - getSession
-      - setSessionCookies
-      - clearSession
+
+
+
+
+    * SESSION
+      - obtenerSesion / getSession
+      - establecerSesionCookies / setSessionCookies
+      - limpiarSesion / clearSession
       - crearSesionConExpiracion
       - obtenerVariablesSesion
       - cerrarSesion
