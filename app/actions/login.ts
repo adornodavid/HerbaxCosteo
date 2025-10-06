@@ -92,7 +92,7 @@ export async function procesarInicioSesion(email: string, password: string): Pro
     // Crear string de permisos separados por |
     const permisosString = permisos?.map((p) => p.permisoid).join("|") || ""
 
-    // Paso 4: Crear cookies de sesión
+    // Paso 5: Crear cookies de sesión
     await setSessionCookies({
       UsuarioId: userData.id,
       Email: userData.email,
