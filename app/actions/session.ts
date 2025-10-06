@@ -48,7 +48,7 @@ export interface SessionData {
 
 // Función: crearSesion / setSession: Funcion donde se crea la sesion
 
-// Función: getSession: función para obtener las cookies de la sesion creada
+// Función: obtenerSesion / getSession: función para obtener las cookies de la sesion creada
 export async function getSession(): Promise<Session | null> {
   try {
     const cookieStore = cookies()
