@@ -19,6 +19,7 @@
     - materialesetiquetado
     - formulas
     - materiasprimas
+    - historicos
 ================================================== */
 
 // Usuarios
