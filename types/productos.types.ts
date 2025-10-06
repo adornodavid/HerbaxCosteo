@@ -97,7 +97,7 @@ interface ProductosEstadisticas {
   tiempoPromedio: string
 }
 
-interface ProductoCatalogo {
+interface ProductoXCatalogo {
   catalogoid: number | null
   precioventa: number | null
   margenutilidad: number | null
