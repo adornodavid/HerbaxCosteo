@@ -7,8 +7,8 @@
     - roles
     - permisos
   Catalogos:
-    - unidadesmedida
-    - formasfarmaceuticas
+    - unidades-medida
+    - formas-farmaceuticas
     - segmentos  ?
     - tipos ?
   Principales:
@@ -16,9 +16,9 @@
     - zonas
     - catalogos
     - productos
-    - materialetiquetado
+    - materiales-etiquetado
     - formulas
-    - materiasprimas
+    - materias-primas
     - historicos
 ================================================== */
 
