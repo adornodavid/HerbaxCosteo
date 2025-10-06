@@ -5,7 +5,7 @@
 ================================================== */
 import { cookies } from "next/headers"
 import type { Session } from "@/types/usuarios"
-import { Encrypt, Desencrypt } from "./utilerias"
+import { Desencrypt } from "./utilerias"
 
 /* ==================================================
   Interfaces, clases, objetos
@@ -47,7 +47,6 @@ export interface SessionData {
 ================================================== */
 
 // Función: crearSesion / setSession: Funcion donde se crea la sesion
-
 
 // Función: getSession: función para obtener las cookies de la sesion creada
 export async function getSession(): Promise<Session | null> {
@@ -97,19 +96,21 @@ export async function establecerSesionCookies(SesionEncriptada: string): Promise
 }
 
 // Función: obtenerSesionCookies / getSessionCookies: Función para obtener las cookies de la sesion, cookies/ticket/cookiencriptda
-export async function obtenerSesionCookies(): Promise<String | null> {
+export async function obtenerSesionCookies(): Promise<string | null> {
   try {
     const cookieStore = cookies()
 
     const CookieEncriptada = cookieStore.get("HealthyLabCosteo")?.value
 
     if (!CookieEncriptada) {
+      console.error("Error: No se pudo obtener la cookie encriptada HealthyLabCosteo")
       return null
     }
 
-    return {
-      CookieEncriptada: CookieEncriptada,
-    }
+    // Desencriptar la cookie
+    const CookieDesencriptada = await Desencrypt(CookieEncriptada)
+
+    return CookieDesencriptada
   } catch (error) {
     console.error("Error obteniendo las cookies encriptadas en app/actions/session:", error)
     return null
@@ -128,13 +129,13 @@ export async function setSessionCookies(sessionData: Session): Promise<void> {
     sameSite: "lax" as const,
   }
 
-  cookieStore.set("UsuarioId", Session.UsuarioId.toString(), cookieOptions)
-  cookieStore.set("Email", Session.Email, cookieOptions)
-  cookieStore.set("NombreCompleto", Session.NombreCompleto, cookieOptions)
-  cookieStore.set("ClienteId", Session.ClienteId.toString(), cookieOptions)
-  cookieStore.set("RolId", Session.RolId.toString(), cookieOptions)
-  cookieStore.set("Permisos", Session.Permisos, cookieOptions)
-  cookieStore.set("SesionActiva", Session.SesionActiva.toString(), cookieOptions)
+  cookieStore.set("UsuarioId", sessionData.UsuarioId.toString(), cookieOptions)
+  cookieStore.set("Email", sessionData.Email, cookieOptions)
+  cookieStore.set("NombreCompleto", sessionData.NombreCompleto, cookieOptions)
+  cookieStore.set("ClienteId", sessionData.ClienteId.toString(), cookieOptions)
+  cookieStore.set("RolId", sessionData.RolId.toString(), cookieOptions)
+  cookieStore.set("Permisos", sessionData.Permisos, cookieOptions)
+  cookieStore.set("SesionActiva", sessionData.SesionActiva.toString(), cookieOptions)
 }
 
 // Función: clearSession: función para limpiar las cookies de la sesion creada
