@@ -43,7 +43,7 @@ export interface FormulaActualizar {
 export interface FormulaXProducto {
   idrec: number | null
   productoid: number | null
-  formulaid: numbre | null
+  formulaid: number | null
   cantidad: number | null
   costoparcial: number | null
   fechacreacion: Date | null
@@ -51,14 +51,14 @@ export interface FormulaXProducto {
 }
 export interface FormulaXProductoCrear {
   productoid: number | null
-  formulaid: numbre | null
+  formulaid: number | null
   cantidad: number | null
   costoparcial: number | null
   fechacreacion: Date | null
 }
 export interface FormulaXProductoActualizar {
   productoid: number | null
-  formulaid: numbre | null
+  formulaid: number | null
   cantidad: number | null
   costoparcial: number | null
   activo: boolean | null

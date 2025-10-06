@@ -43,7 +43,7 @@ export interface MateriaPrimaActualizar {
 export interface MateriaPrimaXFormula {
   idrec: number | null
   formulaid: number | null
-  materiaprimaid: numbre | null
+  materiaprimaid: number | null
   cantidad: number | null
   costoparcial: number | null
   fechacreacion: Date | null
@@ -51,14 +51,14 @@ export interface MateriaPrimaXFormula {
 }
 export interface MateriaPrimaXFormulaCrear {
   formulaid: number | null
-  materiaprimaid: numbre | null
+  materiaprimaid: number | null
   cantidad: number | null
   costoparcial: number | null
   fechacreacion: Date | null
 }
 export interface MateriaPrimaXFormulaActualizar {
   formulaid: number | null
-  materiaprimaid: numbre | null
+  materiaprimaid: number | null
   cantidad: number | null
   costoparcial: number | null
   activo: boolean | null

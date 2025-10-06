@@ -43,7 +43,7 @@ export interface MaterialEtiquetadoActualizar {
 export interface MaterialEtiquetadoXProducto {
   idrec: number | null
   productoid: number | null
-  materialetiquetadodid: numbre | null
+  materialetiquetadodid: number | null
   cantidad: number | null
   costoparcial: number | null
   fechacreacion: Date | null
@@ -51,14 +51,14 @@ export interface MaterialEtiquetadoXProducto {
 }
 export interface MaterialEtiquetadoXProductoCrear {
   productoid: number | null
-  materialetiquetadodid: numbre | null
+  materialetiquetadodid: number | null
   cantidad: number | null
   costoparcial: number | null
   fechacreacion: Date | null
 }
 export interface MaterialEtiquetadoXProductoActualizar {
   productoid: number | null
-  materialetiquetadodid: numbre | null
+  materialetiquetadodid: number | null
   cantidad: number | null
   costoparcial: number | null
   activo: boolean | null
