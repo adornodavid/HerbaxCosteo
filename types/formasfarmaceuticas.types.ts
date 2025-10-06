@@ -1,3 +1,11 @@
+/* ==================================================
+  Interfaces:
+    - Producto
+    - ProductoCaracteristicas
+    - ProductosListado
+    - ProductoXCatalogo
+    - ProductosEstadisticas
+================================================== */
 export interface Zona {
   id: number
   nombre: string
