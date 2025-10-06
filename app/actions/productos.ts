@@ -69,7 +69,7 @@ export async function objetoProducto(
   zonaid = -1,
   catalogoid = -1,
   activo = "Todos",
-): Promise<{ success: boolean; data?: Producto; error?: string }> {
+): Promise<{ success: boolean; data?: oProducto; error?: string }> {
   try {
     const resultado = await obtenerProductos(productoid, productonombre, clienteid, zonaid, catalogoid, activo)
 
@@ -81,7 +81,7 @@ export async function objetoProducto(
       return { success: false, error: "Producto no encontrado" }
     }
 
-    const producto: Producto = resultado.data[0] as Producto
+    const producto: oProducto = resultado.data[0] as oProducto
 
     return { success: true, data: producto }
   } catch (error) {
@@ -98,7 +98,7 @@ export async function objetoProductos(
   zonaid = -1,
   catalogoid = -1,
   activo = "Todos",
-): Promise<{ success: boolean; data?: Producto[]; error?: string }> {
+): Promise<{ success: boolean; data?: oProducto[]; error?: string }> {
   try {
     const resultado = await obtenerProductos(productoid, productonombre, clienteid, zonaid, catalogoid, activo)
 
@@ -106,7 +106,7 @@ export async function objetoProductos(
       return { success: false, error: resultado.error || "No se encontraron datos" }
     }
 
-    const productos: Producto[] = resultado.data as Producto[]
+    const productos: oProducto[] = resultado.data as oProducto[]
 
     return { success: true, data: productos }
   } catch (error) {
