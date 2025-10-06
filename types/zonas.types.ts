@@ -1,3 +1,13 @@
+/* ==================================================
+  Interfaces:
+    * CRUD
+      - Zona
+      - ZonaCrear
+      - ZonaActualizar
+    * Especiales
+================================================== */
+
+// CRUD
 export interface Zona {
   id: number
   nombre: string
