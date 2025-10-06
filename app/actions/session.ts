@@ -27,8 +27,10 @@ export interface SessionData {
     - crearSesion / setSession
     - obtenerSesion / getSession
     - establecerSesionCookies / setSessionCookies
+    - obtenerSesionCookies / getSessionCookies
+
     - limpiarSesion / clearSession
-    - crearSesionConExpiracion
+    - crearSesionConExpiracion x
     - obtenerVariablesSesion
     - cerrarSesion
     - obtenerTiempoRestanteSesion
@@ -77,6 +79,21 @@ export async function getSession(): Promise<Session | null> {
     console.error("Error getting session:", error)
     return null
   }
+}
+
+// Funcion: establecerSesionCookies / setSessionCookies: Función donde se crea la cookie/ticket
+export async function establecerSesionCookies(SesionEncriptada: string): Promise<void> {
+  const cookieStore = cookies()
+
+  // Configurar cookies con duración de 1 día
+  const cookieOptions = {
+    maxAge: 1 * 24 * 60 * 60, // 1 días en segundos
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+  }
+
+  cookieStore.set("HealthyLabCosteo", SesionEncriptada.toString(), cookieOptions)
 }
 
 // Función: setSessionCookies: función para definir variables de sesion
