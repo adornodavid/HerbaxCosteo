@@ -5,7 +5,7 @@
 ================================================== */
 import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
-import type { Producto } from "@/types/productos.types"
+import type { oProducto } from "@/types/productos.types"
 import { imagenSubir } from "@/app/actions/utilerias"
 
 /* ==================================================
