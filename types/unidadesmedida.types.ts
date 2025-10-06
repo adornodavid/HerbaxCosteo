@@ -1,3 +1,13 @@
+/* ==================================================
+  Interfaces:
+    * CRUD
+      - UnidadMedida
+      - UnidadMedidaCrear
+      - UnidadMedidaActualizar
+    * Especiales
+================================================== */
+
+// CRUD
 export interface UnidadMedida {
   id: number
   descripcion: string
