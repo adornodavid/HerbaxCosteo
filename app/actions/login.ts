@@ -125,8 +125,6 @@ export async function procesarInicioSesion(email: string, password: string): Pro
 }
 
 // Funcion: procesarCerrarSesion
-
-// Nueva función para cerrar sesión
-export async function logout(): Promise<void> {
-  await cerrarSesion()
+export async function procesarCerrarSesion(): Promise<void> {
+  await eliminarSesionCookies()
 }
