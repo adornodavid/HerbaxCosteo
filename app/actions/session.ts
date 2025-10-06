@@ -63,7 +63,7 @@ export async function obtenerSesion(): Promise<Session | null> {
     let NombreCompleto = ""
     let ClienteId = ""
     let RolId = ""
-    let Permisos = ""
+    let Permisos: string[] = []
     let SesionActiva = ""
 
     for (const elemento of CookiesArray) {
@@ -86,7 +86,7 @@ export async function obtenerSesion(): Promise<Session | null> {
           RolId = valor
           break
         case "Permisos":
-          Permisos = valor
+          Permisos = valor.split("_")
           break
         case "SesionActiva":
           SesionActiva = valor
@@ -104,7 +104,7 @@ export async function obtenerSesion(): Promise<Session | null> {
       NombreCompleto: NombreCompleto || "",
       ClienteId: Number.parseInt(ClienteId || "0"),
       RolId: Number.parseInt(RolId || "0"),
-      Permisos: Permisos || "",
+      Permisos: Permisos.join("_") || "",
       SesionActiva: SesionActiva === "true",
     }
   } catch (error) {
