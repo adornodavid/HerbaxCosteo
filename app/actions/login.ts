@@ -6,8 +6,7 @@
 import { supabase } from "@/lib/supabase"
 import { setSessionCookies } from "./session-actions"
 import { cerrarSesion } from "./session-actions-with-expiration" // Importar cerrarSesion
-import { HashData, Encrypt } from "./utilerias"
-import { establecerSesionCookies } from "./session"
+import { HashData } from "./utilerias"
 import type { LoginResult } from "./types" // Declare the LoginResult variable
 
 /* ==================================================
@@ -90,14 +89,13 @@ export async function procesarInicioSesion(email: string, password: string): Pro
       console.error("Error obteniendo permisos del rol, en actions/login paso 4:", permisosError)
     }
 
-    // Crear string de permisos separados por _
+    // Crear string de permisos separados por |
     const permisosString = permisos?.map((p) => p.permisoid).join("_") || ""
 
-    const sessionString = `UsuarioId:${userData.id}|Email:${userData.email}|NombreCompleto:${userData.nombrecompleto}|ClienteId:${userData.clienteid}|RolId:${userData.rolid}|Permisos:${permisosString}|SesionActiva:true`
-    const sessionEncrypted = await Encrypt(sessionString)
+    // Paso 5: Crear string a encryptar y guardar en cookies
+
 
     // Paso 5: Crear cookies de sesión
-    /*
     await setSessionCookies({
       UsuarioId: userData.id,
       Email: userData.email,
@@ -107,8 +105,6 @@ export async function procesarInicioSesion(email: string, password: string): Pro
       Permisos: permisosString,
       SesionActiva: true,
     })
-    */
-    await establecerSesionCookies(sessionEncrypted)
 
     return {
       success: true,
