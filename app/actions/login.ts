@@ -63,7 +63,7 @@ export async function procesarInicioSesion(email: string, password: string): Pro
       }
     }
 
-    // Paso 2: Obtener datos del usuario
+    // Paso 3: Obtener datos del usuario
     const { data: userData, error: userError } = await supabase
       .from("usuarios")
       .select("id, email, nombrecompleto, clienteid, rolid")
