@@ -1,13 +1,32 @@
 /* ==================================================
+  * CRUD
+    - Configuracion
+    - ConfiguracionCrear
+    - ConfiguracionActualizar
   * Especiales:
 ================================================== */
 
-// Especiales
-export interface configXXXX {
+// CRUD
+export interface Configuracion{
   id: number | null
   descripcion: string | null
   tipodato: string | null
   valor: string | null
   activo: boolean | null
   fechacreacion: Date | null
+}
+
+export interface ConfiguracionCrear{
+  descripcion: string | null
+  tipodato: string | null
+  valor: string | null
+  fechacreacion: Date | null
+}
+
+export interface ConfiguracionActualizar{
+  id: number | null
+  descripcion: string | null
+  tipodato: string | null
+  valor: string | null
+  activo: boolean | null
 }
