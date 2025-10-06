@@ -1,3 +1,12 @@
+/* ==================================================
+  Interfaces:
+    * CRUD:
+      - Formula
+      - FormulaCrear
+      - FormulaActualizar
+    * Especiales
+================================================== */
+
 // Usuarios
 export * from "./usuarios.types"
 
