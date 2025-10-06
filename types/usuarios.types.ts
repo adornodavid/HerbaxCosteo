@@ -19,16 +19,22 @@ export interface Usuario {
 }
 
 export interface UsuarioCrear {
-  nombre: string
-  email: string
-  password: string
+  nombrecompleto: string | null
+  email: string | null
+  password: string | null
+  rolid: number  | null
+  clienteid: number | null
+  fechacreacion: Date | null
 }
 
 export interface UsuarioActualizar {
-  id: number
-  nombre?: string
-  email?: string
-  activo?: boolean
+  id: number | null
+  nombrecompleto: string | null
+  email: string | null
+  password: string | null
+  rolid: number  | null
+  clienteid: number | null
+  activo: boolean | null
 }
 
 export interface UsuarioLogin {
