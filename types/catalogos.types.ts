@@ -25,3 +25,5 @@ export interface CatalogoActualizar {
   nombre?: string
   activo?: boolean
 }
+
+// Especiales

@@ -24,3 +24,5 @@ export interface FormaFarmaceuticaActualizar {
   nombre: string
   descripcion: string
 }
+
+// Especiales

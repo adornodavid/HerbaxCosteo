@@ -25,3 +25,5 @@ export interface ClienteActualizar {
   nombre?: string
   activo?: boolean
 }
+
+// Especiales

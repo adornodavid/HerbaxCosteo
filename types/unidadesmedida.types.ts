@@ -25,3 +25,5 @@ export interface UnidadMedidaActualizar {
   descripcion?: string
   activo?: boolean
 }
+
+// Especiales

@@ -23,3 +23,5 @@ export interface FormulaActualizar {
   nombre?: string
   activo?: boolean
 }
+
+// Especiales
