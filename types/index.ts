@@ -16,7 +16,7 @@
     - zonas
     - catalogos
     - productos
-    - materialesetiquetado
+    - materialetiquetado
     - formulas
     - materiasprimas
     - historicos
