@@ -8,7 +8,8 @@
     - permisos
   Catalogos:
     - unidadesmedida
-    - formasfarmaceuticas  
+    - formasfarmaceuticas
+    - segmentos  
   Principales:
     - clientes
     - zonas
