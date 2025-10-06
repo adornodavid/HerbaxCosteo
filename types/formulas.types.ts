@@ -3,6 +3,9 @@
     - Formula
     - FormulaCrear
     - FormulaActualizar
+    - FormulasXProducto
+    - FormulasXProductoCrear
+    - FormulasXProductoActualizar
   * Especiales:
 ================================================== */
 
@@ -34,6 +37,30 @@ export interface FormulaActualizar {
   imgurl: string | null
   unidadmedidaid: number | null
   costo: number | null
+  activo: boolean | null
+}
+
+export interface FormulasXProducto {
+  idrec: number | null
+  productoid: number | null
+  materialetiquetadodid: numbre | null
+  cantidad: number | null
+  costoparcial: number | null
+  fechacreacion: Date | null
+  activo: boolean | null
+}
+export interface FormulasXProductoCrear {
+  productoid: number | null
+  materialetiquetadodid: numbre | null
+  cantidad: number | null
+  costoparcial: number | null
+  fechacreacion: Date | null
+}
+export interface FormulasXProductoActualizar {
+  productoid: number | null
+  materialetiquetadodid: numbre | null
+  cantidad: number | null
+  costoparcial: number | null
   activo: boolean | null
 }
 
