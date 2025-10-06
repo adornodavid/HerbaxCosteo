@@ -3,7 +3,7 @@
     - Producto
     - ProductoCaracteristicas
     - ProductosListado
-    - ProductosXCatalogo
+    - ProductoXCatalogo
     - ProductosEstadisticas
 ================================================== */
 interface Producto {
