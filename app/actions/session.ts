@@ -80,24 +80,18 @@ export async function getSession(): Promise<Session | null> {
 }
 
 // Funcion: establecerSesionCookies / setSessionCookies: Función donde se crea la cookie/ticket
-export async function establecerSesionCookies(string): Promise<void> {
+export async function establecerSesionCookies(SesionEncriptada: string): Promise<void> {
   const cookieStore = cookies()
 
-  // Configurar cookies con duración de 20 días
+  // Configurar cookies con duración de 1 día
   const cookieOptions = {
-    maxAge: 20 * 24 * 60 * 60, // 20 días en segundos
+    maxAge: 1 * 24 * 60 * 60, // 1 días en segundos
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,
   }
 
-  cookieStore.set("UsuarioId", Session.UsuarioId.toString(), cookieOptions)
-  cookieStore.set("Email", Session.Email, cookieOptions)
-  cookieStore.set("NombreCompleto", Session.NombreCompleto, cookieOptions)
-  cookieStore.set("ClienteId", Session.ClienteId.toString(), cookieOptions)
-  cookieStore.set("RolId", Session.RolId.toString(), cookieOptions)
-  cookieStore.set("Permisos", Session.Permisos, cookieOptions)
-  cookieStore.set("SesionActiva", Session.SesionActiva.toString(), cookieOptions)
+  cookieStore.set("HealthyLabCosteo", SesionEncriptada.toString(), cookieOptions)
 }
 
 // Función: setSessionCookies: función para definir variables de sesion
