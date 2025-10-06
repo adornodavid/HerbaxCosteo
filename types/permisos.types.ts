@@ -9,30 +9,21 @@
 // CRUD
 export interface Permiso {
   id: number | null
-  codigo: string | null
-  nombre: string | null
-  imgurl: string | null
-  unidadmedidaid: number | null
-  costo: number | null
+  funcion: string | null
+  descripcion: string | null
   fechacreacion: Date | null
   activo: boolean | null
 }
 
 export interface PermisoCrear {
-  codigo: string | null
-  nombre: string | null
-  imgurl: string | null
-  unidadmedidaid: number | null
-  costo: number | null
+  funcion: string | null
+  descripcion: string | null
   fechacreacion: Date | null
 }
 
 export interface PermisoActualizar {
   id: number | null
-  codigo: string | null
-  nombre: string | null
-  imgurl: string | null
-  unidadmedidaid: number | null
-  costo: number | null
+  funcion: string | null
+  descripcion: string | null
   activo: boolean | null
 }
