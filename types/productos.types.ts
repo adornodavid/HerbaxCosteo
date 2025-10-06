@@ -18,7 +18,7 @@
 ================================================== */
 
 // Objetos / Clases
-export interface Producto {
+export interface oProducto {
   id: number
   codigo: string | null
   clienteid: number | null
