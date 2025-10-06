@@ -7,7 +7,7 @@
 ================================================== */
 
 // CRUD
-export interface Cliente {
+export interface MateriaPrima {
   id: number
   nombre: string
   activo: boolean
@@ -15,11 +15,11 @@ export interface Cliente {
   fechamodificacion?: Date
 }
 
-export interface ClienteCrear {
+export interface MateriaPrimaCrear {
   nombre: string
 }
 
-export interface ClienteActualizar {
+export interface MateriaPrimaActualizar {
   id: number
   nombre?: string
   activo?: boolean
