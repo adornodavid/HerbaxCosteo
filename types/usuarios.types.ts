@@ -47,9 +47,8 @@ interface SessionData {
   UsuarioId: string | null
   Email: string | null
   NombreCompleto: string | null
-  HotelId: string | null
+  ClienteId: string | null // Added ClienteId to SessionData
   RolId: string | null
   Permisos: string[] | null
   SesionActiva: boolean | null
-  ClienteId: string | null // Added ClienteId to SessionData
 }
