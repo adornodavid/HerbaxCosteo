@@ -19,7 +19,7 @@ import {
 import { Icons } from "@/components/icons"
 import { UserCheck } from "lucide-react"
 // Backend
-import { procesarInicioSesion } from "@/app/actions/login-actions"
+import { procesarInicioSesion } from "@/app/actions/login"
 
 /* ==================================================
   Principal, Pagina
