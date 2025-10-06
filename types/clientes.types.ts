@@ -15,8 +15,8 @@ export interface Cliente {
   telefono: string | null
   email: string | null
   imgurl: string | null
-  activo: boolean | null
   fechacreacion: Date | null
+  activo: boolean | null
 }
 
 export interface ClienteCrear {

@@ -12,8 +12,8 @@ export interface Configuracion{
   descripcion: string | null
   tipodato: string | null
   valor: string | null
-  activo: boolean | null
   fechacreacion: Date | null
+  activo: boolean | null
 }
 
 export interface ConfiguracionCrear{
