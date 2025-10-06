@@ -44,24 +44,3 @@ export * from "./materiales-etiquetado.types"
 export * from "./formulas.types"
 export * from "./materias-primas.types"
 export * from "./historicos.types"
-
-// Usuarios
-export * from "./usuarios.types"
-
-// Productos
-export * from "./productos.types"
-
-// Clientes
-export * from "./clientes.types"
-
-// Zonas
-export * from "./zonas.types"
-
-// Categorías
-export * from "./categorias.types"
-
-// Unidades de Medida
-export * from "./unidadesmedida.types"
-
-// Common types
-export * from "./common.types"
