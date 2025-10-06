@@ -89,7 +89,7 @@ export async function procesarInicioSesion(email: string, password: string): Pro
       console.error("Error obteniendo permisos del rol, en actions/login paso 4:", permisosError)
     }
 
-    // Crear string de permisos separados por |
+    // Crear string de permisos separados por _
     const permisosString = permisos?.map((p) => p.permisoid).join("_") || ""
 
     const sessionString = `UsuarioId:${userData.id}|Email:${userData.email}|NombreCompleto:${userData.nombrecompleto}|ClienteId:${userData.clienteid}|RolId:${userData.rolid}|Permisos:${permisosString}|SesionActiva:true`
