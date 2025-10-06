@@ -6,6 +6,7 @@
 import { supabase } from "@/lib/supabase"
 import { setSessionCookies } from "./session-actions"
 import { cerrarSesion } from "./session-actions-with-expiration" // Importar cerrarSesion
+import { HashData } from "./utilerias"
 
 /* ==================================================
 	  Funciones
