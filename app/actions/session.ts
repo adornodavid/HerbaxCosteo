@@ -108,7 +108,7 @@ export async function obtenerSesion(): Promise<Session | null> {
       SesionActiva: SesionActiva === "true",
     }
   } catch (error) {
-    console.error("Error getting session:", error)
+    console.error("Error en obtenersesion de actions/session:", error)
     return null
   }
 }
