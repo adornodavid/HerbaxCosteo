@@ -44,4 +44,6 @@ export interface MaterialEtiquetadoXProducto {
   materialetiquetadodid: numbre | null
   cantidad: number | null
   costoparcial: number | null
+  fechacreacion: Date | null
+  activo: boolean | null
 }
