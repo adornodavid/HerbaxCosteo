@@ -7,21 +7,20 @@
 
 // CRUD
 export interface FormaFarmaceutica {
-  id: number
-  nombre: string
-  descripcion: string
+  id: number | null
+  nombre: string | null
+  descripcion: string | null
 }
 
 export interface FormaFarmaceuticaCrear {
-  id: number
-  nombre: string
-  descripcion: string
+  nombre: string | null
+  descripcion: string | null
 }
 
 export interface FormaFarmaceuticaActualizar {
-  id: number
-  nombre: string
-  descripcion: string
+  id: number | null
+  nombre: string | null
+  descripcion: string | null
 }
 
 // Especiales
