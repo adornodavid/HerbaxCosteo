@@ -1,3 +1,13 @@
+/* ==================================================
+  Interfaces:
+    * CRUD
+      - MaterialEtiquetado
+      - MaterialEtiquetadoCrear
+      - MaterialEtiquetadoActualizar
+    * Especiales
+================================================== */
+
+// CRUD
 export interface Cliente {
   id: number
   nombre: string
