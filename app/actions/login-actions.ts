@@ -1,5 +1,8 @@
 "use server"
 
+/* ==================================================
+  Imports
+================================================== */
 import { supabase } from "@/lib/supabase"
 import { setSessionCookies } from "./session-actions"
 import { cerrarSesion } from "./session-actions-with-expiration" // Importar cerrarSesion
