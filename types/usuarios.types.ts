@@ -1,3 +1,11 @@
+/* ==================================================
+  Interfaces:
+    * CRUD
+      - Usuario
+      - UsuarioCrear
+      - UsuarioActualizar
+    * Especiales
+================================================== */
 export interface Usuario {
   id: number
   nombre: string
