@@ -1,8 +1,8 @@
 /* ==================================================
   * CRUD:
-    - MateriaPrima
-    - MateriaPrimaCrear
-    - MateriaPrimaActualizar
+    - MaterialEtiquetado
+    - MaterialEtiquetadoCrear
+    - MaterialEtiquetadoActualizar
   * Especiales:
 ================================================== */
 
