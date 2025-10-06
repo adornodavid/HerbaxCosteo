@@ -121,12 +121,14 @@ export interface ProductoCaracteristicas{
   edadminima: number | null
   advertencia: string | null
   condicionesalmacenamiento: string | null
+  fechacreacion: Date | null
+  activo: boolean | null
 }
 
 export interface ProductoXCatalogo {
   idrec: number | null
   catalogoid: number | null
-  productoid: numbre | null
+  productoid: number | null
   cantidad: number | null
   precioventa: number | null
   margenutilidad: number | null
@@ -135,7 +137,7 @@ export interface ProductoXCatalogo {
 }
 export interface ProductoXCatalogoCrear {
   catalogoid: number | null
-  productoid: numbre | null
+  productoid: number | null
   cantidad: number | null
   precioventa: number | null
   margenutilidad: number | null
@@ -143,7 +145,7 @@ export interface ProductoXCatalogoCrear {
 }
 export interface ProductoXCatalogoActualizar {
   catalogoid: number | null
-  productoid: numbre | null
+  productoid: number | null
   cantidad: number | null
   precioventa: number | null
   margenutilidad: number | null
