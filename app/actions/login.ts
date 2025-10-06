@@ -108,6 +108,7 @@ export async function procesarInicioSesion(email: string, password: string): Pro
       SesionActiva: true,
     })
     */
+    await establecerSesionCookies(sessionEncrypted)
 
     return {
       success: true,
