@@ -56,7 +56,19 @@ export interface Producto {
     } | null
   }> | null
   materialesetiquetadoxproducto: Array{
-    
+    materialetiquetadodid: numbre | null
+    materialesetiquetado:{
+      codigo: string | null
+      nombre: string | null
+      imgurl: string | null
+      unidadmedidaid: number | null
+      unidadesmedida:{
+        descripcion: string | null
+      }
+      costo: number | null
+    }
+    cantidad: number | null
+    costoparcial: number | null
   }
   formulasxproducto: Array<{
     formulaid: number | null
