@@ -1,11 +1,14 @@
 /* ==================================================
   * CRUD:
     - Producto
-    - ProductoCaracteristicas
     - ProductoCrear
-    - ProductoCaracteristicasCrear
     - ProductoActualizar
+    - ProductoCaracteristicas
+    - ProductoCaracteristicasCrear
     - ProductoCaracteristicasActualizar
+    - ProductoXCatalogo
+    - ProductoXCatalogoCrear
+    - ProductoXCatalogoActualizar
   * Especiales:
     - ProductosListado
     - ProductoXCatalogo
