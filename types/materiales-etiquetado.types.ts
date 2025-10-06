@@ -49,5 +49,19 @@ export interface MaterialEtiquetadoXProducto {
   fechacreacion: Date | null
   activo: boolean | null
 }
+export interface MaterialEtiquetadoXProductoCrear {
+  productoid: number | null
+  materialetiquetadodid: numbre | null
+  cantidad: number | null
+  costoparcial: number | null
+  fechacreacion: Date | null
+}
+export interface MaterialEtiquetadoXProductoActualizar {
+  productoid: number | null
+  materialetiquetadodid: numbre | null
+  cantidad: number | null
+  costoparcial: number | null
+  activo: boolean | null
+}
 
 // Especiales
