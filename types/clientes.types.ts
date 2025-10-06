@@ -1,8 +1,10 @@
 /* ==================================================
   Interfaces:
-    - Cliente
-    - ClienteCrear
-    - ClienteActualizar
+    * CRUD
+      - Cliente
+      - ClienteCrear
+      - ClienteActualizar
+    * Especiales
 ================================================== */
 export interface Cliente {
   id: number
