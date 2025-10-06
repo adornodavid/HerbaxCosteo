@@ -46,7 +46,7 @@ import { obtenerProductos } from "@/app/actions/productos"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
 // -- Interfaces, Tipado, Clases, Objetos
-import type { Producto, ProductoCatalogo, ProductoListado, ProductosEstadisticas } from "@/types/productos"
+import type { oProducto, ProductoCatalogo, ProductoListado, ProductosEstadisticas } from "@/types/productos"
 import type { ddlItem } from "@/types/common"
 
 /* ==================================================
