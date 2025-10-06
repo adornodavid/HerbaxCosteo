@@ -76,6 +76,10 @@ interface Producto {
   }> | null
 }
 
+interface ProductoCaracteristicas{
+  
+}
+
 interface ProductoListado {
   ProductoId: number
   ProductoNombre: string
