@@ -1,4 +1,14 @@
-export interface Cliente {
+/* ==================================================
+  Interfaces:
+    * CRUD
+      - Catalogo
+      - CatalogoCrear
+      - CatalogoActualizar
+    * Especiales
+================================================== */
+
+// CRUD
+export interface Catalogo {
   id: number
   nombre: string
   activo: boolean
@@ -6,11 +16,11 @@ export interface Cliente {
   fechamodificacion?: Date
 }
 
-export interface ClienteCrear {
+export interface CatalogoCrear {
   nombre: string
 }
 
-export interface ClienteActualizar {
+export interface CatalogoActualizar {
   id: number
   nombre?: string
   activo?: boolean
