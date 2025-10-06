@@ -96,8 +96,8 @@ export async function establecerSesionCookies(SesionEncriptada: string): Promise
   cookieStore.set("HealthyLabCosteo", SesionEncriptada.toString(), cookieOptions)
 }
 
-// Función: Función para obtener las cookies de la sesion, cookies/ticket/cookiencriptda
-export async function obtenerSesionCookies / getSessionCookies(): Promise<String | null> {
+// Función: obtenerSesionCookies / getSessionCookies: Función para obtener las cookies de la sesion, cookies/ticket/cookiencriptda
+export async function obtenerSesionCookies(): Promise<String | null> {
   try {
     const cookieStore = cookies()
 
