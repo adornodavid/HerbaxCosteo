@@ -27,3 +27,5 @@ export interface ZonaActualizar {
   nombre?: string
   activo?: boolean
 }
+
+// Especiales
