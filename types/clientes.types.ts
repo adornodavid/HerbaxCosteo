@@ -1,3 +1,9 @@
+/* ==================================================
+  Interfaces:
+    - Cliente
+    - ClienteCrear
+    - ClienteActualizar
+================================================== */
 export interface Cliente {
   id: number
   nombre: string
