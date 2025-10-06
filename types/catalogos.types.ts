@@ -8,11 +8,14 @@
 
 // CRUD
 export interface Catalogo {
-  id: number
-  nombre: string
+  id: number | null
+  clienteid: number | null
+  zonaid: number | null
+  nombre: string | null
+  descripcion: string | null
+  imgurl: string | null
   activo: boolean
   fechacreacion?: Date
-  fechamodificacion?: Date
 }
 
 export interface CatalogoCrear {
