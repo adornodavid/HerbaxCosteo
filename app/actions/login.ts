@@ -78,7 +78,7 @@ export async function procesarInicioSesion(email: string, password: string): Pro
       }
     }
 
-    // Paso 3: Obtener permisos del rol
+    // Paso 4: Obtener permisos del rol
     const { data: permisos, error: permisosError } = await supabase
       .from("permisosxrol")
       .select("permisoid")
@@ -86,7 +86,7 @@ export async function procesarInicioSesion(email: string, password: string): Pro
       .eq("activo", true)
 
     if (permisosError) {
-      console.error("Error obteniendo permisos:", permisosError)
+      console.error("Error obteniendo permisos del rol, en actions/login paso 4:", permisosError)
     }
 
     // Crear string de permisos separados por |
