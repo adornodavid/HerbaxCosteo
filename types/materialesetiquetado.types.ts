@@ -1,10 +1,9 @@
 /* ==================================================
-  Interfaces:
-    * CRUD
-      - MaterialEtiquetado
-      - MaterialEtiquetadoCrear
-      - MaterialEtiquetadoActualizar
-    * Especiales
+  * CRUD:
+    - MaterialEtiquetado
+    - MaterialEtiquetadoCrear
+    - MaterialEtiquetadoActualizar
+  * Especiales:
 ================================================== */
 
 // CRUD
