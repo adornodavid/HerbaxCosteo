@@ -55,7 +55,7 @@ export interface Producto {
       descripcion: string | null
     } | null
   }> | null
-  materialesetiquetadoxproducto: Array{
+  materialesetiquetadoxproducto: Array<{
     materialetiquetadodid: numbre | null
     materialesetiquetado:{
       codigo: string | null
@@ -69,7 +69,7 @@ export interface Producto {
     }
     cantidad: number | null
     costoparcial: number | null
-  }
+  }> | null
   formulasxproducto: Array<{
     formulaid: number | null
     formulas:{
