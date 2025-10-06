@@ -6,7 +6,7 @@
 import { supabase } from "@/lib/supabase"
 import { setSessionCookies } from "./session-actions"
 import { cerrarSesion } from "./session-actions-with-expiration" // Importar cerrarSesion
-import { HashData } from "./utilerias"
+import { HashData, Encrypt } from "./utilerias"
 import type { LoginResult } from "./types" // Declare the LoginResult variable
 
 /* ==================================================
@@ -92,10 +92,10 @@ export async function procesarInicioSesion(email: string, password: string): Pro
     // Crear string de permisos separados por |
     const permisosString = permisos?.map((p) => p.permisoid).join("_") || ""
 
-    // Paso 5: Crear string a encryptar y guardar en cookies
+    const sessionString = `UsuarioId:${userData.id}|Email:${userData.email}|NombreCompleto:${userData.nombrecompleto}|ClienteId:${userData.clienteid}|RolId:${userData.rolid}|Permisos:${permisosString}|SesionActiva:true`
+    const sessionEncrypted = await Encrypt(sessionString)
 
-
-    // Paso 5: Crear cookies de sesión
+    // Paso 6: Crear cookies de sesión
     await setSessionCookies({
       UsuarioId: userData.id,
       Email: userData.email,
