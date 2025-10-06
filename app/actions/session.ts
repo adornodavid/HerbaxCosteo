@@ -52,35 +52,60 @@ export interface SessionData {
 export async function obtenerSesion(): Promise<Session | null> {
   try {
     // Paso 1: Obtener la cooki desencriptada
+    const CookiesDesencryptadas = await obtenerSesionCookies()
 
     // Paso 2: dividir string de cookie desencriptada, dividir por | y guardar en un array
+    const CookiesArray = CookiesDesencryptadas?.split("|") || []
 
-    // Paso 3: recorrer array y volver a dividir cada 1 por : y crear su variable de acuerdo al caso, excepto permisos, alli se vuelve a dividir por _ y se crea otro array para guardar en su variable 
+    // Paso 3: recorrer array y volver a dividir cada 1 por : y crear su variable de acuerdo al caso, excepto permisos, alli se vuelve a dividir por _ y se crea otro array para guardar en su variable
+    let UsuarioId = ""
+    let Email = ""
+    let NombreCompleto = ""
+    let ClienteId = ""
+    let RolId = ""
+    let Permisos = ""
+    let SesionActiva = ""
 
+    for (const elemento of CookiesArray) {
+      const [clave, valor] = elemento.split(":")
 
-    
-    const cookieStore = cookies()
+      switch (clave) {
+        case "UsuarioId":
+          UsuarioId = valor
+          break
+        case "Email":
+          Email = valor
+          break
+        case "NombreCompleto":
+          NombreCompleto = valor
+          break
+        case "ClienteId":
+          ClienteId = valor
+          break
+        case "RolId":
+          RolId = valor
+          break
+        case "Permisos":
+          Permisos = valor
+          break
+        case "SesionActiva":
+          SesionActiva = valor
+          break
+      }
+    }
 
-    const usuarioId = cookieStore.get("UsuarioId")?.value
-    const email = cookieStore.get("Email")?.value
-    const nombreCompleto = cookieStore.get("NombreCompleto")?.value
-    const clienteId = cookieStore.get("ClienteId")?.value
-    const rolId = cookieStore.get("RolId")?.value
-    const permisos = cookieStore.get("Permisos")?.value
-    const sesionActiva = cookieStore.get("SesionActiva")?.value
-
-    if (!usuarioId || !email || sesionActiva !== "true") {
+    if (!UsuarioId || !Email || SesionActiva !== "true") {
       return null
     }
 
     return {
-      UsuarioId: Number.parseInt(usuarioId),
-      Email: email,
-      NombreCompleto: nombreCompleto || "",
-      ClienteId: Number.parseInt(clienteId || "0"),
-      RolId: Number.parseInt(rolId || "0"),
-      Permisos: permisos || "",
-      SesionActiva: sesionActiva === "true",
+      UsuarioId: Number.parseInt(UsuarioId),
+      Email: Email,
+      NombreCompleto: NombreCompleto || "",
+      ClienteId: Number.parseInt(ClienteId || "0"),
+      RolId: Number.parseInt(RolId || "0"),
+      Permisos: Permisos || "",
+      SesionActiva: SesionActiva === "true",
     }
   } catch (error) {
     console.error("Error getting session:", error)
@@ -111,7 +136,9 @@ export async function obtenerSesionCookies(): Promise<string | null> {
     const CookieEncriptada = cookieStore.get("HealthyLabCosteo")?.value
 
     if (!CookieEncriptada) {
-      console.error("Error: No se pudo obtener la cookie encriptada HealthyLabCosteo, en obtenerSesionCookies de actions/session")
+      console.error(
+        "Error: No se pudo obtener la cookie encriptada HealthyLabCosteo, en obtenerSesionCookies de actions/session",
+      )
       return null
     }
 
@@ -177,4 +204,4 @@ export async function validateSession(): Promise<boolean> {
 */
 
 // Nueva función para obtener variables de sesión (alias de getSession)
-export const obtenerVariablesSesion = getSession
+export const obtenerVariablesSesion = obtenerSesion
