@@ -30,7 +30,7 @@ export interface SessionData {
   * Cookies
     - establecerSesionCookies / setSessionCookies
     - obtenerSesionCookies / getSessionCookies
-    - borrarSesionCookies / deleteSessionCookies
+    - eliminarSesionCookies / deleteSessionCookies
 
     - limpiarSesion / clearSession
     - crearSesionConExpiracion x
