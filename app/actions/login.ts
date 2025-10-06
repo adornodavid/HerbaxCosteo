@@ -39,6 +39,7 @@ import type { LoginResult } from "./types" // Declare the LoginResult variable
 // procesarInicioSesion: funcion para iniciar sesion en el sistema
 export async function procesarInicioSesion(email: string, password: string): Promise<LoginResult> {
   try {
+    console.log("pass: " + password)
     // Paso 1: Encriptar el password introducido
     const PasswordHash = await HashData(password)
 
