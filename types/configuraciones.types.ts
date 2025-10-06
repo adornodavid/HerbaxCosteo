@@ -4,9 +4,10 @@
 
 // Especiales
 export interface configXXXX {
-  id: number
-  nombre: string
-  activo: boolean
-  fechacreacion?: Date
-  fechamodificacion?: Date
+  id: number | null
+  descripcion: string | null
+  tipodato: string | null
+  valor: string | null
+  activo: boolean | null
+  fechacreacion: Date | null
 }
