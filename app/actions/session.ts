@@ -23,11 +23,14 @@ export interface SessionData {
 /* ==================================================
   Funciones
   --------------------
-  * SESSION
+  * Session
     - crearSesion / setSession
     - obtenerSesion / getSession
+
+  * Cookies
     - establecerSesionCookies / setSessionCookies
     - obtenerSesionCookies / getSessionCookies
+    - borrarCookies / deleteCookies
 
     - limpiarSesion / clearSession
     - crearSesionConExpiracion x
