@@ -71,10 +71,10 @@ export async function procesarInicioSesion(email: string, password: string): Pro
       .single()
 
     if (userError || !userData) {
-      console.error("Error obteniendo datos del usuario:", userError)
+      console.error("Error obteniendo datos del usuario en app/actoins/login paso 3:", userError)
       return {
         success: false,
-        message: "Error obteniendo datos del usuario.",
+        message: "Error obteniendo datos del usuario, en actions/login paso 3.",
       }
     }
 
