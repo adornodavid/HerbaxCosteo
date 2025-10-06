@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase"
 import { setSessionCookies } from "./session-actions"
 import { cerrarSesion } from "./session-actions-with-expiration" // Importar cerrarSesion
 import { HashData } from "./utilerias"
+import type { LoginResult } from "./types" // Declare the LoginResult variable
 
 /* ==================================================
 	  Funciones
@@ -37,15 +38,15 @@ import { HashData } from "./utilerias"
 // procesarInicioSesion: funcion para iniciar sesion en el sistema
 export async function procesarInicioSesion(email: string, password: string): Promise<LoginResult> {
   try {
-    // Paso 1: Hastear el password introducido
+    // Paso 1: Encriptar el password introducido
+    const PasswordHash = await HashData(password)
 
-    
     // Paso 1: Validar credenciales
     const { data: usuarios, error: loginError } = await supabase
       .from("usuarios")
       .select("*")
       .eq("email", email)
-      .eq("password", password)
+      .eq("password", PasswordHash)
       .eq("activo", true)
 
     if (loginError) {
@@ -118,7 +119,6 @@ export async function procesarInicioSesion(email: string, password: string): Pro
 }
 
 // Funcion: procesarCerrarSesion
-
 
 // Nueva función para cerrar sesión
 export async function logout(): Promise<void> {
