@@ -1,6 +1,7 @@
 /* ==================================================
   Catalogos:
     - unidadesmedida
+    - formasfarmaceuticas
   
   Principales
 ================================================== */
