@@ -10,19 +10,34 @@
 export interface Cliente {
   id: number
   nombre: string
-  activo: boolean
-  fechacreacion?: Date
-  fechamodificacion?: Date
+  clave: string | null
+  direccion: string | null
+  telefono: string | null
+  email: string | null
+  imgurl: string | null
+  activo: boolean | null
+  fechacreacion: Date | null
 }
 
 export interface ClienteCrear {
   nombre: string
+  clave: string | null
+  direccion: string | null
+  telefono: string | null
+  email: string | null
+  imgurl: string | null
+  fechacreacion: Date | null
 }
 
 export interface ClienteActualizar {
   id: number
-  nombre?: string
-  activo?: boolean
+  nombre: string
+  clave: string | null
+  direccion: string | null
+  telefono: string | null
+  email: string | null
+  imgurl: string | null
+  activo: boolean | null
 }
 
 // Especiales
