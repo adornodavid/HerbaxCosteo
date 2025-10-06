@@ -157,7 +157,6 @@ export interface ProductoCaracteristicas{
   activo: boolean | null
 }
 export interface ProductoCaracteristicasCrear{
-  id: number
   productoid: number
   descripcion: string | null
   presentacion: string | null
@@ -172,7 +171,6 @@ export interface ProductoCaracteristicasCrear{
   advertencia: string | null
   condicionesalmacenamiento: string | null
   fechacreacion: Date | null
-  activo: boolean | null
 }
 export interface ProductoCaracteristicasActualizar{
   id: number
@@ -189,7 +187,6 @@ export interface ProductoCaracteristicasActualizar{
   edadminima: number | null
   advertencia: string | null
   condicionesalmacenamiento: string | null
-  fechacreacion: Date | null
   activo: boolean | null
 }
 
