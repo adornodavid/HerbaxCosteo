@@ -24,8 +24,8 @@ export interface SessionData {
   Funciones
   --------------------
   * SESSION
-    - obtenerSesion / getSession
     - crearSesion / setSession
+    - obtenerSesion / getSession
     - establecerSesionCookies / setSessionCookies
     - limpiarSesion / clearSession
     - crearSesionConExpiracion
@@ -43,6 +43,10 @@ export interface SessionData {
     - validateSession
     - setSessionCookies
 ================================================== */
+
+// Función: crearSesion / setSession: Funcion donde se crea la sesion
+
+
 // Función: getSession: función para obtener las cookies de la sesion creada
 export async function getSession(): Promise<Session | null> {
   try {
