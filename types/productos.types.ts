@@ -93,7 +93,7 @@ interface ProductoCaracteristicas{
   condicionesalmacenamiento: string | null
 }
 
-interface ProductoListado {
+interface ProductosListado {
   ProductoId: number
   ProductoNombre: string
   ProductoDescripcion: string
