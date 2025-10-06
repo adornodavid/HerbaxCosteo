@@ -9,7 +9,13 @@
   Catalogos:
     - unidadesmedida
     - formasfarmaceuticas  
-  Principales
+  Principales:
+    - clientes
+    - zonas
+    - productos
+    - materialesetiquetado
+    - formulas
+    - materiasprimas
 ================================================== */
 
 // Usuarios
