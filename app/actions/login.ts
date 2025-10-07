@@ -41,6 +41,7 @@ export async function procesarInicioSesion(email: string, password: string): Pro
   try {
     // Paso 1: Encriptar el password introducido // CAMBIO: YA NO ES NECESARIO PERO SE DEJO
     const PasswordHash = await HashData(password)
+    console.log("kkkk: " + email + " - " + password)
 
     // Paso 2: Buscar datos con de acuerdo al email o usuario
     const { data: usuarios, error: loginError } = await supabase
