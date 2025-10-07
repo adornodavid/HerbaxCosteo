@@ -6,7 +6,7 @@
 import { supabase } from "@/lib/supabase"
 import { setSessionCookies } from "./session-actions"
 import { cerrarSesion } from "./session-actions-with-expiration" // Importar cerrarSesion
-import { HashData, Encrypt } from "./utilerias"
+import { HashData, Encrypt, CompareHash } from "./utilerias"
 import { establecerSesionCookies, eliminarSesionCookies } from "./session"
 import type { Session } from "@/types/usuarios" // Declare the LoginResult variable
 
