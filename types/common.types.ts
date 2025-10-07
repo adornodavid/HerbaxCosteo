@@ -33,7 +33,7 @@ export interface FilterParams {
   fechaFin?: Date
 }
 
-interface ddlItem {
+export interface ddlItem {
   value: string
   text: string
 }

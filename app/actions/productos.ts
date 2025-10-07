@@ -6,7 +6,7 @@
 import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
 import type { ddlItem } from "@/types/common.types"
-import type { oProducto, Producto } from "@/types/productos.types"
+import type { oProducto } from "@/types/productos.types"
 import { imagenSubir } from "@/app/actions/utilerias"
 
 /* ==================================================
@@ -912,6 +912,35 @@ export async function estatusActivoProducto(productoid: number, activo: boolean)
 }
 
 // Función: listaDesplegableProductos / ddlProductos: Lista desplegable de productos para agregar
-export async function listaDesplegableProductos(buscar:string): Promise<ddlItem>{
-    
+export async function listaDesplegableProductos(buscar: string): Promise<ddlItem[]> {
+  try {
+    let query = supabase.from("productos").select("id, codigo, nombre").eq("activo", true)
+
+    // Apply filter: search in nombre OR codigo
+    if (buscar && buscar.trim() !== "") {
+      query = query.or(`nombre.ilike.%${buscar}%,codigo.ilike.%${buscar}%`)
+    }
+
+    // Order by nombre
+    query = query.order("nombre", { ascending: true })
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error("Error obteniendo lista desplegable de productos:", error)
+      return []
+    }
+
+    // Map results to ddlItem format: value = id, text = "codigo - nombre"
+    const items: ddlItem[] =
+      data?.map((producto) => ({
+        value: producto.id.toString(),
+        text: `${producto.codigo} - ${producto.nombre}`,
+      })) || []
+
+    return items
+  } catch (error) {
+    console.error("Error en app/actions/productos en listaDesplegableProductos:", error)
+    return []
+  }
 }
