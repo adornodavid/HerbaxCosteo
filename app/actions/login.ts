@@ -39,11 +39,10 @@ import type { Session } from "@/types/usuarios" // Declare the LoginResult varia
 // procesarInicioSesion: funcion para iniciar sesion en el sistema
 export async function procesarInicioSesion(email: string, password: string): Promise<LoginResult> {
   try {
-    console.log("pass: " + password)
     // Paso 1: Encriptar el password introducido
     const PasswordHash = await HashData(password)
 
-    // Paso 2: Validar credenciales
+    // Paso 2: Buscar datos con de acuerdo al email o usuario
     const { data: usuarios, error: loginError } = await supabase
       .from("usuarios")
       .select("*")
@@ -61,9 +60,12 @@ export async function procesarInicioSesion(email: string, password: string): Pro
     if (!usuarios || usuarios.length === 0) {
       return {
         success: false,
-        message: "El correo o el password está incorrecto, favor de verificar.",
+        message: "El correo o el usuario está incorrecto, favor de verificar.",
       }
     }
+    
+    const PasswordValido = await CompareHash(password, usuarios.password)
+    console.log("valido: " + PasswordValido)
 
     // Paso 3: Obtener datos del usuario
     const { data: userData, error: userError } = await supabase
