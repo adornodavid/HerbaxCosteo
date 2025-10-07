@@ -51,6 +51,7 @@ export default function EncryptPage() {
   const [txtTextoH, setTxtTextoH] = useState("")
   const [txtResultadoH, setTxtResultadoH] = useState("")
 
+/*
   // --- Carga Inicial ---
   // Cargar sesión al montar el componente
   useEffect(() => {
@@ -82,6 +83,7 @@ export default function EncryptPage() {
       setLoading(false)
     }
   }
+  */
 
   /* ==================================================
     Funciones
