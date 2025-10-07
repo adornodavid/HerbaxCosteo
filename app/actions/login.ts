@@ -82,7 +82,8 @@ export async function procesarInicioSesion(email: string, password: string): Pro
     const { data: userData, error: userError } = await supabase
       .from("usuarios")
       .select("id, email, nombrecompleto, clienteid, rolid")
-      .eq("email", email)
+      //.eq("email", email)
+      .or(`email.eq.${email},usuario.eq.${email}`)
       .single()
 
     if (userError || !userData) {
