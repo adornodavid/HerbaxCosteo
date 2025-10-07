@@ -203,7 +203,7 @@ export async function HashData(texto: string): Promise<string> {
   try {
     return bcrypt.hash(texto, 10)
   } catch (error) {
-    console.error("Error hashing text:", error)
+    console.error("Error en actions/uilerias en HashData, hashing text:", error)
     throw new Error("Failed to hash text")
   }
 }
