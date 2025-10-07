@@ -42,15 +42,13 @@ export async function procesarInicioSesion(email: string, password: string): Pro
     console.log("pass: " + password)
     // Paso 1: Encriptar el password introducido
     const PasswordHash = await HashData(password)
-    //const PasswordHash = "Herbax25"
-    console.log("pass: " + PasswordHash)
 
     // Paso 2: Validar credenciales
     const { data: usuarios, error: loginError } = await supabase
       .from("usuarios")
       .select("*")
       .eq("email", email)
-      .eq("password", PasswordHash)
+      //.eq("password", PasswordHash)
       .eq("activo", true)
 
     if (loginError) {
