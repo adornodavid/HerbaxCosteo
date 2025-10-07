@@ -34,6 +34,6 @@ export interface FilterParams {
 }
 
 interface ddlItem {
-  id: number
-  nombre: string
+  value: string
+  text: string
 }
