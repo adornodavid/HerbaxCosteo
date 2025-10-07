@@ -17,8 +17,6 @@ import type { Session } from "@/types/usuarios" // Declare the LoginResult varia
       - procesarInicioSesion
     * Cerrar
       - procesarCerrarSesion
-
-      - validateLoginBackend
       
 
 
