@@ -5,8 +5,9 @@ import type React from "react"
 /* ==================================================
   Imports
 ================================================== */
-import { useState } from "react"
-import { useUserSession } from "@/hooks/use-user-session"
+import { useState, useEffect } from "react"
+import { obtenerSesion } from "@/app/actions/session"
+import type { Session } from "@/app/actions/session"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,10 +19,25 @@ import { User, Key, Shield } from "lucide-react"
   Principal - página
 ================================================== */
 export default function PerfilPage() {
-  const { user, loading } = useUserSession()
+  const [user, setUser] = useState<Session | null>(null)
+  const [loading, setLoading] = useState(true)
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+
+  useEffect(() => {
+    const loadSession = async () => {
+      try {
+        const session = await obtenerSesion()
+        setUser(session)
+      } catch (error) {
+        console.error("Error al cargar sesión:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadSession()
+  }, [])
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault()
