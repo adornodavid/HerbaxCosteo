@@ -32,7 +32,7 @@ interface SessionData {
 ================================================== */
 export default function EncryptPage() {
   // --- Variables especiales ---
-  const router = useRouter()
+  //const router = useRouter()
 
   // --- Estados ---
   const [sesion, setSesion] = useState<SessionData | null>(null)
