@@ -51,6 +51,8 @@ export async function procesarInicioSesion(email: string, password: string): Pro
       //.eq("password", PasswordHash)
       .eq("activo", true)
 
+      console.log(usuarios)
+
     if (loginError) {
       console.error("Error en app/actions/login, en paso 2 de consulta de usuario en tabla:", loginError)
       return {
