@@ -163,7 +163,10 @@ export async function eliminarSesionCookies(): Promise<void> {
   cookieStore.delete("HealthyLabCosteo")
 }
 
-
+// Función: obtenerCoookie / getCookie, función para obtener la cookie y la informacion 
+export async function obtenerCoookie(){
+  
+}
 
 
 
