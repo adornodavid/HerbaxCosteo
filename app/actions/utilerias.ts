@@ -40,6 +40,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - Encrypt - (Crypto-js)
     - Desencrypt - (Crypto-js)
     - HashData - (Bcrypt-js)
+    - CompareHash - (Bcrypt-js)
 	================================================== */
 
 /* ==================================================
