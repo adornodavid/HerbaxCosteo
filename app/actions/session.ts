@@ -163,17 +163,53 @@ export async function eliminarSesionCookies(): Promise<void> {
   cookieStore.delete("HealthyLabCosteo")
 }
 
-// Función: obtenerCoookie / getCookie, función para obtener la cookie y la informacion 
-export async function obtenerCoookie(){
-  
+// Función: obtenerCoookie / getCookie, función para obtener la cookie y la informacion
+export async function obtenerCoookie() {
+  try {
+    const cookieStore = cookies()
+    const cookie = cookieStore.get("HealthyLabCosteo")
+
+    if (!cookie) {
+      return {
+        success: false,
+        message: "Cookie no encontrada",
+        data: null,
+      }
+    }
+
+    // Información disponible de la cookie
+    const cookieInfo = {
+      nombre: cookie.name,
+      valor: cookie.value,
+      existe: true,
+      // Información de configuración (basada en establecerSesionCookies)
+      configuracion: {
+        maxAge: 1 * 24 * 60 * 60, // 1 día en segundos
+        maxAgeDias: 1,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      },
+      // Información calculada
+      tiempoMaximoVida: "1 día (86400 segundos)",
+      nota: "La fecha exacta de expiración y creación no están disponibles en el servidor con Next.js cookies API",
+    }
+
+    return {
+      success: true,
+      message: "Cookie obtenida exitosamente",
+      data: cookieInfo,
+    }
+  } catch (error) {
+    console.error("Error obteniendo información de la cookie:", error)
+    return {
+      success: false,
+      message: "Error al obtener la cookie",
+      data: null,
+    }
+  }
 }
 
-
-
-
-
-
-//////////////////////////////////////
 // Función: setSessionCookies: función para definir variables de sesion
 export async function setSessionCookies(sessionData: Session): Promise<void> {
   const cookieStore = cookies()
