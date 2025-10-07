@@ -207,3 +207,13 @@ export async function HashData(texto: string): Promise<string> {
     throw new Error("Failed to hash text")
   }
 }
+
+// Función: CompareHash - (Bcrypt-js) : Hashear o encriptar texto, utilizado para contraseñas
+export async function CompareHash(texto: string, texto2: string): Promise<boolean> {
+  try {
+    return bcrypt.compare(texto, 10)
+  } catch (error) {
+    console.error("Error en actions/uilerias en HashData, hashing text:", error)
+    throw new Error("Failed to hash text")
+  }
+}
