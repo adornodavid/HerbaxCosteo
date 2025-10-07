@@ -39,7 +39,7 @@ import type { Session } from "@/types/usuarios" // Declare the LoginResult varia
 // procesarInicioSesion: funcion para iniciar sesion en el sistema
 export async function procesarInicioSesion(email: string, password: string): Promise<LoginResult> {
   try {
-    // Paso 1: Encriptar el password introducido
+    // Paso 1: Encriptar el password introducido // CAMBIO: YA NO ES NECESARIO PERO SE DEJO
     const PasswordHash = await HashData(password)
 
     // Paso 2: Buscar datos con de acuerdo al email o usuario
