@@ -50,6 +50,7 @@ export async function procesarInicioSesion(email: string, password: string): Pro
       .eq("email", email)
       //.eq("password", PasswordHash)
       .eq("activo", true)
+      .single()
 
       console.log(usuarios.password)
 
