@@ -913,5 +913,5 @@ export async function estatusActivoProducto(productoid: number, activo: boolean)
 
 // Función: listaDesplegableProductos / ddlProductos: Lista desplegable de productos para agregar
 export async function listaDesplegableProductos(buscar:string): Promise<ddlItem>{
-
+    
 }
