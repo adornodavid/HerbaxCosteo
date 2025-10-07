@@ -4,6 +4,7 @@ import type React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { getSession } from "@/app/actions/session-actions"
+import { obtenerSesion } from "@/app/actions/session"
 //import type { DatosSesion } from "@/lib/types-sistema-costeo"
 import type { Session } from "@/types/usuarios"
 
@@ -29,7 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const session = await getSession()
+        const session = await obtenerSesion()
 
         if (session) {
           setUser(session)
