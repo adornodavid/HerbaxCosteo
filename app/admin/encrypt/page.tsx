@@ -65,20 +65,20 @@ export default function EncryptPage() {
 
       // Validación de seguridad
       if (!datosSession || datosSession.SesionActiva !== true) {
-        router.push("/dashboard")
+        //router.push("/dashboard")
         return
       }
 
       const rolId = Number.parseInt(datosSession.RolId?.toString() || "0", 10)
       if (rolId !== 1) {
-        router.push("/dashboard")
+        //router.push("/dashboard")
         return
       }
 
       setSesion(datosSession)
     } catch (error) {
       console.error("Error cargando sesión:", error)
-      router.push("/dashboard")
+      //router.push("/dashboard")
     } finally {
       setLoading(false)
     }
