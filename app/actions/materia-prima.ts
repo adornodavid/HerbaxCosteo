@@ -85,7 +85,7 @@ export async function crearMateriaPrima(formData: FormData) {
 
     // Paso 4: Ejecutar Query
     const { data, error } = await supabase
-      .from("materiasprimas")
+      .from("materiasprima")
       .insert({
         codigo,
         nombre,
