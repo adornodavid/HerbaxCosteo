@@ -160,7 +160,7 @@ export async function obtenerMateriasPrimasXProductos(
       return { success: true, data: [] }
     }
 
-    const DataIds: number[] = data.map((item) => item.formulaid)
+    const DataIds: number[] = data.map((item) => item.materiaprimaid)
 
     return { success: true, data: DataIds }
   } catch (error) {
