@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase"
 import { setSessionCookies } from "./session-actions"
 import { cerrarSesion } from "./session-actions-with-expiration" // Importar cerrarSesion
 import { HashData, Encrypt, CompareHash } from "./utilerias"
-import { establecerSesionCookies, eliminarSesionCookies } from "./session"
+import { establecerSesionCookies, eliminarSesionCookies, limpiarSessionCookies } from "./session"
 import type { Session } from "@/types/usuarios" // Declare the LoginResult variable
 
 /* ==================================================
@@ -141,5 +141,6 @@ export async function procesarInicioSesion(email: string, password: string): Pro
 
 // Funcion: procesarCerrarSesion
 export async function procesarCerrarSesion(): Promise<void> {
+  await limpiarSessionCookies()
   await eliminarSesionCookies()
 }
