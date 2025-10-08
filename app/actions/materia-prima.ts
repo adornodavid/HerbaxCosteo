@@ -100,7 +100,7 @@ export async function crearMateriaPrima(formData: FormData) {
 
     // Return error
     if (error) {
-      console.error("Error creando formula en query en crearFormula de actions/formulas:", error)
+      console.error("Error creando materia prima en query en crearMateriaPrima de actions/materia-prima:", error)
       return { success: false, error: error.message }
     }
 
@@ -109,8 +109,8 @@ export async function crearMateriaPrima(formData: FormData) {
     // Return resultados
     return { success: true, data: data.id }
   } catch (error) {
-    console.error("Error en crearFormula de actions/formulas:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar funcion crearFormula de actions/formulas" }
+    console.error("Error en crearMateriaPrima de actions/materia-prima:", error)
+    return { success: false, error: "Error interno del servidor, al ejecutar funcion crearMateriaPrima de actions/materia-prima" }
   }
 }
 
