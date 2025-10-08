@@ -56,7 +56,19 @@ export default function ClientesPage() {
       }
       const listadoResult = await obtenerClientes(auxAdmin, "", "", "", "", "", "True")
       if (listadoResult.success && listadoResult.data) {
-        const transformedData: Cliente[] = productosResult.data.map((p: Cliente) => ({
+        const transformedData: Cliente[] = listadoResult.data.map((p: Cliente) => ({
+          id: Cliente.id,
+          nombre: Cliente.nombre,
+          clave: Cliente.clave,
+          direccion: Cliente.direccion,
+          telefono: Cliente.telefono,
+          email: Cliente.email,
+          imgurl: Cliente.imgurl,
+          fechacreacion: Cliente.fechacreacion,
+          activo: Cliente.activo,
+
+
+
           id: p.id,
           codigo: p.codigo,
           clienteid: p.clienteid,
