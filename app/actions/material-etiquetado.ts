@@ -99,7 +99,7 @@ export async function crearMaterialEtiquetado(formData: FormData) {
 
     // Return error
     if (error) {
-      console.error("Error creando materia prima en query en crearMateriaPrima de actions/materia-prima:", error)
+      console.error("Error creando material de etiquetado en query en crearMaterialEtiquetado de actions/material-etiquetado:", error)
       return { success: false, error: error.message }
     }
 
@@ -108,8 +108,8 @@ export async function crearMaterialEtiquetado(formData: FormData) {
     // Return resultados
     return { success: true, data: data.id }
   } catch (error) {
-    console.error("Error en crearMateriaPrima de actions/materia-prima:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar funcion crearMateriaPrima de actions/materia-prima" }
+    console.error("Error en crearMaterialEtiquetado de actions/material-etiquetado:", error)
+    return { success: false, error: "Error interno del servidor, al ejecutar funcion crearMaterialEtiquetado de actions/material-etiquetado" }
   }
 }
 
