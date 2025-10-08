@@ -192,9 +192,9 @@ export async function obtenerMateriasPrimasXFormulas(
       return { success: true, data: [] }
     }
 
-    const data: number[] = data.map((item) => item.materiaprimaid)
+    const Data: number[] = data.map((item) => item.materiaprimaid)
 
-    return { success: true, data: data }
+    return { success: true, data: Data }
   } catch (error) {
     console.error("Error en obtenerMateriasPrimasXFormulas de actions/materia-prima:", error)
     return {
