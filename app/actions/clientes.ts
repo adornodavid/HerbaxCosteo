@@ -123,87 +123,17 @@ export async function obtenerClientes(
   activo = "Todos",
 ) {
   try {
-    let Ids: number[] = []
-    if (catalogoid > 0) {
-      const resultado = await obtenerProductosXCatalogos(catalogoid)
-      if (resultado.success && resultado.data) {
-        Ids = resultado.data
-      }
-    }
-
-    let query = supabase.from("productos").select(`
+    // Paso 1: Preparar Query
+    let query = supabase.from("clientes").select(`
         id,
-        codigo,
-        clienteid,
-        clientes!clienteid(nombre),
-        zonaid,
-        zonas!zonaid(nombre),
         nombre,
+        clave,
+        direccion,
+        telefono,
+        email,
         imgurl,
-        unidadmedidaid,
-        unidadesmedida!unidadmedidaid(descripcion),
-        costo,
-        activo,
-        productoscaracteristicas!productoid(
-          descripcion,
-          presentacion,
-          porcion,
-          modouso,
-          porcionenvase,
-          categoriauso,
-          propositoprincipal,
-          propuestavalor,
-          instruccionesingesta,
-          edadminima,
-          advertencia,
-          condicionesalmacenamiento
-        ),
-        productosxcatalogo!productoid(
-          catalogoid,
-          precioventa,
-          margenutilidad,
-          catalogos!catalogoid(
-            nombre,
-            descripcion
-          )
-        ),
-        materialesetiquetadoxproducto!productoid(
-          materialetiquetadoid,
-          materialesetiquetado!materialetiquetadoid(
-            codigo,
-            nombre,
-            imgurl,
-            unidadmedidaid,
-            unidadesmedida!unidadmedidaid(descripcion),
-            costo
-          ),
-          cantidad,
-          costoparcial
-        ),
-        formulasxproducto!productoid(
-          formulaid,
-          formulas!formulaid(
-            codigo,
-            nombre,
-            unidadmedidaid,
-            unidadesmedida!unidadmedidaid(descripcion),
-            costo,
-            materiasprimasxformula!formulaid(
-              materiaprimaid,
-              cantidad,
-              costoparcial,
-              materiasprima!materiaprimaid(
-                codigo, 
-                nombre,
-                unidadmedidaid,
-                unidadesmedida!unidadmedidaid(descripcion),
-                costo
-              )
-            )
-          ),
-          cantidad,
-          costoparcial
-        )
+        fechacreacion,
+        activo
       `)
 
     //Filtros en query, dependiendo parametros
