@@ -132,6 +132,78 @@ export async function obtenerMateriasPrimas(
   }
 }
 
+//Función: obtenerMateriasPrimasXFormulas / selMateriasPrimasXFormulas, funcion para obtener en un array el listado de los ids de materias primas
+export async function obtenerMateriasPrimasXFormulass(
+  formulaid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (formulaid <= 0) {
+      return { success: false, error: "ID de formula inválido" }
+    }
+
+    let Ids: number[] = []
+    if (formulaid > 0) {
+      const resultado = await obtenerProductosXClientes(formulaid)
+      if (resultado.success && resultado.data) {
+        Ids = resultado.data
+      }
+    }
+
+    const { data, error } = await supabase.from("materiasprimasxformula").select("materiaprimaid").in("productoid", Ids)
+
+    if (error) {
+      console.error("Error en query obtenerFormulasXClientes:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const productosIds: number[] = data.map((item) => item.formulaid)
+
+    return { success: true, data: productosIds }
+  } catch (error) {
+    console.error("Error en obtenerFormulasXClientes de actions/formulas:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerFormulasXClientes de actions/formulas",
+    }
+  }
+}
+
+//Función: obtenerFormulasXProductos / selFormulasXProductos, funcion para obtener en un array el listado de los ids de formulas
+export async function obtenerMateriasPrimasXFormulas(
+  formulaid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (formulaid <= 0) {
+      return { success: false, error: "ID de formula inválido" }
+    }
+
+    const { data, error } = await supabase.from("materiasprimasxformula").select("materiaprimaid").eq("formulaid", formulaid)
+
+    if (error) {
+      console.error("Error en query obtenerMateriasPrimasXFormulas de actions/materia-prima:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const data: number[] = data.map((item) => item.materiaprimaid)
+
+    return { success: true, data: data }
+  } catch (error) {
+    console.error("Error en obtenerMateriasPrimasXFormulas de actions/materia-prima:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerMateriasPrimasXFormulas de actions/materia-prima",
+    }
+  }
+}
+
 /*==================================================
   UPDATES-ACTUALIZAR (UPDATES)
 ================================================== */
