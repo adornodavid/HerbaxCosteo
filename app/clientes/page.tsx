@@ -54,8 +54,8 @@ export default function ClientesPage() {
    // --- Paginación ---
   const elementosPaginados = useMemo(() => {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
-    return productosFiltrados.slice(indiceInicio, indiceInicio + resultadosPorPagina)
-  }, [productosFiltrados, paginaActual])
+    return ListadoFiltrados.slice(indiceInicio, indiceInicio + resultadosPorPagina)
+  }, [ListadoFiltrados, paginaActual])
   
   // --- Carga inicial de datos ---
   const cargarDatosIniciales = async () => {
