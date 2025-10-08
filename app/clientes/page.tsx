@@ -50,7 +50,11 @@ export default function ClientesPage() {
     if (!user) return
 
     try {
-      const listadoResult = await obtenerClientes(-1, "", "", "", "", "", "True")
+      let auxAdmin = -1
+      if(!esAdmin){
+        auxAdmin = userClienteId
+      }
+      const listadoResult = await obtenerClientes(auxAdmin, "", "", "", "", "", "True")
       if (listadoResult.success && listadoResult.data) {
         const transformedData: oProducto[] = productosResult.data.map((p: oProducto) => ({
           id: p.id,
