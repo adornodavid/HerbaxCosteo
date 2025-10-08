@@ -103,7 +103,7 @@ export async function crearMaterialEtiquetado(formData: FormData) {
       return { success: false, error: error.message }
     }
 
-    revalidatePath("/formulas")
+    revalidatePath("/materialetiquetado")
 
     // Return resultados
     return { success: true, data: data.id }
