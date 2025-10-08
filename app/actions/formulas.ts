@@ -62,7 +62,15 @@ export async function obtenerFormulas(
     if (clienteid > 0) {
       const resultado = await obtenerProductosXClientes(clienteid)
       if (resultado.success && resultado.data) {
-        Ids = resultado.data
+        IdsXCliente = resultado.data
+      }
+    }
+
+    let IdsXProducto: number[] = []
+    if (productoid > 0) {
+      const resultado = await obtenerFormulasXProductos(productoid)
+      if (resultado.success && resultado.data) {
+        IdsXProducto = resultado.data
       }
     }
 
