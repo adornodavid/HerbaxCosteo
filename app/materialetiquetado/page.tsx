@@ -1,177 +1,203 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, X } from "lucide-react"
+import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 
 export default function MaterialEtiquetadoPage() {
-  const [filtros, setFiltros] = useState({
-    id: "",
-    codigo: "",
-    nombre: "",
-    estatus: "Todos",
-  })
+  // Estados para filtros
+  const [filtroId, setFiltroId] = useState("")
+  const [filtroCodigo, setFiltroCodigo] = useState("")
+  const [filtroNombre, setFiltroNombre] = useState("")
+  const [filtroEstatus, setFiltroEstatus] = useState("-1")
+
+  // Datos de ejemplo para el listado
+  const [materialesEtiquetado] = useState([
+    { id: 1, codigo: "ME001", nombre: "Etiqueta Adhesiva Premium", costo: 50.0, activo: true },
+    { id: 2, codigo: "ME002", nombre: "Etiqueta Térmica Estándar", costo: 75.0, activo: true },
+    { id: 3, codigo: "ME003", nombre: "Etiqueta Holográfica", costo: 120.0, activo: false },
+  ])
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    // Aquí irá la lógica de búsqueda
+    console.log("Buscando con filtros:", { filtroId, filtroCodigo, filtroNombre, filtroEstatus })
+  }
 
   const handleLimpiar = () => {
-    setFiltros({
-      id: "",
-      codigo: "",
-      nombre: "",
-      estatus: "Todos",
-    })
+    setFiltroId("")
+    setFiltroCodigo("")
+    setFiltroNombre("")
+    setFiltroEstatus("-1")
   }
 
-  const handleBuscar = () => {
-    // Búsqueda se implementará más adelante
-    console.log("Buscando con filtros:", filtros)
-  }
-
-  // Datos de ejemplo para la tabla
-  const materialesEjemplo = [
-    {
-      id: 1,
-      codigo: "ME001",
-      nombre: "Etiqueta Adhesiva Premium",
-      estatus: "Activo",
-    },
-    {
-      id: 2,
-      codigo: "ME002",
-      nombre: "Etiqueta Térmica Estándar",
-      estatus: "Activo",
-    },
-    {
-      id: 3,
-      codigo: "ME003",
-      nombre: "Etiqueta Holográfica",
-      estatus: "Inactivo",
-    },
-  ]
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(amount)
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
+      {/* 1. Título y Botón */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Material Etiquetado</h1>
-          <p className="text-muted-foreground">Gestiona el catálogo de materiales de etiquetado</p>
+          <p className="text-muted-foreground">Gestión completa de Material Etiquetado</p>
         </div>
-        <Button className="bg-green-600 hover:bg-green-700">
-          <Plus className="mr-2 h-4 w-4" />
-          Nuevo Material Etiquetado
-        </Button>
+        <Link href="/materialetiquetado/nuevo" passHref>
+          <Button className="bg-[#5d8f72] hover:bg-[#44785a] text-white">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Crear Nuevo Material Etiquetado
+          </Button>
+        </Link>
       </div>
 
-      {/* Filtros */}
-      <Card>
+      <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
           <CardTitle>Filtros de Búsqueda</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="filtro-id">ID</Label>
+          <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 gap-4 items-end" onSubmit={handleFormSubmit}>
+            <div className="lg:col-span-2">
+              <label htmlFor="txtMaterialEtiquetadoId" className="text-sm font-medium">
+                ID
+              </label>
               <Input
-                id="filtro-id"
-                placeholder="ID del material"
-                value={filtros.id}
-                onChange={(e) => setFiltros({ ...filtros, id: e.target.value })}
+                id="txtMaterialEtiquetadoId"
+                name="txtMaterialEtiquetadoId"
+                type="text"
+                placeholder="Buscar por ID..."
+                value={filtroId}
+                onChange={(e) => setFiltroId(e.target.value)}
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="filtro-codigo">Código</Label>
+            <div className="lg:col-span-2">
+              <label htmlFor="txtMaterialEtiquetadoCodigo" className="text-sm font-medium">
+                Código
+              </label>
               <Input
-                id="filtro-codigo"
-                placeholder="Código del material"
-                value={filtros.codigo}
-                onChange={(e) => setFiltros({ ...filtros, codigo: e.target.value })}
+                id="txtMaterialEtiquetadoCodigo"
+                name="txtMaterialEtiquetadoCodigo"
+                type="text"
+                placeholder="Buscar por código..."
+                maxLength={50}
+                value={filtroCodigo}
+                onChange={(e) => setFiltroCodigo(e.target.value)}
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="filtro-nombre">Nombre</Label>
+            <div className="lg:col-span-2">
+              <label htmlFor="txtMaterialEtiquetadoNombre" className="text-sm font-medium">
+                Nombre
+              </label>
               <Input
-                id="filtro-nombre"
-                placeholder="Nombre del material"
-                value={filtros.nombre}
-                onChange={(e) => setFiltros({ ...filtros, nombre: e.target.value })}
+                id="txtMaterialEtiquetadoNombre"
+                name="txtMaterialEtiquetadoNombre"
+                type="text"
+                placeholder="Buscar por nombre..."
+                maxLength={150}
+                value={filtroNombre}
+                onChange={(e) => setFiltroNombre(e.target.value)}
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="filtro-estatus">Estatus</Label>
-              <Select value={filtros.estatus} onValueChange={(value) => setFiltros({ ...filtros, estatus: value })}>
-                <SelectTrigger id="filtro-estatus">
-                  <SelectValue placeholder="Seleccionar estatus" />
+            <div className="lg:col-span-2">
+              <label htmlFor="ddlEstatus" className="text-sm font-medium">
+                Estatus
+              </label>
+              <Select name="ddlEstatus" value={filtroEstatus} onValueChange={setFiltroEstatus}>
+                <SelectTrigger id="ddlEstatus">
+                  <SelectValue placeholder="Selecciona un estatus" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Todos">Todos</SelectItem>
-                  <SelectItem value="Activo">Activo</SelectItem>
-                  <SelectItem value="Inactivo">Inactivo</SelectItem>
+                  <SelectItem value="-1">Todos</SelectItem>
+                  <SelectItem value="true">Activo</SelectItem>
+                  <SelectItem value="false">Inactivo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </div>
-
-          <div className="flex gap-2 mt-4">
-            <Button variant="outline" onClick={handleLimpiar}>
-              <X className="mr-2 h-4 w-4" />
-              Limpiar
-            </Button>
-            <Button onClick={handleBuscar}>
-              <Search className="mr-2 h-4 w-4" />
-              Buscar
-            </Button>
-          </div>
+            <div className="flex gap-2 col-span-full md:col-span-2 lg:col-span-2 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full md:w-auto bg-[#4a4a4a] text-white hover:bg-[#333333]"
+                style={{ fontSize: "12px" }}
+                onClick={handleLimpiar}
+              >
+                <RotateCcw className="mr-2 h-3 w-3" /> Limpiar
+              </Button>
+              <Button
+                type="submit"
+                className="w-full md:w-auto bg-[#4a4a4a] text-white hover:bg-[#333333]"
+                style={{ fontSize: "12px" }}
+              >
+                <Search className="mr-2 h-3 w-3" /> Buscar
+              </Button>
+            </div>
+          </form>
         </CardContent>
       </Card>
 
-      {/* Resultados */}
-      <Card>
+      <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
           <CardTitle>Resultados</CardTitle>
+          <CardDescription>
+            Mostrando {materialesEtiquetado.length} materiales de etiquetado encontrados.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Código</TableHead>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Estatus</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {materialesEjemplo.map((material) => (
-                <TableRow key={material.id}>
-                  <TableCell>{material.id}</TableCell>
-                  <TableCell className="font-medium">{material.codigo}</TableCell>
-                  <TableCell>{material.nombre}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                        material.estatus === "Activo" ? "bg-green-50 text-green-700" : "bg-gray-50 text-gray-700"
-                      }`}
-                    >
-                      {material.estatus}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
-                      Ver
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-3 px-4 font-medium">ID</th>
+                  <th className="text-left py-3 px-4 font-medium">Código</th>
+                  <th className="text-left py-3 px-4 font-medium">Nombre</th>
+                  <th className="text-left py-3 px-4 font-medium">Costo</th>
+                  <th className="text-left py-3 px-4 font-medium">Estatus</th>
+                  <th className="text-left py-3 px-4 font-medium">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {materialesEtiquetado.map((me) => (
+                  <tr key={me.id} className="border-b hover:bg-gray-50">
+                    <td className="py-3 px-4">{me.id}</td>
+                    <td className="py-3 px-4">{me.codigo}</td>
+                    <td className="py-3 px-4">{me.nombre}</td>
+                    <td className="py-3 px-4">{formatCurrency(me.costo)}</td>
+                    <td className="py-3 px-4">
+                      <span
+                        className={`px-2 py-1 text-xs rounded-xs font-semibold ${
+                          me.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                        }`}
+                      >
+                        {me.activo ? "Activo" : "Inactivo"}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" title="Ver Detalles">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" title="Editar">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" title={me.activo ? "Inactivar" : "Activar"}>
+                          {me.activo ? (
+                            <ToggleRight className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <ToggleLeft className="h-4 w-4 text-green-500" />
+                          )}
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
     </div>
