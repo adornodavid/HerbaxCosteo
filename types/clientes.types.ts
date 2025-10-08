@@ -1,4 +1,6 @@
 /* ==================================================
+  * Objetos / Clases
+    - oProducto
   * CRUD:
     - Cliente
     - ClienteCrear
