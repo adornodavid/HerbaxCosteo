@@ -49,19 +49,17 @@ export async function crearFormula(formData: FormData) {
     const existe: boolean = await (async () => {
       const resultado = await obtenerFormulas(
         -1,
+        formData.get("codigo") as string,
         formData.get("nombre") as string,
-        formData.get("clave") as string,
-        //Number.parseInt(formData.get("clienteid") as string),
-        "",
-        "",
-        "",
         "Todos",
+        -1,
+        -1,
       )
       return resultado.success && resultado.data && resultado.data.length >= 1
     })()
 
     if (existe) {
-      return { success: false, error: "El cliente que se intenta ingresar ya existe y no se puede proceder" }
+      return { success: false, error: "La formula que se intenta ingresar ya existe y no se puede proceder" }
     }
 
     // Paso 2: Subir imagen para obtener su url
