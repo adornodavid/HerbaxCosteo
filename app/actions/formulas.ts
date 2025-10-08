@@ -58,8 +58,8 @@ export async function obtenerFormulas(
   try {
     // Paso 1: Obtener arrays de las formulasid que esten por cliente y/o por producto
 
-    
-    // Paso 1: Preparar Query
+
+    // Paso 2: Preparar Query
     let query = supabase.from("clientes").select(`
         id,
         nombre,
@@ -72,7 +72,7 @@ export async function obtenerFormulas(
         activo
       `)
 
-    // Paso 2: Filtros en query, dependiendo parametros
+    // Paso 3: Filtros en query, dependiendo parametros
     if (id !== -1) {
       query = query.eq("id", id)
     }
@@ -101,10 +101,10 @@ export async function obtenerFormulas(
       }
     }
 
-    // Paso 3: Ejecutar query
+    // Paso 4: Ejecutar query
     query = query.order("nombre", { ascending: true })
 
-    // Paso 4: Varaibles y resultados del query
+    // Paso 5: Varaibles y resultados del query
     const { data, error } = await query
 
     // Error en query
@@ -113,7 +113,7 @@ export async function obtenerFormulas(
       return { success: false, error: error.message }
     }
 
-    // Paso 5: Retorno de data
+    // Paso 6: Retorno de data
     return { success: true, data }
   } catch (error) {
     console.error("Error en obtenerClientes de actions/clientes:", error)
