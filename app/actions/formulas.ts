@@ -120,6 +120,42 @@ export async function obtenerFormulas(
     return { success: false, error: "Error interno del servidor, al ejecutar obtenerClientes de actions/clientes" }
   }
 }
+
+//Función: obtenerProductosXCatalogos / selProductosXCatalogos, funcion para obtener en un array el listado de los ids de productos
+export async function obtenerFormulasXClientes(
+  clienteid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (catalogoid <= 0) {
+      return { success: false, error: "ID de cliente inválido" }
+    }
+
+    const { data, error } = await supabase.from("productosxcatalogo").select("productoid").eq("catalogoid", catalogoid)
+
+    if (error) {
+      console.error("Error en query obtenerFormulasXClientes:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const productosIds: number[] = data.map((item) => item.formulaid)
+
+    return { success: true, data: productosIds }
+  } catch (error) {
+    console.error("Error en obtenerFormulasXClientes de actions/formulas:", error)
+    return { success: false, error: "Error interno del servidor, al ejecutar obtenerFormulasXClientes de actions/formulas" }
+  }
+}
+
+
+
+
+
+
+
 export async function obtenerFormulass(page = 1, limit = 20, clienteid = -1) {
   const offset = (page - 1) * limit
   try {
