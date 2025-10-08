@@ -110,8 +110,8 @@ export async function obtenerMaterialesEtiquetados(
         query = query.eq("activo", false)
       }
     }
-    if (IdsMerge.length > 0) {
-      query = query.in("id", IdsMerge)
+    if (IdsXProducto.length > 0) {
+      query = query.in("id", IdsXProducto)
     }
 
     // Paso 4: Ejecutar query
