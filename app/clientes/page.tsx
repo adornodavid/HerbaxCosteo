@@ -90,8 +90,8 @@ export default function ClientesPage() {
         }))
 
         setClientes(Listado)
-        setProductosFiltrados(Listado)
-        setTotalProductos(Listado.length)
+        //setProductosFiltrados(Listado)
+        //setTotalProductos(Listado.length)
       } else {
         console.log("[v0] No hay datos o la consulta falló")
       }
