@@ -140,7 +140,7 @@ export async function obtenerSesionCookies(): Promise<string | null> {
     const CookieEncriptada = cookieStore.get("HealthyLabCosteo")?.value
 
     if (!CookieEncriptada) {
-      console.error(
+      console.log(
         "Error: No se pudo obtener la cookie encriptada HealthyLabCosteo, en obtenerSesionCookies de actions/session",
       )
       return null
