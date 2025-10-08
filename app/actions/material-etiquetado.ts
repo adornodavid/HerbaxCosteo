@@ -60,7 +60,7 @@ export async function obtenerMaterialesEtiquetados(
     // Paso 1: Obtener arrays de las formulasid que esten por cliente y/o por producto
     let IdsXProducto: number[] = []
     if (productoid > 0) {
-      const resultado = await obtenerMateriasPrimasXProductos(productoid)
+      const resultado = await obtenerMaterialesEtiquetadoXProductos(productoid)
       if (resultado.success && resultado.data) {
         IdsXProducto = resultado.data
       }
