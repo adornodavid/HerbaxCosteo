@@ -134,6 +134,38 @@ export async function obtenerMaterialesEtiquetados(
   }
 }
 
+// Función: obtenerMaterialesEtiquetadosXProductos / selMaterialesEtiquetadosXProductos, funcion para obtener en un array el listado de los ids de materiales de etiquetado
+export async function obtenerMaterialesEtiquetadosXProductos(
+  formulaid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (formulaid <= 0) {
+      return { success: false, error: "ID de formula inválido" }
+    }
+
+    const { data, error } = await supabase.from("materiasprimasxformula").select("materiaprimaid").eq("formulaid", formulaid)
+
+    if (error) {
+      console.error("Error en query obtenerMateriasPrimasXFormulas de actions/materia-prima:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const DataIds: number[] = data.map((item) => item.materiaprimaid)
+
+    return { success: true, data: DataIds }
+  } catch (error) {
+    console.error("Error en obtenerMateriasPrimasXFormulas de actions/materia-prima:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerMateriasPrimasXFormulas de actions/materia-prima",
+    }
+  }
+}
+
 /*==================================================
   UPDATES-ACTUALIZAR (UPDATES)
 ================================================== */
