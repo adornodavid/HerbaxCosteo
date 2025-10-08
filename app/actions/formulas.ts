@@ -262,9 +262,9 @@ export async function obtenerFormulasXProductos(
       return { success: true, data: [] }
     }
 
-    const productosIds: number[] = data.map((item) => item.formulaid)
+    const Data: number[] = data.map((item) => item.productoid)
 
-    return { success: true, data: productosIds }
+    return { success: true, data: Data }
   } catch (error) {
     console.error("Error en obtenerFormulasXProductos de actions/formulas:", error)
     return {
