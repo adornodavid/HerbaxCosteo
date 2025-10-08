@@ -27,6 +27,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
     - crearFormula / insFormula
   * READS-OBTENER (SELECTS)
     - obtenerFormulas / selFormulas
+    - obtenerFormulasXClientes / selFormulasXClientes
+    - obtenerFormulasXProductos / selFormulasXProductos
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarFormula / updFormula    
   * DELETES-ELIMINAR (DELETES)
