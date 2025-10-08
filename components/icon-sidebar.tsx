@@ -12,7 +12,7 @@ export function IconSidebar({ onToggleNavigation }: IconSidebarProps) {
       {/* Hamburger Menu Icon */}
       <button
         onClick={onToggleNavigation}
-        className="w-12 h-12 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-4"
+        className="w-12 h-12 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-6"
         title="Menú"
       >
         <Icons.Menu className="w-6 h-6 text-gray-700" />
@@ -21,64 +21,51 @@ export function IconSidebar({ onToggleNavigation }: IconSidebarProps) {
       {/* Profile Icon */}
       <Link
         href="/perfil"
-        className="w-12 h-12 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-4"
+        className="flex flex-col items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-6 p-2"
         title="Perfil"
       >
-        <Icons.User className="w-6 h-6 text-gray-700" />
+        <Icons.User className="w-6 h-6 text-gray-700 mb-1" />
+        <span className="text-xs text-gray-600">Perfil</span>
       </Link>
 
       {/* Dashboard Icon */}
       <Link
         href="/dashboard"
-        className="w-12 h-12 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-4"
+        className="flex flex-col items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-6 p-2"
         title="Dashboard"
       >
-        <Icons.BarChart className="w-6 h-6 text-gray-700" />
+        <Icons.BarChart className="w-6 h-6 text-gray-700 mb-1" />
+        <span className="text-xs text-gray-600">Dashboard</span>
       </Link>
 
       {/* Products Icon */}
       <Link
         href="/productos"
-        className="w-12 h-12 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-4"
+        className="flex flex-col items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-6 p-2"
         title="Productos"
       >
-        <Icons.Package className="w-6 h-6 text-gray-700" />
-      </Link>
-
-      {/* Materials Icon */}
-      <Link
-        href="/materiaprima"
-        className="w-12 h-12 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-4"
-        title="Materiales"
-      >
-        <Icons.Salad className="w-6 h-6 text-gray-700" />
-      </Link>
-
-      {/* Catalogs Icon */}
-      <Link
-        href="/catalogos"
-        className="w-12 h-12 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-4"
-        title="Catálogos"
-      >
-        <Icons.FileText className="w-6 h-6 text-gray-700" />
+        <Icons.Package className="w-6 h-6 text-gray-700 mb-1" />
+        <span className="text-xs text-gray-600">Productos</span>
       </Link>
 
       {/* Reports Icon */}
       <Link
         href="/reportes"
-        className="w-12 h-12 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-4"
+        className="flex flex-col items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-6 p-2"
         title="Reportes"
       >
-        <Icons.FileBarChart className="w-6 h-6 text-gray-700" />
+        <Icons.FileBarChart className="w-6 h-6 text-gray-700 mb-1" />
+        <span className="text-xs text-gray-600">Reportes</span>
       </Link>
 
-      {/* Settings Icon */}
+      {/* Logout Icon */}
       <Link
-        href="/configuraciones"
-        className="w-12 h-12 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-4"
-        title="Configuraciones"
+        href="/api/auth/logout"
+        className="flex flex-col items-center justify-center rounded-lg hover:bg-gray-100 transition-colors p-2 mt-auto"
+        title="Cerrar Sesión"
       >
-        <Icons.Settings className="w-6 h-6 text-gray-700" />
+        <Icons.LogOut className="w-6 h-6 text-gray-700 mb-1" />
+        <span className="text-xs text-gray-600">Salir</span>
       </Link>
     </div>
   )
