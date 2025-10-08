@@ -50,6 +50,13 @@ export default function ClientesPage() {
     if (!user) return
 
     try {
+    id = -1,
+  nombre = "",
+  clave = "",
+  direccion = "",
+  telefono = "",
+  email = ""
+  activo = "Todos",
       const listadoResult = await obtenerClientes(-1, "", -1, -1, -1, "True")
       if (productosResult.success && productosResult.data) {
         const transformedData: oProducto[] = productosResult.data.map((p: oProducto) => ({
