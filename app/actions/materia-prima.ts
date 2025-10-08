@@ -47,6 +47,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 /*==================================================
   READS-OBTENER (SELECTS)
 ================================================== */
+// Función: obtenerMateriasPrimas / selMateriasPrimas: función para obtener la o las materias primas
 
 /*==================================================
   UPDATES-ACTUALIZAR (UPDATES)
