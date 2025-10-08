@@ -41,7 +41,7 @@ export async function crearCliente(formData: FormData) {
   try {
     //Validar si no existe
     const existe: boolean = await (async () => {
-      const resultado = await obtenerProductos(
+      const resultado = await obtenerClientes(
         -1,
         formData.get("nombre") as string,
         Number.parseInt(formData.get("clienteid") as string),
@@ -53,7 +53,7 @@ export async function crearCliente(formData: FormData) {
     })()
 
     if (existe) {
-      return { success: false, error: "El producto que se intenta ingresar ya existe y no se puede proceder" }
+      return { success: false, error: "El cliente que se intenta ingresar ya existe y no se puede proceder" }
     }
 
     //Subir imagen para obtener su url
