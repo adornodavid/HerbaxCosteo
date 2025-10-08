@@ -30,6 +30,33 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - estatusActivoCliente / actCliente
     - listaDesplegableClientes / ddlClientes
 ================================================== */
+
+/*==================================================
+    OBJETOS / CLASES
+================================================== */
+
+/*==================================================
+    CREATES-CREAR (INSERTS)
+================================================== */
+
+/*==================================================
+  READS-OBTENER (SELECTS)
+================================================== */
+
+/*==================================================
+  UPDATES-ACTUALIZAR (UPDATES)
+================================================== */
+
+/*==================================================
+  * DELETES-ELIMINAR (DELETES)
+================================================== */
+
+
+/*==================================================
+  * SPECIALS-ESPECIALES ()
+================================================== */
+
+
 //Función: crearCliente: funcion para crear un cliente
 
 //Función: obtenerClientes: funcion para obtener todos los clientes
