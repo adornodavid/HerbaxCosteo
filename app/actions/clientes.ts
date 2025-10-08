@@ -6,7 +6,6 @@
 import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
 import { imagenSubir } from "@/app/actions/utilerias"
-import { obtenerProductosXClientes } from "@/app/actions/productos"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
