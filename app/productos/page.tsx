@@ -1,9 +1,13 @@
-"use client"
+s"use client"
 
 /* ==================================================
 	  Imports
 	================================================== */
+// -- Interfaces, Tipado, Clases, Objetos
 import type React from "react"
+import type { ddlItem } from "@/types/common"
+import type { oProducto, ProductoCatalogo, ProductoListado, ProductosEstadisticas } from "@/types/productos"
+// -- Assets
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -45,9 +49,6 @@ import {
 import { obtenerProductos } from "@/app/actions/productos"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
-// -- Interfaces, Tipado, Clases, Objetos
-import type { oProducto, ProductoCatalogo, ProductoListado, ProductosEstadisticas } from "@/types/productos"
-import type { ddlItem } from "@/types/common"
 
 /* ==================================================
   Interfaces, tipados, clases

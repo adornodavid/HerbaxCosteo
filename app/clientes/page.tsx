@@ -3,9 +3,9 @@
 /* ==================================================
 	  Imports
 	================================================== */
-// Interfaces, clases y objetos
+// -- Interfaces, clases y objetos
 import type React from "react"
-// Assets
+// -- Assets
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -13,17 +13,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
-// Backend
+// -- Frontend
+
+// -- Backend
+import { obtenerClientes } from "@/app/actions/clientes"
 
 /* ==================================================
 	  Componente Principal, Pagina
 	================================================== */
 export default function ClientesPage() {
+  // --- Variables especiales ---
+  const router = useRouter()
+  const { user, isLoading: authLoading } = useAuth()
+  
   // Estados para filtros
   const [filtroId, setFiltroId] = useState("")
   const [filtroClave, setFiltroClave] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
   const [filtroEstatus, setFiltroEstatus] = useState("-1")
+
+  // Paginación
+  const [paginaActual, setPaginaActual] = useState(1)
+  const resultadosPorPagina = 20
+
+  const esAdmin = useMemo(() => user && [1, 2, 3, 4].includes(user.RolId), [user])
 
   // Datos de ejemplo para el listado
   const [clientes] = useState([
@@ -32,6 +45,172 @@ export default function ClientesPage() {
     { id: 3, codigo: "CLI003", nombre: "Cliente 3", direccion: "Dirección 3", activo: false },
   ])
 
+  // --- Carga inicial de datos ---
+  const cargarDatosIniciales = async () => {
+    if (!user) return
+
+    try {
+      const listadoResult = await obtenerClientes(-1, "", -1, -1, -1, "True")
+      if (productosResult.success && productosResult.data) {
+        const transformedData: oProducto[] = productosResult.data.map((p: oProducto) => ({
+          id: p.id,
+          codigo: p.codigo,
+          clienteid: p.clienteid,
+          clientes: {
+            nombre: p.clientes?.nombre || null,
+          },
+          zonaid: p.zonaid,
+          zonas: {
+            nombre: p.zonas?.nombre || null,
+          },
+          nombre: p.nombre,
+          imgurl: p.imgurl,
+          unidadmedidaid: p.unidadmedidaid,
+          unidadesmedida: {
+            descripcion: p.unidadesmedida?.descripcion || null,
+          },
+          costo: p.costo,
+          activo: p.activo,
+          productoscaracteristicas: {
+            descripcion: p.productoscaracteristicas?.descripcion || null,
+            presentacion: p.productoscaracteristicas?.presentacion || null,
+            porcion: p.productoscaracteristicas?.porcion || null,
+            modouso: p.productoscaracteristicas?.modouso || null,
+            porcionenvase: p.productoscaracteristicas?.porcionenvase || null,
+            categoriauso: p.productoscaracteristicas?.categoriauso || null,
+            propositoprincipal: p.productoscaracteristicas?.propositoprincipal || null,
+            propuestavalor: p.productoscaracteristicas?.propuestavalor || null,
+            instruccionesingesta: p.productoscaracteristicas?.instruccionesingesta || null,
+            edadminima: p.productoscaracteristicas?.edadminima || null,
+            advertencia: p.productoscaracteristicas?.advertencia || null,
+            condicionesalmacenamiento: p.productoscaracteristicas?.condicionesalmacenamiento || null,
+          },
+          productosxcatalogo: p.productosxcatalogo?.map((cat) => ({
+            catalogoid: cat.catalogoid || null,
+            precioventa: cat.precioventa || null,
+            margenutilidad: cat.margenutilidad || null,
+            catalogos: {
+              nombre: cat.catalogos?.nombre || null,
+              descripcion: cat.catalogos?.descripcion || null,
+            },
+          })) || [],
+
+          formulasxproducto: p.formulasxproducto?.map((fxp) => ({
+            formulaid: fxp.formulaid || null,
+            formulas: {
+              codigo: fxp.formulas?.codigo || null,
+              nombre: fxp.formulas?.nombre || null,
+              unidadmedidaid: fxp.formulas?.unidadmedidaid || null,
+              unidadesmedida: {
+                descripcion: fxp.unidadesmedida?.descripcion || null,
+              },
+              costo: fxp.formulas?.costo || null,
+              materiasprimasxformula: fxp.materiasprimasxformula?.map((mxf) => ({
+                materiaprimaid: mxf.materiaprimaid || null,
+                cantidad: mxf.cantidad || null,
+                costoparcial: mxf.costoparcial || null,
+                materiasprima: {
+                  codigo: mxf.materiasprima?.codigo || null,
+                  nombre: mxf.materiasprima?.nombre || null,
+                  unidadmedidaid: mxf.materiasprima?.codigo || null,
+                  unidadesmedida: {
+                    descripcion: mxf.unidadesmedida?.descripcion || null,
+                  },
+                  costo: mxf.materiasprima?.codigo || null,
+                },
+              })) || [],
+            } || null,
+          })) || [],
+        }))
+
+        const productosListado: ProductoListado[] = transformedData.map((p: oProducto) => ({
+          ProductoId: p.id,
+          ProductoNombre: p.nombre || "Sin nombre",
+          ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
+          ProductoTiempo: "N/A",
+          ProductoCosto: p.costo || 0,
+          ProductoActivo: p.activo === true,
+          ProductoImagenUrl: p.imgurl,
+          ClienteId: p.clienteid || -1,
+          ClienteNombre: p.clientes?.nombre || "N/A",
+          CatalogoId: p.productosxcatalogo[0]?.catalogoid || -1,
+          CatalogoNombre: p.productosxcatalogo[0]?.catalogos?.nombre || "N/A",
+        }))
+
+        setProductos(productosListado)
+        setProductosFiltrados(productosListado)
+        setTotalProductos(productosListado.length)
+      } else {
+        console.log("[v0] No hay datos o la consulta falló")
+      }
+
+      const userClienteId = [1, 2, 3, 4].includes(Number(user.RolId)) ? -1 : Number(user.ClienteId)
+      // -- Cargar clientes
+      const { data: clientesData, error: clientesError } = await listaDesplegableClientes(userClienteId,"")
+      if (!clientesError) {
+        const clientesConTodos = [1, 2, 3, 4].includes(Number(user.RolId))
+          ? [{ id: -1, nombre: "Todos" }, ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))]
+          : (clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
+        setClientes(clientesConTodos)
+
+        if ([1, 2, 3, 4].includes(Number(user.RolId))) {
+          setFiltroCliente("-1")
+        } else {
+          const aux = clientesData.id
+          setFiltroCliente(aux)
+        }
+        //setFiltroCliente("-1")
+      } else {
+        console.error("Error cargando clientes:", clientesError)
+      }
+
+      // -- Cargar catalogos
+      const catalogosResult = await listaDesplegableCatalogos(-1, "", userClienteId)
+      if (!catalogosResult.error) {
+        const catalogosConTodos = [1, 2, 3, 4].includes(Number(user.RolId))
+          ? [
+              { id: -1, nombre: "Todos" },
+              ...(catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre })),
+            ]
+          : (catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre }))
+
+        setCatalogos(catalogosConTodos)
+
+        if ([1, 2, 3, 4].includes(Number(user.RolId))) {
+          setFiltroCatalogo("-1") // Set to "Todos" for admin roles
+        } else {
+          // Set to first available catalog for restricted users
+          if (catalogosResult.data && catalogosResult.data.length > 0) {
+            setFiltroCatalogo(catalogosResult.data[0].id.toString())
+          }
+        }
+      } else {
+        console.error("Error cargando catálogos iniciales:", catalogosResult.error)
+      }
+    } catch (error) {
+      console.error("Error al cargar datos iniciales:", error)
+    } finally {
+      setPageLoading(false)
+    }
+  }
+
+  // --- Carga Inicial y Seguridad ---
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user || user.RolId === 0) {
+        router.push("/login")
+        return
+      }
+
+      const inicializar = async () => {
+        setPageLoading(true)
+        await cargarDatosIniciales()
+      }
+      inicializar()
+    }
+  }, [authLoading, user, router, esAdmin])
+
+  // -- Handles
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     // Aquí irá la lógica de búsqueda
