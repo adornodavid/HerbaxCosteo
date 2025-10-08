@@ -60,7 +60,7 @@ export async function obtenerFormulas(
     // Paso 1: Obtener arrays de las formulasid que esten por cliente y/o por producto
     let IdsXCliente: number[] = []
     if (clienteid > 0) {
-      const resultado = await obtenerProductosXClientes(clienteid)
+      const resultado = await obtenerFormulasXClientes(clienteid)
       if (resultado.success && resultado.data) {
         IdsXCliente = resultado.data
       }
