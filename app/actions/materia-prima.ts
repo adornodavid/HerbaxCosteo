@@ -138,18 +138,18 @@ export async function obtenerMateriasPrimasXProductos(
 ): Promise<{ success: boolean; data?: number[]; error?: string }> {
   try {
     if (productoid <= 0) {
-      return { success: false, error: "ID de productoid inválido" }
+      return { success: false, error: "ID de producto inválido" }
     }
 
     let Ids: number[] = []
-    if (formulaid > 0) {
-      const resultado = await obtenerProductosXClientes(formulaid)
+    if (productoid > 0) {
+      const resultado = await obtenerFormulasXProductos(productoid)
       if (resultado.success && resultado.data) {
         Ids = resultado.data
       }
     }
 
-    const { data, error } = await supabase.from("materiasprimasxformula").select("materiaprimaid").in("productoid", Ids)
+    const { data, error } = await supabase.from("materiasprimasxformula").select("materiaprimaid").in("formulaid", Ids)
 
     if (error) {
       console.error("Error en query obtenerFormulasXClientes:", error)
@@ -160,7 +160,7 @@ export async function obtenerMateriasPrimasXProductos(
       return { success: true, data: [] }
     }
 
-    const DataIds: number[] = data.map((item) => item.materiaprimaid)
+    const DataIds: number[] = data.map((item) => item.formulaid)
 
     return { success: true, data: DataIds }
   } catch (error) {
