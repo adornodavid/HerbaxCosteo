@@ -78,7 +78,7 @@ export async function crearCliente(formData: FormData) {
     const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
     const activo = true
 
-    //Ejecutar Query
+    // Paso 4: Ejecutar Query
     const { data, error } = await supabase
       .from("productos")
       .insert({
