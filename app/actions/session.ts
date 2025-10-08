@@ -156,6 +156,15 @@ export async function obtenerSesionCookies(): Promise<string | null> {
   }
 }
 
+// Función para limpiar todas las cookies de sesión
+export async function limpiarSessionCookies(): Promise<void> {    
+  const cookieName = "HealthyLabCosteo"
+  // Establecer fecha pasada para expirar las cookies
+  const pastDate = new Date(0).toUTCString()
+  document.cookie = `${cookieName}=; expires=${pastDate}; path=/; SameSite=Strict`
+  console.log("Variables de sesión eliminadas correctamente")
+}
+
 // Función: eliminarSesionCookies / deleteSessionCookies: función para limpiar las cookies de la sesion creada
 export async function eliminarSesionCookies(): Promise<void> {
   const cookieStore = cookies()
@@ -210,14 +219,7 @@ export async function obtenerCoookie() {
   }
 }
 
-// Función para limpiar todas las cookies de sesión
-export async function limpiarSessionCookies(): Promise<void> {    
-  const cookieName = "HealthyLabCosteo"
-  // Establecer fecha pasada para expirar las cookies
-  const pastDate = new Date(0).toUTCString()
-  document.cookie = `${cookieName}=; expires=${pastDate}; path=/; SameSite=Strict`
-  console.log("Variables de sesión eliminadas correctamente")
-}
+
 
 
 
