@@ -230,9 +230,9 @@ export async function obtenerFormulasXClientes(
       return { success: true, data: [] }
     }
 
-    const Data: number[] = data.map((item) => item.formulaid)
+    const DataIds: number[] = data.map((item) => item.formulaid)
 
-    return { success: true, data: Data }
+    return { success: true, data: DataIds }
   } catch (error) {
     console.error("Error en obtenerFormulasXClientes de actions/formulas:", error)
     return {
@@ -262,9 +262,9 @@ export async function obtenerFormulasXProductos(
       return { success: true, data: [] }
     }
 
-    const Data: number[] = data.map((item) => item.formulaid)
+    const DataIds: number[] = data.map((item) => item.formulaid)
 
-    return { success: true, data: Data }
+    return { success: true, data: DataIds }
   } catch (error) {
     console.error("Error en obtenerFormulasXProductos de actions/formulas:", error)
     return {
