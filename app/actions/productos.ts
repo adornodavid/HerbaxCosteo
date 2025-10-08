@@ -550,9 +550,9 @@ export async function obtenerProductosXClientes(
       return { success: true, data: [] }
     }
 
-    const productosIds: number[] = data.map((item) => item.productoid)
+    const Data: number[] = data.map((item) => item.productoid)
 
-    return { success: true, data: productosIds }
+    return { success: true, data: Data }
   } catch (error) {
     console.error("Error en obtenerProductosXClientes de actions/productos:", error)
     return { success: false, error: "Error interno del servidor, al ejecutar obtenerProductosXClientes de actions/productos" }
