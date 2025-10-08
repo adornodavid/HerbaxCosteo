@@ -74,7 +74,6 @@ export async function crearCliente(formData: FormData) {
     const direccion = formData.get("direccion") as string
     const telefono = formData.get("telefono") as string
     const email = formData.get("email") as string
-    const imgurl = imagenurl
     const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
     const activo = true
 
@@ -82,12 +81,11 @@ export async function crearCliente(formData: FormData) {
     const { data, error } = await supabase
       .from("clientes")
       .insert({
-        codigo,
-        clienteid,
-        zonaid,
         nombre,
-        unidadmedidaid,
-        costo,
+        clave,
+        direccion,
+        telefono,
+        email,
         imgurl: imagenurl,
         fechacreacion: fecha,
         activo,
@@ -97,7 +95,7 @@ export async function crearCliente(formData: FormData) {
 
     // Return error
     if (error) {
-      console.error("Error creando producto en app/Actions/productos en crearProducto:", error)
+      console.error("Error creando cliente en actions/clientes en crearcliente:", error)
       return { success: false, error: error.message }
     }
 
