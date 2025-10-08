@@ -32,6 +32,7 @@ export default function ClientesPage() {
   const resultadosPorPagina = 20 
 
   // --- Estados ---
+  const [pageLoading, setPageLoading] = useState(true)
   const [Listado, setListado] = useState<Cliente[]>([])
   const [ListadoFiltrados, setListadoFiltrados] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
