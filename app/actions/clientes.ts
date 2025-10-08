@@ -113,7 +113,145 @@ export async function crearCliente(formData: FormData) {
   READS-OBTENER (SELECTS)
 ================================================== */
 //Función: obtenerClientes: funcion para obtener todos los clientes
+export async function obtenerProductos(
+  productoid = -1,
+  productonombre = "",
+  clienteid = -1,
+  zonaid = -1,
+  catalogoid = -1,
+  activo = "Todos",
+) {
+  try {
+    let Ids: number[] = []
+    if (catalogoid > 0) {
+      const resultado = await obtenerProductosXCatalogos(catalogoid)
+      if (resultado.success && resultado.data) {
+        Ids = resultado.data
+      }
+    }
 
+    let query = supabase.from("productos").select(`
+        id,
+        codigo,
+        clienteid,
+        clientes!clienteid(nombre),
+        zonaid,
+        zonas!zonaid(nombre),
+        nombre,
+        imgurl,
+        unidadmedidaid,
+        unidadesmedida!unidadmedidaid(descripcion),
+        costo,
+        activo,
+        productoscaracteristicas!productoid(
+          descripcion,
+          presentacion,
+          porcion,
+          modouso,
+          porcionenvase,
+          categoriauso,
+          propositoprincipal,
+          propuestavalor,
+          instruccionesingesta,
+          edadminima,
+          advertencia,
+          condicionesalmacenamiento
+        ),
+        productosxcatalogo!productoid(
+          catalogoid,
+          precioventa,
+          margenutilidad,
+          catalogos!catalogoid(
+            nombre,
+            descripcion
+          )
+        ),
+        materialesetiquetadoxproducto!productoid(
+          materialetiquetadoid,
+          materialesetiquetado!materialetiquetadoid(
+            codigo,
+            nombre,
+            imgurl,
+            unidadmedidaid,
+            unidadesmedida!unidadmedidaid(descripcion),
+            costo
+          ),
+          cantidad,
+          costoparcial
+        ),
+        formulasxproducto!productoid(
+          formulaid,
+          formulas!formulaid(
+            codigo,
+            nombre,
+            unidadmedidaid,
+            unidadesmedida!unidadmedidaid(descripcion),
+            costo,
+            materiasprimasxformula!formulaid(
+              materiaprimaid,
+              cantidad,
+              costoparcial,
+              materiasprima!materiaprimaid(
+                codigo, 
+                nombre,
+                unidadmedidaid,
+                unidadesmedida!unidadmedidaid(descripcion),
+                costo
+              )
+            )
+          ),
+          cantidad,
+          costoparcial
+        )
+      `)
+
+    //Filtros en query, dependiendo parametros
+    if (productoid !== -1) {
+      query = query.eq("id", productoid)
+    }
+
+    if (clienteid !== -1) {
+      query = query.eq("clienteid", clienteid)
+    }
+    if (zonaid !== -1) {
+      query = query.eq("zonaid", zonaid)
+    }
+    if (productonombre !== "") {
+      query = query.ilike("nombre", `%${productonombre}%`)
+    }
+    if (catalogoid > 0) {
+      query = query.in("id", Ids)
+    }
+    if (activo !== "Todos") {
+      const isActive = ["True", "true", "Activo", "1", true].includes(activo)
+      const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
+
+      if (isActive) {
+        query = query.eq("activo", true)
+      } else if (isInactive) {
+        query = query.eq("activo", false)
+      }
+    }
+
+    //Ejecutar query
+    query = query.order("nombre", { ascending: true })
+
+    //Varaibles y resultados del query
+    const { data, error } = await query
+
+    //Error en query
+    if (error) {
+      console.error("Error obteniendo productos:", error)
+      return { success: false, error: error.message }
+    }
+
+    //Retorno de data
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en app/actions/productos en obtenerProductos:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
 
 /*==================================================
   UPDATES-ACTUALIZAR (UPDATES)
