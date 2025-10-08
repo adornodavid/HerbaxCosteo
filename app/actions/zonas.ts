@@ -89,7 +89,7 @@ export async function obtenerZonas(
     return { success: true, data }
   } catch (error) {
     console.error("Error en actions/zonas en obtenerZona:", error)
-    return { success: false, error: "Error interno del servidor" }
+    return { success: false, error: "Error interno del servidor, al ejecutar obtenerZonas de actions/zonas" }
   }
 }
 
