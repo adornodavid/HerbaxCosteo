@@ -132,13 +132,13 @@ export async function obtenerMateriasPrimas(
   }
 }
 
-//Función: obtenerMateriasPrimasXFormulas / selMateriasPrimasXFormulas, funcion para obtener en un array el listado de los ids de materias primas
-export async function obtenerMateriasPrimasXFormulass(
-  formulaid = -1,
+// Función: obtenerMateriasPrimasXProductos / selMateriasPrimasXProductos, funcion para obtener en un array el listado de los ids de materias primas
+export async function obtenerMateriasPrimasXProductos(
+  productoid = -1,
 ): Promise<{ success: boolean; data?: number[]; error?: string }> {
   try {
-    if (formulaid <= 0) {
-      return { success: false, error: "ID de formula inválido" }
+    if (productoid <= 0) {
+      return { success: false, error: "ID de productoid inválido" }
     }
 
     let Ids: number[] = []
@@ -172,7 +172,7 @@ export async function obtenerMateriasPrimasXFormulass(
   }
 }
 
-//Función: obtenerFormulasXProductos / selFormulasXProductos, funcion para obtener en un array el listado de los ids de formulas
+// Función: obtenerMateriasPrimasXFormulas / selMateriasPrimasXFormulas, funcion para obtener en un array el listado de los ids de materias primas
 export async function obtenerMateriasPrimasXFormulas(
   formulaid = -1,
 ): Promise<{ success: boolean; data?: number[]; error?: string }> {
