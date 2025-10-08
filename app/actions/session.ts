@@ -210,6 +210,15 @@ export async function obtenerCoookie() {
   }
 }
 
+// Función para limpiar todas las cookies de sesión
+export async function clearSessionCookies(): Promise<void> {    
+  const cookieName = "HealthyLabCosteo"
+  // Establecer fecha pasada para expirar las cookies
+  const pastDate = new Date(0).toUTCString()
+  document.cookie = `${cookieName}=; expires=${pastDate}; path=/; SameSite=Strict`
+  console.log("Variables de sesión eliminadas correctamente")
+}
+
 // Función: setSessionCookies: función para definir variables de sesion
 export async function setSessionCookies(sessionData: Session): Promise<void> {
   const cookieStore = cookies()
