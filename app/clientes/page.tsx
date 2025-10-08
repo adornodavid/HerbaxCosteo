@@ -33,6 +33,8 @@ export default function ClientesPage() {
 
   // --- Estados ---
   const [Listado, setListado] = useState<Cliente[]>([])
+  const [ListadoFiltrados, setListadoFiltrados] = useState<Cliente[]>([])
+  const [totalProductos, setTotalProductos] = useState(0)
   
   // Estados para filtros
   const [filtroId, setFiltroId] = useState("")
