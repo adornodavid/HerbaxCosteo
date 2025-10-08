@@ -146,7 +146,7 @@ export async function obtenerMaterialesEtiquetadosXProductos(
     const { data, error } = await supabase.from("materialesetiquetadoxproductos").select("materialetiquetadoid").eq("productoid", productoid)
 
     if (error) {
-      console.error("Error en query obtenerMateriasPrimasXFormulas de actions/materia-prima:", error)
+      console.error("Error en query obtenerMaterialesEtiquetadosXProductos de actions/material-etiquetado:", error)
       return { success: false, error: error.message }
     }
 
@@ -158,10 +158,10 @@ export async function obtenerMaterialesEtiquetadosXProductos(
 
     return { success: true, data: DataIds }
   } catch (error) {
-    console.error("Error en obtenerMateriasPrimasXFormulas de actions/materia-prima:", error)
+    console.error("Error en obtenerMaterialesEtiquetadosXProductos de actions/material-etiquetado:", error)
     return {
       success: false,
-      error: "Error interno del servidor, al ejecutar obtenerMateriasPrimasXFormulas de actions/materia-prima",
+      error: "Error interno del servidor, al ejecutar obtenerMaterialesEtiquetadosXProductos de actions/material-etiquetado",
     }
   }
 }
