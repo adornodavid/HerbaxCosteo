@@ -19,6 +19,12 @@ export interface oCliente {
   imgurl: string | null
   fechacreacion: Date | null
   activo: boolean | null
+  // Zonas
+  // Catalogos
+  // Productos
+  // Materiales de etiquetado
+  // Formulas
+  // Materias Primas
 }
 
 // CRUD
