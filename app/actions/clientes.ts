@@ -165,7 +165,7 @@ export async function obtenerClientes(
       }
     }
 
-    //Ejecutar query
+    // Paso 3: Ejecutar query
     query = query.order("nombre", { ascending: true })
 
     //Varaibles y resultados del query
