@@ -16,16 +16,16 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   Funciones
   --------------------
   * CREATES-CREAR (INSERTS)
-    - crearCliente / insCliente
+    - crearZona / insZona
   * READS-OBTENER (SELECTS)
-    - obtenerClientes / selClientes
+    - obtenerZonas / selZonas
   * UPDATES-ACTUALIZAR (UPDATES)
-    - actualizarCliente / updCliente
+    - actualizarZona / updZona
   * DELETES-ELIMINAR (DELETES)
-    - eliminarCliente / delCliente
+    - eliminarZona / delZona
   * SPECIALS-ESPECIALES ()
-    - estatusActivoCliente / actCliente
-    - listaDesplegableClientes / ddlClientes
+    - estatusActivoZona / actZona
+    - listaDesplegableZonas / ddlZonas
 ================================================== */
 
 /*==================================================
