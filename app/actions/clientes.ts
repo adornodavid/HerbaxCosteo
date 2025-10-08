@@ -113,12 +113,13 @@ export async function crearCliente(formData: FormData) {
   READS-OBTENER (SELECTS)
 ================================================== */
 //Función: obtenerClientes: funcion para obtener todos los clientes
-export async function obtenerProductos(
-  productoid = -1,
-  productonombre = "",
-  clienteid = -1,
-  zonaid = -1,
-  catalogoid = -1,
+export async function obtenerClientes(
+  id = -1,
+  nombre = "",
+  clave = "",
+  direccion = "",
+  telefono = "",
+  email = ""
   activo = "Todos",
 ) {
   try {
