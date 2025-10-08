@@ -62,7 +62,7 @@ export default function ClientesPage() {
     try {
       let auxAdmin = -1
       if(!esAdmin){
-        auxAdmin = userClienteId
+        auxAdmin = user.ClienteId
       }
       const Result = await obtenerClientes(auxAdmin, "", "", "", "", "", "True")
       if (Result.success && Result.data) {
