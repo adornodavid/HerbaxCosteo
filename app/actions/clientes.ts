@@ -137,26 +137,27 @@ export async function obtenerClientes(
       `)
 
     // Paso 2: Filtros en query, dependiendo parametros
-    if (productoid !== -1) {
-      query = query.eq("id", productoid)
+    if (id !== -1) {
+      query = query.eq("id", id)
     }
-
-    if (clienteid !== -1) {
-      query = query.eq("clienteid", clienteid)
+    if (nombre !== "") {
+      query = query.ilike("nombre", `%${nombre}%`)
     }
-    if (zonaid !== -1) {
-      query = query.eq("zonaid", zonaid)
+    if (clave !== "") {
+      query = query.ilike("clave", `%${clave}%`)
     }
-    if (productonombre !== "") {
-      query = query.ilike("nombre", `%${productonombre}%`)
+    if (direccion !== "") {
+      query = query.ilike("direccion", `%${direccion}%`)
     }
-    if (catalogoid > 0) {
-      query = query.in("id", Ids)
+    if (telefono !== "") {
+      query = query.ilike("telefono", `%${telefono}%`)
+    }
+    if (email !== "") {
+      query = query.ilike("email", `%${email}%`)
     }
     if (activo !== "Todos") {
       const isActive = ["True", "true", "Activo", "1", true].includes(activo)
       const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
-
       if (isActive) {
         query = query.eq("activo", true)
       } else if (isInactive) {
