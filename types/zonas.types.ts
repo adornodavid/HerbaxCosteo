@@ -13,13 +13,8 @@ export interface oZona {
   id: number
   nombre: string | null
   clave: string | null
-  direccion: string | null
-  telefono: string | null
-  email: string | null
   imgurl: string | null
-  fechacreacion: Date | null
-  activo: boolean | null
-  // Zonas
+  // Clientes
   // Catalogos
   // Productos
   // Materiales de etiquetado
