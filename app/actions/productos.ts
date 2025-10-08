@@ -37,6 +37,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - obtenerProductos / selProductos
     - obtenerProductosCaracteristicas / selProductosCaracteristicas
     - obtenerProductosXCatalogos / selProductosXCatalogos
+    - obtenerProductosXClientes / selProductosXClientes
     
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarProducto / updProducto
