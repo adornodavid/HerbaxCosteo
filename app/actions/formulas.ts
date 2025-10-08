@@ -25,15 +25,31 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
   --------------------
   * CREATES-CREAR (INSERTS)
     - crearFormula / insFormula
+    - crearFormulaEtapa2 / insFormulaEtapa2
   * READS-OBTENER (SELECTS)
     - obtenerFormulas / selFormulas
+    - obtenerFormulasPorFiltros / selFormulasXFiltros
+    - obtenerFormulaPorId / selFormulaXId
+    - obtenerIngredientesPorCliente
+    - obtenerUnidadesMedida
+    - obtenerIngredientesFormula
+    - obtenerClientes
+    - getIngredientDetails
+    - obtenerFormulaCompleta
+    - obtenerDetallesFormula
+    - obtenerIngredientesDeFormula
+    - obtenerProductosDeFormula
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarFormula / updFormula
+    - estatusActivoFormula / actFormula
+    - actualizarFormulaEtapa1
   * DELETES-ELIMINAR (DELETES)
     - eliminarFormula / delFormula
+    - eliminarIngredienteFormula
+    - eliminarRegistroIncompleto
   * SPECIALS-ESPECIALES ()
-    - estatusActivoFormula / actFormula
-    - listaDesplegableFormulas / ddlFormulas
+    - estadisticasFormulasTotales / statsFormlasTotales
+    - verificarIngredienteDuplicado
 ================================================== */
 
 /*==================================================
@@ -74,7 +90,7 @@ export async function obtenerFormulas(
       }
     }
 
-    let IdsMerge: 
+    const IdsMerge: number[] = [...new Set([...IdsXCliente, ...IdsXProducto])]
 
     // Paso 2: Preparar Query
     let query = supabase.from("formulas").select(`
@@ -165,7 +181,10 @@ export async function obtenerFormulasXClientes(
     return { success: true, data: productosIds }
   } catch (error) {
     console.error("Error en obtenerFormulasXClientes de actions/formulas:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar obtenerFormulasXClientes de actions/formulas" }
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerFormulasXClientes de actions/formulas",
+    }
   }
 }
 
@@ -194,13 +213,12 @@ export async function obtenerFormulasXProductos(
     return { success: true, data: productosIds }
   } catch (error) {
     console.error("Error en obtenerFormulasXProductos de actions/formulas:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar obtenerFormulasXProductos de actions/formulas" }
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerFormulasXProductos de actions/formulas",
+    }
   }
 }
-
-
-
-
 
 export async function obtenerFormulass(page = 1, limit = 20, clienteid = -1) {
   const offset = (page - 1) * limit
@@ -281,39 +299,9 @@ export async function obtenerFormulass(page = 1, limit = 20, clienteid = -1) {
   * DELETES-ELIMINAR (DELETES)
 ================================================== */
 
-
 /*==================================================
   * SPECIALS-ESPECIALES ()
 ================================================== */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* ==================================================
   Funciones
@@ -443,8 +431,6 @@ export async function crearFormulaEtapa2(
     return { success: false, error: error.message }
   }
 }
-
-
 
 //Función: obtenerFormulasPorFiltros: funcion para obtener todas las formulas por el filtrado
 export async function obtenerFormulasPorFiltros(nombre = "", clienteId = "", activo = true, page = 1, limit = 20) {
