@@ -61,7 +61,7 @@ export async function crearCliente(formData: FormData) {
     let imagenurl = ""
     const imagen = formData.get("imagen") as File
     if (imagen && imagen.size > 0) {
-      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "productos")
+      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "clientes")
 
       if (!resultadoImagen.success) {
         return { success: false, error: resultadoImagen.error || "Error al subir la imagen" }
