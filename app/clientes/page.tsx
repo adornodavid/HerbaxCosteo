@@ -34,7 +34,7 @@ export default function ClientesPage() {
   // --- Estados ---
   const [Listado, setListado] = useState<Cliente[]>([])
   const [ListadoFiltrados, setListadoFiltrados] = useState<Cliente[]>([])
-  const [totalListado, setTotalListado] = useState(0)
+  const [TotalListado, setTotalListado] = useState(0)
   
   // Estados para filtros
   const [filtroId, setFiltroId] = useState("")
@@ -91,8 +91,8 @@ export default function ClientesPage() {
         }))
 
         setClientes(Listado)
-        //setProductosFiltrados(Listado)
-        //setTotalProductos(Listado.length)
+        setListadoFiltrados(Listado)
+        setTotalListado(Listado.length)
       } else {
         console.log("[v0] No hay datos o la consulta falló")
       }
