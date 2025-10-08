@@ -142,6 +142,7 @@ export default function ProductosPage() {
   const [selectedFormulasAsociadas, setSelectedFormulasAsociadas] = useState<FormulaAsociada[]>([])
   const [selectedIngredientesAsociados, setSelectedIngredientesAsociados] = useState<IngredienteAsociado[]>([])
   const [isDetailsLoading, setIsDetailsLoading] = useState(false)
+
   const [productosFiltrados, setProductosFiltrados] = useState<ProductoListado[]>([])
   const [totalProductos, setTotalProductos] = useState(0)
 
