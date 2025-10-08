@@ -141,6 +141,6 @@ export async function procesarInicioSesion(email: string, password: string): Pro
 
 // Funcion: procesarCerrarSesion
 export async function procesarCerrarSesion(): Promise<void> {
-  await limpiarSessionCookies()
+  //await limpiarSessionCookies()
   await eliminarSesionCookies()
 }
