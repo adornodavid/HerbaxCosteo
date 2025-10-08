@@ -53,8 +53,8 @@ export async function obtenerMaterialesEtiquetados(
   codigo = "",
   nombre = "",
   activo = "Todos",
-  formulaid = -1,
   productoid = -1,
+  //formulaid = -1,
 ) {
   try {
     // Paso 1: Obtener arrays de las formulasid que esten por cliente y/o por producto
