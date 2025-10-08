@@ -160,9 +160,9 @@ export async function obtenerMateriasPrimasXFormulass(
       return { success: true, data: [] }
     }
 
-    const productosIds: number[] = data.map((item) => item.formulaid)
+    const Data: number[] = data.map((item) => item.materiaprimaid)
 
-    return { success: true, data: productosIds }
+    return { success: true, data: Data }
   } catch (error) {
     console.error("Error en obtenerFormulasXClientes de actions/formulas:", error)
     return {
