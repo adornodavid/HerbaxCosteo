@@ -44,6 +44,75 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 /*==================================================
     CREATES-CREAR (INSERTS)
 ================================================== */
+// Función crearMateriaPrima / insMateriaPrima: función para crear una materia prima
+export async function crearMateriaPrima(formData: FormData) {
+  try {
+    // Paso 1: Validar si no existe
+    const existe: boolean = await (async () => {
+      const resultado = await obtenerFormulas(
+        -1,
+        formData.get("codigo") as string,
+        formData.get("nombre") as string,
+        "Todos",
+        -1,
+        -1,
+      )
+      return resultado.success && resultado.data && resultado.data.length >= 1
+    })()
+
+    if (existe) {
+      return { success: false, error: "La formula que se intenta ingresar ya existe y no se puede proceder" }
+    }
+
+    // Paso 2: Subir imagen para obtener su url
+    let imagenurl = ""
+    const imagen = formData.get("imagen") as File
+    if (imagen && imagen.size > 0) {
+      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "formulas")
+      if (!resultadoImagen.success) {
+        return { success: false, error: resultadoImagen.error || "Error al subir la imagen" }
+      }
+      imagenurl = resultadoImagen.url || ""
+    }
+
+    // Paso 3: Pasar datos del formData a variables con tipado de datos
+    const codigo = formData.get("codigo") as string
+    const nombre = formData.get("nombre") as string
+    const unidadmedidaid = Number.parseInt(formData.get("zonaid") as string) || null
+    const costo = formData.get("costo") as string
+    const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
+    const activo = true
+
+    // Paso 4: Ejecutar Query
+    const { data, error } = await supabase
+      .from("formulas")
+      .insert({
+        codigo,
+        nombre,
+        imgurl: imagenurl,
+        unidadmedidaid,
+        costo,
+        fechacreacion: fecha,
+        activo,
+      })
+      .select("id")
+      .single()
+
+    // Return error
+    if (error) {
+      console.error("Error creando formula en query en crearFormula de actions/formulas:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/formulas")
+
+    // Return resultados
+    return { success: true, data: data.id }
+  } catch (error) {
+    console.error("Error en crearFormula de actions/formulas:", error)
+    return { success: false, error: "Error interno del servidor, al ejecutar funcion crearFormula de actions/formulas" }
+  }
+}
 
 /*==================================================
   READS-OBTENER (SELECTS)
