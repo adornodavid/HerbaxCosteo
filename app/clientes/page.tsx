@@ -48,6 +48,12 @@ export default function ClientesPage() {
     { id: 3, codigo: "CLI003", nombre: "Cliente 3", direccion: "Dirección 3", activo: false },
   ])
 
+   // --- Paginación ---
+  const productosPaginados = useMemo(() => {
+    const indiceInicio = (paginaActual - 1) * resultadosPorPagina
+    return productosFiltrados.slice(indiceInicio, indiceInicio + resultadosPorPagina)
+  }, [productosFiltrados, paginaActual])
+  
   // --- Carga inicial de datos ---
   const cargarDatosIniciales = async () => {
     if (!user) return
