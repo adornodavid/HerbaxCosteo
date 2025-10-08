@@ -15,7 +15,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 // Backend
 
-
+/* ==================================================
+	  Componente Principal, Pagina
+	================================================== */
 export default function ClientesPage() {
   // Estados para filtros
   const [filtroId, setFiltroId] = useState("")
