@@ -122,15 +122,15 @@ export async function obtenerMaterialesEtiquetados(
 
     // Error en query
     if (error) {
-      console.error("Error obteniendo materias primas en query en obtenerMateriasPrimas de actions/materia-prima:", error)
+      console.error("Error obteniendo materiales de etiquetado en query en obtenerMaterialesEtiquetados de actions/material-etiquetado:", error)
       return { success: false, error: error.message }
     }
 
     // Paso 6: Retorno de data
     return { success: true, data }
   } catch (error) {
-    console.error("Error en obtenerMateriasPrimas de actions/materia-prima:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar obtenerMateriasPrimas de actions/materia-prima" }
+    console.error("Error en obtenerMaterialesEtiquetados de actions/material-etiquetado:", error)
+    return { success: false, error: "Error interno del servidor, al ejecutar obtenerMaterialesEtiquetados de actions/material-etiquetado" }
   }
 }
 
