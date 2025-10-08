@@ -535,14 +535,14 @@ export async function obtenerProductosXClientes(
   clienteid = -1,
 ): Promise<{ success: boolean; data?: number[]; error?: string }> {
   try {
-    if (catalogoid <= 0) {
-      return { success: false, error: "ID de catálogo inválido" }
+    if (clienteid <= 0) {
+      return { success: false, error: "ID de cliente inválido" }
     }
 
-    const { data, error } = await supabase.from("productosxcatalogo").select("productoid").eq("catalogoid", catalogoid)
+    const { data, error } = await supabase.from("productos").select("productoid").eq("clienteid", clienteid)
 
     if (error) {
-      console.error("Error en query obtenerProductosXCatalogos:", error)
+      console.error("Error en query obtenerProductosXClientes de actions/productos:", error)
       return { success: false, error: error.message }
     }
 
@@ -554,8 +554,8 @@ export async function obtenerProductosXClientes(
 
     return { success: true, data: productosIds }
   } catch (error) {
-    console.error("Error en obtenerProductosXCatalogos:", error)
-    return { success: false, error: "Error interno del servidor" }
+    console.error("Error en obtenerProductosXClientes de actions/productos:", error)
+    return { success: false, error: "Error interno del servidor, al ejecutar obtenerProductosXClientes de actions/productos" }
   }
 }
 
