@@ -5,7 +5,7 @@
 	================================================== */
 // -- Interfaces, clases y objetos
 import type React from "react"
-import type { oClientes, ClientesListado, ClientesEstadisticas } from "@/types/clientes"
+import type { oCliente, Cliente, ClientesListado, ClientesEstadisticas } from "@/types/clientes"
 // -- Assets
 import { useState } from "react"
 import Link from "next/link"
