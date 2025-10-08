@@ -3,36 +3,14 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { LogOut, CheckCircle } from "lucide-react"
+import { limpiarSessionCookies } from "app/actions/session"
 
 export default function LogoutPage() {
   const router = useRouter()
 
   useEffect(() => {
     // Función para limpiar todas las cookies de sesión
-    const clearSessionCookies = () => {
-      const cookiesToClear = [
-        "UsuarioId",
-        "Email",
-        "NombreCompleto",
-        "ClienteId",
-        "RolId",
-        "Permisos",
-        "SesionActiva",
-        "ExpiresAt",
-      ]
-
-      // Establecer fecha pasada para expirar las cookies
-      const pastDate = new Date(0).toUTCString()
-
-      cookiesToClear.forEach((cookieName) => {
-        document.cookie = `${cookieName}=; expires=${pastDate}; path=/; SameSite=Strict`
-      })
-
-      console.log("Variables de sesión eliminadas correctamente")
-    }
-
-    // Limpiar cookies inmediatamente
-    clearSessionCookies()
+    limpiarSessionCookies()
 
     // Redirigir al login después de un breve delay
     const timer = setTimeout(() => {
