@@ -37,7 +37,80 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     CREATES-CREAR (INSERTS)
 ================================================== */
 //Función: crearCliente: funcion para crear un cliente
+export async function crearCliente(formData: FormData) {
+  try {
+    //Validar si no existe
+    const existe: boolean = await (async () => {
+      const resultado = await obtenerProductos(
+        -1,
+        formData.get("nombre") as string,
+        Number.parseInt(formData.get("clienteid") as string),
+        Number.parseInt(formData.get("zonaid") as string) || -1,
+        -1,
+        "Todos",
+      )
+      return resultado.success && resultado.data && resultado.data.length >= 1
+    })()
 
+    if (existe) {
+      return { success: false, error: "El producto que se intenta ingresar ya existe y no se puede proceder" }
+    }
+
+    //Subir imagen para obtener su url
+    let imagenurl = ""
+    const imagen = formData.get("imagen") as File
+    if (imagen && imagen.size > 0) {
+      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "productos")
+
+      if (!resultadoImagen.success) {
+        return { success: false, error: resultadoImagen.error || "Error al subir la imagen" }
+      }
+
+      imagenurl = resultadoImagen.url || ""
+    }
+
+    //Pasar datos del formData a variables con tipado de datos
+    const codigo = formData.get("codigo") as string
+    const clienteid = Number.parseInt(formData.get("clienteid") as string)
+    const zonaid = Number.parseInt(formData.get("zonaid") as string) || null
+    const nombre = formData.get("nombre") as string
+    const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || null
+    const costo = 0.0
+    const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
+    const activo = true
+
+    //Ejecutar Query
+    const { data, error } = await supabase
+      .from("productos")
+      .insert({
+        codigo,
+        clienteid,
+        zonaid,
+        nombre,
+        unidadmedidaid,
+        costo,
+        imgurl: imagenurl,
+        fechacreacion: fecha,
+        activo,
+      })
+      .select("id")
+      .single()
+
+    //Return error
+    if (error) {
+      console.error("Error creando producto en app/Actions/productos en crearProducto:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/productos")
+
+    //Return resultados
+    return { success: true, data: data.id }
+  } catch (error) {
+    console.error("Error en actions/productos en crearProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
 
 /*==================================================
   READS-OBTENER (SELECTS)
