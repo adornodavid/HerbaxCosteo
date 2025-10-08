@@ -13,7 +13,7 @@ import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } fro
 export default function ClientesPage() {
   // Estados para filtros
   const [filtroId, setFiltroId] = useState("")
-  const [filtroCodigo, setFiltroCodigo] = useState("")
+  const [filtroClave, setFiltroClave] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
   const [filtroEstatus, setFiltroEstatus] = useState("-1")
 
@@ -27,12 +27,12 @@ export default function ClientesPage() {
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     // Aquí irá la lógica de búsqueda
-    console.log("Buscando con filtros:", { filtroId, filtroCodigo, filtroNombre, filtroEstatus })
+    console.log("Buscando con filtros:", { filtroId, filtroClave, filtroNombre, filtroEstatus })
   }
 
   const handleLimpiar = () => {
     setFiltroId("")
-    setFiltroCodigo("")
+    setFiltroClave("")
     setFiltroNombre("")
     setFiltroEstatus("-1")
   }
@@ -74,20 +74,6 @@ export default function ClientesPage() {
               />
             </div>
             <div className="lg:col-span-2">
-              <label htmlFor="txtClienteCodigo" className="text-sm font-medium">
-                Código
-              </label>
-              <Input
-                id="txtClienteCodigo"
-                name="txtClienteCodigo"
-                type="text"
-                placeholder="Buscar por código..."
-                maxLength={50}
-                value={filtroCodigo}
-                onChange={(e) => setFiltroCodigo(e.target.value)}
-              />
-            </div>
-            <div className="lg:col-span-2">
               <label htmlFor="txtClienteNombre" className="text-sm font-medium">
                 Nombre
               </label>
@@ -99,6 +85,20 @@ export default function ClientesPage() {
                 maxLength={150}
                 value={filtroNombre}
                 onChange={(e) => setFiltroNombre(e.target.value)}
+              />
+            </div>
+            <div className="lg:col-span-2">
+              <label htmlFor="txtClienteClave" className="text-sm font-medium">
+                Clave
+              </label>
+              <Input
+                id="txtClienteClave"
+                name="txtClienteClave"
+                type="text"
+                placeholder="Buscar por clave..."
+                maxLength={50}
+                value={filtroClave}
+                onChange={(e) => setFiltroClave(e.target.value)}
               />
             </div>
             <div className="lg:col-span-2">
