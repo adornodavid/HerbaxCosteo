@@ -36,9 +36,7 @@ export default function ClientesPage() {
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1)
-  const resultadosPorPagina = 20
-
-  
+  const resultadosPorPagina = 20  
 
   // Datos de ejemplo para el listado
   const [clientes] = useState([
