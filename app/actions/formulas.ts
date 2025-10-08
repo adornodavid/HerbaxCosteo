@@ -108,8 +108,8 @@ export async function obtenerFormulas(
         query = query.eq("activo", false)
       }
     }
-    if (clienteid > 0) {
-      query = query.in("id", Ids)
+    if (IdsMerge.length > 0) {
+      query = query.in("id", IdsMerge)
     }
 
     // Paso 4: Ejecutar query
