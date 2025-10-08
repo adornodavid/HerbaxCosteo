@@ -27,19 +27,18 @@ export default function ClientesPage() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
   const esAdmin = useMemo(() => user && RolesAdmin.includes(user.RolId), [user])
+  // Paginación
+  const [paginaActual, setPaginaActual] = useState(1)
+  const resultadosPorPagina = 20 
 
   // --- Estados ---
-  const [Clientes, setClientes] = useState<Cliente[]>([])
+  const [Listado, setListado] = useState<Cliente[]>([])
   
   // Estados para filtros
   const [filtroId, setFiltroId] = useState("")
   const [filtroClave, setFiltroClave] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
-  const [filtroEstatus, setFiltroEstatus] = useState("-1")
-
-  // Paginación
-  const [paginaActual, setPaginaActual] = useState(1)
-  const resultadosPorPagina = 20  
+  const [filtroEstatus, setFiltroEstatus] = useState("-1") 
 
   // Datos de ejemplo para el listado
   const [clientes] = useState([
@@ -49,7 +48,7 @@ export default function ClientesPage() {
   ])
 
    // --- Paginación ---
-  const productosPaginados = useMemo(() => {
+  const eleemtosPaginados = useMemo(() => {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
     return productosFiltrados.slice(indiceInicio, indiceInicio + resultadosPorPagina)
   }, [productosFiltrados, paginaActual])
