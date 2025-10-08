@@ -136,14 +136,14 @@ export async function obtenerMaterialesEtiquetados(
 
 // Función: obtenerMaterialesEtiquetadosXProductos / selMaterialesEtiquetadosXProductos, funcion para obtener en un array el listado de los ids de materiales de etiquetado
 export async function obtenerMaterialesEtiquetadosXProductos(
-  formulaid = -1,
+  productoid = -1,
 ): Promise<{ success: boolean; data?: number[]; error?: string }> {
   try {
-    if (formulaid <= 0) {
-      return { success: false, error: "ID de formula inválido" }
+    if (productoid <= 0) {
+      return { success: false, error: "ID de producto inválido" }
     }
 
-    const { data, error } = await supabase.from("materiasprimasxformula").select("materiaprimaid").eq("formulaid", formulaid)
+    const { data, error } = await supabase.from("materialesetiquetadoxproductos").select("materiaprimaid").eq("productoid", productoid)
 
     if (error) {
       console.error("Error en query obtenerMateriasPrimasXFormulas de actions/materia-prima:", error)
