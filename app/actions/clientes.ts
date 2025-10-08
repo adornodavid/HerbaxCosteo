@@ -136,7 +136,7 @@ export async function obtenerClientes(
         activo
       `)
 
-    //Filtros en query, dependiendo parametros
+    // Paso 2: Filtros en query, dependiendo parametros
     if (productoid !== -1) {
       query = query.eq("id", productoid)
     }
