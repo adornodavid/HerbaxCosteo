@@ -58,6 +58,14 @@ export async function obtenerMaterialesEtiquetados(
 ) {
   try {
     // Paso 1: Obtener arrays de las formulasid que esten por cliente y/o por producto
+    let IdsXProducto: number[] = []
+    if (productoid > 0) {
+      const resultado = await obtenerMateriasPrimasXProductos(productoid)
+      if (resultado.success && resultado.data) {
+        IdsXProducto = resultado.data
+      }
+    }
+
     /*
     let IdsXFormula: number[] = []
     if (formulaid > 0) {
@@ -68,15 +76,7 @@ export async function obtenerMaterialesEtiquetados(
     }
     */
 
-    let IdsXProducto: number[] = []
-    if (productoid > 0) {
-      const resultado = await obtenerMateriasPrimasXProductos(productoid)
-      if (resultado.success && resultado.data) {
-        IdsXProducto = resultado.data
-      }
-    }
-
-    const IdsMerge: number[] = [...new Set([...IdsXFormula, ...IdsXProducto])]
+    //const IdsMerge: number[] = [...new Set([...IdsXFormula, ...IdsXProducto])]
 
     // Paso 2: Preparar Query
     let query = supabase.from("materiasprimas").select(`
