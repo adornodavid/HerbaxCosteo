@@ -68,7 +68,7 @@ export async function crearCliente(formData: FormData) {
       imagenurl = resultadoImagen.url || ""
     }
 
-    //Pasar datos del formData a variables con tipado de datos
+    // Paso 3: Pasar datos del formData a variables con tipado de datos
     const codigo = formData.get("codigo") as string
     const clienteid = Number.parseInt(formData.get("clienteid") as string)
     const zonaid = Number.parseInt(formData.get("zonaid") as string) || null
