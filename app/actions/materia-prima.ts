@@ -152,7 +152,7 @@ export async function obtenerMateriasPrimasXProductos(
     const { data, error } = await supabase.from("materiasprimasxformula").select("materiaprimaid").in("formulaid", Ids)
 
     if (error) {
-      console.error("Error en query obtenerFormulasXClientes:", error)
+      console.error("Error en query obtenerMateriasPrimasXProductos de actions/materia-prima:", error)
       return { success: false, error: error.message }
     }
 
@@ -164,10 +164,10 @@ export async function obtenerMateriasPrimasXProductos(
 
     return { success: true, data: DataIds }
   } catch (error) {
-    console.error("Error en obtenerFormulasXClientes de actions/formulas:", error)
+    console.error("Error en obtenerMateriasPrimasXProductos de actions/materia-prima:", error)
     return {
       success: false,
-      error: "Error interno del servidor, al ejecutar obtenerFormulasXClientes de actions/formulas",
+      error: "Error interno del servidor, al ejecutar obtenerMateriasPrimasXProductos de actions/materia-prima",
     }
   }
 }
