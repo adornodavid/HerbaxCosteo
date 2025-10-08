@@ -95,13 +95,13 @@ export async function crearCliente(formData: FormData) {
       .select("id")
       .single()
 
-    //Return error
+    // Return error
     if (error) {
       console.error("Error creando producto en app/Actions/productos en crearProducto:", error)
       return { success: false, error: error.message }
     }
 
-    revalidatePath("/productos")
+    revalidatePath("/clientes")
 
     //Return resultados
     return { success: true, data: data.id }
