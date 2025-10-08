@@ -219,6 +219,11 @@ export async function clearSessionCookies(): Promise<void> {
   console.log("Variables de sesión eliminadas correctamente")
 }
 
+
+
+
+////////////////
+
 // Función: setSessionCookies: función para definir variables de sesion
 export async function setSessionCookies(sessionData: Session): Promise<void> {
   const cookieStore = cookies()
