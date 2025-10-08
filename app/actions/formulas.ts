@@ -12,6 +12,84 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 /* ==================================================
+  --------------------
+  Objetos / Clases
+  --------------------
+  * Objetos
+    - objetoFormula / oFormula (Individual)
+    - objetoFormulas / oFormulas (Listado / Array)
+  
+  --------------------
+  Funciones
+  --------------------
+  * CREATES-CREAR (INSERTS)
+    - crearFormula / insFormula
+  * READS-OBTENER (SELECTS)
+    - obtenerFormulas / selFormulas
+  * UPDATES-ACTUALIZAR (UPDATES)
+    - actualizarFormula / updFormula
+  * DELETES-ELIMINAR (DELETES)
+    - eliminarFormula / delFormula
+  * SPECIALS-ESPECIALES ()
+    - estatusActivoFormula / actFormula
+    - listaDesplegableFormulas / ddlFormulas
+================================================== */
+
+/*==================================================
+    OBJETOS / CLASES
+================================================== */
+
+/*==================================================
+    CREATES-CREAR (INSERTS)
+================================================== */
+
+/*==================================================
+  READS-OBTENER (SELECTS)
+================================================== */
+
+/*==================================================
+  UPDATES-ACTUALIZAR (UPDATES)
+================================================== */
+
+/*==================================================
+  * DELETES-ELIMINAR (DELETES)
+================================================== */
+
+
+/*==================================================
+  * SPECIALS-ESPECIALES ()
+================================================== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==================================================
   Funciones
   --------------------
 	* CREATES-CREAR (INSERTS)
