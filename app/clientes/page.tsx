@@ -8,6 +8,7 @@ import type React from "react"
 import type { oCliente, Cliente, ClientesListado, ClientesEstadisticas } from "@/types/clientes"
 // -- Assets
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
