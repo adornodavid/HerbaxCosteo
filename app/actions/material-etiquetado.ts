@@ -17,23 +17,23 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   Objetos / Clases
   --------------------
   * Objetos
-    - objetoMateriaPrima / oMateriaPrima (Individual)
-    - objetoMateriasPrimas / oMateriasPrimas (Listado / Array)
+    - objetoMaterialEtiquetado / oMaterialEtiquetado (Individual)
+    - objetoMaterialesEtiquetados / oMaterialesEtiquetados (Listado / Array)
   
   --------------------
   Funciones
   --------------------
   * CREATES-CREAR (INSERTS)
-    - crearMateriaPrima / insMateriaPrima
+    - crearMaterialEtiquetado / insMaterialEtiquetado
   * READS-OBTENER (SELECTS)
-    - obtenerMateriasPrimas / selMateriasPrimas
+    - obtenerMaterialesEtiquetados / selMaterialesEtiquetados
   * UPDATES-ACTUALIZAR (UPDATES)
-    - actualizarMateriaPrima / updMateriaPrima
+    - actualizarMaterialEtiquetado / updMaterialEtiquetado
   * DELETES-ELIMINAR (DELETES)
-    - eliminarMateriaPrima / delMateriaPrima
+    - eliminarMaterialEtiquetado / delMaterialEtiquetado
   * SPECIALS-ESPECIALES ()
-    - estatusActivoMateriaPrima / actMateriaPrima
-    - listaDesplegableMateriasPrimas / ddlMateriasPrimas
+    - estatusActivoMaterialEtiquetado / actMaterialEtiquetado
+    - listaDesplegableMaterialesEtiquetados / ddlMaterialesEtiquetados
 ================================================== */
 
 /*==================================================
