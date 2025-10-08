@@ -141,7 +141,7 @@ export async function obtenerFormulasXClientes(
       }
     }
 
-    const { data, error } = await supabase.from("formulasxproducto").select("formulaid").eq("catalogoid", catalogoid)
+    const { data, error } = await supabase.from("formulasxproducto").select("formulaid").in("productoid", Ids)
 
     if (error) {
       console.error("Error en query obtenerFormulasXClientes:", error)
