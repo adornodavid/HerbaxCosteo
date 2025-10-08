@@ -177,10 +177,10 @@ export async function obtenerClientes(
       return { success: false, error: error.message }
     }
 
-    //Retorno de data
+    // Paso 5: Retorno de data
     return { success: true, data }
   } catch (error) {
-    console.error("Error en app/actions/productos en obtenerProductos:", error)
+    console.error("Error en app/actions/clientes en obtenerClientes:", error)
     return { success: false, error: "Error interno del servidor" }
   }
 }
