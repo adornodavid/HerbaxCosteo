@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 // -- Frontend
-
+import { RolesAdmin } from "@/app/actions/configuraciones"
 // -- Backend
 import { obtenerClientes } from "@/app/actions/clientes"
 
