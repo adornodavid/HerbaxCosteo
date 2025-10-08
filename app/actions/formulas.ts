@@ -156,13 +156,13 @@ export async function obtenerFormulasXProductos(
 ): Promise<{ success: boolean; data?: number[]; error?: string }> {
   try {
     if (catalogoid <= 0) {
-      return { success: false, error: "ID de cliente inválido" }
+      return { success: false, error: "ID de producto inválido" }
     }
 
-    const { data, error } = await supabase.from("productosxcatalogo").select("productoid").eq("catalogoid", catalogoid)
+    const { data, error } = await supabase.from("formulasXproducto").select("formulaid").eq("productoid", productoid)
 
     if (error) {
-      console.error("Error en query obtenerFormulasXClientes:", error)
+      console.error("Error en query obtenerFormulasXProductos de actions/formulas:", error)
       return { success: false, error: error.message }
     }
 
@@ -174,8 +174,8 @@ export async function obtenerFormulasXProductos(
 
     return { success: true, data: productosIds }
   } catch (error) {
-    console.error("Error en obtenerFormulasXClientes de actions/formulas:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar obtenerFormulasXClientes de actions/formulas" }
+    console.error("Error en obtenerFormulasXProductos de actions/formulas:", error)
+    return { success: false, error: "Error interno del servidor, al ejecutar obtenerFormulasXProductos de actions/formulas" }
   }
 }
 
