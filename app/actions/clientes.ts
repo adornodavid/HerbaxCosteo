@@ -20,8 +20,6 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - crearCliente / insCliente
   * READS-OBTENER (SELECTS)
     - obtenerClientes / selClientes
-    - obtenerClientesPorFiltros / selClientesXFiltros
-    - obtenerClientePorId / selClienteXId
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarCliente / updCliente
   * DELETES-ELIMINAR (DELETES)
