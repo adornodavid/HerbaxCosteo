@@ -49,7 +49,7 @@ export async function crearMateriaPrima(formData: FormData) {
   try {
     // Paso 1: Validar si no existe
     const existe: boolean = await (async () => {
-      const resultado = await obtenerFormulas(
+      const resultado = await obtenerMateriasPrimas(
         -1,
         formData.get("codigo") as string,
         formData.get("nombre") as string,
