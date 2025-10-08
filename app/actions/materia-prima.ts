@@ -120,15 +120,15 @@ export async function obtenerMateriasPrimas(
 
     // Error en query
     if (error) {
-      console.error("Error obteniendo clientes en query en obtenerClientes de actions/clientes:", error)
+      console.error("Error obteniendo materias primas en query en obtenerMateriasPrimas de actions/materia-prima:", error)
       return { success: false, error: error.message }
     }
 
     // Paso 6: Retorno de data
     return { success: true, data }
   } catch (error) {
-    console.error("Error en obtenerClientes de actions/clientes:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar obtenerClientes de actions/clientes" }
+    console.error("Error en obtenerMateriasPrimas de actions/materia-prima:", error)
+    return { success: false, error: "Error interno del servidor, al ejecutar obtenerMateriasPrimas de actions/materia-prima" }
   }
 }
 
