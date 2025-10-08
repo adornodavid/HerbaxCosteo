@@ -151,8 +151,8 @@ export async function obtenerFormulasXClientes(
 }
 
 //Función: obtenerFormulasXProductos / selFormulasXProductos, funcion para obtener en un array el listado de los ids de formulas
-export async function obtenerFormulasXClientes(
-  clienteid = -1,
+export async function obtenerFormulasXProductos(
+  productoid = -1,
 ): Promise<{ success: boolean; data?: number[]; error?: string }> {
   try {
     if (catalogoid <= 0) {
