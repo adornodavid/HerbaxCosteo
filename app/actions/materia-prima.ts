@@ -59,16 +59,16 @@ export async function obtenerMateriasPrimas(
   try {
     // Paso 1: Obtener arrays de las formulasid que esten por cliente y/o por producto
     let IdsXFormula: number[] = []
-    if (clienteid > 0) {
-      const resultado = await obtenerFormulasXClientes(clienteid)
+    if (formulaid > 0) {
+      const resultado = await obtenerMateriasPrimasXFormulas(formulaid)
       if (resultado.success && resultado.data) {
-        IdsXCliente = resultado.data
+        IdsXFormula = resultado.data
       }
     }
 
     let IdsXProducto: number[] = []
     if (productoid > 0) {
-      const resultado = await obtenerFormulasXProductos(productoid)
+      const resultado = await obtenerMateriasPrimasXProductos(productoid)
       if (resultado.success && resultado.data) {
         IdsXProducto = resultado.data
       }
