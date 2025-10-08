@@ -19,7 +19,7 @@ import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } fro
 
 // -- Backend
 import { useAuth } from "@/contexts/auth-context"
-import { RolesAdmin } from "@/app/actions/configuraciones"
+import { RolesAdmin } from "@/app/actions/configuraciones-frontend"
 import { obtenerClientes } from "@/app/actions/clientes"
 
 /* ==================================================
