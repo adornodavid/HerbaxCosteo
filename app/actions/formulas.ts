@@ -3,6 +3,7 @@
   Imports
 ================================================== */
 import { createClient } from "@/lib/supabase"
+import { obtenerProductosXClientes } from "@/app/actions/productos"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
