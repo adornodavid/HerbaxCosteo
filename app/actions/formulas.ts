@@ -106,6 +106,7 @@ export async function obtenerFormulas(
         query = query.eq("activo", false)
       }
     }
+    
 
     // Paso 4: Ejecutar query
     query = query.order("nombre", { ascending: true })
