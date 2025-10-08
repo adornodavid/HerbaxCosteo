@@ -26,6 +26,7 @@ export default function ClientesPage() {
   // --- Variables especiales ---
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
+  const esAdmin = useMemo(() => user && [1, 2, 3, 4].includes(user.RolId), [user])
   
   // Estados para filtros
   const [filtroId, setFiltroId] = useState("")
@@ -37,7 +38,7 @@ export default function ClientesPage() {
   const [paginaActual, setPaginaActual] = useState(1)
   const resultadosPorPagina = 20
 
-  const esAdmin = useMemo(() => user && [1, 2, 3, 4].includes(user.RolId), [user])
+  
 
   // Datos de ejemplo para el listado
   const [clientes] = useState([
