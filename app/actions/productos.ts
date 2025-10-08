@@ -521,9 +521,9 @@ export async function obtenerProductosXCatalogos(
       return { success: true, data: [] }
     }
 
-    const Data: number[] = data.map((item) => item.productoid)
+    const DataIds: number[] = data.map((item) => item.productoid)
 
-    return { success: true, data: Data }
+    return { success: true, data: DataIds }
   } catch (error) {
     console.error("Error en obtenerProductosXCatalogos:", error)
     return { success: false, error: "Error interno del servidor" }
@@ -550,9 +550,9 @@ export async function obtenerProductosXClientes(
       return { success: true, data: [] }
     }
 
-    const Data: number[] = data.map((item) => item.productoid)
+    const DataIds: number[] = data.map((item) => item.productoid)
 
-    return { success: true, data: Data }
+    return { success: true, data: DataIds }
   } catch (error) {
     console.error("Error en obtenerProductosXClientes de actions/productos:", error)
     return { success: false, error: "Error interno del servidor, al ejecutar obtenerProductosXClientes de actions/productos" }
