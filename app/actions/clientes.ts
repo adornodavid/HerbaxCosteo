@@ -69,18 +69,18 @@ export async function crearCliente(formData: FormData) {
     }
 
     // Paso 3: Pasar datos del formData a variables con tipado de datos
-    const codigo = formData.get("codigo") as string
-    const clienteid = Number.parseInt(formData.get("clienteid") as string)
-    const zonaid = Number.parseInt(formData.get("zonaid") as string) || null
     const nombre = formData.get("nombre") as string
-    const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || null
-    const costo = 0.0
+    const clave = formData.get("clave") as string
+    const direccion = formData.get("direccion") as string
+    const telefono = formData.get("telefono") as string
+    const email = formData.get("email") as string
+    const imgurl = imagenurl
     const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
     const activo = true
 
     // Paso 4: Ejecutar Query
     const { data, error } = await supabase
-      .from("productos")
+      .from("clientes")
       .insert({
         codigo,
         clienteid,
