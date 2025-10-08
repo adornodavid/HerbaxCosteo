@@ -29,4 +29,4 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   
 //  Función: insUsuario
 
-const RolesAdmin = [1, 2, 3, 4];
+export const RolesAdmin = [1, 2, 3, 4];
