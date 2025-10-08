@@ -9,8 +9,7 @@
 ================================================== */
 
 // Objetos / Clases
-// Objetos / Clases
-export interface oProducto {
+export interface oCliente {
   id: number
   codigo: string | null
   clienteid: number | null
