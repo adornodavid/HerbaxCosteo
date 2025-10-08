@@ -90,7 +90,7 @@ export default function ClientesPage() {
           ClienteActivo: c.activo === true,
         }))
 
-        setClientes(Listado)
+        setListado(Listado)
         setListadoFiltrados(Listado)
         setTotalListado(Listado.length)
       } else {
