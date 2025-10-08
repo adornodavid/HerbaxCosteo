@@ -521,9 +521,9 @@ export async function obtenerProductosXCatalogos(
       return { success: true, data: [] }
     }
 
-    const productosIds: number[] = data.map((item) => item.productoid)
+    const Data: number[] = data.map((item) => item.productoid)
 
-    return { success: true, data: productosIds }
+    return { success: true, data: Data }
   } catch (error) {
     console.error("Error en obtenerProductosXCatalogos:", error)
     return { success: false, error: "Error interno del servidor" }
