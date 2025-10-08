@@ -1,7 +1,11 @@
 "use client"
 
+/* ==================================================
+	  Imports
+	================================================== */
+// Interfaces, clases y objetos
 import type React from "react"
-
+// Assets
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -9,6 +13,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
+// Backend
+
 
 export default function ClientesPage() {
   // Estados para filtros
