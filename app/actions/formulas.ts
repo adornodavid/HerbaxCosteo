@@ -130,6 +130,14 @@ export async function obtenerFormulasXClientes(
       return { success: false, error: "ID de cliente inválido" }
     }
 
+    let Ids: number[] = []
+    if (clienteid > 0) {
+      const resultado = await obtenerFormulasXProductos(clienteid)
+      if (resultado.success && resultado.data) {
+        Ids = resultado.data
+      }
+    }
+
     const { data, error } = await supabase.from("productosxcatalogo").select("productoid").eq("catalogoid", catalogoid)
 
     if (error) {
