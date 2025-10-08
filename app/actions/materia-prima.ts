@@ -61,14 +61,14 @@ export async function crearMateriaPrima(formData: FormData) {
     })()
 
     if (existe) {
-      return { success: false, error: "La formula que se intenta ingresar ya existe y no se puede proceder" }
+      return { success: false, error: "La materia prima que se intenta ingresar ya existe y no se puede proceder" }
     }
 
     // Paso 2: Subir imagen para obtener su url
     let imagenurl = ""
     const imagen = formData.get("imagen") as File
     if (imagen && imagen.size > 0) {
-      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "formulas")
+      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "materiasprimas")
       if (!resultadoImagen.success) {
         return { success: false, error: resultadoImagen.error || "Error al subir la imagen" }
       }
