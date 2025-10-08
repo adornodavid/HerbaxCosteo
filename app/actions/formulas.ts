@@ -58,7 +58,8 @@ export async function obtenerFormulas(
 ) {
   try {
     // Paso 1: Obtener arrays de las formulasid que esten por cliente y/o por producto
-
+    if(clienteid > 0){
+    }
 
     // Paso 2: Preparar Query
     let query = supabase.from("clientes").select(`
