@@ -52,23 +52,14 @@ export async function obtenerZonas(
   id = -1,
   nombre = "",
   clave = "",
-  direccion = "",
-  telefono = "",
-  email = ""
-  activo = "Todos",
 ) {
   try {
     // Paso 1: Preparar Query
-    let query = supabase.from("clientes").select(`
+    let query = supabase.from("zonas").select(`
         id,
         nombre,
         clave,
-        direccion,
-        telefono,
-        email,
-        imgurl,
-        fechacreacion,
-        activo
+        imgurl
       `)
 
     // Paso 2: Filtros en query, dependiendo parametros
@@ -81,24 +72,6 @@ export async function obtenerZonas(
     if (clave !== "") {
       query = query.ilike("clave", `%${clave}%`)
     }
-    if (direccion !== "") {
-      query = query.ilike("direccion", `%${direccion}%`)
-    }
-    if (telefono !== "") {
-      query = query.ilike("telefono", `%${telefono}%`)
-    }
-    if (email !== "") {
-      query = query.ilike("email", `%${email}%`)
-    }
-    if (activo !== "Todos") {
-      const isActive = ["True", "true", "Activo", "1", true].includes(activo)
-      const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
-      if (isActive) {
-        query = query.eq("activo", true)
-      } else if (isInactive) {
-        query = query.eq("activo", false)
-      }
-    }
 
     // Paso 3: Ejecutar query
     query = query.order("nombre", { ascending: true })
@@ -108,14 +81,14 @@ export async function obtenerZonas(
 
     // Error en query
     if (error) {
-      console.error("Error obteniendo clientes en obtenerClientes de actions/clientes:", error)
+      console.error("Error obteniendo zonas en obtenerZona de actions/zonas:", error)
       return { success: false, error: error.message }
     }
 
     // Paso 5: Retorno de data
     return { success: true, data }
   } catch (error) {
-    console.error("Error en app/actions/clientes en obtenerClientes:", error)
+    console.error("Error en actions/zonas en obtenerZona:", error)
     return { success: false, error: "Error interno del servidor" }
   }
 }
