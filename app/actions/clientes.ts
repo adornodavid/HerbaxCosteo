@@ -183,15 +183,15 @@ export async function obtenerClientes(
 
     // Error en query
     if (error) {
-      console.error("Error obteniendo clientes en obtenerClientes de actions/clientes:", error)
+      console.error("Error obteniendo clientes en query en obtenerClientes de actions/clientes:", error)
       return { success: false, error: error.message }
     }
 
     // Paso 5: Retorno de data
     return { success: true, data }
   } catch (error) {
-    console.error("Error en app/actions/clientes en obtenerClientes:", error)
-    return { success: false, error: "Error interno del servidor" }
+    console.error("Error en obtenerClientes de actions/clientes:", error)
+    return { success: false, error: "Error interno del servidor, al ejecutar obtenerClientes de actions/clientes" }
   }
 }
 
