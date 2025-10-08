@@ -63,7 +63,6 @@ export function AppSidebar() {
       hasSubmenu: true,
       submenu: [
         { name: "Materia Prima", href: "/materiaprima", icon: Icons.Pill },
-        { name: "Categorías", href: "/categorias", icon: Icons.Package },
         { name: "Etiquetado", href: "/materialetiquetado", icon: Icons.Package },
       ],
     },
