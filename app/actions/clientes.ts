@@ -5,6 +5,7 @@
 ================================================== */
 import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
+import { imagenSubir } from "@/app/actions/utilerias"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -39,7 +40,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 //Función: crearCliente: funcion para crear un cliente
 export async function crearCliente(formData: FormData) {
   try {
-    //Validar si no existe
+    // Paso 1: Validar si no existe
     const existe: boolean = await (async () => {
       const resultado = await obtenerClientes(
         -1,
@@ -56,7 +57,7 @@ export async function crearCliente(formData: FormData) {
       return { success: false, error: "El cliente que se intenta ingresar ya existe y no se puede proceder" }
     }
 
-    //Subir imagen para obtener su url
+    // Paso 2: Subir imagen para obtener su url
     let imagenurl = ""
     const imagen = formData.get("imagen") as File
     if (imagen && imagen.size > 0) {
