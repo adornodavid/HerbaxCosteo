@@ -85,12 +85,11 @@ export async function crearFormula(formData: FormData) {
     const { data, error } = await supabase
       .from("formulas")
       .insert({
+        codigo,
         nombre,
-        clave,
-        direccion,
-        telefono,
-        email,
         imgurl: imagenurl,
+        unidadmedidaid,
+        costo,
         fechacreacion: fecha,
         activo,
       })
