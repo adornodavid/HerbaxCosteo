@@ -33,6 +33,7 @@ export default function ClientesPage() {
 
   // --- Estados ---
   const [pageLoading, setPageLoading] = useState(true)
+  const [isSearching, setIsSearching] = useState(false)
   const [Listado, setListado] = useState<Cliente[]>([])
   const [ListadoFiltrados, setListadoFiltrados] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
