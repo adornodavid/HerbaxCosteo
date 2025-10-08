@@ -266,7 +266,7 @@ export default function ClientesPage() {
               <thead>
                 <tr className="border-b">
                   <th className="text-left py-3 px-4 font-medium">ID</th>
-                  <th className="text-left py-3 px-4 font-medium">Código</th>
+                  <th className="text-left py-3 px-4 font-medium">Clave</th>
                   <th className="text-left py-3 px-4 font-medium">Nombre</th>
                   <th className="text-left py-3 px-4 font-medium">Dirección</th>
                   <th className="text-left py-3 px-4 font-medium">Estatus</th>
@@ -275,18 +275,18 @@ export default function ClientesPage() {
               </thead>
               <tbody>
                 {Listado.map((cliente) => (
-                  <tr key={cliente.id} className="border-b hover:bg-gray-50">
-                    <td className="py-3 px-4">{cliente.id}</td>
-                    <td className="py-3 px-4">{cliente.codigo}</td>
-                    <td className="py-3 px-4">{cliente.nombre}</td>
-                    <td className="py-3 px-4">{cliente.direccion}</td>
+                  <tr key={cliente.ClienteId} className="border-b hover:bg-gray-50">
+                    <td className="py-3 px-4">{cliente.ClienteId}</td>
+                    <td className="py-3 px-4">{cliente.ClienteClave}</td>
+                    <td className="py-3 px-4">{cliente.ClienteNombre}</td>
+                    <td className="py-3 px-4">{cliente.ClienteDireccion}</td>
                     <td className="py-3 px-4">
                       <span
                         className={`px-2 py-1 text-xs rounded-xs font-semibold ${
-                          cliente.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                          cliente.ClienteActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
                         }`}
                       >
-                        {cliente.activo ? "Activo" : "Inactivo"}
+                        {cliente.ClienteActivo ? "Activo" : "Inactivo"}
                       </span>
                     </td>
                     <td className="py-3 px-4">
@@ -297,8 +297,8 @@ export default function ClientesPage() {
                         <Button variant="ghost" size="icon" title="Editar">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" title={cliente.activo ? "Inactivar" : "Activar"}>
-                          {cliente.activo ? (
+                        <Button variant="ghost" size="icon" title={cliente.ClienteActivo ? "Inactivar" : "Activar"}>
+                          {cliente.ClienteActivo ? (
                             <ToggleRight className="h-4 w-4 text-red-500" />
                           ) : (
                             <ToggleLeft className="h-4 w-4 text-green-500" />
