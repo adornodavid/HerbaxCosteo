@@ -164,7 +164,7 @@ export async function obtenerFormulasXProductos(
   productoid = -1,
 ): Promise<{ success: boolean; data?: number[]; error?: string }> {
   try {
-    if (catalogoid <= 0) {
+    if (productoid <= 0) {
       return { success: false, error: "ID de producto inválido" }
     }
 
