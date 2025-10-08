@@ -47,7 +47,77 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
   READS-OBTENER (SELECTS)
 ================================================== */
 //Función: obtenerFormulas: funcion para obtener todas las formulas
-export async function obtenerFormulas(page = 1, limit = 20, clienteid = -1) {
+export async function obtenerFormulas(
+  id = -1,
+  codigo = "",
+  nombre = "",
+  activo = "Todos",
+  clienteid = -1,
+  productoid = -1,
+) {
+  try {
+    // Paso 1: Preparar Query
+    let query = supabase.from("clientes").select(`
+        id,
+        nombre,
+        clave,
+        direccion,
+        telefono,
+        email,
+        imgurl,
+        fechacreacion,
+        activo
+      `)
+
+    // Paso 2: Filtros en query, dependiendo parametros
+    if (id !== -1) {
+      query = query.eq("id", id)
+    }
+    if (nombre !== "") {
+      query = query.ilike("nombre", `%${nombre}%`)
+    }
+    if (clave !== "") {
+      query = query.ilike("clave", `%${clave}%`)
+    }
+    if (direccion !== "") {
+      query = query.ilike("direccion", `%${direccion}%`)
+    }
+    if (telefono !== "") {
+      query = query.ilike("telefono", `%${telefono}%`)
+    }
+    if (email !== "") {
+      query = query.ilike("email", `%${email}%`)
+    }
+    if (activo !== "Todos") {
+      const isActive = ["True", "true", "Activo", "1", true].includes(activo)
+      const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
+      if (isActive) {
+        query = query.eq("activo", true)
+      } else if (isInactive) {
+        query = query.eq("activo", false)
+      }
+    }
+
+    // Paso 3: Ejecutar query
+    query = query.order("nombre", { ascending: true })
+
+    // Paso 4: Varaibles y resultados del query
+    const { data, error } = await query
+
+    // Error en query
+    if (error) {
+      console.error("Error obteniendo clientes en query en obtenerClientes de actions/clientes:", error)
+      return { success: false, error: error.message }
+    }
+
+    // Paso 5: Retorno de data
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en obtenerClientes de actions/clientes:", error)
+    return { success: false, error: "Error interno del servidor, al ejecutar obtenerClientes de actions/clientes" }
+  }
+}
+export async function obtenerFormulass(page = 1, limit = 20, clienteid = -1) {
   const offset = (page - 1) * limit
   try {
     /*
