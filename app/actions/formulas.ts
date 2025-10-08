@@ -75,14 +75,14 @@ export async function obtenerFormulas(
     }
 
     // Paso 2: Preparar Query
-    let query = supabase.from("clientes").select(`
+    let query = supabase.from("formulas").select(`
         id,
+        codigo,
         nombre,
-        clave,
-        direccion,
-        telefono,
-        email,
         imgurl,
+        unidadmedidaid,
+        unidadesmedida!unidadmedidaid(descripcion),
+        costo,
         fechacreacion,
         activo
       `)
