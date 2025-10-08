@@ -168,12 +168,12 @@ export async function obtenerClientes(
     // Paso 3: Ejecutar query
     query = query.order("nombre", { ascending: true })
 
-    //Varaibles y resultados del query
+    // Paso 4: Varaibles y resultados del query
     const { data, error } = await query
 
-    //Error en query
+    // Error en query
     if (error) {
-      console.error("Error obteniendo productos:", error)
+      console.error("Error obteniendo clientes en obtenerClientes de actions/clientes:", error)
       return { success: false, error: error.message }
     }
 
