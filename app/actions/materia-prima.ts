@@ -13,18 +13,50 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the supabase variable
 
 /* ==================================================
-	  Funciones
-	  --------------------
-		* CREATES/CREAR/INSERTS
-			- crearUsuario / insUsuario
-		* READS/OBTENER/SELECTS
-			- selXXXXX
-		* UPDATES/ACTUALIZAR/UPDATES
-			- updXXXXX
-		* DELETES/ELIMINAR/DELETES
-			- delXXXXX
-		* SPECIALS/ESPECIALES
-			- xxxXXXXX
-	================================================== */
+  --------------------
+  Objetos / Clases
+  --------------------
+  * Objetos
+    - objetoMateriaPrima / oMateriaPrima (Individual)
+    - objetoMateriasPrimas / oMateriasPrimas (Listado / Array)
   
-//  Función: insUsuario
+  --------------------
+  Funciones
+  --------------------
+  * CREATES-CREAR (INSERTS)
+    - crearMateriaPrima / insMateriaPrima
+  * READS-OBTENER (SELECTS)
+    - obtenerMateriasPrimas / selMateriasPrimas
+  * UPDATES-ACTUALIZAR (UPDATES)
+    - actualizarMateriaPrima / updMateriaPrima
+  * DELETES-ELIMINAR (DELETES)
+    - eliminarMateriaPrima / delMateriaPrima
+  * SPECIALS-ESPECIALES ()
+    - estatusActivoMateriaPrima / actMateriaPrima
+    - listaDesplegableMateriasPrimas / ddlMateriasPrimas
+================================================== */
+
+/*==================================================
+    OBJETOS / CLASES
+================================================== */
+
+/*==================================================
+    CREATES-CREAR (INSERTS)
+================================================== */
+
+/*==================================================
+  READS-OBTENER (SELECTS)
+================================================== */
+
+/*==================================================
+  UPDATES-ACTUALIZAR (UPDATES)
+================================================== */
+
+/*==================================================
+  * DELETES-ELIMINAR (DELETES)
+================================================== */
+
+
+/*==================================================
+  * SPECIALS-ESPECIALES ()
+================================================== */
