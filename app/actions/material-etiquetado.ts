@@ -47,6 +47,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 /*==================================================
   READS-OBTENER (SELECTS)
 ================================================== */
+// Función: obtenerMaterialesEtiquetados / selMaterialesEtiquetados: Función para obtener el o los materiales de etiquetado
+
 
 /*==================================================
   UPDATES-ACTUALIZAR (UPDATES)
