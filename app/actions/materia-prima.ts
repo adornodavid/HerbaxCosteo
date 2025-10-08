@@ -4,6 +4,7 @@
   Imports
 ================================================== */
 import { createClient } from '@/lib/supabase'
+import { obtenerFormulasXProductos } from "@/app/actions/productos"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
