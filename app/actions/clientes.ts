@@ -36,10 +36,14 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 /*==================================================
     CREATES-CREAR (INSERTS)
 ================================================== */
+//Función: crearCliente: funcion para crear un cliente
+
 
 /*==================================================
   READS-OBTENER (SELECTS)
 ================================================== */
+//Función: obtenerClientes: funcion para obtener todos los clientes
+
 
 /*==================================================
   UPDATES-ACTUALIZAR (UPDATES)
@@ -55,9 +59,9 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 ================================================== */
 
 
-//Función: crearCliente: funcion para crear un cliente
 
-//Función: obtenerClientes: funcion para obtener todos los clientes
+
+
 
 //Función: obtenerClientesPorFiltros: funcion para obtener todos los clientes por el filtrado
 //Funcion: obtenerClientesFiltrados
