@@ -91,20 +91,11 @@ export async function obtenerFormulas(
     if (id !== -1) {
       query = query.eq("id", id)
     }
+    if (codigo !== "") {
+      query = query.ilike("codigo", `%${codigo}%`)
+    }
     if (nombre !== "") {
       query = query.ilike("nombre", `%${nombre}%`)
-    }
-    if (clave !== "") {
-      query = query.ilike("clave", `%${clave}%`)
-    }
-    if (direccion !== "") {
-      query = query.ilike("direccion", `%${direccion}%`)
-    }
-    if (telefono !== "") {
-      query = query.ilike("telefono", `%${telefono}%`)
-    }
-    if (email !== "") {
-      query = query.ilike("email", `%${email}%`)
     }
     if (activo !== "Todos") {
       const isActive = ["True", "true", "Activo", "1", true].includes(activo)
