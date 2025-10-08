@@ -98,50 +98,6 @@ export default function ClientesPage() {
       } else {
         console.log("[v0] No hay datos o la consulta falló")
       }
-
-      const userClienteId = [1, 2, 3, 4].includes(Number(user.RolId)) ? -1 : Number(user.ClienteId)
-      // -- Cargar clientes
-      const { data: clientesData, error: clientesError } = await listaDesplegableClientes(userClienteId,"")
-      if (!clientesError) {
-        const clientesConTodos = [1, 2, 3, 4].includes(Number(user.RolId))
-          ? [{ id: -1, nombre: "Todos" }, ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))]
-          : (clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
-        setClientes(clientesConTodos)
-
-        if ([1, 2, 3, 4].includes(Number(user.RolId))) {
-          setFiltroCliente("-1")
-        } else {
-          const aux = clientesData.id
-          setFiltroCliente(aux)
-        }
-        //setFiltroCliente("-1")
-      } else {
-        console.error("Error cargando clientes:", clientesError)
-      }
-
-      // -- Cargar catalogos
-      const catalogosResult = await listaDesplegableCatalogos(-1, "", userClienteId)
-      if (!catalogosResult.error) {
-        const catalogosConTodos = [1, 2, 3, 4].includes(Number(user.RolId))
-          ? [
-              { id: -1, nombre: "Todos" },
-              ...(catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre })),
-            ]
-          : (catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre }))
-
-        setCatalogos(catalogosConTodos)
-
-        if ([1, 2, 3, 4].includes(Number(user.RolId))) {
-          setFiltroCatalogo("-1") // Set to "Todos" for admin roles
-        } else {
-          // Set to first available catalog for restricted users
-          if (catalogosResult.data && catalogosResult.data.length > 0) {
-            setFiltroCatalogo(catalogosResult.data[0].id.toString())
-          }
-        }
-      } else {
-        console.error("Error cargando catálogos iniciales:", catalogosResult.error)
-      }
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error)
     } finally {
