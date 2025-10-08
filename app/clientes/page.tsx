@@ -5,7 +5,7 @@
 	================================================== */
 // -- Interfaces, clases y objetos
 import type React from "react"
-import type { oCliente, Cliente, ClientesListado, ClientesEstadisticas } from "@/types/clientes"
+import type { Cliente } from "@/types/clientes"
 // -- Assets
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
@@ -32,7 +32,7 @@ export default function ClientesPage() {
   const esAdmin = useMemo(() => user && RolesAdmin.includes(user.RolId), [user])
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1)
-  const resultadosPorPagina = 20 
+  const resultadosPorPagina = 20
 
   // --- Estados ---
   const [pageLoading, setPageLoading] = useState(true)
@@ -40,12 +40,12 @@ export default function ClientesPage() {
   const [Listado, setListado] = useState<Cliente[]>([])
   const [ListadoFiltrados, setListadoFiltrados] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
-  
+
   // Estados para filtros
   const [filtroId, setFiltroId] = useState("")
   const [filtroClave, setFiltroClave] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
-  const [filtroEstatus, setFiltroEstatus] = useState("-1") 
+  const [filtroEstatus, setFiltroEstatus] = useState("-1")
 
   // Datos de ejemplo para el listado
   const [clientes] = useState([
@@ -54,19 +54,19 @@ export default function ClientesPage() {
     { id: 3, codigo: "CLI003", nombre: "Cliente 3", direccion: "Dirección 3", activo: false },
   ])
 
-   // --- Paginación ---
+  // --- Paginación ---
   const elementosPaginados = useMemo(() => {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
     return ListadoFiltrados.slice(indiceInicio, indiceInicio + resultadosPorPagina)
   }, [ListadoFiltrados, paginaActual])
-  
+
   // --- Carga inicial de datos ---
   const cargarDatosIniciales = async () => {
     if (!user) return
 
     try {
       let auxAdmin = -1
-      if(!esAdmin){
+      if (!esAdmin) {
         auxAdmin = user.ClienteId
       }
       const Result = await obtenerClientes(auxAdmin, "", "", "", "", "", "True")
@@ -86,7 +86,7 @@ export default function ClientesPage() {
         const Listado: Cliente[] = transformedData.map((c: Cliente) => ({
           ClienteId: c.id,
           ClienteNombre: c.nombre || "Sin nombre",
-          ClienteClave: c.clave || "Sin clave"
+          ClienteClave: c.clave || "Sin clave", // Added missing comma
           ClienteDireccion: c.direccion || "Sin dirección",
           ClienteTelefono: c.telefono || "Sin telefono",
           ClienteEmail: c.email || "Sin email",
@@ -145,16 +145,7 @@ export default function ClientesPage() {
       <div className="flex h-screen w-full items-center justify-center">
         <div className="flex items-center justify-center min-h-screen">
           <div className="flex flex-col items-center justify-center p-8">
-            <div className="relative w-24 h-24 mb-4">
-              <Image
-                src="/images/design-mode/cargando.gif"
-                alt="Cargando..."
-                width={300}
-                height={300}
-                unoptimized
-                className="absolute inset-0 animate-bounce-slow"
-              />
-            </div>
+            <div className="relative w-24 h-24 mb-4">{/* Placeholder for Image component */}</div>
             <p className="text-lg font-semibold text-gray-800">Cargando Pagina...</p>
           </div>
         </div>
