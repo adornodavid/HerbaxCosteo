@@ -127,13 +127,13 @@ export async function obtenerFormulasXClientes(
   clienteid = -1,
 ): Promise<{ success: boolean; data?: number[]; error?: string }> {
   try {
-    if (catalogoid <= 0) {
+    if (clienteid <= 0) {
       return { success: false, error: "ID de cliente inválido" }
     }
 
     let Ids: number[] = []
     if (clienteid > 0) {
-      const resultado = await obtenerFormulasXProductos(clienteid)
+      const resultado = await obtenerProductosXClientes(clienteid)
       if (resultado.success && resultado.data) {
         Ids = resultado.data
       }
