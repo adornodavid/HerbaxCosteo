@@ -9,8 +9,7 @@ export default function LogoutPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Función para limpiar todas las cookies de sesión
-    limpiarSessionCookies()
+    procesarCerrarSesion()
 
     // Redirigir al login después de un breve delay
     const timer = setTimeout(() => {
