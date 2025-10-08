@@ -230,7 +230,7 @@ export async function obtenerFormulasXClientes(
       return { success: true, data: [] }
     }
 
-    const Data: number[] = data.map((item) => item.productoid)
+    const Data: number[] = data.map((item) => item.formulaid)
 
     return { success: true, data: Data }
   } catch (error) {
@@ -262,7 +262,7 @@ export async function obtenerFormulasXProductos(
       return { success: true, data: [] }
     }
 
-    const Data: number[] = data.map((item) => item.productoid)
+    const Data: number[] = data.map((item) => item.formulaid)
 
     return { success: true, data: Data }
   } catch (error) {
