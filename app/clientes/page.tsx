@@ -27,6 +27,9 @@ export default function ClientesPage() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
   const esAdmin = useMemo(() => user && RolesAdmin.includes(user.RolId), [user])
+
+  // --- Estados ---
+  const [Clientes, setClientes] = useState<Cliente[]>([])
   
   // Estados para filtros
   const [filtroId, setFiltroId] = useState("")
@@ -77,20 +80,12 @@ export default function ClientesPage() {
           ClienteEmail: c.email || "Sin email",
           ClienteImgUrl: c.imgurl || "Sin imagen",
           ClienteFechaCreacion: c.fechacreacion,
-          ClienteActivo: c.activo,
-
-          ProductoCosto: p.costo || 0,
-          ProductoActivo: p.activo === true,
-          ProductoImagenUrl: p.imgurl,
-          ClienteId: p.clienteid || -1,
-          ClienteNombre: p.clientes?.nombre || "N/A",
-          CatalogoId: p.productosxcatalogo[0]?.catalogoid || -1,
-          CatalogoNombre: p.productosxcatalogo[0]?.catalogos?.nombre || "N/A",
+          ClienteActivo: c.activo === true,
         }))
 
-        setProductos(productosListado)
-        setProductosFiltrados(productosListado)
-        setTotalProductos(productosListado.length)
+        setClientes(Listado)
+        setProductosFiltrados(Listado)
+        setTotalProductos(Listado.length)
       } else {
         console.log("[v0] No hay datos o la consulta falló")
       }
