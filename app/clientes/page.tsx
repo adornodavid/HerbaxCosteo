@@ -68,11 +68,17 @@ export default function ClientesPage() {
           activo: c.activo,
         }))
 
-        const productosListado: ProductoListado[] = transformedData.map((p: oProducto) => ({
-          ProductoId: p.id,
-          ProductoNombre: p.nombre || "Sin nombre",
-          ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
-          ProductoTiempo: "N/A",
+        const Listado: Cliente[] = transformedData.map((c: Cliente) => ({
+          ClienteId: c.id,
+          ClienteNombre: c.nombre || "Sin nombre",
+          ClienteClave: c.clave || "Sin clave"
+          ClienteDireccion: c.direccion || "Sin dirección",
+          ClienteTelefono: c.telefono || "Sin telefono",
+          ClienteEmail: c.email || "Sin email",
+          ClienteImgUrl: c.imgurl || "Sin imagen",
+          ClienteFechaCreacion: c.fechacreacion,
+          ClienteActivo: c.activo,
+
           ProductoCosto: p.costo || 0,
           ProductoActivo: p.activo === true,
           ProductoImagenUrl: p.imgurl,
