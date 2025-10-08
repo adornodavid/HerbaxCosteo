@@ -74,6 +74,8 @@ export async function obtenerFormulas(
       }
     }
 
+    let IdsMerge: 
+
     // Paso 2: Preparar Query
     let query = supabase.from("formulas").select(`
         id,
@@ -106,7 +108,9 @@ export async function obtenerFormulas(
         query = query.eq("activo", false)
       }
     }
-    
+    if (clienteid > 0) {
+      query = query.in("id", Ids)
+    }
 
     // Paso 4: Ejecutar query
     query = query.order("nombre", { ascending: true })
