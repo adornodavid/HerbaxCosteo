@@ -75,7 +75,7 @@ export async function obtenerMateriasPrimas(
       }
     }
 
-    const IdsMerge: number[] = [...new Set([...IdsXCliente, ...IdsXProducto])]
+    const IdsMerge: number[] = [...new Set([...IdsXFormula, ...IdsXProducto])]
 
     // Paso 2: Preparar Query
     let query = supabase.from("materiasprimas").select(`
