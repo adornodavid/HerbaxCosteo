@@ -105,7 +105,7 @@ export async function crearCliente(formData: FormData) {
 
     // Return error
     if (error) {
-      console.error("Error creando cliente en actions/clientes en crearcliente:", error)
+      console.error("Error creando cliente en query en crearcliente de actions/clientes:", error)
       return { success: false, error: error.message }
     }
 
@@ -114,7 +114,7 @@ export async function crearCliente(formData: FormData) {
     // Return resultados
     return { success: true, data: data.id }
   } catch (error) {
-    console.error("Error en actions/clientes en crearCliente:", error)
+    console.error("Error en crearCliente de actions/clientes:", error)
     return { success: false, error: "Error interno del servidor, al ejecutar funcion crearCliente de actions/clientes" }
   }
 }
