@@ -104,7 +104,7 @@ export async function crearMateriaPrima(formData: FormData) {
       return { success: false, error: error.message }
     }
 
-    revalidatePath("/formulas")
+    revalidatePath("/materiaprima")
 
     // Return resultados
     return { success: true, data: data.id }
