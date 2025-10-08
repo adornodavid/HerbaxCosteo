@@ -45,9 +45,11 @@ export async function crearCliente(formData: FormData) {
       const resultado = await obtenerClientes(
         -1,
         formData.get("nombre") as string,
-        Number.parseInt(formData.get("clienteid") as string),
-        Number.parseInt(formData.get("zonaid") as string) || -1,
-        -1,
+        formData.get("clave") as string,
+        //Number.parseInt(formData.get("clienteid") as string),
+        "",
+        "",
+        "",
         "Todos",
       )
       return resultado.success && resultado.data && resultado.data.length >= 1
