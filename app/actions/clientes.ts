@@ -15,6 +15,14 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the supabase variable
 
 /* ==================================================
+  --------------------
+  Objetos / Clases
+  --------------------
+  * Objetos
+    - objetoCliente / oCliente (Individual)
+    - objetoClientes / oClientes (Listado / Array)
+  
+  --------------------
   Funciones
   --------------------
   * CREATES-CREAR (INSERTS)
