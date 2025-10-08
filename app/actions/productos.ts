@@ -530,6 +530,35 @@ export async function obtenerProductosXCatalogos(
   }
 }
 
+// Función: obtenerProductosXClientes / selProductosXClientes: función para obtener array de los ids de productos
+export async function obtenerProductosXClientes(
+  clienteid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (catalogoid <= 0) {
+      return { success: false, error: "ID de catálogo inválido" }
+    }
+
+    const { data, error } = await supabase.from("productosxcatalogo").select("productoid").eq("catalogoid", catalogoid)
+
+    if (error) {
+      console.error("Error en query obtenerProductosXCatalogos:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const productosIds: number[] = data.map((item) => item.productoid)
+
+    return { success: true, data: productosIds }
+  } catch (error) {
+    console.error("Error en obtenerProductosXCatalogos:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
 /*==================================================
   UPDATES-ACTUALIZAR (UPDATES)
 ================================================== */
