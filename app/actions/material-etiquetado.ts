@@ -43,8 +43,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 /*==================================================
     CREATES-CREAR (INSERTS)
 ================================================== */
-// Función crearMateriaPrima / insMateriaPrima: función para crear una materia prima
-export async function crearMateriaPrima(formData: FormData) {
+// Función crearMaterialEtiquetado / insMaterialEtiquetado: función para crear un material de etiquetado
+export async function crearMaterialEtiquetado(formData: FormData) {
   try {
     // Paso 1: Validar si no existe
     const existe: boolean = await (async () => {
