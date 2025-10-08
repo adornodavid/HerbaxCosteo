@@ -48,26 +48,26 @@ export async function crearMaterialEtiquetado(formData: FormData) {
   try {
     // Paso 1: Validar si no existe
     const existe: boolean = await (async () => {
-      const resultado = await obtenerMateriasPrimas(
+      const resultado = await obtenerMaterialesEtiquetados(
         -1,
         formData.get("codigo") as string,
         formData.get("nombre") as string,
         "Todos",
         -1,
-        -1,
+        //-1,
       )
       return resultado.success && resultado.data && resultado.data.length >= 1
     })()
 
     if (existe) {
-      return { success: false, error: "La materia prima que se intenta ingresar ya existe y no se puede proceder" }
+      return { success: false, error: "El material de etiquetado que se intenta ingresar ya existe y no se puede proceder" }
     }
 
     // Paso 2: Subir imagen para obtener su url
     let imagenurl = ""
     const imagen = formData.get("imagen") as File
     if (imagen && imagen.size > 0) {
-      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "materiasprimas")
+      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "materialesetiquetado")
       if (!resultadoImagen.success) {
         return { success: false, error: resultadoImagen.error || "Error al subir la imagen" }
       }
@@ -84,7 +84,7 @@ export async function crearMaterialEtiquetado(formData: FormData) {
 
     // Paso 4: Ejecutar Query
     const { data, error } = await supabase
-      .from("materiasprima")
+      .from("materialesetiquetado")
       .insert({
         codigo,
         nombre,
