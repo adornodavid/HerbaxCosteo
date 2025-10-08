@@ -74,11 +74,9 @@ export async function crearFormula(formData: FormData) {
     }
 
     // Paso 3: Pasar datos del formData a variables con tipado de datos
+    const codigo = formData.get("codigo") as string
     const nombre = formData.get("nombre") as string
-    const clave = formData.get("clave") as string
-    const direccion = formData.get("direccion") as string
-    const telefono = formData.get("telefono") as string
-    const email = formData.get("email") as string
+    
     const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
     const activo = true
 
