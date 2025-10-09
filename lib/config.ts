@@ -1,15 +1,38 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+export const AppConfig = {
+  // Arrays de configuración
+  arrays: {
+    // Array de números
+    categoriasPermitidas: [1, 2, 3, 5],
+    
+    // Array de strings
+    estadosProducto: ['activo', 'inactivo', 'pendiente', 'descontinuado'],
+    
+    // Array de objetos
+    rolesSistema: [
+      { id: 1, nombre: 'Administrador', nivel: 10 },
+      { id: 2, nombre: 'Supervisor', nivel: 5 },
+      { id: 3, nombre: 'Usuario', nivel: 1 }
+    ],
+    
+    // Array para dropdowns
+    opcionesUnidadMedida: [
+      { id: 1, valor: 'kg', label: 'Kilogramos' },
+      { id: 2, valor: 'g', label: 'Gramos' },
+      { id: 3, valor: 'lb', label: 'Libras' },
+      { id: 4, valor: 'oz', label: 'Onzas' }
+    ],
+    
+    // Array para filtros
+    meses: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+  },
+  
+  // Arrays individuales (si prefieres)
+  categoriasIds: [1, 2, 3, 5],
+  zonasPermitidas: [101, 102, 103, 105],
+  tiposDocumento: ['DNI', 'RUC', 'PASAPORTE', 'CEDULA']
+} as const
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
-
-export function formatCurrency(amount: number | null | undefined): string {
-  if (amount === null || amount === undefined) return "$0.00"
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    minimumFractionDigits: 2,
-  }).format(amount)
-}
+// Exportar arrays individualmente (opcional)
+export const CATEGORIAS_PERMITIDAS = [1, 2, 3, 5] as const
+export const ESTADOS_PRODUCTO = ['activo', 'inactivo', 'pendiente'] as const
+export const ROLES_SISTEMA = [1, 2, 3, 4, 5] as const
