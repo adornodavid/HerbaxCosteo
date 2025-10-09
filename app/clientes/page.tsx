@@ -124,6 +124,8 @@ export default function ClientesPage() {
     e.preventDefault()
     // Aquí irá la lógica de búsqueda
     console.log("Buscando con filtros:", { filtroId, filtroClave, filtroNombre, filtroEstatus })
+
+    
   }
 
   const handleLimpiar = () => {
@@ -131,6 +133,8 @@ export default function ClientesPage() {
     setFiltroClave("")
     setFiltroNombre("")
     setFiltroEstatus("-1")
+
+    cargarDatosIniciales()
   }
 
   // --- Renderizado ---
