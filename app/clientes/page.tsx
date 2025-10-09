@@ -125,7 +125,7 @@ export default function ClientesPage() {
     console.log("Buscando con filtros:", { filtroId, filtroClave, filtroNombre, filtroEstatus })
 
     const Id = Number.parseInt(filtroId, 10)
-    ejecutarBusquedaProductos(filtroNombre, clienteId, catalogoId, filtroEstatus)
+    ejecutarBusquedaProductos(Id, filtroClave, filtroNombre, filtroEstatus)
   }
 
   const handleLimpiar = () => {
