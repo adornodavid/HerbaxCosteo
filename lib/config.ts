@@ -33,7 +33,7 @@ export const AppConfig = {
 } as const
 
 // Exportar arrays individualmente (opcional)
-export const RolesAdministradores
+export const RolesAdmin = [] as const
 export const CATEGORIAS_PERMITIDAS = [1, 2, 3, 5] as const
 export const ESTADOS_PRODUCTO = ['activo', 'inactivo', 'pendiente'] as const
 export const ROLES_SISTEMA = [1, 2, 3, 4, 5] as const
