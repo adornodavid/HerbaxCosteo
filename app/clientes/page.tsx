@@ -128,7 +128,7 @@ export default function ClientesPage() {
     const Id = Number.parseInt(filtroId, 10)
     ejecutarBusqueda(Id, filtroClave, filtroNombre, filtroEstatus)
   }
-
+  // Busqueda - Limpiar o Resetear
   const handleLimpiar = () => {
     setFiltroId("")
     setFiltroClave("")
