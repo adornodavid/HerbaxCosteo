@@ -47,7 +47,7 @@ export default function ClientesPage() {
   const [filtroClave, setFiltroClave] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
   const [filtroEstatus, setFiltroEstatus] = useState("-1")
-  
+
   // --- Paginación ---
   const elementosPaginados = useMemo(() => {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
@@ -105,11 +105,12 @@ export default function ClientesPage() {
   // --- Carga Inicial y Seguridad ---
   useEffect(() => {
     if (!authLoading) {
+      // Validar
       if (!user || user.RolId === 0) {
         router.push("/login")
         return
       }
-
+      // Iniciar
       const inicializar = async () => {
         setPageLoading(true)
         await cargarDatosIniciales()
