@@ -122,10 +122,10 @@ export default function ClientesPage() {
   // -- Handles --
   const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // Aquí irá la lógica de búsqueda
     console.log("Buscando con filtros:", { filtroId, filtroClave, filtroNombre, filtroEstatus })
 
-
+    const Id = Number.parseInt(filtroId, 10)
+    ejecutarBusquedaProductos(filtroNombre, clienteId, catalogoId, filtroEstatus)
   }
 
   const handleLimpiar = () => {
