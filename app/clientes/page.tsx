@@ -147,7 +147,7 @@ export default function ClientesPage() {
           <div className="flex flex-col items-center justify-center p-8">
             <div className="relative w-24 h-24 mb-4">
               <Image
-                //src="/images/design-mode/cargando.gif"
+                src="/images/design-mode/cargando.gif"
                 alt="Cargando..."
                 width={300}
                 height={300}
