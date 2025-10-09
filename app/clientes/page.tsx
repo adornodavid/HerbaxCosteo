@@ -47,14 +47,7 @@ export default function ClientesPage() {
   const [filtroClave, setFiltroClave] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
   const [filtroEstatus, setFiltroEstatus] = useState("-1")
-
-  // Datos de ejemplo para el listado
-  const [clientes] = useState([
-    { id: 1, codigo: "CLI001", nombre: "Cliente 1", direccion: "Dirección 1", activo: true },
-    { id: 2, codigo: "CLI002", nombre: "Cliente 2", direccion: "Dirección 2", activo: true },
-    { id: 3, codigo: "CLI003", nombre: "Cliente 3", direccion: "Dirección 3", activo: false },
-  ])
-
+  
   // --- Paginación ---
   const elementosPaginados = useMemo(() => {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
