@@ -179,7 +179,7 @@ export default function ClientesPage() {
           <CardTitle>Filtros de Búsqueda</CardTitle>
         </CardHeader>
         <CardContent>
-          <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 gap-4 items-end" onSubmit={handleFormSubmit}>
+          <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 gap-4 items-end" onSubmit={handleBuscar}>
             <div className="lg:col-span-2">
               <label htmlFor="txtClienteId" className="text-sm font-medium">
                 ID
