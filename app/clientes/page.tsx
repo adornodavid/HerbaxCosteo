@@ -140,7 +140,6 @@ export default function ClientesPage() {
 
   // --- Renderizado ---
   // Loading
-  /*
   if (pageLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
@@ -162,7 +161,6 @@ export default function ClientesPage() {
       </div>
     )
   }
-  */
 
   return (
     <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
