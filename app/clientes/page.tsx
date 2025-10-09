@@ -119,13 +119,13 @@ export default function ClientesPage() {
     }
   }, [authLoading, user, router, esAdmin])
 
-  // -- Handles
+  // -- Handles --
   const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     // Aquí irá la lógica de búsqueda
     console.log("Buscando con filtros:", { filtroId, filtroClave, filtroNombre, filtroEstatus })
 
-    
+
   }
 
   const handleLimpiar = () => {
