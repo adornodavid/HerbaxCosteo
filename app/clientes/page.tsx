@@ -120,6 +120,7 @@ export default function ClientesPage() {
   }, [authLoading, user, router, esAdmin])
 
   // -- Handles --
+  // Busqueda - Ejecutar
   const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     console.log("Buscando con filtros:", { filtroId, filtroClave, filtroNombre, filtroEstatus })
