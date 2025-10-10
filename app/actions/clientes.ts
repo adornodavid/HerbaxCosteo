@@ -124,12 +124,12 @@ export async function crearCliente(formData: FormData) {
 ================================================== */
 //Función: obtenerClientes: funcion para obtener todos los clientes
 export async function obtenerClientes(
-  id = -1,
-  nombre = "",
-  clave = "",
-  direccion = "",
-  telefono = "",
-  email = "",
+  id: number = -1,
+  nombre: string = "",
+  clave: string = "",
+  direccion: string = "",
+  telefono: string = "",
+  email: string = "",
   activo = "Todos",
 ) {
   try {
