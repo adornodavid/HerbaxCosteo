@@ -191,6 +191,7 @@ console.log("ejecutar busqueda inicial")
       // Validar
       if (!user || user.RolId === 0) {
         router.push("/login")
+        setPageLoading(false)
         return
       }
       // Iniciar
