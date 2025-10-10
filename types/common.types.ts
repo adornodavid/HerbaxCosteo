@@ -48,3 +48,8 @@ export interface ModalError {
   Titulo?: string
   Mensaje?: string
 }
+
+export interface ModalTutorial {
+  Titulo?: string
+  Mensaje?: string
+}
