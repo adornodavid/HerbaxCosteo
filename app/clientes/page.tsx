@@ -153,7 +153,7 @@ export default function ClientesPage() {
       if (!esAdmin) {
         auxAdmin = user.ClienteId
       }
-      const Result = await obtenerClientes(auxAdmin, "", "", "", "", "", "True")
+      const Result = await obtenerClientes(auxAdmin, "HERBAX", "", "", "", "", "True")
       if (Result.success && Result.data) {
         const transformedData: Cliente[] = Result.data.map((c: Cliente) => ({
           id: c.id,
