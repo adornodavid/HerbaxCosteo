@@ -61,11 +61,15 @@ export default function ClientesPage() {
   // -- Funciones --
   // --- Función de búsqueda, no es la busqueda inicial ---
   const ejecutarBusqueda = async (id: number, nombre: string, clave: string, estatus: string) => {
+    // Validar usuario activo
     if (!user) return
+
+    // Actualizar estados
     setIsSearching(true)
     setPaginaActual(1)
 
     console.log("filtros: id: " + id + " _ nombre: " + nombre + " _ clave: " + clave + " _ estatus: " + estatus)
+    // Formatear variables a mandar como parametros
     const auxId = id != -1 ? id : -1
     const auxEstatus =
       estatus === "-1"
