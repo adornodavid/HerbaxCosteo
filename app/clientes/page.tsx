@@ -205,6 +205,7 @@ export default function ClientesPage() {
 
     const Id = filtroId === "" || filtroId === "0" ? -1 : Number.parseInt(filtroId, 10)
     console.log("filtroId: ", filtroId)
+    console.log("Id: ", Id)
     console.log("filtroEstatus: ", filtroEstatus)
     ejecutarBusqueda(Id, filtroClave, filtroNombre, filtroEstatus)
   }
