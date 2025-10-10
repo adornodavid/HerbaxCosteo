@@ -61,7 +61,7 @@ export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose
               <iframe
                 width="100%"
                 height="100%"
-                src="https://www.youtube.com/embed/kD0MPeu_GQ4?si=IavLwhvaT3jActa7" // Reemplazar VIDEO_ID_AQUI
+                src={VideoUrl} // Reemplazar VIDEO_ID_AQUI
                 title="Video Documental Fundación Esquipulas"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
