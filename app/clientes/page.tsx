@@ -116,7 +116,7 @@ export default function ClientesPage() {
         return { success: false, message: "Error en búsqueda del filtro de búsqueda:", result.error }
       }
 
-      return { success: true }
+      return { success: true, data: Listado}
     } catch (error) {
       console.log("Error inesperado al realizar la busqueda:", error)
       return { success: false, message: "Error inesperado al realizar la busqueda:", error }
