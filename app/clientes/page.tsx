@@ -104,7 +104,7 @@ export default function ClientesPage() {
         setListadoFiltrados(Listado)
         setTotalListado(Listado.length)
       } else {
-        console.log("No hay datos o la consulta falló")
+        console.log("No hay datos o la consulta falló.")
       }
 
       if (!result.success) {
