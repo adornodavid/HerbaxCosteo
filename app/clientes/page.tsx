@@ -33,8 +33,7 @@ export default function ClientesPage() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
   const esAdmin = useMemo(() => user && RolesAdmin.includes(user.RolId), [user])
-  // Paginación
-  const [paginaActual, setPaginaActual] = useState(1)
+  // Paginación  
   const resultadosPorPagina = 20
 
   // --- Estados ---
@@ -43,6 +42,7 @@ export default function ClientesPage() {
   const [ListadoFiltrados, setListadoFiltrados] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
   const [isSearching, setIsSearching] = useState(false)
+  const [paginaActual, setPaginaActual] = useState(1)
 
   // Estados para filtros
   const [filtroId, setFiltroId] = useState("")
@@ -55,6 +55,130 @@ export default function ClientesPage() {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
     return ListadoFiltrados.slice(indiceInicio, indiceInicio + resultadosPorPagina)
   }, [ListadoFiltrados, paginaActual])
+
+  // -- Funciones --
+  // --- Función de búsqueda, no es la busqueda inicial ---
+  const ejecutarBusquedaProductos = async (id: number, nombre: string, clave: string, estatus: string) => {
+    if (!user) return
+    setIsSearching(true)
+    setPaginaActual(1)
+
+    console.log("filtros: productonombre: " + productonombre + " _ clienteid: " + clienteid + " _ catalogoid: " + catalogoid + " _ estatus: " + estatus)
+    try {
+      const result = await obtenerProductos(
+        -1, // productoid
+        productonombre, // productonombre
+        clienteid, // clienteid
+        -1, // zonaid
+        catalogoid,
+        estatus === "-1" ? "Todos" : estatus === "true" ? "Activo" : "Inactivo", // activo
+      )
+
+      if (result.success && result.data) {
+        const transformedData: oProducto[] = result.data.map((p: oProducto) => ({
+          id: p.id,
+          codigo: p.codigo,
+          clienteid: p.clienteid,
+          clientes: {
+            nombre: p.clientes?.nombre || null,
+          },
+          zonaid: p.zonaid,
+          zonas: {
+            nombre: p.zonas?.nombre || null,
+          },
+          nombre: p.nombre,
+          imgurl: p.imgurl,
+          unidadmedidaid: p.unidadmedidaid,
+          unidadesmedida: {
+            descripcion: p.unidadesmedida?.descripcion || null,
+          },
+          costo: p.costo,
+          activo: p.activo,
+          productoscaracteristicas: {
+            descripcion: p.productoscaracteristicas?.descripcion || null,
+            presentacion: p.productoscaracteristicas?.presentacion || null,
+            porcion: p.productoscaracteristicas?.porcion || null,
+            modouso: p.productoscaracteristicas?.modouso || null,
+            porcionenvase: p.productoscaracteristicas?.porcionenvase || null,
+            categoriauso: p.productoscaracteristicas?.categoriauso || null,
+            propositoprincipal: p.productoscaracteristicas?.propositoprincipal || null,
+            propuestavalor: p.productoscaracteristicas?.propuestavalor || null,
+            instruccionesingesta: p.productoscaracteristicas?.instruccionesingesta || null,
+            edadminima: p.productoscaracteristicas?.edadminima || null,
+            advertencia: p.productoscaracteristicas?.advertencia || null,
+            condicionesalmacenamiento: p.productoscaracteristicas?.condicionesalmacenamiento || null,
+          },
+          productosxcatalogo: p.productosxcatalogo?.map((cat) => ({
+            catalogoid: cat.catalogoid || null,
+            precioventa: cat.precioventa || null,
+            margenutilidad: cat.margenutilidad || null,
+            catalogos: {
+              nombre: cat.catalogos?.nombre || null,
+              descripcion: cat.catalogos?.descripcion || null,
+            },
+          })) || [],
+
+          formulasxproducto: p.formulasxproducto?.map((fxp) => ({
+            formulaid: fxp.formulaid || null,
+            formulas: {
+              codigo: fxp.formulas?.codigo || null,
+              nombre: fxp.formulas?.nombre || null,
+              unidadmedidaid: fxp.formulas?.unidadmedidaid || null,
+              unidadesmedida: {
+                descripcion: fxp.unidadesmedida?.descripcion || null,
+              },
+              costo: fxp.formulas?.costo || null,
+              materiasprimasxformula: fxp.materiasprimasxformula?.map((mxf) => ({
+                materiaprimaid: mxf.materiaprimaid || null,
+                cantidad: mxf.cantidad || null,
+                costoparcial: mxf.costoparcial || null,
+                materiasprima: {
+                  codigo: mxf.materiasprima?.codigo || null,
+                  nombre: mxf.materiasprima?.nombre || null,
+                  unidadmedidaid: mxf.materiasprima?.codigo || null,
+                  unidadesmedida: {
+                    descripcion: mxf.unidadesmedida?.descripcion || null,
+                  },
+                  costo: mxf.materiasprima?.codigo || null,
+                },
+              })) || [],
+            } || null,
+          })) || [],
+        }))
+
+        const productosListado: ProductoListado[] = transformedData.map((p: oProducto) => ({
+          ProductoId: p.id,
+          ProductoNombre: p.nombre || "Sin nombre",
+          ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
+          ProductoTiempo: "N/A",
+          ProductoCosto: p.costo || 0,
+          ProductoActivo: p.activo === true,
+          ProductoImagenUrl: p.imgurl,
+          ClienteId: p.clienteid || -1,
+          ClienteNombre: p.clientes?.nombre || "N/A",
+          CatalogoId: p.productosxcatalogo[0]?.catalogoid || -1,
+          CatalogoNombre: p.productosxcatalogo[0]?.catalogos?.nombre || "N/A",
+        }))
+
+        setProductos(productosListado)
+        setProductosFiltrados(productosListado)
+        setTotalProductos(productosListado.length)
+      } else {
+        console.log("[v0] No hay datos o la consulta falló")
+      }
+
+      if (!result.success) {
+        console.error("Error en búsqueda del filtro de búsqueda:", result.error)
+        setProductos([])
+        return
+      }
+    } catch (error) {
+      console.error("Error inesperado al buscar productos:", error)
+      setProductos([])
+    } finally {
+      setIsSearching(false)
+    }
+  }
 
   // --- Carga inicial de datos ---
   const cargarDatosIniciales = async () => {
