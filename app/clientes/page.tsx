@@ -81,7 +81,7 @@ export default function ClientesPage() {
         "", // direccion
         "", // telefono
         "", // email
-        estatus === "-1" ? "Todos" : estatus === "true" ? "Activo" : "Inactivo", // activo
+        estatus === "-1" ? "Todos" : estatus === "true" ? "true" : "false", // activo
       )
 console.log("result: ", result:success, " - data: ", result.data)
       if (result.success && result.data) {
