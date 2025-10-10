@@ -30,6 +30,7 @@ console.log("fin de imports")
 	  Componente Principal, Pagina
 	================================================== */
 export default function ClientesPage() {
+  console.log("iniciar principal")
   // --- Variables especiales ---
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
