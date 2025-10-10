@@ -135,7 +135,7 @@ export default function ClientesPage() {
         auxAdmin = user.ClienteId
       }
 
-      
+      const Result = ejecutarBusqueda(auxAdmin, "", "", "Todos")
       /*
       const Result = await obtenerClientes(auxAdmin, "", "", "", "", "", "True")
       if (Result.success && Result.data) {
@@ -201,7 +201,7 @@ export default function ClientesPage() {
     console.log("Buscando con filtros:", { filtroId, filtroClave, filtroNombre, filtroEstatus })
 
     const Id = filtroId === "" || filtroId === "0" ? -1 : Number.parseInt(filtroId, 10)
-    ejecutarBusqueda(Id, filtroClave, filtroNombre, filtroEstatus)
+    const Result = ejecutarBusqueda(Id, filtroClave, filtroNombre, filtroEstatus)
   }
   // Busqueda - Limpiar o Resetear
   const handleLimpiar = () => {
