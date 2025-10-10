@@ -63,7 +63,7 @@ export default function ClientesPage() {
     setIsSearching(true)
     setPaginaActual(1)
 
-    console.log("filtros: productonombre: " + productonombre + " _ clienteid: " + clienteid + " _ catalogoid: " + catalogoid + " _ estatus: " + estatus)
+    console.log("filtros: id: " + id + " _ nombre: " + nombre + " _ clave: " + clave + " _ estatus: " + estatus)
     try {
       const result = await obtenerProductos(
         -1, // productoid
