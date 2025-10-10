@@ -271,9 +271,9 @@ export default function ClientesPage() {
   if (showModalTutorial) {
     return (
       <PageModalTutorial
-        title={ModalTutorial.Titulo}
-        message={ModalTutorial.Subtitulo}
-        videourl={ModalTutorial.VideoUrl}
+        Titulo={ModalTutorial.Titulo}
+        Subtitulo={ModalTutorial.Subtitulo}
+        VideoUrl={ModalTutorial.VideoUrl}
         isOpen={true}
         onClose={() => setShowModalTutorial(false)}
       />
