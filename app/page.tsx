@@ -2,24 +2,22 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/use-auth"
-import { PageLoadingScreen } from "@/components/page-loading-screen"
 
-export default function Page() {
+export default function HomePage() {
   const router = useRouter()
-  const { user, isLoading } = useAuth()
 
   useEffect(() => {
-    if (!isLoading) {
-      if (user) {
-        // Redirect to clientes page if user is authenticated
-        router.push("/clientes")
-      } else {
-        // Redirect to login if not authenticated
-        router.push("/login")
-      }
-    }
-  }, [isLoading, user, router])
+    // Redirigir automáticamente al dashboard
+    router.replace("/dashboard")
+  }, [router])
 
-  return <PageLoadingScreen />
+  // Mostrar un loading mientras redirige
+  return (
+    <div className="flex-1 flex items-center justify-center min-h-screen">
+      <div className="text-center space-y-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="text-gray-600">Redirigiendo al Dashboard...</p>
+      </div>
+    </div>
+  )
 }

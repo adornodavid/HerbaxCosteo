@@ -1,6 +1,6 @@
 "use client"
 
-import { AlertTriangle, X } from 'lucide-react'
+import { AlertTriangle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface PageModalAlertProps {
@@ -43,7 +43,7 @@ export function PageModalAlert({ title, message, isOpen, onClose }: PageModalAle
 
         {/* Footer with close button */}
         <div className="px-6 pb-6 flex justify-end">
-          <Button onClick={onClose}>
+          <Button onClick={onClose} variant="default">
             Cerrar
           </Button>
         </div>

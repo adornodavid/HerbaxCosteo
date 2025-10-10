@@ -1,18 +1,26 @@
-"use client"
-
 import Image from "next/image"
 
-export function PageLoadingScreen() {
+interface Props {
+  message?: string
+}
+
+export function PageLoadingScreen({ message = "Cargando Pagina..." }: Props) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="text-center">
-        <div className="mb-8 flex justify-center">
-          <div className="relative h-24 w-24">
-            <Image src="/loading-spinner.png" alt="Loading" width={96} height={96} className="animate-spin" />
+    <div className="flex h-screen w-full items-center justify-center">
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center justify-center p-8">
+          <div className="relative w-24 h-24 mb-4">
+            <Image
+              src="/images/design-mode/cargando.gif"
+              alt="Cargando..."
+              width={300}
+              height={300}
+              unoptimized
+              className="absolute inset-0 animate-bounce-slow"
+            />
           </div>
+          <p className="text-lg font-semibold text-gray-800">{message}</p>
         </div>
-        <h2 className="text-2xl font-semibold text-gray-800 mb-2">Cargando...</h2>
-        <p className="text-gray-600">Por favor espere un momento</p>
       </div>
     </div>
   )

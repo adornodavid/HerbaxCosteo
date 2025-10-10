@@ -16,9 +16,15 @@ export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose
 
   // Convert YouTube URL to embed format
   const getEmbedUrl = (url: string) => {
-    const videoId = url.split("v=")[1]?.split("&")[0] || url.split("/").pop()
-    return `https://www.youtube.com/embed/${videoId}?quality=hd1080`
+    // Handle different YouTube URL formats
+    const videoIdMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/)
+    if (videoIdMatch && videoIdMatch[1]) {
+      return `https://www.youtube.com/embed/${videoIdMatch[1]}?quality=hd1080`
+    }
+    return url
   }
+
+  const embedUrl = getEmbedUrl(VideoUrl)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -53,7 +59,7 @@ export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose
           <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
             <iframe
               className="absolute top-0 left-0 w-full h-full rounded-lg"
-              src={getEmbedUrl(VideoUrl)}
+              src={embedUrl}
               title={Titulo}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -63,7 +69,9 @@ export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose
 
         {/* Footer with close button */}
         <div className="px-6 pb-6 flex justify-end">
-          <Button onClick={onClose}>Cerrar</Button>
+          <Button onClick={onClose} variant="default">
+            Cerrar
+          </Button>
         </div>
       </div>
     </div>
