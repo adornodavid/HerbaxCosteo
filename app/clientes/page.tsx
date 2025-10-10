@@ -98,6 +98,7 @@ export default function ClientesPage() {
       )
 
       if (result.success && result.data) {
+      console.log(result.success, " - data: ", result.data)
         const transformedData: Cliente[] = result.data.map((c: Cliente) => ({
           id: c.id,
           nombre: c.nombre,
