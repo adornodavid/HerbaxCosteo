@@ -66,7 +66,15 @@ export default function ClientesPage() {
     setPaginaActual(1)
 
     console.log("filtros: id: " + id + " _ nombre: " + nombre + " _ clave: " + clave + " _ estatus: " + estatus)
-    const auxEstatus = 
+    const auxEstatus =
+      estatus === "-1"
+        ? "Todos"
+        : ["True", "true", "TRUE", "Activo", "activo", "ACTIVO"].includes(estatus)
+          ? true
+          : ["False", "false", "FALSE", "Inactivo", "inactivo", "INACTIVO"].includes(estatus)
+            ? false
+            : "Todos"
+
     try {
       const result = await obtenerClientes(
         -1, // id
@@ -79,7 +87,7 @@ export default function ClientesPage() {
       )
 
       if (result.success && result.data) {
-        const transformedData: Cliente[] = Result.data.map((c: Cliente) => ({
+        const transformedData: Cliente[] = result.data.map((c: Cliente) => ({
           id: c.id,
           nombre: c.nombre,
           clave: c.clave,
@@ -195,7 +203,7 @@ export default function ClientesPage() {
     console.log("Buscando con filtros:", { filtroId, filtroClave, filtroNombre, filtroEstatus })
 
     const Id = filtroId === "" || filtroId === "0" ? -1 : Number.parseInt(filtroId, 10)
-    const Result = ejecutarBusqueda(Id, filtroClave, filtroNombre, filtroEstatus)
+    ejecutarBusqueda(Id, filtroClave, filtroNombre, filtroEstatus)
   }
   // Busqueda - Limpiar o Resetear
   const handleLimpiar = () => {
