@@ -130,7 +130,7 @@ export async function obtenerClientes(
   direccion: string = "",
   telefono: string = "",
   email: string = "",
-  activo = "Todos",
+  activo: string = "Todos",
 ) {
   try {
   console.log("en tray")
