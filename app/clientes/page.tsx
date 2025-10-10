@@ -19,6 +19,7 @@ import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } fro
 import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
+import { PageModalTutorial } from "@/components/page-modal-tutorial"
 // -- Frontend
 
 // -- Backend
