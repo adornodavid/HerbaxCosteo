@@ -128,6 +128,9 @@ export default function ProductosPage() {
     costoTotal: 0, // Inicializado a 0
     tiempoPromedio: "N/A",
   })
+  const [productosFiltrados, setProductosFiltrados] = useState<ProductoListado[]>([])
+  const [totalProductos, setTotalProductos] = useState(0)
+  const [paginaActual, setPaginaActual] = useState(1)
   const [clientes, setClientes] = useState<ddlItem[]>([])
   const [catalogos, setCatalogos] = useState<ddlItem[]>([])
   const [pageLoading, setPageLoading] = useState(true)
@@ -145,17 +148,11 @@ export default function ProductosPage() {
   const [selectedIngredientesAsociados, setSelectedIngredientesAsociados] = useState<IngredienteAsociado[]>([])
   const [isDetailsLoading, setIsDetailsLoading] = useState(false)
 
-  const [productosFiltrados, setProductosFiltrados] = useState<ProductoListado[]>([])
-  const [totalProductos, setTotalProductos] = useState(0)
-
   // Filtros
   const [filtroNombre, setFiltroNombre] = useState("")
   const [filtroCliente, setFiltroCliente] = useState("-1")
   const [filtroCatalogo, setFiltroCatalogo] = useState("-1")
-  const [filtroEstatus, setFiltroEstatus] = useState("-1") // Nuevo filtro de estatus
-
-  // Paginación
-  const [paginaActual, setPaginaActual] = useState(1)
+  const [filtroEstatus, setFiltroEstatus] = useState("-1") // Nuevo filtro de estatus  
 
   // --- Función de búsqueda SIN dependencias automáticas ---
   const ejecutarBusquedaProductos = async (productonombre: string, clienteid: number, catalogoid: number, estatus: string) => {
