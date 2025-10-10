@@ -117,6 +117,8 @@ export default function ProductosPage() {
   // --- Variables especiales ---
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
+  const esAdmin = useMemo(() => user && [1, 2, 3, 4].includes(user.RolId), [user])
+  const resultadosPorPagina = 20
 
   // --- Estados ---
   const [productos, setProductos] = useState<ProductoListado[]>([])
