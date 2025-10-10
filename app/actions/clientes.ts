@@ -152,7 +152,7 @@ export async function obtenerClientes(
       query = query.eq("id", id)
     }
     if (nombre !== "") {
-      query = query.ilike("nombre", `%${nombre}%`)
+      query = query.ilike("nombre", `%${nombre.trim()}%`)
     }
     if (clave !== "") {
       query = query.ilike("clave", `%${clave}%`)
