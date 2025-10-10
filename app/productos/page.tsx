@@ -154,9 +154,6 @@ export default function ProductosPage() {
 
   // Paginación
   const [paginaActual, setPaginaActual] = useState(1)
-  const resultadosPorPagina = 20
-
-  const esAdmin = useMemo(() => user && [1, 2, 3, 4].includes(user.RolId), [user])
 
   // --- Función de búsqueda SIN dependencias automáticas ---
   const ejecutarBusquedaProductos = async (productonombre: string, clienteid: number, catalogoid: number, estatus: string) => {
