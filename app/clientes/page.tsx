@@ -7,7 +7,7 @@ console.log("inicia archivo")
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
 // -- Assets
-import { useAuth } from "@/contexts/auth-context"
+
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -22,7 +22,7 @@ import { PageLoadingScreen } from "@/components/page-loading-screen"
 // -- Frontend
 
 // -- Backend
-
+import { useAuth } from "@/contexts/auth-context"
 import { RolesAdmin } from "@/lib/config"
 import { obtenerClientes } from "@/app/actions/clientes"
 console.log("fin de imports")
