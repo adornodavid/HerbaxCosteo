@@ -228,7 +228,7 @@ export default function ClientesPage() {
     const Clave = filtroClave
     const Estatus = filtroEstatus === "-1" ? "Todos" : filtroEstatus
 
-    ejecutarBusqueda(Id, filtroClave, filtroNombre, Estatus)
+    ejecutarBusqueda(Id, filtroNombre, filtroClave, Estatus)
   }
   // Busqueda - Limpiar o Resetear
   const handleLimpiar = () => {
