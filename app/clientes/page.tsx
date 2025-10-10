@@ -240,6 +240,11 @@ export default function ClientesPage() {
     return <PageLoadingScreen message="Cargando Clientes..." />
   }
 
+  // ModalAlert
+  if(showModalAlert){
+
+  }
+
   return (
     <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
       {/* 1. Título y Botón */}
