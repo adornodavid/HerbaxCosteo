@@ -119,7 +119,7 @@ export default function ClientesPage() {
       return { success: true }
     } catch (error) {
       console.log("Error inesperado al buscar productos:", error)
-      return { error: true, message: "Error en búsqueda del filtro de búsqueda:", result.error }
+      return { error: true, message: "Error inesperado al buscar productos:", error }
       setListado([])
     } finally {
       setIsSearching(false)
