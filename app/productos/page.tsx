@@ -142,6 +142,12 @@ export default function ProductosPage() {
   const [searchTerm, setSearchTerm] = useState("") // Este estado no se usa en la búsqueda actual, pero se mantiene
   const [productoToDelete, setProductoToDelete] = useState<number | null>(null)
 
+   // Filtros
+  const [filtroNombre, setFiltroNombre] = useState("")
+  const [filtroCliente, setFiltroCliente] = useState("-1")
+  const [filtroCatalogo, setFiltroCatalogo] = useState("-1")
+  const [filtroEstatus, setFiltroEstatus] = useState("-1") // Nuevo filtro de estatus  
+  
   // Estados para el modal de detalles mejorado
   const [showProductoDetailsModal, setShowProductoDetailsModal] = useState(false)
   const [selectedProductoDetails, setSelectedProductoDetails] = useState<ProductoDetail[] | null>(null)
@@ -149,12 +155,6 @@ export default function ProductosPage() {
   const [selectedFormulasAsociadas, setSelectedFormulasAsociadas] = useState<FormulaAsociada[]>([])
   const [selectedIngredientesAsociados, setSelectedIngredientesAsociados] = useState<IngredienteAsociado[]>([])
   const [isDetailsLoading, setIsDetailsLoading] = useState(false)
-
-  // Filtros
-  const [filtroNombre, setFiltroNombre] = useState("")
-  const [filtroCliente, setFiltroCliente] = useState("-1")
-  const [filtroCatalogo, setFiltroCatalogo] = useState("-1")
-  const [filtroEstatus, setFiltroEstatus] = useState("-1") // Nuevo filtro de estatus  
 
   // --- Función de búsqueda SIN dependencias automáticas ---
   const ejecutarBusquedaProductos = async (productonombre: string, clienteid: number, catalogoid: number, estatus: string) => {
