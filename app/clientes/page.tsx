@@ -66,6 +66,7 @@ export default function ClientesPage() {
     setPaginaActual(1)
 
     console.log("filtros: id: " + id + " _ nombre: " + nombre + " _ clave: " + clave + " _ estatus: " + estatus)
+    const auxId = id != -1 ? id : -1
     const auxEstatus =
       estatus === "-1"
         ? "Todos"
@@ -77,13 +78,13 @@ export default function ClientesPage() {
 
     try {
       const result = await obtenerClientes(
-        -1, // id
+        auxId, // id
         nombre, // nombre
         clave, // clave
         "", // direccion
         "", // telefono
         "", // email
-        estatus === "-1" ? "Todos" : estatus === "true" ? "Activo" : "Inactivo", // activo
+        auxEstatus === "-1" ? "Todos" : estatus === "true" ? "Activo" : "Inactivo", // activo
       )
 
       if (result.success && result.data) {
