@@ -57,13 +57,23 @@ export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose
         {/* YouTube Video */}
         <div className="px-6 pb-6">
           <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-            <iframe
-              className="absolute top-0 left-0 w-full h-full rounded-lg"
-              src={embedUrl}
-              title={Titulo}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
+            <div className="aspect-video rounded-lg overflow-hidden shadow-xl border-4 border-esq-secondary-red">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/kD0MPeu_GQ4?si=IavLwhvaT3jActa7" // Reemplazar VIDEO_ID_AQUI
+                title="Video Documental Fundación Esquipulas"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="bg-slate-200 flex items-center justify-center"
+              >
+                <div className="text-slate-500 text-center">
+                  <PlayCircle className="h-16 w-16 mx-auto mb-2" />
+                  Video Próximamente
+                </div>
+              </iframe>
+            </div>
           </div>
         </div>
 
