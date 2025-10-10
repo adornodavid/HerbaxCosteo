@@ -192,7 +192,7 @@ export default function ClientesPage() {
       setModalTutorial({
         Titulo: "Prueba de Mensaje de alerta",
         Subtitulo: "Esto es una prueba para mostrar el modal de alerta",
-        VideoUrl: "CNffhGM_2v4?si=iMcHozm5R5x75sQJ",
+        VideoUrl: "https://www.youtube.com/embed/kD0MPeu_GQ4?si=IavLwhvaT3jActa7",
       })
       setShowModalTutorial(true)
     }
