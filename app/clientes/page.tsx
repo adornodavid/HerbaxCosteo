@@ -223,6 +223,8 @@ export default function ClientesPage() {
 
     // Variables auxiliares y formateadas para mandar como parametros
     const Id = filtroId === "" || filtroId === "0" ? -1 : Number.parseInt(filtroId, 10)
+    const Nombre = filtroNombre
+    const Clave = filtroClave
     const Estatus = filtroEstatus === "-1" ? "Todos" : filtroEstatus
 
     ejecutarBusqueda(Id, filtroClave, filtroNombre, Estatus)
