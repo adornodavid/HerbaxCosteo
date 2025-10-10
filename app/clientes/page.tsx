@@ -191,7 +191,7 @@ export default function ClientesPage() {
     e.preventDefault()
     console.log("Buscando con filtros:", { filtroId, filtroClave, filtroNombre, filtroEstatus })
 
-    const Id = Number.parseInt(filtroId, 10)
+    const Id = filtroId === "" ? "-1" : Number.parseInt(filtroId, 10),
     ejecutarBusqueda(Id, filtroClave, filtroNombre, filtroEstatus)
   }
   // Busqueda - Limpiar o Resetear
