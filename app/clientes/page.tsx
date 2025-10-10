@@ -69,6 +69,9 @@ export default function ClientesPage() {
         -1, // id
         nombre, // nombre
         clave, // clave
+        "", // direccion
+        "", // telefono
+        "", // email
         estatus === "-1" ? "Todos" : estatus === "true" ? "Activo" : "Inactivo", // activo
       )
 
