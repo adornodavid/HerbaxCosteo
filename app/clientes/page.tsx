@@ -58,7 +58,7 @@ export default function ClientesPage() {
 
   // -- Funciones --
   // --- Función de búsqueda, no es la busqueda inicial ---
-  const ejecutarBusquedaProductos = async (id: number, nombre: string, clave: string, estatus: string) => {
+  const ejecutarBusqueda = async (id: number, nombre: string, clave: string, estatus: string) => {
     if (!user) return
     setIsSearching(true)
     setPaginaActual(1)
