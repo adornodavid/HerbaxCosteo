@@ -129,7 +129,7 @@ export async function obtenerClientes(
   clave = "",
   direccion = "",
   telefono = "",
-  email = ""
+  email = "",
   activo = "Todos",
 ) {
   try {
