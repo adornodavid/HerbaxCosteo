@@ -204,9 +204,11 @@ console.log("auxEstatus: ", auxEstatus)
   // -- Handles --
   // Busqueda - Ejecutar
   const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
+    // Prevenir cambio de pagina
     e.preventDefault()
     console.log("Buscando con filtros:", { filtroId, filtroClave, filtroNombre, filtroEstatus })
 
+    // Variables auxiliares y formateadas para mandar como parametros
     const Id = filtroId === "" || filtroId === "0" ? -1 : Number.parseInt(filtroId, 10)
     const Estatus = filtroEstatus === "-1" ? "Todos" : filtroEstatus
     console.log("filtroId: ", filtroId)
