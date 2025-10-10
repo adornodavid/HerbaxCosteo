@@ -10,7 +10,7 @@ interface PageModalErrorProps {
   onClose: () => void
 }
 
-export function PageModalError({ isOpen, onClose, titulo, mensaje }: PageModalErrorProps) {
+export function PageModalError({ title, message, isOpen, onClose }: PageModalErrorProps) {
   if (!isOpen) return null
 
   return (
@@ -30,7 +30,7 @@ export function PageModalError({ isOpen, onClose, titulo, mensaje }: PageModalEr
           {/* Primera fila: Icono y texto "Error" */}
           <div className="flex items-center gap-3 mb-4">
             <XCircle className="h-10 w-10 text-red-500" />
-            <h2 className="text-3xl font-bold text-red-900">Error</h2>
+            <h2 className="text-3xl font-bold text-red-500">Error</h2>
           </div>
 
           {/* Segunda fila: Título del error */}
