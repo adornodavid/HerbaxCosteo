@@ -42,6 +42,9 @@ export default function ClientesPage() {
   // Mostrar/Ocultar contenido
   const [pageLoading, setPageLoading] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
+  const [ModalAlert, setModalAlert] = useState<ModalAlert>("")
+  const [ModalError, setModalError] = useState<ModalError>("")
+  const [ModalTutorial, setModalTutorial] = useState<ModalTutorial>("")
   // Cargar contenido en elementos 
   const [filtroId, setFiltroId] = useState("")
   const [filtroClave, setFiltroClave] = useState("")
