@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 // -- Components
 import { PageLoadingScreen } from "@/components/page-loading-screen"
+import { PageModalAlert } from "@/components/page-modal-alert"
 // -- Frontend
 
 // -- Backend
@@ -40,16 +41,16 @@ export default function ClientesPage() {
   //const [ListadoFiltrados, setListadoFiltrados] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
   const [paginaActual, setPaginaActual] = useState(1)
-  const [ModalAlert, setModalAlert] = useState<ModalAlert>("")
+  const [ModalAlert, setModalAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
   const [ModalError, setModalError] = useState<ModalError>("")
   const [ModalTutorial, setModalTutorial] = useState<ModalTutorial>("")
   // Mostrar/Ocultar contenido
   const [pageLoading, setPageLoading] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
-  const [showModalAlert, setShowShowModalAlert] = useState(false)
+  const [showModalAlert, setShowModalAlert] = useState(false)
   const [showModalError, setShowModalError] = useState(false)
   const [showModalTutorial, setShowModalTutorial] = useState(false)
-  // Cargar contenido en elementos 
+  // Cargar contenido en elementos
   const [filtroId, setFiltroId] = useState("")
   const [filtroClave, setFiltroClave] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
@@ -186,8 +187,11 @@ export default function ClientesPage() {
       console.log("Error al cargar datos iniciales:", error)
     } finally {
       setPageLoading(false)
-      // Pruebas de componentes tipo modal, modalAlert
-      
+      setModalAlert({
+        Titulo: "Prueba de Mensaje de alerta",
+        Mensaje: "Esto es una prueba para mostrar el modal de alerta",
+      })
+      setShowModalAlert(true)
     }
   }
 
@@ -408,6 +412,14 @@ export default function ClientesPage() {
           </div>
         </CardContent>
       </Card>
+
+      {showModalAlert && (
+        <PageModalAlert
+          title={ModalAlert.Titulo || ""}
+          message={ModalAlert.Mensaje || ""}
+          onClose={() => setShowModalAlert(false)}
+        />
+      )}
     </div>
   )
 }
