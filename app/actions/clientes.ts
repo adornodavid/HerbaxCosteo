@@ -133,7 +133,6 @@ export async function obtenerClientes(
   activo: string = "Todos",
 ) {
   try {
-  console.log("en tray")
     // Paso 1: Preparar Query
     let query = supabase.from("clientes").select(`
         id,
