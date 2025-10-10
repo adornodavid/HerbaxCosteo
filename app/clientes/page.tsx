@@ -11,7 +11,6 @@ import type { Cliente } from "@/types/clientes"
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -23,7 +22,6 @@ import { PageLoadingScreen } from "@/components/page-loading-screen"
 
 // -- Backend
 import { useAuth } from "@/contexts/auth-context"
-import { RolesAdmin } from "@/lib/config"
 import { obtenerClientes } from "@/app/actions/clientes"
 console.log("fin de imports")
 
@@ -35,13 +33,13 @@ export default function ClientesPage() {
   // --- Variables especiales ---
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
-  const esAdmin = useMemo(() => user && [1,2,3,4].includes(user.RolId), [user])
+  const esAdmin = useMemo(() => user && [1, 2, 3, 4].includes(user.RolId), [user])
   // Paginación
   const resultadosPorPagina = 20
   console.log("Variables")
 
   // --- Estados ---
-  const [pageLoading, setPageLoading] = useState(false)
+  const [pageLoading, setPageLoading] = useState(true)
   const [Listado, setListado] = useState<Cliente[]>([])
   //const [ListadoFiltrados, setListadoFiltrados] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
@@ -59,7 +57,7 @@ export default function ClientesPage() {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
     return Listado.slice(indiceInicio, indiceInicio + resultadosPorPagina)
   }, [Listado, paginaActual])
-console.log("funciones")
+  console.log("funciones")
   // -- Funciones --
   // --- Función de búsqueda, no es la busqueda inicial ---
   const ejecutarBusqueda = async (id: number, nombre: string, clave: string, estatus: string) => {
@@ -119,7 +117,7 @@ console.log("funciones")
       if (!result.success) {
         console.error("Error en búsqueda del filtro de búsqueda:", result.error)
         setListado([])
-        return { success: false, message: "Error en búsqueda del filtro de búsqueda:", result.error }
+        return { success: false, message: "Error en búsqueda del filtro de búsqueda:", error: result.error }
       }
 
       return { success: true, data: listadoTransformado }
@@ -134,7 +132,7 @@ console.log("funciones")
 
   // --- Carga inicial de datos ---
   const cargarDatosIniciales = async () => {
-  console.log("carga inicial")
+    console.log("carga inicial")
     if (!user) return
 
     try {
@@ -142,7 +140,7 @@ console.log("funciones")
       if (!esAdmin) {
         auxAdmin = user.ClienteId
       }
-console.log("ejecutar busqueda inicial")
+      console.log("ejecutar busqueda inicial")
       const Result = await ejecutarBusqueda(auxAdmin, "", "", "Todos")
       console.log("despues de busqueda inicial")
       /*
@@ -188,9 +186,9 @@ console.log("ejecutar busqueda inicial")
 
   // --- Carga Inicial y Seguridad ---
   useEffect(() => {
-  console.log("Este log SÍ aparece en la consola del navegador")
-  console.log("User:", user)
-  console.log("esAdmin:", esAdmin)
+    console.log("Este log SÍ aparece en la consola del navegador")
+    console.log("User:", user)
+    console.log("esAdmin:", esAdmin)
     if (!authLoading) {
       // Validar
       if (!user || user.RolId === 0) {
