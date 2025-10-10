@@ -5,6 +5,7 @@
     - PaginatedResponse
     - FilterParams
     - ddlItem
+    - ModalAlert
 ================================================== */
 export interface ApiResponse<T> {
   success: boolean
@@ -36,4 +37,9 @@ export interface FilterParams {
 export interface ddlItem {
   value: string
   text: string
+}
+
+export interface ModalAlert {
+  Titulo: string
+  Mensaje: string
 }
