@@ -168,7 +168,7 @@ console.log("result: ", result.success, " - data: ", result.data)
         }))
 
         setListado(Listado)
-        setListadoFiltrados(Listado)
+        //setListadoFiltrados(Listado)
         setTotalListado(Listado.length)
       } else {
         console.log("No hay datos o la consulta falló")
