@@ -42,8 +42,8 @@ export default function ClientesPage() {
   const [TotalListado, setTotalListado] = useState(0)
   const [paginaActual, setPaginaActual] = useState(1)
   const [ModalAlert, setModalAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
-  const [ModalError, setModalError] = useState<ModalError>("")
-  const [ModalTutorial, setModalTutorial] = useState<ModalTutorial>("")
+  const [ModalError, setModalError] = useState<ModalError>({ Titulo: "", Mensaje: "" })
+  const [ModalTutorial, setModalTutorial] = useState<ModalTutorial>({ Titulo: "", Mensaje: "" })
   // Mostrar/Ocultar contenido
   const [pageLoading, setPageLoading] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
