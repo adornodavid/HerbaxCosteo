@@ -113,7 +113,7 @@ export default function ClientesPage() {
       if (!result.success) {
         console.error("Error en búsqueda del filtro de búsqueda:", result.error)
         setListado([])
-        return { error: "Error en búsqueda del filtro de búsqueda:", result.error }
+        return { message: "Error en búsqueda del filtro de búsqueda:", result.error }
       }
 
       return { success: true }
