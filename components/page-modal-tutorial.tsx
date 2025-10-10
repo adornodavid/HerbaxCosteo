@@ -58,7 +58,7 @@ export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose
 
         {/* YouTube Video */}
         <div className="px-6 pb-6">
-          <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+          <div className="relative w-full">
             <div className="aspect-video rounded-lg overflow-hidden shadow-xl border-4 border-esq-secondary-red">
               <iframe
                 width="100%"
