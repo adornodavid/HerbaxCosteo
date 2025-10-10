@@ -121,6 +121,8 @@ export default function ProductosPage() {
   const resultadosPorPagina = 20
 
   // --- Estados ---
+  const [pageLoading, setPageLoading] = useState(true)
+  const [isSearching, setIsSearching] = useState(false)
   const [productos, setProductos] = useState<ProductoListado[]>([])
   const [estadisticas, setEstadisticas] = useState<ProductosEstadisticas>({
     totalProductos: 0,
@@ -133,8 +135,8 @@ export default function ProductosPage() {
   const [paginaActual, setPaginaActual] = useState(1)
   const [clientes, setClientes] = useState<ddlItem[]>([])
   const [catalogos, setCatalogos] = useState<ddlItem[]>([])
-  const [pageLoading, setPageLoading] = useState(true)
-  const [isSearching, setIsSearching] = useState(false)
+  
+  
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [productoToToggle, setProductoToToggle] = useState<{ id: number; activo: boolean } | null>(null)
   const [searchTerm, setSearchTerm] = useState("") // Este estado no se usa en la búsqueda actual, pero se mantiene
