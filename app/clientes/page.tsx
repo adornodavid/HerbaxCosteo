@@ -91,7 +91,7 @@ export default function ClientesPage() {
           activo: c.activo,
         }))
 
-        const Listado: Cliente[] = transformedData.map((c: Cliente) => ({
+        const listadoTransformado: Cliente[] = transformedData.map((c: Cliente) => ({
           ClienteId: c.id,
           ClienteNombre: c.nombre || "Sin nombre",
           ClienteClave: c.clave || "Sin clave", // Added missing comma
@@ -103,9 +103,9 @@ export default function ClientesPage() {
           ClienteActivo: c.activo === true,
         }))
 
-        setListado(Listado)
+        setListado(listadoTransformado)
         //setListadoFiltrados(Listado)
-        setTotalListado(Listado.length)
+        setTotalListado(listadoTransformado.length)
       } else {
         console.log("No hay datos o la consulta falló.")
       }
@@ -116,7 +116,7 @@ export default function ClientesPage() {
         return { success: false, message: "Error en búsqueda del filtro de búsqueda:", result.error }
       }
 
-      return { success: true, data: Listado }
+      return { success: true, data: listadoTransformado }
     } catch (error) {
       console.log("Error inesperado al realizar la busqueda:", error)
       setListado([])
