@@ -66,6 +66,7 @@ export default function ClientesPage() {
     setPaginaActual(1)
 
     console.log("filtros: id: " + id + " _ nombre: " + nombre + " _ clave: " + clave + " _ estatus: " + estatus)
+    const auxEstatus = 
     try {
       const result = await obtenerClientes(
         -1, // id
