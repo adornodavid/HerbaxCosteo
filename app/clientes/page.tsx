@@ -92,7 +92,7 @@ export default function ClientesPage() {
           activo: c.activo,
         }))
 
-        const listadoTransformado: Cliente[] = transformedData.map((c: Cliente) => ({
+        listadoTransformado = transformedData.map((c: Cliente) => ({
           ClienteId: c.id,
           ClienteNombre: c.nombre || "Sin nombre",
           ClienteClave: c.clave || "Sin clave", // Added missing comma
