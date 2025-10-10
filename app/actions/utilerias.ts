@@ -126,7 +126,7 @@ export async function imagenBorrar(imageUrl: string, folder: string) {
   Funciones: Textos
 ================================================== */
 //Función: textoLimpiarParaProceder / textCleanToProcess: Quitar caracteres que pueden afectar proceso, evitar inyecciones SQL
-export function textoLimpiarParaProceder(texto: string): string {
+export async function textoLimpiarParaProceder(texto: string): string {
   // Validar que se recibió un string válido
   if (!texto || typeof texto !== "string") {
     return ""
