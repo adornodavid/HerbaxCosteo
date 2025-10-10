@@ -28,7 +28,7 @@ export function PageModalAlert({ title, message, isOpen, onClose }: PageModalAle
         {/* Header: Icon + "Alerta" */}
         <div className="flex items-center gap-3 p-6 pb-4">
           <AlertTriangle className="h-8 w-8 text-yellow-500" />
-          <h2 className="text-2xl font-bold text-yellow-700">Alerta</h2>
+          <h2 className="text-2xl font-bold text-yellow-900">Alerta</h2>
         </div>
 
         {/* Title */}
