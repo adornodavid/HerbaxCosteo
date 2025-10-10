@@ -79,7 +79,7 @@ export default function ClientesPage() {
           : ["False", "false", "FALSE", "Inactivo", "inactivo", "INACTIVO"].includes(estatus)
             ? false
             : "Todos"
-console.log("auxEstatus: ", auxEstatus)
+    console.log("auxEstatus: ", auxEstatus)
     try {
       const result = await obtenerClientes(
         auxId, // id
@@ -355,40 +355,51 @@ console.log("auxEstatus: ", auxEstatus)
                 </tr>
               </thead>
               <tbody>
-                {Listado?.map((cliente) => (
-                  <tr key={cliente.ClienteId} className="border-b hover:bg-gray-50">
-                    <td className="py-3 px-4">{cliente.ClienteId}</td>
-                    <td className="py-3 px-4">{cliente.ClienteClave}</td>
-                    <td className="py-3 px-4">{cliente.ClienteNombre}</td>
-                    <td className="py-3 px-4">{cliente.ClienteDireccion}</td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={`px-2 py-1 text-xs rounded-xs font-semibold ${
-                          cliente.ClienteActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                        }`}
-                      >
-                        {cliente.ClienteActivo ? "Activo" : "Inactivo"}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" title="Ver Detalles">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" title="Editar">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" title={cliente.ClienteActivo ? "Inactivar" : "Activar"}>
-                          {cliente.ClienteActivo ? (
-                            <ToggleRight className="h-4 w-4 text-red-500" />
-                          ) : (
-                            <ToggleLeft className="h-4 w-4 text-green-500" />
-                          )}
-                        </Button>
+                {isSearching && (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+                        <span>Buscando resultados.....</span>
                       </div>
                     </td>
                   </tr>
-                ))}
+                )}
+                {!isSearching &&
+                  Listado?.map((cliente) => (
+                    <tr key={cliente.ClienteId} className="border-b hover:bg-gray-50">
+                      <td className="py-3 px-4">{cliente.ClienteId}</td>
+                      <td className="py-3 px-4">{cliente.ClienteClave}</td>
+                      <td className="py-3 px-4">{cliente.ClienteNombre}</td>
+                      <td className="py-3 px-4">{cliente.ClienteDireccion}</td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`px-2 py-1 text-xs rounded-xs font-semibold ${
+                            cliente.ClienteActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                          }`}
+                        >
+                          {cliente.ClienteActivo ? "Activo" : "Inactivo"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" title="Ver Detalles">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" title="Editar">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" title={cliente.ClienteActivo ? "Inactivar" : "Activar"}>
+                            {cliente.ClienteActivo ? (
+                              <ToggleRight className="h-4 w-4 text-red-500" />
+                            ) : (
+                              <ToggleLeft className="h-4 w-4 text-green-500" />
+                            )}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
