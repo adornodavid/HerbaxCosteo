@@ -100,11 +100,11 @@ export default function ClientesPage() {
           ClienteActivo: c.activo === true,
         }))
 
-        setProductos(productosListado)
-        setProductosFiltrados(productosListado)
-        setTotalProductos(productosListado.length)
+        setListado(Listado)
+        setListadoFiltrados(Listado)
+        setTotalListado(Listado.length)
       } else {
-        console.log("[v0] No hay datos o la consulta falló")
+        console.log("No hay datos o la consulta falló")
       }
 
       if (!result.success) {
