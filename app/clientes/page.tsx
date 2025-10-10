@@ -119,8 +119,8 @@ export default function ClientesPage() {
       return { success: true, data: Listado }
     } catch (error) {
       console.log("Error inesperado al realizar la busqueda:", error)
-      return { success: false, message: "Error inesperado al realizar la busqueda:", error }
       setListado([])
+      return { success: false, message: "Error inesperado al realizar la busqueda:", error }
     } finally {
       setIsSearching(false)
     }
