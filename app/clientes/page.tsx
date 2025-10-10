@@ -40,7 +40,7 @@ export default function ClientesPage() {
   console.log("Variables")
 
   // --- Estados ---
-  const [pageLoading, setPageLoading] = useState(true)
+  const [pageLoading, setPageLoading] = useState(false)
   const [Listado, setListado] = useState<Cliente[]>([])
   //const [ListadoFiltrados, setListadoFiltrados] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
