@@ -98,7 +98,7 @@ export default function ClientesPage() {
       )
 
       if (result.success && result.data) {
-      console.log(result.success, " - data: ", result.data)
+        console.log(result.success, " - data: ", result.data)
         const transformedData: Cliente[] = result.data.map((c: Cliente) => ({
           id: c.id,
           nombre: c.nombre,
@@ -224,11 +224,11 @@ export default function ClientesPage() {
 
     // Variables auxiliares y formateadas para mandar como parametros
     const Id = filtroId === "" || filtroId === "0" ? -1 : Number.parseInt(filtroId, 10)
-    const Nombre = filtroNombre
+    const Nombre: string = filtroNombre.trim()
     const Clave = filtroClave
     const Estatus = filtroEstatus === "-1" ? "Todos" : filtroEstatus
 
-    ejecutarBusqueda(Id, filtroNombre, filtroClave, Estatus)
+    ejecutarBusqueda(Id, Nombre, Clave, Estatus)
   }
   // Busqueda - Limpiar o Resetear
   const handleLimpiar = () => {
