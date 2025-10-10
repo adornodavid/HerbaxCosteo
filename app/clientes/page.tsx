@@ -17,7 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 // -- Components
 import { PageLoadingScreen } from "@/components/page-loading-screen"
-import { PageModalAlert, PageModalError, PageModalTutorial } from "@/components/page-modal-alert"
+import { PageModalAlert } from "@/components/page-modal-alert"
+import { PageModalError } from "@/components/page-modal-error"
 // -- Frontend
 
 // -- Backend
