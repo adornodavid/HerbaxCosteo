@@ -175,6 +175,7 @@ export default function ClientesPage() {
       }
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error)
+      console.log("Error al cargar datos iniciales:", error)
     } finally {
       setPageLoading(false)
     }
