@@ -188,18 +188,15 @@ console.log("result: ", result.success, " - data: ", result.data)
 
   // --- Carga Inicial y Seguridad ---
   useEffect(() => {
-    console.log("Este log SÍ aparece en la consola del navegador")
-    console.log("User:", user)
-    console.log("esAdmin:", esAdmin)
     if (!authLoading) {
       // Validar
       if (!user || user.RolId === 0) {
         router.push("/login")
-        setPageLoading(false)
         return
       }
       // Iniciar
       const inicializar = async () => {
+        setPageLoading(true)
         await cargarDatosIniciales()
       }
       inicializar()
