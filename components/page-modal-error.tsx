@@ -35,12 +35,12 @@ export function PageModalError({ title, message, isOpen, onClose }: PageModalErr
 
           {/* Segunda fila: Título del error */}
           <div className="mb-3">
-            <h3 className="text-xl font-semibold text-gray-800">{titulo}</h3>
+            <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
           </div>
 
           {/* Tercera fila: Mensaje del error */}
           <div className="mb-6">
-            <p className="text-gray-600 leading-relaxed">{mensaje}</p>
+            <p className="text-gray-600 leading-relaxed">{message}</p>
           </div>
 
           {/* Botón de cerrar */}
