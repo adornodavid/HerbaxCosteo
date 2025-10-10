@@ -189,11 +189,12 @@ export default function ClientesPage() {
       console.log("Error al cargar datos iniciales:", error)
     } finally {
       setPageLoading(false)
-      setModalError({
+      setModalTutorial({
         Titulo: "Prueba de Mensaje de alerta",
-        Mensaje: "Esto es una prueba para mostrar el modal de alerta",
+        Subtitulo: "Esto es una prueba para mostrar el modal de alerta",
+        VideoUrl: "",
       })
-      setShowModalError(true)
+      setShowModalTutorial(true)
     }
   }
 
