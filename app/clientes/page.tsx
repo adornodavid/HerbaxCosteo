@@ -137,7 +137,7 @@ export default function ClientesPage() {
         auxAdmin = user.ClienteId
       }
 
-      const Result = ejecutarBusqueda(auxAdmin, "", "", "Todos")
+      const Result = await ejecutarBusqueda(auxAdmin, "", "", "Todos")
       /*
       const Result = await obtenerClientes(auxAdmin, "", "", "", "", "", "True")
       if (Result.success && Result.data) {
