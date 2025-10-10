@@ -85,6 +85,7 @@ export default function ClientesPage() {
           : ["False", "false", "FALSE", "Inactivo", "inactivo", "INACTIVO"].includes(estatus)
             ? false
             : "Todos"
+    console.log("nombre: ", nombre, " - clave: ", clave)
     try {
       const result = await obtenerClientes(
         auxId, // id
