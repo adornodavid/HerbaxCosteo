@@ -144,7 +144,7 @@ console.log("result: ", result:success, " - data: ", result.data)
       }
       console.log("ejecutar busqueda inicial")
       const Result = await ejecutarBusqueda(auxAdmin, "", "", "Todos")
-      console.log("despues de busqueda inicial")
+      console.log("despues de busqueda inicial ", Result)
       /*
       const Result = await obtenerClientes(auxAdmin, "", "", "", "", "", "True")
       if (Result.success && Result.data) {
