@@ -43,7 +43,7 @@ export function PageModalAlert({ title, message, isOpen, onClose }: PageModalAle
 
         {/* Footer with close button */}
         <div className="px-6 pb-6 flex justify-end">
-          <Button onClick={onClose} variant="default">
+          <Button onClick={onClose} variant="default" className="bg-yellow-500">
             Cerrar
           </Button>
         </div>
