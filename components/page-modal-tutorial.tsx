@@ -64,7 +64,7 @@ export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose
                 width="100%"
                 height="100%"
                 //src={VideoUrl} // Reemplazar VIDEO_ID_AQUI
-                src={VideoTutorial}
+                src={VideoUrl}
                 title="Video Documental Fundación Esquipulas"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
