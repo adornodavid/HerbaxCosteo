@@ -132,6 +132,9 @@ export default function ClientesPage() {
       if (!esAdmin) {
         auxAdmin = user.ClienteId
       }
+
+      
+      /*
       const Result = await obtenerClientes(auxAdmin, "", "", "", "", "", "True")
       if (Result.success && Result.data) {
         const transformedData: Cliente[] = Result.data.map((c: Cliente) => ({
@@ -164,6 +167,7 @@ export default function ClientesPage() {
       } else {
         console.log("No hay datos o la consulta falló")
       }
+      */
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error)
     } finally {
