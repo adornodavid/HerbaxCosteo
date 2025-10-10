@@ -326,7 +326,7 @@ export default function ClientesPage() {
       <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
           <CardTitle>Resultados</CardTitle>
-          <CardDescription>Mostrando {Listado.length} elementos encontrados.</CardDescription>
+          <CardDescription>Mostrando {Listado?.length || 0} elementos encontrados.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -342,7 +342,7 @@ export default function ClientesPage() {
                 </tr>
               </thead>
               <tbody>
-                {Listado.map((cliente) => (
+                {Listado?.map((cliente) => (
                   <tr key={cliente.ClienteId} className="border-b hover:bg-gray-50">
                     <td className="py-3 px-4">{cliente.ClienteId}</td>
                     <td className="py-3 px-4">{cliente.ClienteClave}</td>
