@@ -1,6 +1,6 @@
 "use client"
 
-import { Video, X } from "lucide-react"
+import { Video, X, PlayCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface PageModalTutorialProps {
