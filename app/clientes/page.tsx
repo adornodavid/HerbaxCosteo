@@ -187,6 +187,9 @@ console.log("ejecutar busqueda inicial")
 
   // --- Carga Inicial y Seguridad ---
   useEffect(() => {
+  console.log("Este log SÍ aparece en la consola del navegador")
+  console.log("User:", user)
+  console.log("esAdmin:", esAdmin)
     if (!authLoading) {
       // Validar
       if (!user || user.RolId === 0) {
