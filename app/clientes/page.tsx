@@ -5,6 +5,7 @@
 // -- Interfaces, clases y objetos
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
+import type { ModalAlert, ModalError, ModalTutorial } from "@/types/common"
 // -- Assets
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
