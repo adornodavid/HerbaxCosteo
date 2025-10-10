@@ -186,6 +186,8 @@ export default function ClientesPage() {
       console.log("Error al cargar datos iniciales:", error)
     } finally {
       setPageLoading(false)
+      // Pruebas de componentes tipo modal, modalAlert
+      
     }
   }
 
