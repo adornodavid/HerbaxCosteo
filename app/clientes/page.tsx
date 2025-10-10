@@ -69,7 +69,7 @@ export default function ClientesPage() {
         auxAdmin = user.ClienteId
       }
       const result = await obtenerClientes(
-        -1, // id
+        auxAdmin, // id, filtro si es admin
         nombre, // nombre
         clave, // clave
         "", // direccion
