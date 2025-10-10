@@ -64,6 +64,10 @@ export default function ClientesPage() {
 
     console.log("filtros: id: " + id + " _ nombre: " + nombre + " _ clave: " + clave + " _ estatus: " + estatus)
     try {
+      let auxAdmin = id === -1 ? -1 : id
+      if (!esAdmin) {
+        auxAdmin = user.ClienteId
+      }
       const result = await obtenerClientes(
         -1, // id
         nombre, // nombre
