@@ -34,6 +34,7 @@ export default function ClientesPage() {
   const esAdmin = useMemo(() => user && [1,2,3,4].includes(user.RolId), [user])
   // Paginación
   const resultadosPorPagina = 20
+  console.log("Variables")
 
   // --- Estados ---
   const [pageLoading, setPageLoading] = useState(true)
@@ -54,7 +55,7 @@ export default function ClientesPage() {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
     return Listado.slice(indiceInicio, indiceInicio + resultadosPorPagina)
   }, [Listado, paginaActual])
-
+console.log("funciones")
   // -- Funciones --
   // --- Función de búsqueda, no es la busqueda inicial ---
   const ejecutarBusqueda = async (id: number, nombre: string, clave: string, estatus: string) => {
@@ -129,6 +130,7 @@ export default function ClientesPage() {
 
   // --- Carga inicial de datos ---
   const cargarDatosIniciales = async () => {
+  console.log("carga inicial")
     if (!user) return
 
     try {
@@ -136,8 +138,9 @@ export default function ClientesPage() {
       if (!esAdmin) {
         auxAdmin = user.ClienteId
       }
-
+console.log("ejecutar busqueda inicial")
       const Result = await ejecutarBusqueda(auxAdmin, "", "", "Todos")
+      console.log("despues de busqueda inicial")
       /*
       const Result = await obtenerClientes(auxAdmin, "", "", "", "", "", "True")
       if (Result.success && Result.data) {
