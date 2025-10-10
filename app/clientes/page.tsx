@@ -34,14 +34,15 @@ export default function ClientesPage() {
   const resultadosPorPagina = 20
 
   // --- Estados ---
-  const [pageLoading, setPageLoading] = useState(true)
+  // Cargar contenido en variables
   const [Listado, setListado] = useState<Cliente[]>([])
   //const [ListadoFiltrados, setListadoFiltrados] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
-  const [isSearching, setIsSearching] = useState(false)
   const [paginaActual, setPaginaActual] = useState(1)
-
-  // Estados para filtros
+  // Mostrar/Ocultar contenido
+  const [pageLoading, setPageLoading] = useState(true)
+  const [isSearching, setIsSearching] = useState(false)
+  // Cargar contenido en elementos 
   const [filtroId, setFiltroId] = useState("")
   const [filtroClave, setFiltroClave] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
