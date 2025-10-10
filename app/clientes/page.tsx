@@ -39,12 +39,15 @@ export default function ClientesPage() {
   //const [ListadoFiltrados, setListadoFiltrados] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
   const [paginaActual, setPaginaActual] = useState(1)
-  // Mostrar/Ocultar contenido
-  const [pageLoading, setPageLoading] = useState(true)
-  const [isSearching, setIsSearching] = useState(false)
   const [ModalAlert, setModalAlert] = useState<ModalAlert>("")
   const [ModalError, setModalError] = useState<ModalError>("")
   const [ModalTutorial, setModalTutorial] = useState<ModalTutorial>("")
+  // Mostrar/Ocultar contenido
+  const [pageLoading, setPageLoading] = useState(true)
+  const [isSearching, setIsSearching] = useState(false)
+  const [showModalAlert, setShowShowModalAlert] = useState(false)
+  const [showModalError, setShowModalError] = useState(false)
+  const [showModalTutorial, setShowModalTutorial] = useState(false)
   // Cargar contenido en elementos 
   const [filtroId, setFiltroId] = useState("")
   const [filtroClave, setFiltroClave] = useState("")
