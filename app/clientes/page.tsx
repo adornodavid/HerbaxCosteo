@@ -134,7 +134,6 @@ console.log("result: ", result.success, " - data: ", result.data)
 
   // --- Carga inicial de datos ---
   const cargarDatosIniciales = async () => {
-    console.log("carga inicial")
     if (!user) return
 
     try {
@@ -142,10 +141,6 @@ console.log("result: ", result.success, " - data: ", result.data)
       if (!esAdmin) {
         auxAdmin = user.ClienteId
       }
-      console.log("ejecutar busqueda inicial")
-      const Result = await ejecutarBusqueda(auxAdmin, "", "", "Todos")
-      console.log("despues de busqueda inicial ", Result)
-      /*
       const Result = await obtenerClientes(auxAdmin, "", "", "", "", "", "True")
       if (Result.success && Result.data) {
         const transformedData: Cliente[] = Result.data.map((c: Cliente) => ({
@@ -173,12 +168,11 @@ console.log("result: ", result.success, " - data: ", result.data)
         }))
 
         setListado(Listado)
-        //setListadoFiltrados(Listado)
+        setListadoFiltrados(Listado)
         setTotalListado(Listado.length)
       } else {
         console.log("No hay datos o la consulta falló")
       }
-      */
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error)
     } finally {
