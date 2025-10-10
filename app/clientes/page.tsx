@@ -24,6 +24,7 @@ import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { useAuth } from "@/contexts/auth-context"
 import { RolesAdmin } from "@/lib/config"
 import { obtenerClientes } from "@/app/actions/clientes"
+console.log("fin de imports")
 
 /* ==================================================
 	  Componente Principal, Pagina
