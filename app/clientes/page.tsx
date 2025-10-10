@@ -38,7 +38,7 @@ export default function ClientesPage() {
   // --- Estados ---
   const [pageLoading, setPageLoading] = useState(true)
   const [Listado, setListado] = useState<Cliente[]>([])
-  const [ListadoFiltrados, setListadoFiltrados] = useState<Cliente[]>([])
+  //const [ListadoFiltrados, setListadoFiltrados] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
   const [isSearching, setIsSearching] = useState(false)
   const [paginaActual, setPaginaActual] = useState(1)
@@ -52,8 +52,8 @@ export default function ClientesPage() {
   // --- Paginación ---
   const elementosPaginados = useMemo(() => {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
-    return ListadoFiltrados.slice(indiceInicio, indiceInicio + resultadosPorPagina)
-  }, [ListadoFiltrados, paginaActual])
+    return Listado.slice(indiceInicio, indiceInicio + resultadosPorPagina)
+  }, [Listado, paginaActual])
 
   // -- Funciones --
   // --- Función de búsqueda, no es la busqueda inicial ---
@@ -116,7 +116,7 @@ export default function ClientesPage() {
         return { success: false, message: "Error en búsqueda del filtro de búsqueda:", result.error }
       }
 
-      return { success: true, data: Listado}
+      return { success: true, data: Listado }
     } catch (error) {
       console.log("Error inesperado al realizar la busqueda:", error)
       return { success: false, message: "Error inesperado al realizar la busqueda:", error }
