@@ -40,6 +40,6 @@ export interface ddlItem {
 }
 
 export interface ModalAlert {
-  Titulo: string
-  Mensaje: string
+  Titulo?: string
+  Mensaje?: string
 }
