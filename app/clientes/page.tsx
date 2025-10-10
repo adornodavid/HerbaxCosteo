@@ -62,6 +62,7 @@ export default function ClientesPage() {
     setIsSearching(true)
     setPaginaActual(1)
 
+    let listadoTransformado: Cliente[] = []
     console.log("filtros: id: " + id + " _ nombre: " + nombre + " _ clave: " + clave + " _ estatus: " + estatus)
     try {
       let auxAdmin = id === -1 ? -1 : id
