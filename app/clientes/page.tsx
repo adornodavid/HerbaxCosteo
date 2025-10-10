@@ -241,8 +241,15 @@ export default function ClientesPage() {
   }
 
   // ModalAlert
-  if(showModalAlert){
-
+  if (showModalAlert) {
+    return (
+      <PageModalAlert
+        title={ModalAlert.Titulo}
+        message={ModalAlert.Mensaje}
+        isOpen={true}
+        onClose={() => setShowModalAlert(false)}
+      />
+    )
   }
 
   return (
@@ -418,13 +425,13 @@ export default function ClientesPage() {
         </CardContent>
       </Card>
 
-      {showModalAlert && (
+      {/* {showModalAlert && (
         <PageModalAlert
           title={ModalAlert.Titulo || ""}
           message={ModalAlert.Mensaje || ""}
           onClose={() => setShowModalAlert(false)}
         />
-      )}
+      )} */}
     </div>
   )
 }
