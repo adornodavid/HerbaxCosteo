@@ -10,7 +10,6 @@ import type { Cliente } from "@/types/clientes"
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -22,7 +21,7 @@ import { PageLoadingScreen } from "@/components/page-loading-screen"
 
 // -- Backend
 import { useAuth } from "@/contexts/auth-context"
-import { RolesAdmin } from '@/lib/config'
+import { RolesAdmin } from "@/lib/config"
 import { obtenerClientes } from "@/app/actions/clientes"
 
 /* ==================================================
@@ -33,7 +32,7 @@ export default function ClientesPage() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
   const esAdmin = useMemo(() => user && RolesAdmin.includes(user.RolId), [user])
-  // Paginación  
+  // Paginación
   const resultadosPorPagina = 20
 
   // --- Estados ---
@@ -76,7 +75,7 @@ export default function ClientesPage() {
       )
 
       if (result.success && result.data) {
-        const transformedData: Cliente[] = Result.data.map((c: Cliente) => ({
+        const transformedData: Cliente[] = result.data.map((c: Cliente) => ({
           id: c.id,
           nombre: c.nombre,
           clave: c.clave,
@@ -191,7 +190,7 @@ export default function ClientesPage() {
     e.preventDefault()
     console.log("Buscando con filtros:", { filtroId, filtroClave, filtroNombre, filtroEstatus })
 
-    const Id = filtroId === "" ? "-1" : Number.parseInt(filtroId, 10),
+    const Id = filtroId === "" || filtroId === "0" ? -1 : Number.parseInt(filtroId, 10)
     ejecutarBusqueda(Id, filtroClave, filtroNombre, filtroEstatus)
   }
   // Busqueda - Limpiar o Resetear
@@ -240,7 +239,8 @@ export default function ClientesPage() {
               <Input
                 id="txtClienteId"
                 name="txtClienteId"
-                type="text"
+                type="number"
+                min="0"
                 placeholder="Buscar por ID..."
                 value={filtroId}
                 onChange={(e) => setFiltroId(e.target.value)}
