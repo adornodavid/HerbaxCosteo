@@ -200,7 +200,6 @@ console.log("ejecutar busqueda inicial")
       }
       // Iniciar
       const inicializar = async () => {
-        setPageLoading(true)
         await cargarDatosIniciales()
       }
       inicializar()
