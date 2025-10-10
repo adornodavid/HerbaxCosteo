@@ -4,10 +4,10 @@ import { X, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface PageModalErrorProps {
+  title: string
+  message: string
   isOpen: boolean
   onClose: () => void
-  titulo: string
-  mensaje: string
 }
 
 export function PageModalError({ isOpen, onClose, titulo, mensaje }: PageModalErrorProps) {
