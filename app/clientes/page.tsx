@@ -1,5 +1,4 @@
 "use client"
-console.log("inicia archivo")
 /* ==================================================
 	  Imports
 	================================================== */
@@ -7,7 +6,6 @@ console.log("inicia archivo")
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
 // -- Assets
-
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -23,20 +21,17 @@ import { PageLoadingScreen } from "@/components/page-loading-screen"
 // -- Backend
 import { useAuth } from "@/contexts/auth-context"
 import { obtenerClientes } from "@/app/actions/clientes"
-console.log("fin de imports")
 
 /* ==================================================
 	  Componente Principal, Pagina
 	================================================== */
 export default function ClientesPage() {
-  console.log("iniciar principal")
   // --- Variables especiales ---
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
   const esAdmin = useMemo(() => user && [1, 2, 3, 4].includes(user.RolId), [user])
   // Paginación
   const resultadosPorPagina = 20
-  console.log("Variables")
 
   // --- Estados ---
   const [pageLoading, setPageLoading] = useState(true)
@@ -57,7 +52,7 @@ export default function ClientesPage() {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
     return Listado.slice(indiceInicio, indiceInicio + resultadosPorPagina)
   }, [Listado, paginaActual])
-  console.log("funciones")
+
   // -- Funciones --
   // --- Función de búsqueda, no es la busqueda inicial ---
   const ejecutarBusqueda = async (id: number, nombre: string, clave: string, estatus: string) => {
@@ -125,6 +120,7 @@ export default function ClientesPage() {
 
       if (!result.success) {
         console.error("Error en búsqueda del filtro de búsqueda:", result.error)
+        console.log("Error en búsqueda del filtro de búsqueda:", result.error)
         setListado([])
         return
       }
