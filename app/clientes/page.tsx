@@ -68,10 +68,12 @@ export default function ClientesPage() {
     let listadoTransformado: Cliente[] = []
     console.log("filtros: id: " + id + " _ nombre: " + nombre + " _ clave: " + clave + " _ estatus: " + estatus)
     try {
+    console.log("inicia try deEjecutar busqued")
       let auxAdmin = id === -1 ? -1 : id
       if (!esAdmin) {
         auxAdmin = user.ClienteId
       }
+      console.log("se determino auxAdmin: ", auxAdmin)
       const result = await obtenerClientes(
         auxAdmin, // id, filtro si es admin
         nombre, // nombre
