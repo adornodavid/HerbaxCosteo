@@ -51,5 +51,6 @@ export interface ModalError {
 
 export interface ModalTutorial {
   Titulo?: string
-  Mensaje?: string
+  Subtitulo?: string
+  VideoUrl?: string
 }
