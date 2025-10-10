@@ -81,7 +81,7 @@ export default function ClientesPage() {
         "", // email
         estatus === "-1" ? "Todos" : estatus === "true" ? "Activo" : "Inactivo", // activo
       )
-
+console.log("result: ", result:success, " - data: ", result.data)
       if (result.success && result.data) {
         const transformedData: Cliente[] = result.data.map((c: Cliente) => ({
           id: c.id,
