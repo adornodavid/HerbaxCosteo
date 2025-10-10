@@ -14,6 +14,7 @@ interface PageModalTutorialProps {
 export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose }: PageModalTutorialProps) {
   if (!isOpen) return null
 
+/*
   // Convert YouTube URL to embed format
   const getEmbedUrl = (url: string) => {
     // Handle different YouTube URL formats
@@ -25,6 +26,7 @@ export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose
   }
 
   const embedUrl = getEmbedUrl(VideoUrl)
+  */
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
