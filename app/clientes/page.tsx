@@ -65,27 +65,20 @@ export default function ClientesPage() {
     setIsSearching(true)
     setPaginaActual(1)
 
-    let listadoTransformado: Cliente[] = []
     console.log("filtros: id: " + id + " _ nombre: " + nombre + " _ clave: " + clave + " _ estatus: " + estatus)
     try {
-    console.log("inicia try deEjecutar busqued")
-      let auxAdmin = id === -1 ? -1 : id
-      if (!esAdmin) {
-        auxAdmin = user.ClienteId
-      }
-      console.log("se determino auxAdmin: ", auxAdmin)
       const result = await obtenerClientes(
-        auxAdmin, // id, filtro si es admin
+        -1, // id
         nombre, // nombre
         clave, // clave
         "", // direccion
         "", // telefono
         "", // email
-        estatus === "-1" ? "Todos" : estatus === "true" ? "true" : "false", // activo
+        estatus === "-1" ? "Todos" : estatus === "true" ? "Activo" : "Inactivo", // activo
       )
-console.log("result: ", result.success, " - data: ", result.data)
+
       if (result.success && result.data) {
-        const transformedData: Cliente[] = result.data.map((c: Cliente) => ({
+        const transformedData: Cliente[] = Result.data.map((c: Cliente) => ({
           id: c.id,
           nombre: c.nombre,
           clave: c.clave,
@@ -97,7 +90,7 @@ console.log("result: ", result.success, " - data: ", result.data)
           activo: c.activo,
         }))
 
-        listadoTransformado = transformedData.map((c: Cliente) => ({
+        const Listado: Cliente[] = transformedData.map((c: Cliente) => ({
           ClienteId: c.id,
           ClienteNombre: c.nombre || "Sin nombre",
           ClienteClave: c.clave || "Sin clave", // Added missing comma
@@ -109,9 +102,9 @@ console.log("result: ", result.success, " - data: ", result.data)
           ClienteActivo: c.activo === true,
         }))
 
-        setListado(listadoTransformado)
-        //setListadoFiltrados(Listado)
-        setTotalListado(listadoTransformado.length)
+        setListado(Listado)
+        setListadoFiltrados(Listado)
+        setTotalListado(Listado.length)
       } else {
         console.log("No hay datos o la consulta falló.")
       }
@@ -119,14 +112,11 @@ console.log("result: ", result.success, " - data: ", result.data)
       if (!result.success) {
         console.error("Error en búsqueda del filtro de búsqueda:", result.error)
         setListado([])
-        return { success: false, message: "Error en búsqueda del filtro de búsqueda:", error: result.error }
+        return
       }
-
-      return { success: true, data: listadoTransformado }
     } catch (error) {
-      console.log("Error inesperado al realizar la busqueda:", error)
+      console.log("Error inesperado al buscar productos:", error)
       setListado([])
-      return { success: false, message: "Error inesperado al realizar la busqueda:", error }
     } finally {
       setIsSearching(false)
     }
