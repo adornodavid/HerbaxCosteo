@@ -66,11 +66,9 @@ export default function ClientesPage() {
     console.log("filtros: id: " + id + " _ nombre: " + nombre + " _ clave: " + clave + " _ estatus: " + estatus)
     try {
       const result = await obtenerClientes(
-        -1, // productoid
-        productonombre, // productonombre
-        clienteid, // clienteid
-        -1, // zonaid
-        catalogoid,
+        -1, // id
+        nombre, // nombre
+        clave, // clave
         estatus === "-1" ? "Todos" : estatus === "true" ? "Activo" : "Inactivo", // activo
       )
 
