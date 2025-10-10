@@ -115,6 +115,8 @@ export default function ClientesPage() {
         setListado([])
         return
       }
+
+      return { success: true }
     } catch (error) {
       console.log("Error inesperado al buscar productos:", error)
       setListado([])
