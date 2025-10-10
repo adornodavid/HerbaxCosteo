@@ -264,6 +264,19 @@ export default function ClientesPage() {
     )
   }
 
+  // ModalTutorial
+  if (showModalTutorial) {
+    return (
+      <PageModalTutorial
+        title={ModalTutorial.Titulo}
+        message={ModalTutorial.Subtitulo}
+        videourl={ModalTutorial.VideoUrl}
+        isOpen={true}
+        onClose={() => setShowModalTutorial(false)}
+      />
+    )
+  }
+
   return (
     <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
       {/* 1. Título y Botón */}
