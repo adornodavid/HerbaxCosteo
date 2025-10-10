@@ -43,3 +43,8 @@ export interface ModalAlert {
   Titulo?: string
   Mensaje?: string
 }
+
+export interface ModalError {
+  Titulo?: string
+  Mensaje?: string
+}
