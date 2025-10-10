@@ -143,7 +143,7 @@ export default function ClientesPage() {
   // --- Renderizado ---
   // Loading
   if (pageLoading) {
-    return <LoadingScreen message="Cargando Clientes..." />
+    return <PageLoadingScreen message="Cargando Clientes..." />
   }
 
   return (
