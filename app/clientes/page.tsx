@@ -250,8 +250,8 @@ export default function ClientesPage() {
   if (showModalAlert) {
     return (
       <PageModalAlert
-        title={ModalAlert.Titulo}
-        message={ModalAlert.Mensaje}
+        Titulo={ModalAlert.Titulo}
+        Mensaje={ModalAlert.Mensaje}
         isOpen={true}
         onClose={() => setShowModalAlert(false)}
       />
@@ -262,8 +262,8 @@ export default function ClientesPage() {
   if (showModalError) {
     return (
       <PageModalError
-        title={ModalError.Titulo}
-        message={ModalError.Mensaje}
+        Titulo={ModalError.Titulo}
+        Mensaje={ModalError.Mensaje}
         isOpen={true}
         onClose={() => setShowModalError(false)}
       />
