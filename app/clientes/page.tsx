@@ -9,16 +9,15 @@ import type { ModalAlert, ModalError, ModalTutorial } from "@/types/common"
 // -- Assets
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
+import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 // -- Configuraciones
 import { RolesAdmin, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Components
-
+import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
@@ -58,7 +57,13 @@ export default function ClientesPage() {
   const [showModalTutorial, setShowModalTutorial] = useState(false)
   const [showPageTituloMasNuevo, setShowPageTituloMasNuevo] = useState(false)
   // Cargar contenido en elementos
-  const [PageTituloMasNuevo, setPageTituloMasNuevo] = PageTituloMasNuevo<ModalAlert>({ Titulo: "", Subtitulo: "", Visible: false, BotonTexto: "", Ruta: "" })
+  const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState({
+    Titulo: "",
+    Subtitulo: "",
+    Visible: false,
+    BotonTexto: "",
+    Ruta: "",
+  })
   const [filtroId, setFiltroId] = useState("")
   const [filtroClave, setFiltroClave] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
@@ -164,9 +169,9 @@ export default function ClientesPage() {
         Subtitulo: "Gestión completa de Clientes",
         Visible: esAdmin == true ? true : false,
         BotonTexto: "Crear NuevoCliente",
-        Ruta: "/clientes/nuevo"
+        Ruta: "/clientes/nuevo",
       })
-      setShowPageTituloMasNuevo(true)      
+      setShowPageTituloMasNuevo(true)
 
       const Result = await ejecutarBusqueda(auxAdminClienteId, "", "", "True")
       if (!Result.success) {
@@ -314,21 +319,15 @@ export default function ClientesPage() {
   return (
     <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
       {/* 1. Título y Botón */}
-
-      <div className="flex flex-col gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Clientes</h1>
-          <p className="text-muted-foreground">Gestión completa de Clientes</p>
-        </div>
-        <div className="flex justify-end">
-          <Link href="/clientes/nuevo" passHref>
-            <Button className="bg-[#5d8f72] hover:bg-[#44785a] text-white">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Crear Nuevo Cliente
-            </Button>
-          </Link>
-        </div>
-      </div>
+      {showPageTituloMasNuevo && (
+        <PageTitlePlusNew
+          Titulo={PageTituloMasNuevo.Titulo}
+          Subtitulo={PageTituloMasNuevo.Subtitulo}
+          Visible={PageTituloMasNuevo.Visible}
+          BotonTexto={PageTituloMasNuevo.BotonTexto}
+          Ruta={PageTituloMasNuevo.Ruta}
+        />
+      )}
 
       {/* 2. Filtros de Búsqueda */}
       <Card className="rounded-xs border bg-card text-card-foreground shadow">
