@@ -152,10 +152,10 @@ export default function ClientesPage() {
       const Result = await ejecutarBusqueda(auxAdminClienteId, "", "", "True")
       if (!Result.success){
         setModalAlert({
-        Titulo: "En ejecucion de Busqueda de carga inicial",
-        Mensaje: Result.mensaje,
-      })
-      setShowModalAlert(true)
+          Titulo: "En ejecucion de Busqueda de carga inicial",
+          Mensaje: Result.mensaje,
+        })
+        setShowModalAlert(true)
       }
       
       /*
