@@ -5,8 +5,8 @@
   - Assets
   - Configuraciones (variables)
   - Tipados (interfaces, clases, objetos)
-  - Componentes
   - Librerias
+  - Componentes
   - Frontend
   - Bakcend
 	================================================== */
