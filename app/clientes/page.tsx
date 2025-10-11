@@ -462,14 +462,6 @@ export default function ClientesPage() {
           </div>
         </CardContent>
       </Card>
-
-      {/* {showModalAlert && (
-        <PageModalAlert
-          title={ModalAlert.Titulo || ""}
-          message={ModalAlert.Mensaje || ""}
-          onClose={() => setShowModalAlert(false)}
-        />
-      )} */}
     </div>
   )
 }
