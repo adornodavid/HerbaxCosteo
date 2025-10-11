@@ -116,9 +116,10 @@ export default function ClientesPage() {
         setTotalListado(Listado.length)
         setListadoSinResultados(Listado.length === 0)
 
-        
+        return { success: true, mensaje:"Se ejecuto correctamente cada proceso." }
       } else {
         console.log("No hay datos o la consulta falló.")
+        return { success: false, mensaje: "No hay datos o la consulta falló." }
       }
 
       if (!result.success) {
@@ -126,7 +127,7 @@ export default function ClientesPage() {
         console.log("Error en búsqueda del filtro de búsqueda:", result.error)
         setListado([])
         setListadoSinResultados(true)
-        return
+        return { success: false, mensaje: "Error en búsqueda del filtro de búsqueda: " + result.error }
       }
     } catch (error) {
       console.log("Error inesperado al buscar productos:", error)
