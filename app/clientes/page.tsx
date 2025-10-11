@@ -83,15 +83,7 @@ export default function ClientesPage() {
 
     // Ejecutar Consulta principal
     try {
-      const result = await obtenerClientes(
-        auxId, // id
-        nombre, // nombre
-        clave, // clave
-        "", // direccion
-        "", // telefono
-        "", // email
-        auxEstatus, // activo
-      )
+      const result = await obtenerClientes( auxId, nombre, clave, "", "", "", auxEstatus, )
 
       if (result.success && result.data) {
         console.log(result.success, " - data: ", result.data)
