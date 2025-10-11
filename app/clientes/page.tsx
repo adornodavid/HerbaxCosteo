@@ -192,13 +192,6 @@ export default function ClientesPage() {
       console.log("Error al cargar datos iniciales:", error)
     } finally {
       setPageLoading(false)
-
-      setModalTutorial({
-        Titulo: "Prueba de Mensaje de alerta",
-        Mensaje: "Esto es una prueba para mostrar el modal de alerta",
-        VideoUrl: "https://www.youtube.com/watch?v=CNffhGM_2v4",
-      })
-      setShowModalTutorial(true)
     }
   }
 
@@ -249,6 +242,15 @@ export default function ClientesPage() {
     return <PageLoadingScreen message="Cargando Clientes..." />
   }
 
+  // Como conssumir modales
+  /*
+  setModalTutorial({
+        Titulo: "Prueba de Mensaje de alerta",
+        Mensaje: "Esto es una prueba para mostrar el modal de alerta",
+        VideoUrl: "https://www.youtube.com/watch?v=CNffhGM_2v4",
+      })
+      setShowModalTutorial(true)
+  */
   // ModalAlert
   if (showModalAlert) {
     return (
