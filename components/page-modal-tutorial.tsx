@@ -14,7 +14,6 @@ interface PageModalTutorialProps {
 export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose }: PageModalTutorialProps) {
   if (!isOpen) return null
 
-/*
   // Convert YouTube URL to embed format
   const getEmbedUrl = (url: string) => {
     // Handle different YouTube URL formats
@@ -26,34 +25,29 @@ export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose
   }
 
   const embedUrl = getEmbedUrl(VideoUrl)
-  */
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="relative bg-white rounded-lg shadow-xl border-4 border-blue-500 w-[80%] max-w-6xl mx-4 max-h-[90vh] overflow-y-auto">
-        {/* Close button */}
+      <div className="relative bg-gradient-to-br from-blue-900 to-blue-600 rounded-lg shadow-xl w-[80%] max-w-6xl mx-4 max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 z-10"
+          className="absolute top-2 right-2 text-white hover:text-white/80 z-10"
           aria-label="Cerrar"
         >
           <X className="h-5 w-5" />
         </button>
 
-        {/* Header: Icon + "Video Tutorial" */}
         <div className="flex items-center gap-3 p-6 pb-4">
-          <Video className="h-8 w-8 text-blue-500" />
-          <h2 className="text-2xl font-bold text-blue-500">Video Tutorial</h2>
+          <Video className="h-8 w-8 text-white" />
+          <h2 className="text-2xl font-bold text-white">Video Tutorial</h2>
         </div>
 
-        {/* Titulo */}
         <div className="px-6 pb-2">
-          <h3 className="text-xl font-semibold text-gray-800">{Titulo}</h3>
+          <h3 className="text-xl font-semibold text-white">{Titulo}</h3>
         </div>
 
-        {/* Subtitulo */}
         <div className="px-6 pb-4">
-          <p className="text-lg text-gray-600">{Subtitulo}</p>
+          <p className="text-lg text-white">{Subtitulo}</p>
         </div>
 
         {/* YouTube Video */}
@@ -63,8 +57,7 @@ export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose
               <iframe
                 width="100%"
                 height="100%"
-                //src={VideoUrl} // Reemplazar VIDEO_ID_AQUI
-                src={VideoUrl}
+                src={embedUrl}
                 title="Video Documental Fundación Esquipulas"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
