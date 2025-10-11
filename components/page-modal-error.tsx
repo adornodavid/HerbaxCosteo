@@ -4,13 +4,13 @@ import { X, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface PageModalErrorProps {
-  title: string
-  message: string
+  Titulo: string
+  Mensaje: string
   isOpen: boolean
   onClose: () => void
 }
 
-export function PageModalError({ title, message, isOpen, onClose }: PageModalErrorProps) {
+export function PageModalError({ Titulo, Mensaje, isOpen, onClose }: PageModalErrorProps) {
   if (!isOpen) return null
 
   return (
@@ -31,11 +31,11 @@ export function PageModalError({ title, message, isOpen, onClose }: PageModalErr
           </div>
 
           <div className="mb-3">
-            <h3 className="text-xl font-semibold text-white">{title}</h3>
+            <h3 className="text-xl font-semibold text-white">{Titulo}</h3>
           </div>
 
           <div className="mb-6">
-            <p className="text-white/90 leading-relaxed">{message}</p>
+            <p className="text-white/90 leading-relaxed">{Mensaje}</p>
           </div>
 
           <div className="flex justify-end">
