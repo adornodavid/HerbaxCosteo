@@ -1,7 +1,7 @@
 "use client"
 
 /* ==================================================
-  Imports
+  Imports:
     - Assets
     - Configuraciones (variables)
     - Tipados (interfaces, clases, objetos)
