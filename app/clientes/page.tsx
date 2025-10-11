@@ -15,6 +15,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
+// -- Configuraciones
+import { RolesAdmin } from '@/lib/config'
 // -- Components
 import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageModalAlert } from "@/components/page-modal-alert"
@@ -33,7 +35,7 @@ export default function ClientesPage() {
   // --- Variables especiales ---
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
-  const esAdmin = useMemo(() => user && [1, 2, 3, 4].includes(user.RolId), [user])
+  const esAdmin = useMemo(() => user && RolesAdmin.includes(user.RolId), [user])
   // Paginación
   const resultadosPorPagina = 20
 
