@@ -198,7 +198,7 @@ export default function ClientesPage() {
     }
   }
 
-  // --- Carga Inicial y Seguridad ---
+  // --- Inicio (carga inicial y seguridad) ---
   useEffect(() => {
     if (!authLoading) {
       // Validar
