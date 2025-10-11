@@ -154,7 +154,7 @@ export default function ClientesPage() {
     }
   }
 
-  // --- Inicio (carga inicial y seguridad) ---
+  // Inicio (carga inicial y seguridad)
   const cargarDatosIniciales = async () => {
     if (!user) return
 
