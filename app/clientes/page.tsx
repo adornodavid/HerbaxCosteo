@@ -1,7 +1,7 @@
 "use client"
 /* ==================================================
 	  Imports
-	================================================== */
+================================================== */
 // -- Assets
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
