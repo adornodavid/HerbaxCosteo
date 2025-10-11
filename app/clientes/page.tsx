@@ -157,7 +157,14 @@ export default function ClientesPage() {
         auxAdminClienteId = user.ClienteId
       }
 
-      
+      setPageTituloMasNuevo({
+        Titulo: "Clientes",
+        Subtitulo: "Gestión completa de Clientes",
+        Visible: esAdmin == true ? true : false,
+        BotonTexto: "Crear NuevoCliente",
+        Ruta: "/clientes/nuevo"
+      })
+      setShowPageTituloMasNuevo(true)      
 
       const Result = await ejecutarBusqueda(auxAdminClienteId, "", "", "True")
       if (!Result.success) {
