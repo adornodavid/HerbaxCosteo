@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 // -- Configuraciones
-import { RolesAdmin, arrActivoTrue, arrActivoFalse } from '@/lib/config'
+import { RolesAdmin, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Components
 import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageModalAlert } from "@/components/page-modal-alert"
@@ -48,6 +48,7 @@ export default function ClientesPage() {
   const [ModalAlert, setModalAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
   const [ModalError, setModalError] = useState<ModalError>({ Titulo: "", Mensaje: "" })
   const [ModalTutorial, setModalTutorial] = useState<ModalTutorial>({ Titulo: "", Subtitulo: "", VideoUrl: "" })
+  const [ListadoSinResultados, setListadoSinResultados] = useState(false)
   // Mostrar/Ocultar contenido
   const [pageLoading, setPageLoading] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
@@ -128,6 +129,7 @@ export default function ClientesPage() {
         setListado(Listado)
         //setListadoFiltrados(Listado)
         setTotalListado(Listado.length)
+        setListadoSinResultados(Listado.length === 0)
       } else {
         console.log("No hay datos o la consulta falló.")
       }
@@ -136,11 +138,13 @@ export default function ClientesPage() {
         console.error("Error en búsqueda del filtro de búsqueda:", result.error)
         console.log("Error en búsqueda del filtro de búsqueda:", result.error)
         setListado([])
+        setListadoSinResultados(true)
         return
       }
     } catch (error) {
       console.log("Error inesperado al buscar productos:", error)
       setListado([])
+      setListadoSinResultados(true)
     } finally {
       setIsSearching(false)
     }
@@ -184,6 +188,7 @@ export default function ClientesPage() {
         setListado(Listado)
         //setListadoFiltrados(Listado)
         setTotalListado(Listado.length)
+        setListadoSinResultados(Listado.length === 0)
       } else {
         console.log("No hay datos o la consulta falló")
       }
@@ -420,7 +425,17 @@ export default function ClientesPage() {
                     </td>
                   </tr>
                 )}
-                
+
+                {!isSearching && Listado.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <span>No se encontraron resultados con los parametros indicados, favor de verificar.</span>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+
                 {!isSearching &&
                   Listado?.map((cliente) => (
                     <tr key={cliente.ClienteId} className="border-b hover:bg-gray-50">
