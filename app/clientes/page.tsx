@@ -220,6 +220,7 @@ export default function ClientesPage() {
 
     ejecutarBusqueda(Id, Nombre, Clave, Estatus)
   }
+  
   // Busqueda - Limpiar o Resetear
   const handleLimpiar = () => {
     setFiltroId("")
