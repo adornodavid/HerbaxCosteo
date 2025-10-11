@@ -133,6 +133,7 @@ export default function ClientesPage() {
       console.log("Error inesperado al buscar productos:", error)
       setListado([])
       setListadoSinResultados(true)
+      return { error: true, mensaje: "Error inesperado al buscar productos:" + error }
     } finally {
       setIsSearching(false)
     }
