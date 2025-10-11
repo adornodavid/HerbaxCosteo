@@ -4,13 +4,13 @@ import { AlertTriangle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface PageModalAlertProps {
-  title: string
-  message: string
+  Titulo: string
+  Mensaje: string
   isOpen: boolean
   onClose: () => void
 }
 
-export function PageModalAlert({ title, message, isOpen, onClose }: PageModalAlertProps) {
+export function PageModalAlert({ Titulo, Mensaje, isOpen, onClose }: PageModalAlertProps) {
   if (!isOpen) return null
 
   return (
@@ -26,11 +26,11 @@ export function PageModalAlert({ title, message, isOpen, onClose }: PageModalAle
         </div>
 
         <div className="px-6 pb-2">
-          <h3 className="text-lg font-semibold text-black">{title}</h3>
+          <h3 className="text-lg font-semibold text-black">{Titulo}</h3>
         </div>
 
         <div className="px-6 pb-6">
-          <p className="text-black">{message}</p>
+          <p className="text-black">{Mensaje}</p>
         </div>
 
         <div className="px-6 pb-6 flex justify-end">
