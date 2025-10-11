@@ -21,7 +21,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 
 /* ==================================================
-	Componente Principal, Pagina
+	Principal (Pagina)
+  
 ================================================== */
 export default function ZonasPage() {
   const [filtroId, setFiltroId] = useState("")
