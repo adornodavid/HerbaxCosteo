@@ -1,8 +1,8 @@
 "use client"
 /* ==================================================
-	  Imports
+	Imports
 ================================================== */
-// -- Assets
+// -- Assets --
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -10,14 +10,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
-// -- Configuraciones
+// -- Configuraciones --
 import { RolesAdmin, arrActivoTrue, arrActivoFalse } from "@/lib/config"
-// -- Tipados (interfaces, clases, objetos)
+// -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
 import type { ModalAlert, ModalError, ModalTutorial } from "@/types/common"
-// -- Librerias
-// -- Components
+// -- Librerias --
+// -- Componentes --
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageModalAlert } from "@/components/page-modal-alert"
