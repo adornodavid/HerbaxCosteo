@@ -191,11 +191,11 @@ export default function ClientesPage() {
     } finally {
       setPageLoading(false)
 
-      setModalAlerta({
+      setModalAlert({
         Titulo: "Prueba de Mensaje de alerta",
         Mensaje: "Esto es una prueba para mostrar el modal de alerta",
       })
-      setShowModalAlerta(true)
+      setShowModalAlert(true)
     }
   }
 
