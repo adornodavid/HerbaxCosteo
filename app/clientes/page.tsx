@@ -70,7 +70,7 @@ export default function ClientesPage() {
   const [filtroNombre, setFiltroNombre] = useState("")
   const [filtroEstatus, setFiltroEstatus] = useState("-1")
 
-  // --- Paginación ---
+  // --- Variables (post carga elementos) ---
   const elementosPaginados = useMemo(() => {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
     return Listado.slice(indiceInicio, indiceInicio + resultadosPorPagina)
