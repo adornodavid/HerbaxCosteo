@@ -21,14 +21,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 
 /* ==================================================
-	Principal (Pagina)
-  - Variables especiales
-  - Estados
-  - Funciones
-  - Inicio (carga inicial y seguridad)
-  - Manejadores (Handles)
-  - Renders (contenidos auxiliares)
-  - Contenido
+	Principal (Pagina):
+    - Variables especiales
+    - Estados
+    - Funciones
+    - Inicio (carga inicial y seguridad)
+    - Manejadores (Handles)
+    - Renders (contenidos auxiliares)
+    - Contenido
 ================================================== */
 export default function ZonasPage() {
   const [filtroId, setFiltroId] = useState("")
