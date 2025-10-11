@@ -215,7 +215,7 @@ export default function ClientesPage() {
     }
   }, [authLoading, user, router, esAdmin])
 
-  // -- Handles --
+  // -- Manejadores (Handles) --
   // Busqueda - Ejecutar
   const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
     // Prevenir cambio de pagina
@@ -240,7 +240,7 @@ export default function ClientesPage() {
     cargarDatosIniciales()
   }
 
-  // --- Renderizado ---
+  // --- Renders (contenidos auxiliares) ---
   // Loading
   if (pageLoading) {
     return <PageLoadingScreen message="Cargando Clientes..." />
