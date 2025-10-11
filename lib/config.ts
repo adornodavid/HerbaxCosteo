@@ -36,8 +36,4 @@ export const AppConfig = {
 export const RolesAdmin = [1, 2, 3, 4] as const
 export const Estados = ['activo', 'inactivo', 'pendiente'] as const
 export const arrActivoTrue = ["True", "true", "TRUE", "Activo", "activo", "ACTIVO"] as const
-export const arrActivoFalse = ["True", "true", "TRUE", "Activo", "activo", "ACTIVO"] as const
-
-["True", "true", "TRUE", "Activo", "activo", "ACTIVO"].includes(estatus)
-          ? true
-          : ["False", "false", "FALSE", "Inactivo", "inactivo", "INACTIVO"].includes(estatus)
+export const arrActivoFalse = ["False", "false", "FALSE", "Inactivo", "inactivo", "INACTIVO"] as const
