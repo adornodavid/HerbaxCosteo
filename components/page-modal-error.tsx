@@ -15,37 +15,31 @@ export function PageModalError({ title, message, isOpen, onClose }: PageModalErr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="relative w-full max-w-md bg-white rounded-lg shadow-xl border-4 border-red-500">
-        {/* Botón de cerrar */}
+      <div className="relative w-full max-w-md bg-gradient-to-br from-red-900 to-red-600 rounded-lg shadow-xl">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-2 right-2 text-white hover:text-white/80 transition-colors"
           aria-label="Cerrar"
         >
           <X className="h-5 w-5" />
         </button>
 
-        {/* Contenido del modal */}
         <div className="p-6">
-          {/* Primera fila: Icono y texto "Error" */}
           <div className="flex items-center gap-3 mb-4">
-            <XCircle className="h-10 w-10 text-red-500" />
-            <h2 className="text-3xl font-bold text-red-500">Error</h2>
+            <XCircle className="h-10 w-10 text-white" />
+            <h2 className="text-3xl font-bold text-white">Error</h2>
           </div>
 
-          {/* Segunda fila: Título del error */}
           <div className="mb-3">
-            <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
+            <h3 className="text-xl font-semibold text-white">{title}</h3>
           </div>
 
-          {/* Tercera fila: Mensaje del error */}
           <div className="mb-6">
-            <p className="text-gray-600 leading-relaxed">{message}</p>
+            <p className="text-white/90 leading-relaxed">{message}</p>
           </div>
 
-          {/* Botón de cerrar */}
           <div className="flex justify-end">
-            <Button onClick={onClose} variant="destructive">
+            <Button onClick={onClose} className="bg-white text-black hover:bg-white/90">
               Cerrar
             </Button>
           </div>
