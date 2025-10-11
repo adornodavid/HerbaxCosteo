@@ -2,13 +2,13 @@
 
 /* ==================================================
   Imports
-  - Assets
-  - Configuraciones (variables)
-  - Tipados (interfaces, clases, objetos)
-  - Librerias
-  - Componentes
-  - Frontend
-  - Bakcend
+    - Assets
+    - Configuraciones (variables)
+    - Tipados (interfaces, clases, objetos)
+    - Librerias
+    - Componentes
+    - Frontend
+    - Bakcend
 	================================================== */
 import type React from "react"
 
