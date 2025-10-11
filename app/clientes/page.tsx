@@ -23,9 +23,9 @@ import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
 import { PageModalTutorial } from "@/components/page-modal-tutorial"
-// -- Frontend
+// -- Frontend --
 
-// -- Backend
+// -- Backend --
 import { useAuth } from "@/contexts/auth-context"
 import { obtenerClientes } from "@/app/actions/clientes"
 
