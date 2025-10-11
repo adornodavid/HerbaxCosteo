@@ -420,6 +420,7 @@ export default function ClientesPage() {
                     </td>
                   </tr>
                 )}
+                
                 {!isSearching &&
                   Listado?.map((cliente) => (
                     <tr key={cliente.ClienteId} className="border-b hover:bg-gray-50">
