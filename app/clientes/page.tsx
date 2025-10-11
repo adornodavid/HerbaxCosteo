@@ -159,10 +159,12 @@ export default function ClientesPage() {
 
     try {
       const auxClienteId = esAdmin === true ? -1 : user.ClienteId
+      /*
       let auxAdminClienteId = -1
       if (!esAdmin) {
         auxAdminClienteId = user.ClienteId
       }
+      */
 
       setPageTituloMasNuevo({
         Titulo: "Clientes",
@@ -173,7 +175,7 @@ export default function ClientesPage() {
       })
       setShowPageTituloMasNuevo(true)
 
-      const Result = await ejecutarBusqueda(auxAdminClienteId, "", "", "True")
+      const Result = await ejecutarBusqueda(auxClienteId, "", "", "True")
       if (!Result.success) {
         setModalAlert({
           Titulo: "En ejecucion de Busqueda de carga inicial",
