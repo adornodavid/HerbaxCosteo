@@ -82,9 +82,9 @@ export default function ClientesPage() {
     const auxEstatus =
       estatus === "-1"
         ? "Todos"
-        : ["True", "true", "TRUE", "Activo", "activo", "ACTIVO"].includes(estatus)
+        : arrActivoTrue.includes(estatus)
           ? true
-          : ["False", "false", "FALSE", "Inactivo", "inactivo", "INACTIVO"].includes(estatus)
+          : arrActivoFalse.includes(estatus)
             ? false
             : "Todos"
     console.log("nombre: ", nombre, " - clave: ", clave)
