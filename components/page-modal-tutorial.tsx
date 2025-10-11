@@ -28,7 +28,7 @@ export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="relative bg-gradient-to-br from-blue-900 to-blue-600 rounded-lg shadow-xl w-[80%] max-w-6xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-gradient-to-br from-blue-900 to-blue-600 rounded-lg shadow-xl w-[80%] max-w-6xl mx-4 max-h-[90vh]">
         <button
           onClick={onClose}
           className="absolute top-2 right-2 text-white hover:text-white/80 z-10"
