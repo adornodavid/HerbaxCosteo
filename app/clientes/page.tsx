@@ -55,6 +55,7 @@ export default function ClientesPage() {
   const [showModalAlert, setShowModalAlert] = useState(false)
   const [showModalError, setShowModalError] = useState(false)
   const [showModalTutorial, setShowModalTutorial] = useState(false)
+  const [showPageTituloMasNuevo, setShowPageTituloMasNuevo] = useState(false)
   // Cargar contenido en elementos
   const [PageTituloMasNuevo, setPageTituloMasNuevo] = PageTituloMasNuevo<ModalAlert>({ Titulo: "", Subtitulo: "", Visible: false, BotonTexto: "", Ruta: "" })
   const [filtroId, setFiltroId] = useState("")
