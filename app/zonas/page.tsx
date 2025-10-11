@@ -1,5 +1,15 @@
 "use client"
 
+/* ==================================================
+  Imports
+  - Assets
+  - Configuraciones (variables)
+  - Tipados (interfaces, clases, objetos)
+  - Componentes
+  - Librerias
+  - Frontend
+  - Bakcend
+	================================================== */
 import type React from "react"
 
 import { useState } from "react"
