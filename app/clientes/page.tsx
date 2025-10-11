@@ -79,11 +79,18 @@ export default function ClientesPage() {
 
     // Formatear variables a mandar como parametros
     const auxId = id != -1 ? id : -1
-    const auxEstatus = estatus === "-1" ? "Todos" : arrActivoTrue.includes(estatus) ? true : arrActivoFalse.includes(estatus) ? false : "Todos"
+    const auxEstatus =
+      estatus === "-1"
+        ? "Todos"
+        : arrActivoTrue.includes(estatus)
+          ? true
+          : arrActivoFalse.includes(estatus)
+            ? false
+            : "Todos"
 
     // Ejecutar Consulta principal
     try {
-      const result = await obtenerClientes( auxId, nombre, clave, "", "", "", auxEstatus, )
+      const result = await obtenerClientes(auxId, nombre, clave, "", "", "", auxEstatus)
 
       if (result.success && result.data) {
         console.log(result.success, " - data: ", result.data)
@@ -116,7 +123,7 @@ export default function ClientesPage() {
         setTotalListado(Listado.length)
         setListadoSinResultados(Listado.length === 0)
 
-        return { success: true, mensaje:"Se ejecuto correctamente cada proceso." }
+        return { success: true, mensaje: "Se ejecuto correctamente cada proceso." }
       } else {
         console.log("No hay datos o la consulta falló.")
         return { success: false, mensaje: "No hay datos o la consulta falló." }
@@ -148,16 +155,16 @@ export default function ClientesPage() {
       if (!esAdmin) {
         auxAdminClienteId = user.ClienteId
       }
-      
+
       const Result = await ejecutarBusqueda(auxAdminClienteId, "", "", "True")
-      if (!Result.success){
+      if (!Result.success) {
         setModalAlert({
           Titulo: "En ejecucion de Busqueda de carga inicial",
           Mensaje: Result.mensaje,
         })
         setShowModalAlert(true)
       }
-      
+
       /*
       const Result = await obtenerClientes(auxAdminClienteId, "", "", "", "", "", "True")
       if (Result.success && Result.data) {
@@ -254,7 +261,7 @@ export default function ClientesPage() {
   if (pageLoading) {
     return <PageLoadingScreen message="Cargando Clientes..." />
   }
-  
+
   // ModalAlert
   if (showModalAlert) {
     return (
@@ -295,17 +302,19 @@ export default function ClientesPage() {
   return (
     <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
       {/* 1. Título y Botón */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="flex flex-col gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Clientes</h1>
           <p className="text-muted-foreground">Gestión completa de Clientes</p>
         </div>
-        <Link href="/clientes/nuevo" passHref>
-          <Button className="bg-[#5d8f72] hover:bg-[#44785a] text-white">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Crear Nuevo Cliente
-          </Button>
-        </Link>
+        <div className="flex justify-end">
+          <Link href="/clientes/nuevo" passHref>
+            <Button className="bg-[#5d8f72] hover:bg-[#44785a] text-white">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Crear Nuevo Cliente
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* 2. Filtros de Búsqueda */}
