@@ -195,7 +195,7 @@ export default function ClientesPage() {
         Titulo: "Prueba de Mensaje de alerta",
         Mensaje: "Esto es una prueba para mostrar el modal de alerta",
       })
-      setShowModalTutorial(true)
+      setShowModalAlerta(true)
     }
   }
 
