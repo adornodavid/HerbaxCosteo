@@ -2,10 +2,6 @@
 /* ==================================================
 	  Imports
 	================================================== */
-// -- Interfaces, clases y objetos
-import type React from "react"
-import type { Cliente } from "@/types/clientes"
-import type { ModalAlert, ModalError, ModalTutorial } from "@/types/common"
 // -- Assets
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
@@ -16,6 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 // -- Configuraciones
 import { RolesAdmin, arrActivoTrue, arrActivoFalse } from "@/lib/config"
+// -- Tipados (interfaces, clases, objetos)
+import type React from "react"
+import type { Cliente } from "@/types/clientes"
+import type { ModalAlert, ModalError, ModalTutorial } from "@/types/common"
 // -- Components
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageLoadingScreen } from "@/components/page-loading-screen"
