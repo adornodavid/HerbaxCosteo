@@ -81,13 +81,9 @@ export default function ClientesPage() {
     // Formatear variables a mandar como parametros
     const auxId = id != -1 ? id : -1
     const auxEstatus =
-      estatus === "-1"
-        ? "Todos"
-        : arrActivoTrue.includes(estatus)
-          ? true
-          : arrActivoFalse.includes(estatus)
-            ? false
-            : "Todos"
+      estatus === "-1" ? "Todos"
+        : arrActivoTrue.includes(estatus) ? true
+          : arrActivoFalse.includes(estatus) ? false : "Todos"
     console.log("nombre: ", nombre, " - clave: ", clave)
     try {
       const result = await obtenerClientes(
