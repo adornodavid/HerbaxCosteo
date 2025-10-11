@@ -181,42 +181,6 @@ export default function ClientesPage() {
         })
         setShowModalAlert(true)
       }
-
-      /*
-      const Result = await obtenerClientes(auxAdminClienteId, "", "", "", "", "", "True")
-      if (Result.success && Result.data) {
-        const transformedData: Cliente[] = Result.data.map((c: Cliente) => ({
-          id: c.id,
-          nombre: c.nombre,
-          clave: c.clave,
-          direccion: c.direccion,
-          telefono: c.telefono,
-          email: c.email,
-          imgurl: c.imgurl,
-          fechacreacion: c.fechacreacion,
-          activo: c.activo,
-        }))
-
-        const Listado: Cliente[] = transformedData.map((c: Cliente) => ({
-          ClienteId: c.id,
-          ClienteNombre: c.nombre || "Sin nombre",
-          ClienteClave: c.clave || "Sin clave", // Added missing comma
-          ClienteDireccion: c.direccion || "Sin dirección",
-          ClienteTelefono: c.telefono || "Sin telefono",
-          ClienteEmail: c.email || "Sin email",
-          ClienteImgUrl: c.imgurl || "Sin imagen",
-          ClienteFechaCreacion: c.fechacreacion,
-          ClienteActivo: c.activo === true,
-        }))
-
-        setListado(Listado)
-        //setListadoFiltrados(Listado)
-        setTotalListado(Listado.length)
-        setListadoSinResultados(Listado.length === 0)
-      } else {
-        console.log("No hay datos o la consulta falló")
-      }
-      */
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error)
       console.log("Error al cargar datos iniciales:", error)
