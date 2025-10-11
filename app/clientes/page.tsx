@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 // -- Configuraciones
-import { RolesAdmin } from '@/lib/config'
+import { RolesAdmin, arrActivoTrue, arrActivoFalse } from '@/lib/config'
 // -- Components
 import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageModalAlert } from "@/components/page-modal-alert"
