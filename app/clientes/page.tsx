@@ -144,11 +144,18 @@ export default function ClientesPage() {
     if (!user) return
 
     try {
-      let auxAdmin = -1
+      let auxAdminClienteId = -1
       if (!esAdmin) {
-        auxAdmin = user.ClienteId
+        auxAdminClienteId = user.ClienteId
       }
-      const Result = await obtenerClientes(auxAdmin, "", "", "", "", "", "True")
+      
+      const Result = await ejecutarBusqueda(auxAdminClienteId, "", "", "True")
+      if (Result.success){
+
+      }
+      
+      /*
+      const Result = await obtenerClientes(auxAdminClienteId, "", "", "", "", "", "True")
       if (Result.success && Result.data) {
         const transformedData: Cliente[] = Result.data.map((c: Cliente) => ({
           id: c.id,
@@ -181,6 +188,7 @@ export default function ClientesPage() {
       } else {
         console.log("No hay datos o la consulta falló")
       }
+      */
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error)
       console.log("Error al cargar datos iniciales:", error)
@@ -220,7 +228,7 @@ export default function ClientesPage() {
 
     ejecutarBusqueda(Id, Nombre, Clave, Estatus)
   }
-  
+
   // Busqueda - Limpiar o Resetear
   const handleLimpiar = () => {
     setFiltroId("")
