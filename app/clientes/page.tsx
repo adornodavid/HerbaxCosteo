@@ -30,8 +30,8 @@ import { useAuth } from "@/contexts/auth-context"
 import { obtenerClientes } from "@/app/actions/clientes"
 
 /* ==================================================
-	  Componente Principal (Pagina)
-	================================================== */
+	Componente Principal (Pagina)
+================================================== */
 export default function ClientesPage() {
   // --- Variables especiales ---
   const router = useRouter()
