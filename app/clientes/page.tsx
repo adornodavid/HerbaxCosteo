@@ -157,6 +157,8 @@ export default function ClientesPage() {
         auxAdminClienteId = user.ClienteId
       }
 
+      
+
       const Result = await ejecutarBusqueda(auxAdminClienteId, "", "", "True")
       if (!Result.success) {
         setModalAlert({
