@@ -9,7 +9,7 @@
     - Componentes
     - Frontend
     - Bakcend
-	================================================== */
+================================================== */
 import type React from "react"
 
 import { useState } from "react"
@@ -20,6 +20,9 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 
+/* ==================================================
+	Componente Principal, Pagina
+================================================== */
 export default function ZonasPage() {
   const [filtroId, setFiltroId] = useState("")
   const [filtroClave, setFiltroClave] = useState("")
