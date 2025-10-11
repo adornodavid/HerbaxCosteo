@@ -39,11 +39,6 @@ export default function ClientesPage() {
   const esAdmin = useMemo(() => user && RolesAdmin.includes(user.RolId), [user])
   // Paginación
   const resultadosPorPagina = 20
-  // --- Variables (post carga elementos) ---
-  const elementosPaginados = useMemo(() => {
-    const indiceInicio = (paginaActual - 1) * resultadosPorPagina
-    return Listado.slice(indiceInicio, indiceInicio + resultadosPorPagina)
-  }, [Listado, paginaActual])
 
   // --- Estados ---
   // Cargar contenido en variables
@@ -75,7 +70,11 @@ export default function ClientesPage() {
   const [filtroNombre, setFiltroNombre] = useState("")
   const [filtroEstatus, setFiltroEstatus] = useState("-1")
 
-  
+  // --- Variables (post carga elementos) ---
+  const elementosPaginados = useMemo(() => {
+    const indiceInicio = (paginaActual - 1) * resultadosPorPagina
+    return Listado.slice(indiceInicio, indiceInicio + resultadosPorPagina)
+  }, [Listado, paginaActual])
 
   // -- Funciones --
   // --- Función de búsqueda, no es la busqueda inicial ---
