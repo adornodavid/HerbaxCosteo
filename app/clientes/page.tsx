@@ -158,6 +158,7 @@ export default function ClientesPage() {
     if (!user) return
 
     try {
+      const auxClienteId = esAdmin === true ? -1 : user.ClienteId
       let auxAdminClienteId = -1
       if (!esAdmin) {
         auxAdminClienteId = user.ClienteId
