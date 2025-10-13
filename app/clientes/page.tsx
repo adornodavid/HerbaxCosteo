@@ -467,7 +467,12 @@ export default function ClientesPage() {
                     {/* Action buttons at bottom */}
                     <div className="flex gap-4 justify-center mt-auto">
                       <div className="flex flex-col items-center">
-                        <Button variant="ghost" size="icon" title="Ver Detalles">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Ver Detalles"
+                          onClick={() => router.push(`/clientes/${elemento.ClienteId}/ver`)}
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
                         <span className="text-xs text-muted-foreground mt-1">Ver</span>
