@@ -271,7 +271,7 @@ export default function ClientesPage() {
   // --- Contenido ---
   return (
     <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
-      {// -- Componentes -- }
+      { /* -- Componentes -- */ }
       {showModalAlert && (
         <PageModalAlert
           Titulo={ModalAlert.Titulo}
