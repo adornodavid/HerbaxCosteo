@@ -112,6 +112,7 @@ export async function obtenerZonas(
   id: number = -1,
   nombre: string = "",
   clave: string = "",
+  activo: string = "Todos",
 ) {
   try {
     // Paso 1: Preparar Query
@@ -131,6 +132,15 @@ export async function obtenerZonas(
     }
     if (clave !== "") {
       query = query.ilike("clave", `%${clave}%`)
+    }
+    if (activo !== "Todos") {
+      const isActive = ["True", "true", "Activo", "1", true].includes(activo)
+      const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
+      if (isActive) {
+        query = query.eq("activo", true)
+      } else if (isInactive) {
+        query = query.eq("activo", false)
+      }
     }
 
     // Paso 3: Ejecutar query
