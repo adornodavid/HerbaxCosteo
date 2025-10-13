@@ -21,7 +21,7 @@ import { PageModalValidation } from "@/components/page-modal-validation"
 import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
 // -- Backend -- 
-import { obtenerClientes, eliminarCliente } from "@/lib/clientes" // Declare the variables here
+import { obtenerClientes, eliminarCliente } from "@/app/actions/clientes" // Declare the variables here
 
 /* ==================================================
 	Componente Principal (Pagina)
