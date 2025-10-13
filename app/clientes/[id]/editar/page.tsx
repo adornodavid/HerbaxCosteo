@@ -40,7 +40,7 @@ export default function EditarClientePage() {
     }
   }
 
-  const ejecutarRegistro = async (e: React.FormEvent<HTMLFormElement>) => {
+  const ejecutarActualizacion = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     const formData = new FormData(e.currentTarget)
