@@ -38,6 +38,7 @@ export default function EliminarClientePage() {
   const [showModalValidation, setShowModalValidation] = useState(false)
   const [modalValidationTitle, setModalValidationTitle] = useState("")
   const [modalValidationMessage, setModalValidationMessage] = useState("")
+  const [modalValidationClose, setModalValidationClose] = useState("")
 
   const [showModalAlert, setShowModalAlert] = useState(false)
   const [modalAlertTitle, setModalAlertTitle] = useState("")
