@@ -409,6 +409,3 @@ export async function listaDesplegableClientes2(id = "-1", nombre = "") {
     return { data: null, error: error.message }
   }
 }
-
-// Nota: Las funciones de crear, actualizar y eliminar no fueron solicitadas para clientes-actions.ts,
-// pero si las necesitas en el futuro, se adaptarían de manera similar a las de hoteles-actions.ts.
