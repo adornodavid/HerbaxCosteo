@@ -144,7 +144,7 @@ export default function ZonasPage() {
       console.log("Error inesperado al buscar productos:", error)
       setListado([])
       //setListadoSinResultados(true)
-      return { error: true, mensaje: "Error inesperado al buscar productos: " + error }
+      return { error: true, mensaje: "Error inesperado al buscar elementos: " + error }
     } finally {
       setIsSearching(false)
     }
