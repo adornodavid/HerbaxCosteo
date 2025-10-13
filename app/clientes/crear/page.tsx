@@ -63,6 +63,7 @@ export default function CrearClientePage() {
         router.push("/clientes")
       } else {
         alert(`Error al crear cliente: ${result.error}`)
+        
       }
     } catch (error) {
       setShowProcessing(false)
