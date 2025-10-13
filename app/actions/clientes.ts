@@ -222,6 +222,8 @@ export async function actualizarCliente(formData: FormData) {
     }
 
     // Paso 2: Subir imagen para obtener su url
+    
+
     let imagenurl = ""
     const imagen = formData.get("imagen") as File
     const auxNombre = formData.get("nombre") as string
