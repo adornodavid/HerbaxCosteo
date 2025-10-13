@@ -14,6 +14,20 @@ import { Card, CardContent } from "@/components/ui/card"
 export default function CrearClientePage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    } else {
+      setImagePreview(null)
+    }
+  }
 
   const ejecutarRegistro = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -50,14 +64,16 @@ export default function CrearClientePage() {
       <Card>
         <CardContent className="pt-6">
           <form id="frmCliente" onSubmit={ejecutarRegistro} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="txtNombre">Nombre</Label>
-              <Input id="txtNombre" name="nombre" type="text" required placeholder="Ingrese el nombre del cliente" />
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="txtNombre">Nombre</Label>
+                <Input id="txtNombre" name="nombre" type="text" required placeholder="Ingrese el nombre del cliente" />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="txtClave">Clave</Label>
-              <Input id="txtClave" name="clave" type="text" required placeholder="Ingrese la clave del cliente" />
+              <div className="space-y-2">
+                <Label htmlFor="txtClave">Clave</Label>
+                <Input id="txtClave" name="clave" type="text" required placeholder="Ingrese la clave del cliente" />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -65,19 +81,38 @@ export default function CrearClientePage() {
               <Input id="txtDireccion" name="direccion" type="text" placeholder="Ingrese la dirección" />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="txtTelefono">Teléfono</Label>
-              <Input id="txtTelefono" name="telefono" type="tel" placeholder="Ingrese el teléfono" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="txtTelefono">Teléfono</Label>
+                <Input id="txtTelefono" name="telefono" type="tel" placeholder="Ingrese el teléfono" />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="txtEmail">Email</Label>
+                <Input id="txtEmail" name="email" type="email" placeholder="Ingrese el email" />
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="txtEmail">Email</Label>
-              <Input id="txtEmail" name="email" type="email" placeholder="Ingrese el email" />
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="imageImg">Imagen</Label>
+                <Input id="imageImg" name="imagen" type="file" accept="image/*" onChange={handleImageChange} />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="imageImg">Imagen</Label>
-              <Input id="imageImg" name="imagen" type="file" accept="image/*" />
+              <div className="space-y-2">
+                <Label>Previsualización</Label>
+                <div className="border rounded-md h-[100px] flex items-center justify-center bg-muted">
+                  {imagePreview ? (
+                    <img
+                      src={imagePreview || "/placeholder.svg"}
+                      alt="Preview"
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  ) : (
+                    <span className="text-muted-foreground text-sm">Sin imagen seleccionada</span>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className="flex gap-4 pt-4">
