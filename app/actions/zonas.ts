@@ -138,9 +138,9 @@ export async function obtenerZonas(
       const isActive = arrActivoTrue.includes(activo)
       const isInactive = arrActivoFalse.includes(activo)
       if (isActive) {
-        query = query.eq("activo", TRUE)
+        query = query.eq("activo", true)
       } else if (isInactive) {
-        query = query.eq("activo", FALSE)
+        query = query.eq("activo", false)
       }
     }
 
