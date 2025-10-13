@@ -154,15 +154,15 @@ export async function obtenerZonas(
 
     // Error en query
     if (error) {
-      console.error("Error obteniendo zonas de query en obtenerZona de actions/zonas:", error)
+      console.error("Error obteniendo zonas de query en obtenerZona de actions/zonas: ", error)
       return { success: false, error: error.message }
     }
 
     // Paso 5: Retorno de data
     return { success: true, data }
   } catch (error) {
-    console.error("Error en obtenerZona de actions/zonas:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar obtenerZonas de actions/zonas" }
+    console.error("Error en obtenerZona de actions/zonas: " + error)
+    return { success: false, error: "Error interno del servidor, al ejecutar obtenerZonas de actions/zonas: " + error }
   }
 }
 
