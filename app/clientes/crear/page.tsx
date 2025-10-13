@@ -1,12 +1,14 @@
 "use client"
 
 import type React from "react"
+import type { ModalAlert, ModalError } from "@/types/modal" // Import ModalAlert and ModalError types
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { crearCliente } from "@/app/actions/clientes"
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
-import { PageModalAlert, PageModalError } from "@/components/page-modal-alert"
+import { PageModalAlert } from "@/components/page-modal-alert"
+import { PageProcessing } from "@/components/page-processing"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,11 +18,12 @@ export default function CrearClientePage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [ModalAlert, setModalAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
-  const [ModalError, setModalError] = useState<ModalError>({ Titulo: "", Mensaje: "" })
+  const [modalAlert, setModalAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
+  const [modalError, setModalError] = useState<ModalError>({ Titulo: "", Mensaje: "" })
   const [showModalAlert, setShowModalAlert] = useState(false)
   const [showModalError, setShowModalError] = useState(false)
   const [showValidationAlert, setShowValidationAlert] = useState(false)
+  const [showProcessing, setShowProcessing] = useState(false)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -47,32 +50,24 @@ export default function CrearClientePage() {
       return
     }
 
+    setShowProcessing(true)
     setIsSubmitting(true)
 
     try {
       const result = await crearCliente(formData)
+
+      setShowProcessing(false)
 
       if (result.success) {
         alert("Cliente creado exitosamente")
         router.push("/clientes")
       } else {
         alert(`Error al crear cliente: ${result.error}`)
-        /*<PageModalAlert
-          Titulo="Error al crear cliente."
-          Mensaje='Error en: la creacion del cliente en crearCliente'
-          isOpen={true}
-          onClose={() => setShowModalAlert(false)}
-        />*/
       }
     } catch (error) {
+      setShowProcessing(false)
       alert("Error inesperado al crear cliente")
       console.error(error)
-      /*<PageModalError
-          Titulo="Error inesperado al crear cliente."
-          Mensaje="Error en: inesperado al crear cliente"
-          isOpen={true}
-          onClose={() => setShowModalError(false)}
-        />*/
     } finally {
       setIsSubmitting(false)
     }
@@ -91,6 +86,8 @@ export default function CrearClientePage() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      <PageProcessing isOpen={showProcessing} />
+
       <PageTitlePlusNew
         Titulo="Creación de nuevo cliente"
         Subtitulo="Formulario para registrar un nuevo cliente"
@@ -104,12 +101,16 @@ export default function CrearClientePage() {
           <form id="frmCliente" onSubmit={ejecutarRegistro} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="txtNombre"><span className="text-red-500">*</span> Nombre</Label>
+                <Label htmlFor="txtNombre">
+                  <span className="text-red-500">*</span> Nombre
+                </Label>
                 <Input id="txtNombre" name="nombre" type="text" placeholder="Ingrese el nombre del cliente" />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="txtClave"><span className="text-red-500">*</span> Clave</Label>
+                <Label htmlFor="txtClave">
+                  <span className="text-red-500">*</span> Clave
+                </Label>
                 <Input id="txtClave" name="clave" type="text" placeholder="Ingrese la clave del cliente" />
               </div>
             </div>
