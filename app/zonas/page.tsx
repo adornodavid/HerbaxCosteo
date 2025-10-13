@@ -413,7 +413,7 @@ export default function ZonasPage() {
 
                 {!isSearching &&
                   Listado?.map((elemento) => (
-                    <tr key={elemento.ClienteId} className="border-b hover:bg-gray-50">
+                    <tr key={elemento.ZonaId} className="border-b hover:bg-gray-50">
                       <td className="py-3 px-4">{elemento.ClienteId}</td>
                       <td className="py-3 px-4">{elemento.ClienteClave}</td>
                       <td className="py-3 px-4">{elemento.ClienteNombre}</td>
@@ -421,10 +421,10 @@ export default function ZonasPage() {
                       <td className="py-3 px-4">
                         <span
                           className={`px-2 py-1 text-xs rounded-xs font-semibold ${
-                            elemento.ClienteActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                            elemento.ZonaActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
                           }`}
                         >
-                          {elemento.ClienteActivo ? "Activo" : "Inactivo"}
+                          {elemento.ZonaActivo ? "Activo" : "Inactivo"}
                         </span>
                       </td>
                       <td className="py-3 px-4">
@@ -435,8 +435,8 @@ export default function ZonasPage() {
                           <Button variant="ghost" size="icon" title="Editar">
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" title={elemento.ClienteActivo ? "Inactivar" : "Activar"}>
-                            {elemento.ClienteActivo ? (
+                          <Button variant="ghost" size="icon" title={elemento.ZonaActivo ? "Inactivar" : "Activar"}>
+                            {elemento.ZonaActivo ? (
                               <ToggleRight className="h-4 w-4 text-red-500" />
                             ) : (
                               <ToggleLeft className="h-4 w-4 text-green-500" />
