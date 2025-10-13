@@ -166,7 +166,7 @@ export default function ClientesPage() {
         Subtitulo: "Gestión completa de Clientes",
         Visible: esAdmin == true ? true : false,
         BotonTexto: "Crear Nuevo Cliente",
-        Ruta: "/clientes/nuevo",
+        Ruta: "/clientes/crear",
       })
       setShowPageTituloMasNuevo(true)
 
