@@ -6,7 +6,7 @@
 import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
 import { imagenSubir } from "@/app/actions/utilerias"
-//import { createServerSupabaseClientWrapper } from "@/app/actions/supabaseWrapper"
+import { createServerSupabaseClientWrapper } from "@/app/actions/supabaseWrapper"
 import { cookies } from "next/headers"
 
 /* ==================================================
@@ -291,7 +291,30 @@ export async function actualizarCliente(formData: FormData) {
 /*==================================================
   * DELETES-ELIMINAR (DELETES)
 ================================================== */
+//Función: eliminarCliente / delCliente: funcion para eliminar un cliente
+export async function eliminarCliente(id: number) {
+  try {
+    // Paso 1: Ejecutar Query DELETE
+    const { error } = await supabase.from("clientes").delete().eq("id", id)
 
+    // Return error
+    if (error) {
+      console.error("Error eliminando cliente en query en eliminarCliente de actions/clientes:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/clientes")
+
+    // Return resultados
+    return { success: true }
+  } catch (error) {
+    console.error("Error en eliminarCliente de actions/clientes:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion eliminarCliente de actions/clientes: " + error,
+    }
+  }
+}
 
 /*==================================================
   * SPECIALS-ESPECIALES ()
@@ -320,11 +343,11 @@ export async function estatusActivoCliente(id: number, activo: boolean): Promise
 // Función: obtenerClientesPorFiltros: funcion para obtener todos los clientes por el filtrado
 // Funcion: obtenerClientesFiltrados
 export async function obtenerClientesFiltrados(nombre = "", page = 1, limit = 20) {
-  const supabase = createServerSupabaseClientWrapper(cookies())
+  const supabaseClient = createServerSupabaseClientWrapper(cookies())
   const offset = (page - 1) * limit
 
   try {
-    let supabaseQuery = supabase
+    let supabaseQuery = supabaseClient
       .from("clientes") // Cambiado de 'hoteles' a 'clientes'
       .select("id, nombre, direccion, imgurl, activo", { count: "exact" }) // Ajustado para columnas de clientes
       .order("nombre", { ascending: true })
@@ -362,9 +385,9 @@ export async function obtenerClientesFiltrados(nombre = "", page = 1, limit = 20
 
 // Funcion: obtenerTotalClientes
 export async function obtenerTotalClientes() {
-  const supabase = createServerSupabaseClientWrapper(cookies())
+  const supabaseClient = createServerSupabaseClientWrapper(cookies())
   try {
-    const { count, error } = await supabase.from("clientes").select("*", { count: "exact", head: true })
+    const { count, error } = await supabaseClient.from("clientes").select("*", { count: "exact", head: true })
     if (error) {
       console.error("Error al obtener total de clientes:", error)
       return { total: 0, error: error.message }
@@ -418,10 +441,10 @@ export async function listaDesplegableClientes(id = -1, nombre = "", activo = "T
   }
 }
 export async function listaDesplegableClientes2(id = "-1", nombre = "") {
-  const supabase = createServerSupabaseClientWrapper(cookies())
+  const supabaseClient = createServerSupabaseClientWrapper(cookies())
 
   try {
-    let supabaseQuery = supabase.from("clientes").select("id, nombre").order("nombre", { ascending: true })
+    let supabaseQuery = supabaseClient.from("clientes").select("id, nombre").order("nombre", { ascending: true })
 
     if (nombre && nombre.trim() !== "") {
       supabaseQuery = supabaseQuery.ilike("nombre", `%${nombre}%`)
