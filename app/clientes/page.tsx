@@ -132,7 +132,7 @@ export default function ClientesPage() {
         return { success: true, mensaje: "Se ejecuto correctamente cada proceso." }
       } else {
         console.log("No hay datos o la consulta falló.")
-        return { success: false, mensaje: "No hay datos o la consulta falló." }
+        return { success: false, mensaje: "No hay datos o la consulta falló." + error }
       }
 
       if (!result.success) {
