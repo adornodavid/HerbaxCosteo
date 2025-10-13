@@ -4,7 +4,7 @@ import type React from "react"
 import type { ModalAlert, ModalError } from "@/types/modal"
 
 import { useState, useEffect } from "react"
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter, useParams } from "next/navigation"
 import { obtenerClientes, actualizarCliente } from "@/app/actions/clientes"
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageModalError } from "@/components/page-modal-error"
@@ -188,7 +188,7 @@ export default function EditarClientePage() {
         <CardContent className="pt-6">
           <form id="frmCliente" onSubmit={ejecutarActualizacion} className="space-y-4">
             <input type="hidden" name="id" value={clienteId} />
-            
+
             {existingImageUrl && <input type="hidden" name="imgurl" value={existingImageUrl} />}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -221,62 +221,66 @@ export default function EditarClientePage() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="txtDireccion">Dirección</Label>
-              <Input
-                id="txtDireccion"
-                name="direccion"
-                type="text"
-                placeholder="Ingrese la dirección"
-                value={formData.direccion}
-                onChange={handleInputChange}
-              />
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="txtTelefono">Teléfono</Label>
-                <Input
-                  id="txtTelefono"
-                  name="telefono"
-                  type="tel"
-                  placeholder="Ingrese el teléfono"
-                  value={formData.telefono}
-                  onChange={handleInputChange}
-                />
+              {/* Left column: direccion, telefono, email */}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="txtDireccion">Dirección</Label>
+                  <Input
+                    id="txtDireccion"
+                    name="direccion"
+                    type="text"
+                    placeholder="Ingrese la dirección"
+                    value={formData.direccion}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="txtTelefono">Teléfono</Label>
+                  <Input
+                    id="txtTelefono"
+                    name="telefono"
+                    type="tel"
+                    placeholder="Ingrese el teléfono"
+                    value={formData.telefono}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="txtEmail">Email</Label>
+                  <Input
+                    id="txtEmail"
+                    name="email"
+                    type="email"
+                    placeholder="Ingrese el email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="txtEmail">Email</Label>
-                <Input
-                  id="txtEmail"
-                  name="email"
-                  type="email"
-                  placeholder="Ingrese el email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
+              {/* Right column: image input and preview */}
+              <div className="space-y-4 flex flex-col">
+                <div className="space-y-2">
+                  <Label htmlFor="imageImg">Imagen</Label>
+                  <Input id="imageImg" name="imagen" type="file" accept="image/*" onChange={handleImageChange} />
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="imageImg">Imagen</Label>
-                <Input id="imageImg" name="imagen" type="file" accept="image/*" onChange={handleImageChange} />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Previsualización</Label>
-                <div className="border rounded-md h-[100px] flex items-center justify-center bg-muted">
-                  {imagePreview ? (
-                    <img
-                      src={imagePreview || "/placeholder.svg"}
-                      alt="Preview"
-                      className="max-h-full max-w-full object-contain"
-                    />
-                  ) : (
-                    <span className="text-muted-foreground text-sm">Sin imagen seleccionada</span>
-                  )}
+                <div className="space-y-2 flex-1 flex flex-col">
+                  <Label>Previsualización</Label>
+                  <div className="border rounded-md flex-1 flex items-center justify-center bg-muted min-h-[200px]">
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview || "/placeholder.svg"}
+                        alt="Preview"
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    ) : (
+                      <span className="text-muted-foreground text-sm">Sin imagen seleccionada</span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
