@@ -43,7 +43,7 @@ export default function CrearClientePage() {
     const clave = formData.get("clave") as string
 
     if (!nombre || nombre.trim().length < 3 || !clave || clave.trim().length < 1) {
-      setShowValidationAlert(true)
+      setshowModalAlert(true)
       return
     }
 
@@ -61,7 +61,7 @@ export default function CrearClientePage() {
           Titulo="Error al crear cliente."
           Mensaje="Error en: ${result.error}"
           isOpen={true}
-          onClose={() => setShowValidationAlert(false)}
+          onClose={() => setshowModalAlert(false)}
         />
       }
     } catch (error) {
