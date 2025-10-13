@@ -36,6 +36,7 @@ export interface ZonaCrear {
   nombre: string | null
   clave: string | null
   imgurl: string | null
+  fechacreacion: Date | null
 }
 
 export interface ZonaActualizar {
@@ -43,6 +44,7 @@ export interface ZonaActualizar {
   nombre: string | null
   clave: string | null
   imgurl: string | null
+  activo: boolean | null
 }
 
 // Especiales
