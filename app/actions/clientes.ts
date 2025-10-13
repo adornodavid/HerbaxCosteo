@@ -199,6 +199,80 @@ export async function obtenerClientes(
 /*==================================================
   UPDATES-ACTUALIZAR (UPDATES)
 ================================================== */
+//Función: crearCliente: funcion para crear un cliente
+export async function crearCliente(formData: FormData) {
+  try {
+    // Paso 1: Validar si no existe
+    const existe: boolean = await (async () => {
+      const resultado = await obtenerClientes(
+        -1,
+        formData.get("nombre") as string,
+        formData.get("clave") as string,
+        //Number.parseInt(formData.get("clienteid") as string),
+        "",
+        "",
+        "",
+        "Todos",
+      )
+      return resultado.success && resultado.data && resultado.data.length >= 1
+    })()
+
+    if (existe) {
+      return { success: false, error: "El cliente que se intenta ingresar ya existe y no se puede proceder" }
+    }
+
+    // Paso 2: Subir imagen para obtener su url
+    let imagenurl = ""
+    const imagen = formData.get("imagen") as File
+    const auxNombre = formData.get("nombre") as string
+    if (imagen && imagen.size > 0) {
+      const resultadoImagen = await imagenSubir(imagen, auxNombre, "clientes")
+      if (!resultadoImagen.success) {
+        return { success: false, error: resultadoImagen.error }
+      }
+      imagenurl = resultadoImagen.url || ""
+    }
+
+    // Paso 3: Pasar datos del formData a variables con tipado de datos
+    const nombre = formData.get("nombre") as string
+    const clave = formData.get("clave") as string
+    const direccion = formData.get("direccion") as string
+    const telefono = formData.get("telefono") as string
+    const email = formData.get("email") as string
+    const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
+    const activo = true
+
+    // Paso 4: Ejecutar Query
+    const { data, error } = await supabase
+      .from("clientes")
+      .insert({
+        nombre,
+        clave,
+        direccion,
+        telefono,
+        email,
+        imgurl: imagenurl,
+        fechacreacion: fecha,
+        activo,
+      })
+      .select("id")
+      .single()
+
+    // Return error
+    if (error) {
+      console.error("Error creando cliente en query en crearcliente de actions/clientes:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/clientes")
+
+    // Return resultados
+    return { success: true, data: data.id }
+  } catch (error) {
+    console.error("Error en crearCliente de actions/clientes:", error)
+    return { success: false, error: "Error interno del servidor, al ejecutar funcion crearCliente de actions/clientes: " + error }
+  }
+}
 
 /*==================================================
   * DELETES-ELIMINAR (DELETES)
