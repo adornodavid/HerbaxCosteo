@@ -58,7 +58,7 @@ export default function CrearClientePage() {
         alert(`Error al crear cliente: ${result.error}`)
         <PageModalAlert
           Titulo="Error al crear cliente."
-          Mensaje='Error en: ' + { result.error }
+          Mensaje='Error en: la creacion del cliente en crearCliente'
           isOpen={true}
           onClose={() => setShowModalAlert(false)}
         />
@@ -68,7 +68,7 @@ export default function CrearClientePage() {
       console.error(error)
       <PageModalError
           Titulo="Error inesperado al crear cliente."
-          Mensaje="Error en: " + { error }
+          Mensaje="Error en: inesperado al crear cliente"
           isOpen={true}
           onClose={() => setShowModalError(false)}
         />
