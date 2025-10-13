@@ -80,19 +80,6 @@ export default function CrearClientePage() {
     }
   }
 
-  
-
-  if (showModalError) {
-    return (
-      <PageModalError
-        Titulo={modalError.Titulo}
-        Mensaje={modalError.Mensaje}
-        isOpen={true}
-        onClose={() => setShowModalError(false)}
-      />
-    )
-  }
-
   return (
     <div className="container mx-auto py-6 space-y-6">      
       <PageProcessing isOpen={showProcessing} />
@@ -103,6 +90,15 @@ export default function CrearClientePage() {
           Mensaje="Favor de completar los campos obligatorios (Nombre, Clave)."
           isOpen={true}
           onClose={() => setShowModalValidation(false)}
+        />
+      )}
+
+      {showModalError && (
+        <PageModalError
+          Titulo={modalError.Titulo}
+          Mensaje={modalError.Mensaje}
+          isOpen={true}
+          onClose={() => setShowModalError(false)}
         />
       )}
 
