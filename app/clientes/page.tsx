@@ -136,14 +136,14 @@ export default function ClientesPage() {
       }
 
       if (!result.success) {
-        console.error("Error en búsqueda del filtro de búsqueda:", result.error)
-        console.log("Error en búsqueda del filtro de búsqueda:", result.error)
+        console.error("Error en búsqueda del filtro de búsqueda: ", result.error)
+        console.log("Error en búsqueda del filtro de búsqueda: ", result.error)
         setListado([])
         setListadoSinResultados(true)
         return { success: false, mensaje: "Error en búsqueda del filtro de búsqueda: " + result.error }
       }
     } catch (error) {
-      console.log("Error inesperado al buscar productos:", error)
+      console.log("Error inesperado al buscar productos: ", error)
       setListado([])
       setListadoSinResultados(true)
       return { error: true, mensaje: "Error inesperado al buscar productos: " + error }
