@@ -416,10 +416,10 @@ export default function ZonasPage() {
                       <td className="py-3 px-4">
                         <span
                           className={`px-2 py-1 text-xs rounded-xs font-semibold ${
-                            cliente.ZonaActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                            elemento.ZonaActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
                           }`}
                         >
-                          {cliente.ZonaActivo ? "Activo" : "Inactivo"}
+                          {elemento.ZonaActivo ? "Activo" : "Inactivo"}
                         </span>
                       </td>
                       <td className="py-3 px-4">
