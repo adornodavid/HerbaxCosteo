@@ -414,6 +414,15 @@ export default function ZonasPage() {
                       <td className="py-3 px-4">{elemento.ZonaNombre}</td>
                       <td className="py-3 px-4">{elemento.ZonaClave}</td>
                       <td className="py-3 px-4">
+                        <span
+                          className={`px-2 py-1 text-xs rounded-xs font-semibold ${
+                            cliente.ZonaActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                          }`}
+                        >
+                          {cliente.ZonaActivo ? "Activo" : "Inactivo"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
                         <div className="flex gap-1">
                           <Button variant="ghost" size="icon" title="Ver Detalles">
                             <Eye className="h-4 w-4" />
