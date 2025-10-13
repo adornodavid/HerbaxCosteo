@@ -381,6 +381,7 @@ export default function ZonasPage() {
                   <th className="text-left py-3 px-4 font-medium">ID</th>
                   <th className="text-left py-3 px-4 font-medium">Nombre</th>
                   <th className="text-left py-3 px-4 font-medium">Clave</th>
+                  <th className="text-left py-3 px-4 font-medium">Estatus</th>
                   <th className="text-left py-3 px-4 font-medium">Acciones</th>
                 </tr>
               </thead>
