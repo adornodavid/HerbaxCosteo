@@ -43,7 +43,6 @@ export default function ClientesPage() {
   // --- Estados ---
   // Cargar contenido en variables
   const [Listado, setListado] = useState<Cliente[]>([])
-  //const [ListadoFiltrados, setListadoFiltrados] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
   const [paginaActual, setPaginaActual] = useState(1)
   const [ModalAlert, setModalAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
@@ -127,7 +126,6 @@ export default function ClientesPage() {
         }))
 
         setListado(Listado)
-        //setListadoFiltrados(Listado)
         setTotalListado(Listado.length)
         setListadoSinResultados(Listado.length === 0)
 
