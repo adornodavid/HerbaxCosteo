@@ -121,7 +121,9 @@ export async function obtenerZonas(
         id,
         nombre,
         clave,
-        imgurl
+        imgurl,
+        fechacreacion,
+        activo
       `)
 
     // Paso 2: Filtros en query, dependiendo parametros
