@@ -27,7 +27,7 @@ import { PageModalTutorial } from "@/components/page-modal-tutorial"
 
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
-import { obtenerClientes } from "@/app/actions/clientes"
+import { obtenerClientes, estatusActivoCliente } from "@/app/actions/clientes"
 
 /* ==================================================
 	Componente Principal (Pagina)
