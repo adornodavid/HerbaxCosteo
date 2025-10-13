@@ -56,7 +56,7 @@ export default function EditarClientePage() {
     setIsSubmitting(true)
 
     try {
-      const result = await crearCliente(formData)
+      const result = await actualizarCliente(formData)
 
       setShowProcessing(false)
 
