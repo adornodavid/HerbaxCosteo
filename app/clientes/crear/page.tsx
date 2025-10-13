@@ -22,9 +22,10 @@ export default function CrearClientePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [modalAlert, setModalAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
   const [modalError, setModalError] = useState<ModalError>({ Titulo: "", Mensaje: "" })
+  const [modalValidation, setModalValidation] = useState<ModalError>({ Titulo: "", Mensaje: "" })
   const [showModalAlert, setShowModalAlert] = useState(false)
   const [showModalError, setShowModalError] = useState(false)
-  const [showValidationAlert, setShowValidationAlert] = useState(false)
+  const [showModalValidation, setShowModalValidation] = useState(false)
   const [showProcessing, setShowProcessing] = useState(false)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +49,7 @@ export default function CrearClientePage() {
     const clave = formData.get("clave") as string
 
     if (!nombre || nombre.trim().length < 3 || !clave || clave.trim().length < 1) {
-      setShowValidationAlert(true)
+      setShowModalValidation(true)
       return
     }
 
@@ -79,13 +80,13 @@ export default function CrearClientePage() {
     }
   }
 
-  if (showValidationAlert) {
+  if (showModalValidation) {
     return (
-      <PageModalAlert
+      <PageModalValidation
         Titulo="Información necesaria incompleta."
         Mensaje="Se necesita que la información obligatoria este correctamente llenada, favor de verificar......."
         isOpen={true}
-        onClose={() => setShowValidationAlert(false)}
+        onClose={() => setShowModalValidation(false)}
       />
     )
   }
