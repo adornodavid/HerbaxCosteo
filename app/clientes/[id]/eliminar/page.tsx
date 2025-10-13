@@ -61,10 +61,7 @@ export default function EliminarClientePage() {
     }
 
     try {
-      // Note: eliminarCliente function needs to be created in app/actions/clientes.ts
-      // For now, this will call it assuming it exists
-      // const result = await eliminarCliente(clienteId)
-
+      
       // Temporary success simulation until eliminarCliente is implemented
       alert("Cliente eliminado exitosamente")
       router.push("/clientes")
