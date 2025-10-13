@@ -54,11 +54,11 @@ export default function CrearClientePage() {
       } else {
         alert(`Error al crear cliente: ${result.error}`)
         <PageModalAlert
-        Titulo="Error al crear cliente."
-        Mensaje="Error en: ${result.error}"
-        isOpen={true}
-        onClose={() => setShowValidationAlert(false)}
-      />
+          Titulo="Error al crear cliente."
+          Mensaje="Error en: ${result.error}"
+          isOpen={true}
+          onClose={() => setShowValidationAlert(false)}
+        />
       }
     } catch (error) {
       alert("Error inesperado al crear cliente")
