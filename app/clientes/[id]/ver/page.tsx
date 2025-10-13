@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { obtenerClientes } from "@/app/actions/clientes"
 import type { Cliente } from "@/types/clientes"
+import { Edit, Trash2, ArrowLeft } from "lucide-react"
 
 export default function VerClientePage() {
   const params = useParams()
@@ -54,8 +55,7 @@ export default function VerClientePage() {
       <Card className="overflow-hidden">
         <CardContent className="p-0">
           <div className="flex flex-col md:flex-row">
-            {/* Image on the left - full height */}
-            <div className="md:w-1/3 h-64 md:h-auto">
+            <div className="md:w-1/3 h-64 md:h-auto flex items-center justify-center bg-gray-100">
               <img
                 src={
                   cliente.imgurl && cliente.imgurl !== "Sin imagen"
@@ -125,12 +125,12 @@ export default function VerClientePage() {
         </CardContent>
       </Card>
 
-      {/* Action buttons below the card */}
       <div className="flex gap-4 justify-center">
         <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          className="bg-yellow-400 hover:bg-yellow-500 text-black"
           onClick={() => router.push(`/clientes/${clienteId}/editar`)}
         >
+          <Edit className="mr-2 h-4 w-4" />
           Actualizar
         </Button>
 
@@ -138,10 +138,12 @@ export default function VerClientePage() {
           className="bg-red-600 hover:bg-red-700 text-white"
           onClick={() => router.push(`/clientes/${clienteId}/eliminar`)}
         >
+          <Trash2 className="mr-2 h-4 w-4" />
           Eliminar
         </Button>
 
-        <Button variant="outline" onClick={() => router.push("/clientes")}>
+        <Button className="bg-gray-500 hover:bg-gray-600 text-white" onClick={() => router.push("/clientes")}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Regresar a listado
         </Button>
       </div>
