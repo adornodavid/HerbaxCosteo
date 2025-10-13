@@ -92,8 +92,8 @@ export default function CrearClientePage() {
   if (showModalError) {
     return (
       <PageModalError
-        title={modalError.Titulo}
-        message={modalError.Mensaje}
+        Titulo={modalError.Titulo}
+        Mensaje={modalError.Mensaje}
         isOpen={true}
         onClose={() => setShowModalError(false)}
       />
