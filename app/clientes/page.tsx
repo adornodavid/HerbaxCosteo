@@ -177,8 +177,8 @@ export default function ClientesPage() {
         setShowModalAlert(true)
       }
     } catch (error) {
-      console.error("Error al cargar datos iniciales:", error)
-      console.log("Error al cargar datos iniciales:", error)
+      console.error("Error al cargar datos iniciales: ", error)
+      console.log("Error al cargar datos iniciales: ", error)
 
       setModalError({
         Titulo: "Error al cargar datos iniciales",
