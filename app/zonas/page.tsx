@@ -156,7 +156,7 @@ export default function ZonasPage() {
       const auxClienteId = esAdmin === true ? -1 : user.ClienteId
 
       setPageTituloMasNuevo({
-        Titulo: "Clientes",
+        Titulo: "Zonas",
         Subtitulo: "Gestión completa de Zonas",
         Visible: esAdmin == true ? true : false,
         BotonTexto: "Crear Nueva Zona",
