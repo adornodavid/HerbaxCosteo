@@ -3,8 +3,8 @@
 /* ==================================================
   Imports:
 ================================================== */
+// -- Assets --
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -12,6 +12,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
+
+// -- Configuraciones --
+
+// -- Tipados (interfaces, clases, objetos) --
+
+// -- Librerias --
+
+// -- Componentes --
+
+// -- Frontend --
+
+// -- Backend --
+
+
+
+
 
 /* ==================================================
 	Principal (Pagina):
