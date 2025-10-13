@@ -27,14 +27,7 @@ import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } fro
 
 
 /* ==================================================
-	Principal (Pagina):
-    - Variables especiales
-    - Estados
-    - Funciones
-    - Inicio (carga inicial y seguridad)
-    - Manejadores (Handles)
-    - Renders (contenidos auxiliares)
-    - Contenido
+	Componente Principal (Pagina)
 ================================================== */
 export default function ZonasPage() {
   const [filtroId, setFiltroId] = useState("")
