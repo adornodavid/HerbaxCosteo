@@ -20,7 +20,6 @@ export default function CrearClientePage() {
   const [ModalError, setModalError] = useState<ModalError>({ Titulo: "", Mensaje: "" })
   const [showModalAlert, setShowModalAlert] = useState(false)
   const [showModalError, setShowModalError] = useState(false)
-  const [showValidationAlert, setShowValidationAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
