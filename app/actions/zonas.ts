@@ -4,6 +4,7 @@
   Imports
 ================================================== */
 import { createClient } from '@/lib/supabase'
+import { RolesAdmin, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -134,8 +135,8 @@ export async function obtenerZonas(
       query = query.ilike("clave", `%${clave}%`)
     }
     if (activo !== "Todos") {
-      const isActive = ["True", "true", "Activo", "1", true].includes(activo)
-      const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
+      const isActive = arrActivoTrue.includes(activo)
+      const isInactive = arrActivoFalse.includes(activo)
       if (isActive) {
         query = query.eq("activo", true)
       } else if (isInactive) {
