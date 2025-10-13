@@ -56,22 +56,22 @@ export default function CrearClientePage() {
         router.push("/clientes")
       } else {
         alert(`Error al crear cliente: ${result.error}`)
-        <PageModalAlert
+        /*<PageModalAlert
           Titulo="Error al crear cliente."
           Mensaje='Error en: la creacion del cliente en crearCliente'
           isOpen={true}
           onClose={() => setShowModalAlert(false)}
-        />
+        />*/
       }
     } catch (error) {
       alert("Error inesperado al crear cliente")
       console.error(error)
-      <PageModalError
+      /*<PageModalError
           Titulo="Error inesperado al crear cliente."
           Mensaje="Error en: inesperado al crear cliente"
           isOpen={true}
           onClose={() => setShowModalError(false)}
-        />
+        />*/
     } finally {
       setIsSubmitting(false)
     }
