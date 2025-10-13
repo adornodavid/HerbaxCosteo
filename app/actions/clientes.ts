@@ -299,7 +299,7 @@ export async function eliminarCliente(id: number) {
     // Return error
     if (error) {
       console.error("Error eliminando cliente en query en eliminarCliente de actions/clientes:", error)
-      return { success: false, error: error.message }
+      return { success: false, message: "Error en query", error: error.message }
     }
 
     revalidatePath("/clientes")
