@@ -102,13 +102,13 @@ export default function ZonasPage() {
       const result = await obtenerZonas(auxId, nombre, clave, "", "", "", auxEstatus)
       if (result.success && result.data) {
         console.log(result.success, " - data: ", result.data)
-        const transformedData: Zona[] = result.data.map((c: Zona) => ({
-          id: c.id,
-          nombre: c.nombre,
-          clave: c.clave,
-          imgurl: c.imgurl,
-          fechacreacion: c.fechacreacion,
-          activo: c.activo,
+        const transformedData: Zona[] = result.data.map((x: Zona) => ({
+          id: x.id,
+          nombre: x.nombre,
+          clave: x.clave,
+          imgurl: x.imgurl,
+          fechacreacion: x.fechacreacion,
+          activo: x.activo,
         }))
 
         const Listado: Zona[] = transformedData.map((c: Zona) => ({
