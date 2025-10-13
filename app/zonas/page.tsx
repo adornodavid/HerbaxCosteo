@@ -227,8 +227,8 @@ export default function ZonasPage() {
   // Busqueda - Limpiar o Resetear
   const handleLimpiar = () => {
     setFiltroId("")
-    setFiltroClave("")
     setFiltroNombre("")
+    setFiltroClave("")
     setFiltroEstatus("-1")
 
     cargarDatosIniciales()
