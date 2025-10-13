@@ -168,12 +168,6 @@ export default function ClientesPage() {
       })
       setShowPageTituloMasNuevo(true)
 
-      setModalError({
-          Titulo: "Error al cambiar estatus",
-          Mensaje: "No se pudo cambiar el estatus del cliente. Por favor, intente nuevamente.",
-        })
-        setShowModalError(true)
-
       const Result = await ejecutarBusqueda(auxClienteId, "", "", "True")
       if (!Result.success) {
         setModalAlert({
