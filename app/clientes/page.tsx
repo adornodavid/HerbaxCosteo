@@ -116,7 +116,7 @@ export default function ClientesPage() {
         const Listado: Cliente[] = transformedData.map((c: Cliente) => ({
           ClienteId: c.id,
           ClienteNombre: c.nombre || "Sin nombre",
-          ClienteClave: c.clave || "Sin clave", // Added missing comma
+          ClienteClave: c.clave || "Sin clave",
           ClienteDireccion: c.direccion || "Sin dirección",
           ClienteTelefono: c.telefono || "Sin telefono",
           ClienteEmail: c.email || "Sin email",
