@@ -92,9 +92,9 @@ export default function ZonasPage() {
       estatus === "-1"
         ? "Todos"
         : arrActivoTrue.includes(estatus)
-          ? true
+          ? "True"
           : arrActivoFalse.includes(estatus)
-            ? false
+            ? "False"
             : "Todos"
 
     console.log("auxid: " + auxId + " nombre: " + nombre + " clave: " + clave + " auxEstatus: " + auxEstatus)
