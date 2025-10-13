@@ -153,7 +153,7 @@ export default function ZonasPage() {
       setIsSearching(false)
     }
   }
-  
+
   // Inicio (carga inicial y seguridad)
   const cargarDatosIniciales = async () => {
     if (!user) return
@@ -163,10 +163,10 @@ export default function ZonasPage() {
 
       setPageTituloMasNuevo({
         Titulo: "Clientes",
-        Subtitulo: "Gestión completa de Clientes",
+        Subtitulo: "Gestión completa de Zonas",
         Visible: esAdmin == true ? true : false,
-        BotonTexto: "Crear Nuevo Cliente",
-        Ruta: "/clientes/nuevo",
+        BotonTexto: "Crear Nueva Zona",
+        Ruta: "/zonas/nuevo",
       })
       setShowPageTituloMasNuevo(true)
 
