@@ -35,29 +35,47 @@ import { obtenerZonas } from "@/app/actions/zonas"
 	Componente Principal (Pagina)
 ================================================== */
 export default function ZonasPage() {
+  // --- Variables especiales ---
+  const router = useRouter()
+  const { user, isLoading: authLoading } = useAuth()
+  const esAdmin = useMemo(() => user && RolesAdmin.includes(user.RolId), [user])
+  // Paginación
+  const resultadosPorPagina = 20
+
+  // --- Estados ---
+  // Cargar contenido en variables
+  const [Listado, setListado] = useState<Cliente[]>([])
+  const [TotalListado, setTotalListado] = useState(0)
+  const [paginaActual, setPaginaActual] = useState(1)
+  const [ModalAlert, setModalAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
+  const [ModalError, setModalError] = useState<ModalError>({ Titulo: "", Mensaje: "" })
+  const [ModalTutorial, setModalTutorial] = useState<ModalTutorial>({ Titulo: "", Subtitulo: "", VideoUrl: "" })
+  // Mostrar/Ocultar contenido
+  const [pageLoading, setPageLoading] = useState(true)
+  const [isSearching, setIsSearching] = useState(false)
+  const [showModalAlert, setShowModalAlert] = useState(false)
+  const [showModalError, setShowModalError] = useState(false)
+  const [showModalTutorial, setShowModalTutorial] = useState(false)
+  const [showPageTituloMasNuevo, setShowPageTituloMasNuevo] = useState(false)
+  // Cargar contenido en elementos
+  const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState({
+    Titulo: "",
+    Subtitulo: "",
+    Visible: false,
+    BotonTexto: "",
+    Ruta: "",
+  })
   const [filtroId, setFiltroId] = useState("")
-  const [filtroClave, setFiltroClave] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
+  const [filtroClave, setFiltroClave] = useState("")  
   const [filtroEstatus, setFiltroEstatus] = useState("-1")
 
-  const [zonas] = useState([
-    { id: 1, codigo: "ZON001", nombre: "Zona Norte", descripcion: "Zona Norte del país", activo: true },
-    { id: 2, codigo: "ZON002", nombre: "Zona Sur", descripcion: "Zona Sur del país", activo: true },
-    { id: 3, codigo: "ZON003", nombre: "Zona Centro", descripcion: "Zona Centro del país", activo: false },
-  ])
+  // --- Variables (post carga elementos) ---
+  const elementosPaginados = useMemo(() => {
+    const indiceInicio = (paginaActual - 1) * resultadosPorPagina
+    return Listado.slice(indiceInicio, indiceInicio + resultadosPorPagina)
+  }, [Listado, paginaActual])
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    // Aquí irá la lógica de búsqueda
-    console.log("Buscando con filtros:", { filtroId, filtroClave, filtroNombre, filtroEstatus })
-  }
-
-  const handleLimpiar = () => {
-    setFiltroId("")
-    setFiltroClave("")
-    setFiltroNombre("")
-    setFiltroEstatus("-1")
-  }
 
   return (
     <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
