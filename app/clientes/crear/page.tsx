@@ -94,19 +94,17 @@ export default function CrearClientePage() {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      if (showModalValidation) {
-        return (
-          <PageModalValidation
-            Titulo="Información necesaria incompleta."
-            Mensaje="Se necesita que la información obligatoria este correctamente llenada, favor de verificar......."
-            isOpen={true}
-            onClose={() => setShowModalValidation(false)}
-          />
-        )
-      }
-      
+    <div className="container mx-auto py-6 space-y-6">      
       <PageProcessing isOpen={showProcessing} />
+
+      {showModalValidation && (
+        <PageModalValidation
+          Titulo="Información necesaria incompleta."
+          Mensaje="..."
+          isOpen={true}
+          onClose={() => setShowModalValidation(false)}
+        />
+      )}
 
       <PageTitlePlusNew
         Titulo="Creación de nuevo cliente"
