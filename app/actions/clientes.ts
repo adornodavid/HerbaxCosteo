@@ -340,65 +340,7 @@ export async function estatusActivoCliente(id: number, activo: boolean): Promise
   }
 }
 
-// Función: obtenerClientesPorFiltros: funcion para obtener todos los clientes por el filtrado
-// Funcion: obtenerClientesFiltrados
-export async function obtenerClientesFiltrados(nombre = "", page = 1, limit = 20) {
-  const supabaseClient = createServerSupabaseClientWrapper(cookies())
-  const offset = (page - 1) * limit
 
-  try {
-    let supabaseQuery = supabaseClient
-      .from("clientes") // Cambiado de 'hoteles' a 'clientes'
-      .select("id, nombre, direccion, imgurl, activo", { count: "exact" }) // Ajustado para columnas de clientes
-      .order("nombre", { ascending: true })
-
-    // Solo aplicar filtro de nombre si tiene valor (no está vacío)
-    if (nombre && nombre.trim() !== "") {
-      supabaseQuery = supabaseQuery.ilike("nombre", `%${nombre}%`)
-    }
-
-    const { data: queryData, error: queryError, count } = await supabaseQuery.range(offset, offset + limit - 1)
-
-    if (queryError) {
-      console.error("Error al obtener clientes:", queryError)
-      return { data: null, error: queryError.message, totalCount: 0 }
-    }
-
-    // Mapear los datos para que coincidan con el tipo ClienteResult
-    const mappedData =
-      queryData?.map((cliente) => ({
-        Folio: cliente.id,
-        Nombre: cliente.nombre,
-        Direccion: cliente.direccion,
-        ImgUrl: cliente.imgurl,
-        Estatus: cliente.activo,
-      })) || []
-
-    return { data: mappedData, error: null, totalCount: count || 0 }
-  } catch (error: any) {
-    console.error("Error en obtenerClientesFiltrados:", error)
-    return { data: null, error: error.message, totalCount: 0 }
-  }
-}
-
-// Función: obtenerClientePorId: funcion para obtener el cliente por Id del cliente
-
-// Funcion: obtenerTotalClientes
-export async function obtenerTotalClientes() {
-  const supabaseClient = createServerSupabaseClientWrapper(cookies())
-  try {
-    const { count, error } = await supabaseClient.from("clientes").select("*", { count: "exact", head: true })
-    if (error) {
-      console.error("Error al obtener total de clientes:", error)
-      return { total: 0, error: error.message }
-    }
-
-    return { total: count || 0, error: null }
-  } catch (error: any) {
-    console.error("Error en obtenerTotalClientes:", error)
-    return { total: 0, error: error.message }
-  }
-}
 
 // Función: listaDesplegableClientes: función que se utiliza para los dropdownlist y puede contener id y / o nombre
 export async function listaDesplegableClientes(id = -1, nombre = "", activo = "Todos") {
