@@ -16,8 +16,8 @@ export default function CrearClientePage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [showValidationAlert, setShowValidationAlert] = useState(false)
-  const [showValidationError, setShowValidationError] = useState(false)
+  const [showValidationAlert, setShowValidationAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
+  const [showValidationError, setShowValidationError] = useState<ModalError>({ Titulo: "", Mensaje: "" })
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
