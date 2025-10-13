@@ -97,13 +97,10 @@ export default function ZonasPage() {
             ? "False"
             : "Todos"
 
-    console.log("auxid: " + auxId + " nombre: " + nombre + " clave: " + clave + " auxEstatus: " + auxEstatus)
-    console.log("arrActivoTrue: " + arrActivoTrue.includes(estatus) + " - " + arrActivoTrue + " arrActivoFalse: " + arrActivoFalse.includes(estatus) + arrActivoFalse)
     // Ejecutar Consulta principal
     try {
       const result = await obtenerZonas(auxId, nombre, clave, auxEstatus)
       if (result.success && result.data) {
-        console.log(result.success, " - data: ", result.data)
         const transformedData: Zona[] = result.data.map((x: Zona) => ({
           id: x.id,
           nombre: x.nombre,
