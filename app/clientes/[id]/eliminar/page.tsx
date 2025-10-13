@@ -16,8 +16,7 @@ import type { Cliente } from "@/types/clientes"
 // -- Componentes --
 import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
-import { PageModalAlert } from "@/components/page-modal-alert"
-import { PageModalError } from "@/components/page-modal-error"
+import { PageModalValidation } from "@/components/page-modal-validation"
 // -- Frontend --
 
 // -- Backend --
@@ -35,9 +34,9 @@ export default function EliminarClientePage() {
   const [cliente, setCliente] = useState<Cliente | null>(null)
   const [loading, setLoading] = useState(true)
   const [confirmText, setConfirmText] = useState("")
-  const [showModalAlert, setShowModalAlert] = useState(false)
-  const [showModalError, setShowModalError] = useState(false)
-  const [errorMessage, setErrorMessage] = useState("")
+  const [showModalValidation, setShowModalValidation] = useState(false)
+  const [modalValidationTitle, setModalValidationTitle] = useState("")
+  const [modalValidationMessage, setModalValidationMessage] = useState("")
 
   useEffect(() => {
     const cargarCliente = async () => {
@@ -69,23 +68,24 @@ export default function EliminarClientePage() {
       const result = await eliminarCliente(clienteId)
 
       if (result.success) {
-        alert("Cliente eliminado exitosamente")
-        router.push("/clientes")
+        setModalValidationTitle("Cliente eliminado exitosamente")
+        setModalValidationMessage("El cliente ha sido eliminado correctamente del sistema.")
+        setShowModalValidation(true)
       } else {
-        // If success is false and error message exists
         if (result.error) {
-          setErrorMessage(result.error)
-          setShowModalAlert(true)
+          setModalValidationTitle("Error durante ejecucion de eliminado")
+          setModalValidationMessage(result.error)
         } else {
-          // If success is false but no error message
-          setErrorMessage("Ocurrió un error desconocido durante la eliminación")
-          setShowModalError(true)
+          setModalValidationTitle("Error en el momento de ejecutar la eliminacion del cliente")
+          setModalValidationMessage("Ocurrió un error desconocido durante la eliminación")
         }
+        setShowModalValidation(true)
       }
     } catch (error) {
       console.error("Error al eliminar cliente:", error)
-      setErrorMessage("Error inesperado al eliminar el cliente")
-      setShowModalError(true)
+      setModalValidationTitle("Error en el momento de ejecutar la eliminacion del cliente")
+      setModalValidationMessage("Error inesperado al eliminar el cliente")
+      setShowModalValidation(true)
     }
   }
 
@@ -103,18 +103,16 @@ export default function EliminarClientePage() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <PageModalAlert
-        Titulo="Error durante ejecucion de eliminado"
-        Mensaje={errorMessage}
-        isOpen={showModalAlert}
-        onClose={() => setShowModalAlert(false)}
-      />
-
-      <PageModalError
-        Titulo="Error en el momento de ejecutar la eliminacion del cliente"
-        Mensaje={errorMessage}
-        isOpen={showModalError}
-        onClose={() => setShowModalError(false)}
+      <PageModalValidation
+        Titulo={modalValidationTitle}
+        Mensaje={modalValidationMessage}
+        isOpen={showModalValidation}
+        onClose={() => {
+          setShowModalValidation(false)
+          if (modalValidationTitle === "Cliente eliminado exitosamente") {
+            router.push("/clientes")
+          }
+        }}
       />
 
       <PageTitlePlusNew
@@ -145,7 +143,6 @@ export default function EliminarClientePage() {
         </div>
       </div>
 
-      {/* Card with client information */}
       <Card className="overflow-hidden">
         <CardContent className="p-0">
           <div className="flex flex-col md:flex-row">
@@ -161,7 +158,6 @@ export default function EliminarClientePage() {
               />
             </div>
 
-            {/* Client data on the right */}
             <div className="md:w-2/3 p-6 space-y-4">
               <h1 className="text-3xl font-bold mb-6">Información del Cliente</h1>
 
