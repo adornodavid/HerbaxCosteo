@@ -17,6 +17,7 @@ export default function CrearClientePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [showValidationAlert, setShowValidationAlert] = useState(false)
+  const [showValidationError, setShowValidationError] = useState(false)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
