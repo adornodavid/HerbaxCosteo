@@ -111,13 +111,13 @@ export default function ZonasPage() {
           activo: x.activo,
         }))
 
-        const Listado: Zona[] = transformedData.map((c: Zona) => ({
-          ZonaId: c.id,
-          ZonaNombre: c.nombre || "Sin nombre",
-          ZonaClave: c.clave || "Sin clave",
-          ZonaImgUrl: c.imgurl || "Sin imagen",
-          ZonaFechaCreacion: c.fechacreacion,
-          ZonaActivo: c.activo === true,
+        const Listado: Zona[] = transformedData.map((x: Zona) => ({
+          ZonaId: x.id,
+          ZonaNombre: x.nombre || "Sin nombre",
+          ZonaClave: x.clave || "Sin clave",
+          ZonaImgUrl: x.imgurl || "Sin imagen",
+          ZonaFechaCreacion: x.fechacreacion,
+          ZonaActivo: x.activo === true,
         }))
 
         setListado(Listado)
