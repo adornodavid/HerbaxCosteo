@@ -268,46 +268,10 @@ export default function ClientesPage() {
     return <PageLoadingScreen message="Cargando Clientes..." />
   }
 
-  // ModalAlert
-  if (showModalAlert) {
-    return (
-      <PageModalAlert
-        Titulo={ModalAlert.Titulo}
-        Mensaje={ModalAlert.Mensaje}
-        isOpen={true}
-        onClose={() => setShowModalAlert(false)}
-      />
-    )
-  }
-
-  // ModalError
-  if (showModalError) {
-    return (
-      <PageModalError
-        Titulo={ModalError.Titulo}
-        Mensaje={ModalError.Mensaje}
-        isOpen={true}
-        onClose={() => setShowModalError(false)}
-      />
-    )
-  }
-
-  // ModalTutorial
-  if (showModalTutorial) {
-    return (
-      <PageModalTutorial
-        Titulo={ModalTutorial.Titulo}
-        Subtitulo={ModalTutorial.Subtitulo}
-        VideoUrl={ModalTutorial.VideoUrl}
-        isOpen={true}
-        onClose={() => setShowModalTutorial(false)}
-      />
-    )
-  }
-
   // --- Contenido ---
   return (
     <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
+      {// -- Componentes -- }
       {showModalAlert && (
         <PageModalAlert
           Titulo={ModalAlert.Titulo}
