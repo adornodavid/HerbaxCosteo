@@ -65,7 +65,7 @@ export default function EditarClientePage() {
         //router.push("/clientes")
       } else {
         setModalError({
-          Titulo: "Error al crear cliente",
+          Titulo: "Error al actualizar cliente",
           Mensaje: result.error,
         })
         setShowModalError(true)
