@@ -100,7 +100,7 @@ export default function CrearClientePage() {
       {showModalValidation && (
         <PageModalValidation
           Titulo="Información necesaria incompleta."
-          Mensaje="..."
+          Mensaje="Favor de completar los campos obligatorios (Nombre, Clave)."
           isOpen={true}
           onClose={() => setShowModalValidation(false)}
         />
