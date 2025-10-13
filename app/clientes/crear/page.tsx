@@ -63,6 +63,12 @@ export default function CrearClientePage() {
     } catch (error) {
       alert("Error inesperado al crear cliente")
       console.error(error)
+      <PageModalError
+          Titulo="Error inesperado al crear cliente."
+          Mensaje="Error en: ${error}"
+          isOpen={true}
+          onClose={() => setShowValidationError(false)}
+        />
     } finally {
       setIsSubmitting(false)
     }
