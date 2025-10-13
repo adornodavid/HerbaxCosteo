@@ -20,6 +20,7 @@ export default function CrearClientePage() {
   const [ModalError, setModalError] = useState<ModalError>({ Titulo: "", Mensaje: "" })
   const [showModalAlert, setShowModalAlert] = useState(false)
   const [showModalError, setShowModalError] = useState(false)
+  const [showValidationAlert, setShowValidationAlert] = useState(false)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -42,7 +43,7 @@ export default function CrearClientePage() {
     const clave = formData.get("clave") as string
 
     if (!nombre || nombre.trim().length < 3 || !clave || clave.trim().length < 1) {
-      setShowModalAlert(true)
+      setShowValidationAlert(true)
       return
     }
 
