@@ -1,15 +1,25 @@
 "use client"
 
+/* ==================================================
+	Imports
+================================================== */
+// -- Assets --
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Edit, Eye, ArrowLeft } from "lucide-react"
+// -- Tipados (interfaces, clases, objetos) --
+import type { Cliente } from "@/types/clientes"
+// -- Librerias --
+// -- Componentes --
 import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
+// -- Frontend --
+
+// -- Backend --
 import { obtenerClientes } from "@/app/actions/clientes"
-import type { Cliente } from "@/types/clientes"
-import { Edit, Eye, ArrowLeft } from "lucide-react"
 
 export default function EliminarClientePage() {
   const params = useParams()
