@@ -102,8 +102,8 @@ export default function EditarClientePage() {
       )}
 
       <PageTitlePlusNew
-        Titulo="Creación de nuevo cliente"
-        Subtitulo="Formulario para registrar un nuevo cliente"
+        Titulo="Actualización de cliente"
+        Subtitulo="Formulario para actualizar un cliente"
         Visible={false}
         BotonTexto={null}
         Ruta={null}
