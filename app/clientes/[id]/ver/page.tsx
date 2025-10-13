@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { PageLoadingScreen } from "@/components/page-loading-screen"
+import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { obtenerClientes } from "@/app/actions/clientes"
 import type { Cliente } from "@/types/clientes"
 import { Edit, Trash2, ArrowLeft } from "lucide-react"
@@ -51,6 +52,14 @@ export default function VerClientePage() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      <PageTitlePlusNew
+        Titulo="Información de cliente"
+        Subtitulo="Información completa del cliente"
+        Visible={false}
+        BotonTexto={null}
+        Ruta={null}
+      />
+
       {/* Card with client information */}
       <Card className="overflow-hidden">
         <CardContent className="p-0">
