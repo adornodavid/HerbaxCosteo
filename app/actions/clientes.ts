@@ -208,7 +208,26 @@ export async function obtenerClientes(
 /*==================================================
   * SPECIALS-ESPECIALES ()
 ================================================== */
+// Función: estatusActivoProducto / actProducto: Funcion que cambia la columna activo a true(activo) o false(inactivo) del producto
+export async function estatusActivoProducto(productoid: number, activo: boolean): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("productos").update({ activo: activo }).eq("id", productoid)
 
+    if (error) {
+      console.error(
+        "Error actualizando estatus activo del producto en app/actions/productos en estatusActivoProducto:",
+        error,
+      )
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en app/actions/productos en estatusActivoProducto:", error)
+    return false
+  }
+}
 
 
 
