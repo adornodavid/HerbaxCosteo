@@ -405,7 +405,11 @@ export default function ClientesPage() {
                   {/* Image at top */}
                   <div className="relative w-full h-48 overflow-hidden">
                     <img
-                      src={elemento.ClienteImgUrl || "/placeholder.svg?height=200&width=200&text=Cliente"}
+                      src={
+                        elemento.ClienteImgUrl && elemento.ClienteImgUrl !== "Sin imagen"
+                          ? elemento.ClienteImgUrl
+                          : "/placeholder.svg?height=200&width=200&text=Cliente"
+                      }
                       alt={elemento.ClienteNombre}
                       className="w-full h-full object-cover rounded-t-xs"
                     />
@@ -431,26 +435,37 @@ export default function ClientesPage() {
                     </p>
 
                     {/* Direccion */}
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{elemento.ClienteDireccion}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                      <span className="font-medium">Direccion:</span> {elemento.ClienteDireccion}
+                    </p>
 
                     {/* Divider line */}
                     <div className="border-t border-gray-200 my-3"></div>
 
                     {/* Action buttons at bottom */}
-                    <div className="flex gap-1 justify-center mt-auto">
-                      <Button variant="ghost" size="icon" title="Ver Detalles">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" title="Editar">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" title={elemento.ClienteActivo ? "Inactivar" : "Activar"}>
-                        {elemento.ClienteActivo ? (
-                          <ToggleRight className="h-4 w-4 text-red-500" />
-                        ) : (
-                          <ToggleLeft className="h-4 w-4 text-green-500" />
-                        )}
-                      </Button>
+                    <div className="flex gap-4 justify-center mt-auto">
+                      <div className="flex flex-col items-center">
+                        <Button variant="ghost" size="icon" title="Ver Detalles">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <span className="text-xs text-muted-foreground mt-1">Ver</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <Button variant="ghost" size="icon" title="Editar">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <span className="text-xs text-muted-foreground mt-1">Editar</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <Button variant="ghost" size="icon" title={elemento.ClienteActivo ? "Inactivar" : "Activar"}>
+                          {elemento.ClienteActivo ? (
+                            <ToggleRight className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <ToggleLeft className="h-4 w-4 text-green-500" />
+                          )}
+                        </Button>
+                        <span className="text-xs text-muted-foreground mt-1">Estatus</span>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
