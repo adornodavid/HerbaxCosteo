@@ -65,7 +65,7 @@ export default function CrearClientePage() {
   if (showValidationAlert) {
     return (
       <PageModalAlert
-        Titulo="Información necesaria incompleta"
+        Titulo="Información necesaria incompleta."
         Mensaje="Se necesita que la información obligatoria este correctamente llenada, favor de verificar......."
         isOpen={true}
         onClose={() => setShowValidationAlert(false)}
