@@ -4,26 +4,31 @@
   Imports:
 ================================================== */
 // -- Assets --
-import type React from "react"
-import { useState } from "react"
-import Link from "next/link"
+import { useState, useEffect, useMemo } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
-
+import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 // -- Configuraciones --
-
+import { RolesAdmin, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Tipados (interfaces, clases, objetos) --
-
+import type React from "react"
+import type { Cliente } from "@/types/clientes"
+import type { ModalAlert, ModalError, ModalTutorial } from "@/types/common"
 // -- Librerias --
-
 // -- Componentes --
-
+import { PageTitlePlusNew } from "@/components/page-title-plus-new"
+import { PageLoadingScreen } from "@/components/page-loading-screen"
+import { PageModalAlert } from "@/components/page-modal-alert"
+import { PageModalError } from "@/components/page-modal-error"
+import { PageModalTutorial } from "@/components/page-modal-tutorial"
 // -- Frontend --
 
 // -- Backend --
+import { useAuth } from "@/contexts/auth-context"
+import { obtenerClientes } from "@/app/actions/clientes"
 
 
 /* ==================================================
