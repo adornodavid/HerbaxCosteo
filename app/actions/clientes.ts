@@ -199,8 +199,8 @@ export async function obtenerClientes(
 /*==================================================
   UPDATES-ACTUALIZAR (UPDATES)
 ================================================== */
-//Función: crearCliente: funcion para crear un cliente
-export async function crearCliente(formData: FormData) {
+//Función: actualizarCliente / updCliente: funcion para actualizar un cliente
+export async function actualizarCliente(formData: FormData) {
   try {
     // Paso 1: Validar si no existe
     const existe: boolean = await (async () => {
@@ -218,7 +218,7 @@ export async function crearCliente(formData: FormData) {
     })()
 
     if (existe) {
-      return { success: false, error: "El cliente que se intenta ingresar ya existe y no se puede proceder" }
+      return { success: false, error: "Los datos del cliente que desea actualizar ya los tiene otro registro y no se puede proceder, recuerde que la información debe ser unica." }
     }
 
     // Paso 2: Subir imagen para obtener su url
