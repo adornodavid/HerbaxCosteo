@@ -72,7 +72,7 @@ export default function EditarClientePage() {
       }
     } catch (error) {
       setShowProcessing(false)
-      alert("Error inesperado al crear cliente")
+      alert("Error inesperado al actualizar cliente")
       console.error(error)
     } finally {
       setIsSubmitting(false)
