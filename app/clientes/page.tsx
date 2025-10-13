@@ -190,22 +190,35 @@ export default function ClientesPage() {
     }
   }
 
-  // --- Inicio (carga inicial y seguridad) ---
-  useEffect(() => {
-    if (!authLoading) {
-      // Validar
-      if (!user || user.RolId === 0) {
-        router.push("/login")
-        return
-      }
-      // Iniciar
-      const inicializar = async () => {
-        setPageLoading(true)
+  // Estatus - Cambiar activo/inactivo
+  const handleToggleStatusClickActivo = async (clienteId: number, clienteActivo: boolean) => {
+    try {
+      // Toggle the status (if active, make inactive; if inactive, make active)
+      const nuevoEstatus = !clienteActivo
+
+      // Call the estatusActivoCliente function
+      const resultado = await estatusActivoCliente(clienteId, nuevoEstatus)
+
+      if (resultado) {
+        // Success - refresh the list
         await cargarDatosIniciales()
+      } else {
+        // Error
+        setModalError({
+          Titulo: "Error al cambiar estatus",
+          Mensaje: "No se pudo cambiar el estatus del cliente. Por favor, intente nuevamente.",
+        })
+        setShowModalError(true)
       }
-      inicializar()
+    } catch (error) {
+      console.error("Error en handleToggleStatusClickActivo:", error)
+      setModalError({
+        Titulo: "Error al cambiar estatus",
+        Mensaje: `Error inesperado: ${error}`,
+      })
+      setShowModalError(true)
     }
-  }, [authLoading, user, router, esAdmin])
+  }
 
   // -- Manejadores (Handles) --
   // Busqueda - Ejecutar
@@ -231,6 +244,23 @@ export default function ClientesPage() {
 
     cargarDatosIniciales()
   }
+
+  // --- Inicio (carga inicial y seguridad) ---
+  useEffect(() => {
+    if (!authLoading) {
+      // Validar
+      if (!user || user.RolId === 0) {
+        router.push("/login")
+        return
+      }
+      // Iniciar
+      const inicializar = async () => {
+        setPageLoading(true)
+        await cargarDatosIniciales()
+      }
+      inicializar()
+    }
+  }, [authLoading, user, router, esAdmin])
 
   // --- Renders (contenidos auxiliares) ---
   // Loading
@@ -457,7 +487,12 @@ export default function ClientesPage() {
                         <span className="text-xs text-muted-foreground mt-1">Editar</span>
                       </div>
                       <div className="flex flex-col items-center">
-                        <Button variant="ghost" size="icon" title={elemento.ClienteActivo ? "Inactivar" : "Activar"}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title={elemento.ClienteActivo ? "Inactivar" : "Activar"}
+                          onClick={() => handleToggleStatusClickActivo(elemento.ClienteId, elemento.ClienteActivo)}
+                        >
                           {elemento.ClienteActivo ? (
                             <ToggleRight className="h-4 w-4 text-red-500" />
                           ) : (
