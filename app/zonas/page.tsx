@@ -97,7 +97,7 @@ export default function ZonasPage() {
             ? false
             : "Todos"
 
-    console.log("auxid: " + auxid + " nombre: " + nombre + " clave: " + clave + " auxEstatus: " + auxEstatus)
+    console.log("auxid: " + auxId + " nombre: " + nombre + " clave: " + clave + " auxEstatus: " + auxEstatus)
     // Ejecutar Consulta principal
     try {
       const result = await obtenerZonas(auxId, nombre, clave, auxEstatus)
