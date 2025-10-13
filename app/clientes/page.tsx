@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, Edit, ToggleLeft, ToggleRight, EyeOff, X } from "lucide-react"
+import { Search, RotateCcw, Edit, ToggleLeft, ToggleRight, EyeOff, X, Eye } from "lucide-react"
 // -- Configuraciones --
 import { RolesAdmin, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Tipados (interfaces, clases, objetos) --
@@ -23,6 +23,7 @@ import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
 import { PageModalTutorial } from "@/components/page-modal-tutorial"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 // -- Frontend --
 
 // -- Backend --
@@ -56,6 +57,8 @@ export default function ClientesPage() {
   const [showModalError, setShowModalError] = useState(false)
   const [showModalTutorial, setShowModalTutorial] = useState(false)
   const [showPageTituloMasNuevo, setShowPageTituloMasNuevo] = useState(false)
+  const [showDetallesModal, setShowDetallesModal] = useState(false)
+  const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null)
   // Cargar contenido en elementos
   const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState({
     Titulo: "",
@@ -218,6 +221,11 @@ export default function ClientesPage() {
       })
       setShowModalError(true)
     }
+  }
+
+  const handleVerDetalles = (cliente: Cliente) => {
+    setClienteSeleccionado(cliente)
+    setShowDetallesModal(true)
   }
 
   // -- Manejadores (Handles) --
@@ -397,6 +405,91 @@ export default function ClientesPage() {
         </CardContent>
       </Card>
 
+      <Dialog open={showDetallesModal} onOpenChange={setShowDetallesModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detalles del Cliente</DialogTitle>
+          </DialogHeader>
+          {clienteSeleccionado && (
+            <Card className="overflow-hidden border-0 shadow-none">
+              <CardContent className="p-0">
+                <div className="flex flex-col md:flex-row">
+                  {/* Image on the left - centered vertically */}
+                  <div className="md:w-1/3 h-64 md:h-auto flex items-center justify-center bg-gray-300">
+                    <img
+                      src={
+                        clienteSeleccionado.ClienteImgUrl && clienteSeleccionado.ClienteImgUrl !== "Sin imagen"
+                          ? clienteSeleccionado.ClienteImgUrl
+                          : "/placeholder.svg?height=400&width=400&text=Cliente"
+                      }
+                      alt={clienteSeleccionado.ClienteNombre}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+
+                  {/* Client data on the right */}
+                  <div className="md:w-2/3 p-6 space-y-4">
+                    <h2 className="text-2xl font-bold mb-4">Información del Cliente</h2>
+
+                    <div className="space-y-3">
+                      <div>
+                        <span className="font-semibold text-gray-700">ID:</span>
+                        <span className="ml-2 text-gray-900">{clienteSeleccionado.ClienteId}</span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Nombre:</span>
+                        <span className="ml-2 text-gray-900">{clienteSeleccionado.ClienteNombre}</span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Clave:</span>
+                        <span className="ml-2 text-gray-900">{clienteSeleccionado.ClienteClave}</span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Dirección:</span>
+                        <span className="ml-2 text-gray-900">{clienteSeleccionado.ClienteDireccion}</span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Teléfono:</span>
+                        <span className="ml-2 text-gray-900">{clienteSeleccionado.ClienteTelefono}</span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Email:</span>
+                        <span className="ml-2 text-gray-900">{clienteSeleccionado.ClienteEmail}</span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Estatus:</span>
+                        <span
+                          className={`ml-2 px-2 py-1 rounded text-sm font-semibold ${
+                            clienteSeleccionado.ClienteActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                          }`}
+                        >
+                          {clienteSeleccionado.ClienteActivo ? "Activo" : "Inactivo"}
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Fecha de Creación:</span>
+                        <span className="ml-2 text-gray-900">
+                          {clienteSeleccionado.ClienteFechaCreacion
+                            ? new Date(clienteSeleccionado.ClienteFechaCreacion).toLocaleDateString()
+                            : "N/A"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* 3. Resultados - Listado */}
       <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
@@ -465,18 +558,34 @@ export default function ClientesPage() {
                     <div className="border-t border-gray-200 my-3"></div>
 
                     {/* Action buttons at bottom */}
-                    <div className="flex gap-4 justify-center mt-auto">
+                    <div className="flex gap-3 justify-center mt-auto">
+                      {/* Detalles - Opens modal */}
                       <div className="flex flex-col items-center">
                         <Button
                           variant="ghost"
                           size="icon"
                           title="Ver Detalles"
-                          onClick={() => router.push(`/clientes/${elemento.ClienteId}/ver`)}
+                          onClick={() => handleVerDetalles(elemento)}
                         >
                           <EyeOff className="h-4 w-4" />
                         </Button>
                         <span className="text-xs text-muted-foreground mt-1">Detalles</span>
                       </div>
+
+                      {/* Ver - Navigates to ver page */}
+                      <div className="flex flex-col items-center">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Ver Cliente"
+                          onClick={() => router.push(`/clientes/${elemento.ClienteId}/ver`)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <span className="text-xs text-muted-foreground mt-1">Ver</span>
+                      </div>
+
+                      {/* Editar */}
                       <div className="flex flex-col items-center">
                         <Button
                           variant="ghost"
@@ -488,6 +597,8 @@ export default function ClientesPage() {
                         </Button>
                         <span className="text-xs text-muted-foreground mt-1">Editar</span>
                       </div>
+
+                      {/* Estatus */}
                       <div className="flex flex-col items-center">
                         <Button
                           variant="ghost"
@@ -503,6 +614,8 @@ export default function ClientesPage() {
                         </Button>
                         <span className="text-xs text-muted-foreground mt-1">Estatus</span>
                       </div>
+
+                      {/* Eliminar */}
                       <div className="flex flex-col items-center">
                         <Button
                           variant="ghost"
