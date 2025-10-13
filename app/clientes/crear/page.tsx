@@ -80,16 +80,7 @@ export default function CrearClientePage() {
     }
   }
 
-  if (showModalValidation) {
-    return (
-      <PageModalValidation
-        Titulo="Información necesaria incompleta."
-        Mensaje="Se necesita que la información obligatoria este correctamente llenada, favor de verificar......."
-        isOpen={true}
-        onClose={() => setShowModalValidation(false)}
-      />
-    )
-  }
+  
 
   if (showModalError) {
     return (
@@ -104,6 +95,17 @@ export default function CrearClientePage() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      if (showModalValidation) {
+        return (
+          <PageModalValidation
+            Titulo="Información necesaria incompleta."
+            Mensaje="Se necesita que la información obligatoria este correctamente llenada, favor de verificar......."
+            isOpen={true}
+            onClose={() => setShowModalValidation(false)}
+          />
+        )
+      }
+      
       <PageProcessing isOpen={showProcessing} />
 
       <PageTitlePlusNew
