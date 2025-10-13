@@ -382,78 +382,81 @@ export default function ClientesPage() {
           <CardDescription>Mostrando {Listado?.length || 0} elementos encontrados.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-4 font-medium">ID</th>
-                  <th className="text-left py-3 px-4 font-medium">Clave</th>
-                  <th className="text-left py-3 px-4 font-medium">Nombre</th>
-                  <th className="text-left py-3 px-4 font-medium">Dirección</th>
-                  <th className="text-left py-3 px-4 font-medium">Estatus</th>
-                  <th className="text-left py-3 px-4 font-medium">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {isSearching && (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-                        <span>Buscando resultados.....</span>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+          {isSearching && (
+            <div className="flex justify-center items-center h-48">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+              <span className="ml-2">Buscando resultados.....</span>
+            </div>
+          )}
 
-                {!isSearching && Listado.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
-                      <div className="flex items-center justify-center gap-2">
-                        <span>No se encontraron resultados con los parametros indicados, favor de verificar.</span>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+          {!isSearching && Listado.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground">
+              <span>No se encontraron resultados con los parametros indicados, favor de verificar.</span>
+            </div>
+          )}
 
-                {!isSearching &&
-                  Listado?.map((elemento) => (
-                    <tr key={elemento.ClienteId} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-4">{elemento.ClienteId}</td>
-                      <td className="py-3 px-4">{elemento.ClienteClave}</td>
-                      <td className="py-3 px-4">{elemento.ClienteNombre}</td>
-                      <td className="py-3 px-4">{elemento.ClienteDireccion}</td>
-                      <td className="py-3 px-4">
-                        <span
-                          className={`px-2 py-1 text-xs rounded-xs font-semibold ${
-                            elemento.ClienteActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                          }`}
-                        >
-                          {elemento.ClienteActivo ? "Activo" : "Inactivo"}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" title="Ver Detalles">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" title="Editar">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" title={elemento.ClienteActivo ? "Inactivar" : "Activar"}>
-                            {elemento.ClienteActivo ? (
-                              <ToggleRight className="h-4 w-4 text-red-500" />
-                            ) : (
-                              <ToggleLeft className="h-4 w-4 text-green-500" />
-                            )}
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
+          {!isSearching && Listado.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+              {Listado.map((elemento) => (
+                <Card
+                  key={elemento.ClienteId}
+                  className="border bg-card text-card-foreground relative flex flex-col overflow-hidden rounded-xs shadow-lg hover:shadow-xl transition-shadow duration-300"
+                >
+                  {/* Image at top */}
+                  <div className="relative w-full h-48 overflow-hidden">
+                    <img
+                      src={elemento.ClienteImgUrl || "/placeholder.svg?height=200&width=200&text=Cliente"}
+                      alt={elemento.ClienteNombre}
+                      className="w-full h-full object-cover rounded-t-xs"
+                    />
+                    <div className="absolute top-2 right-2">
+                      <span
+                        className={`px-2 py-1 text-xs rounded-xs font-semibold ${
+                          elemento.ClienteActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                        }`}
+                      >
+                        {elemento.ClienteActivo ? "Activo" : "Inactivo"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Card content */}
+                  <CardContent className="flex flex-col flex-grow p-4">
+                    {/* Name in bold */}
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{elemento.ClienteNombre}</h3>
+
+                    {/* Clave in normal text */}
+                    <p className="text-sm text-gray-600 mb-2">
+                      <span className="font-medium">Clave:</span> {elemento.ClienteClave}
+                    </p>
+
+                    {/* Direccion */}
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{elemento.ClienteDireccion}</p>
+
+                    {/* Divider line */}
+                    <div className="border-t border-gray-200 my-3"></div>
+
+                    {/* Action buttons at bottom */}
+                    <div className="flex gap-1 justify-center mt-auto">
+                      <Button variant="ghost" size="icon" title="Ver Detalles">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" title="Editar">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" title={elemento.ClienteActivo ? "Inactivar" : "Activar"}>
+                        {elemento.ClienteActivo ? (
+                          <ToggleRight className="h-4 w-4 text-red-500" />
+                        ) : (
+                          <ToggleLeft className="h-4 w-4 text-green-500" />
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
