@@ -164,7 +164,7 @@ export default function ZonasPage() {
       })
       setShowPageTituloMasNuevo(true)
 
-      const Result = await ejecutarBusqueda(auxClienteId, "", "", "True")
+      const Result = await ejecutarBusqueda(-1, "", "", "True")
       if (!Result.success) {
         setModalAlert({
           Titulo: "En ejecucion de Busqueda de carga inicial",
