@@ -21,7 +21,11 @@ import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 // -- Backend --
 import { obtenerClientes } from "@/app/actions/clientes"
 
+/* ==================================================
+	Componente Principal (Pagina)
+================================================== */
 export default function EliminarClientePage() {
+ // --- Variables especiales ---
   const params = useParams()
   const router = useRouter()
   const clienteId = Number(params.id)
