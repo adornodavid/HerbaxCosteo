@@ -160,7 +160,7 @@ export default function ZonasPage() {
         Subtitulo: "Gestión completa de Zonas",
         Visible: esAdmin == true ? true : false,
         BotonTexto: "Crear Nueva Zona",
-        Ruta: "/zonas/nuevo",
+        Ruta: "/zonas/crear",
       })
       setShowPageTituloMasNuevo(true)
 
