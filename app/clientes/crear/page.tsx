@@ -6,6 +6,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { crearCliente } from "@/app/actions/clientes"
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
+import { PageModalAlert } from "@/components/page-modal-alert"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,6 +16,7 @@ export default function CrearClientePage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [showValidationAlert, setShowValidationAlert] = useState(false)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -31,10 +33,19 @@ export default function CrearClientePage() {
 
   const ejecutarRegistro = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    const formData = new FormData(e.currentTarget)
+    const nombre = formData.get("nombre") as string
+    const clave = formData.get("clave") as string
+
+    if (!nombre || nombre.trim().length < 3 || !clave || clave.trim().length < 1) {
+      setShowValidationAlert(true)
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
-      const formData = new FormData(e.currentTarget)
       const result = await crearCliente(formData)
 
       if (result.success) {
@@ -49,6 +60,17 @@ export default function CrearClientePage() {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  if (showValidationAlert) {
+    return (
+      <PageModalAlert
+        title="Información necesario incompleta"
+        message="Se necesita que la información obligatoria este correctamente llenada, favor de verificar......."
+        isOpen={true}
+        onClose={() => setShowValidationAlert(false)}
+      />
+    )
   }
 
   return (
