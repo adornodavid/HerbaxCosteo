@@ -77,7 +77,7 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
   // Si se presentó un error
   if (uploadError) {
     console.error("Error subiendo imagen en actions/utilerias imagenSubir:", uploadError)
-    return { success: false, error: "Error al subir la imagen" }
+    return { success: false, error: "Error al subir la imagen: " + uploadError }
   }
 
   // Obtener URL
