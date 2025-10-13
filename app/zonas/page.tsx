@@ -44,7 +44,7 @@ export default function ZonasPage() {
 
   // --- Estados ---
   // Cargar contenido en variables
-  const [Listado, setListado] = useState<Cliente[]>([])
+  const [Listado, setListado] = useState<Zona[]>([])
   const [TotalListado, setTotalListado] = useState(0)
   const [paginaActual, setPaginaActual] = useState(1)
   const [ModalAlert, setModalAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
@@ -99,10 +99,10 @@ export default function ZonasPage() {
 
     // Ejecutar Consulta principal
     try {
-      const result = await obtenerClientes(auxId, nombre, clave, "", "", "", auxEstatus)
+      const result = await obtenerZonas(auxId, nombre, clave, "", "", "", auxEstatus)
       if (result.success && result.data) {
         console.log(result.success, " - data: ", result.data)
-        const transformedData: Cliente[] = result.data.map((c: Cliente) => ({
+        const transformedData: Zona[] = result.data.map((c: Zona) => ({
           id: c.id,
           nombre: c.nombre,
           clave: c.clave,
@@ -114,16 +114,13 @@ export default function ZonasPage() {
           activo: c.activo,
         }))
 
-        const Listado: Cliente[] = transformedData.map((c: Cliente) => ({
-          ClienteId: c.id,
-          ClienteNombre: c.nombre || "Sin nombre",
-          ClienteClave: c.clave || "Sin clave", // Added missing comma
-          ClienteDireccion: c.direccion || "Sin dirección",
-          ClienteTelefono: c.telefono || "Sin telefono",
-          ClienteEmail: c.email || "Sin email",
-          ClienteImgUrl: c.imgurl || "Sin imagen",
-          ClienteFechaCreacion: c.fechacreacion,
-          ClienteActivo: c.activo === true,
+        const Listado: Zona[] = transformedData.map((c: Zona) => ({
+          ZonaId: c.id,
+          ZonaNombre: c.nombre || "Sin nombre",
+          ZonaClave: c.clave || "Sin clave",
+          ZonaImgUrl: c.imgurl || "Sin imagen",
+          ZonaFechaCreacion: c.fechacreacion,
+          ZonaActivo: c.activo === true,
         }))
 
         setListado(Listado)
