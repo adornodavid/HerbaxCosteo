@@ -89,12 +89,12 @@ export default function CrearClientePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="txtNombre">Nombre</Label>
-                <Input id="txtNombre" name="nombre" type="text" required placeholder="Ingrese el nombre del cliente" />
+                <Input id="txtNombre" name="nombre" type="text" placeholder="Ingrese el nombre del cliente" />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="txtClave">Clave</Label>
-                <Input id="txtClave" name="clave" type="text" required placeholder="Ingrese la clave del cliente" />
+                <Input id="txtClave" name="clave" type="text" placeholder="Ingrese la clave del cliente" />
               </div>
             </div>
 
