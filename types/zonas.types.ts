@@ -28,7 +28,7 @@ export interface Zona {
   nombre: string | null
   clave: string | null
   imgurl: string | null
-  echacreacion: Date | null
+  fechacreacion: Date | null
   activo: boolean | null
 }
 
