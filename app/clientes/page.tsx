@@ -317,6 +317,25 @@ export default function ClientesPage() {
         />
       )}
 
+      {showModalError && (
+        <PageModalError
+          Titulo={ModalError.Titulo}
+          Mensaje={ModalError.Mensaje}
+          isOpen={true}
+          onClose={() => setShowModalError(false)}
+        />
+      )}
+
+      {showModalTutorial && (
+        <PageModalTutorial
+          Titulo={ModalTutorial.Titulo}
+          Subtitulo={ModalTutorial.Subtitulo}
+          VideoUrl={ModalTutorial.VideoUrl}
+          isOpen={true}
+          onClose={() => setShowModalTutorial(false)}
+        />
+      )}
+
       {/* 1. Título y Botón */}
       {showPageTituloMasNuevo && (
         <PageTitlePlusNew
