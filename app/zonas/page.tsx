@@ -123,7 +123,7 @@ export default function ZonasPage() {
         setListado(Listado)
         //setListadoFiltrados(Listado)
         setTotalListado(Listado.length)
-        setListadoSinResultados(Listado.length === 0)
+        //setListadoSinResultados(Listado.length === 0)
 
         return { success: true, mensaje: "Se ejecuto correctamente cada proceso." }
       } else {
@@ -135,13 +135,13 @@ export default function ZonasPage() {
         console.error("Error en búsqueda del filtro de búsqueda:", result.error)
         console.log("Error en búsqueda del filtro de búsqueda:", result.error)
         setListado([])
-        setListadoSinResultados(true)
+        //setListadoSinResultados(true)
         return { success: false, mensaje: "Error en búsqueda del filtro de búsqueda: " + result.error }
       }
     } catch (error) {
       console.log("Error inesperado al buscar productos:", error)
       setListado([])
-      setListadoSinResultados(true)
+      //setListadoSinResultados(true)
       return { error: true, mensaje: "Error inesperado al buscar productos: " + error }
     } finally {
       setIsSearching(false)
