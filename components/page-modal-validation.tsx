@@ -14,7 +14,7 @@ export function PageModalValidation({ Titulo, Mensaje, isOpen, onClose }: PageMo
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
       <div className="relative bg-gradient-to-br from-sky-400 to-white rounded-lg shadow-xl max-w-md w-full mx-4">
         <button onClick={onClose} className="absolute top-2 right-2 text-black hover:text-gray-800" aria-label="Cerrar">
           <X className="h-5 w-5" />
