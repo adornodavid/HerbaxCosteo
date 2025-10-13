@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
+import { Search, RotateCcw, Edit, ToggleLeft, ToggleRight, EyeOff, X } from "lucide-react"
 // -- Configuraciones --
 import { RolesAdmin, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Tipados (interfaces, clases, objetos) --
@@ -473,9 +473,9 @@ export default function ClientesPage() {
                           title="Ver Detalles"
                           onClick={() => router.push(`/clientes/${elemento.ClienteId}/ver`)}
                         >
-                          <Eye className="h-4 w-4" />
+                          <EyeOff className="h-4 w-4" />
                         </Button>
-                        <span className="text-xs text-muted-foreground mt-1">Ver</span>
+                        <span className="text-xs text-muted-foreground mt-1">Detalles</span>
                       </div>
                       <div className="flex flex-col items-center">
                         <Button
@@ -502,6 +502,17 @@ export default function ClientesPage() {
                           )}
                         </Button>
                         <span className="text-xs text-muted-foreground mt-1">Estatus</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Eliminar"
+                          onClick={() => router.push(`/clientes/${elemento.ClienteId}/eliminar`)}
+                        >
+                          <X className="h-4 w-4 text-red-500" />
+                        </Button>
+                        <span className="text-xs text-muted-foreground mt-1">Eliminar</span>
                       </div>
                     </div>
                   </CardContent>
