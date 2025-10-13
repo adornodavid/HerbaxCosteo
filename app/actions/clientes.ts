@@ -211,7 +211,7 @@ export async function obtenerClientes(
 // Función: estatusActivoCliente / actCliente: Funcion que cambia la columna activo a true(activo) o false(inactivo)
 export async function estatusActivoCliente(id: number, activo: boolean): Promise<boolean> {
   try {
-    const { error } = await supabase.from("clientes").update({ activo: activo }).eq("id", productoid)
+    const { error } = await supabase.from("clientes").update({ activo: activo }).eq("id", id)
 
     if (error) {
       console.error(
