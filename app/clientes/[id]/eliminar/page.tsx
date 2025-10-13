@@ -13,14 +13,13 @@ import { Edit, Eye, ArrowLeft } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type { Cliente } from "@/types/clientes"
 // -- Librerias --
+import { obtenerClientes, eliminarCliente } from "@/lib/clientes" // Declare the variables here
 // -- Componentes --
 import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageModalValidation } from "@/components/page-modal-validation"
-// -- Frontend --
-
-// -- Backend --
-import { obtenerClientes, eliminarCliente } from "@/app/actions/clientes"
+import { PageModalAlert } from "@/components/page-modal-alert"
+import { PageModalError } from "@/components/page-modal-error"
 
 /* ==================================================
 	Componente Principal (Pagina)
@@ -37,6 +36,14 @@ export default function EliminarClientePage() {
   const [showModalValidation, setShowModalValidation] = useState(false)
   const [modalValidationTitle, setModalValidationTitle] = useState("")
   const [modalValidationMessage, setModalValidationMessage] = useState("")
+
+  const [showModalAlert, setShowModalAlert] = useState(false)
+  const [modalAlertTitle, setModalAlertTitle] = useState("")
+  const [modalAlertMessage, setModalAlertMessage] = useState("")
+
+  const [showModalError, setShowModalError] = useState(false)
+  const [modalErrorTitle, setModalErrorTitle] = useState("")
+  const [modalErrorMessage, setModalErrorMessage] = useState("")
 
   useEffect(() => {
     const cargarCliente = async () => {
@@ -73,19 +80,20 @@ export default function EliminarClientePage() {
         setShowModalValidation(true)
       } else {
         if (result.error) {
-          setModalValidationTitle("Error durante ejecucion de eliminado")
-          setModalValidationMessage(result.error)
+          setModalAlertTitle("Error durante ejecucion de eliminado")
+          setModalAlertMessage(result.error)
+          setShowModalAlert(true)
         } else {
-          setModalValidationTitle("Error en el momento de ejecutar la eliminacion del cliente")
-          setModalValidationMessage("Ocurrió un error desconocido durante la eliminación")
+          setModalErrorTitle("Error en el momento de ejecutar la eliminacion del cliente")
+          setModalErrorMessage("Ocurrió un error desconocido durante la eliminación")
+          setShowModalError(true)
         }
-        setShowModalValidation(true)
       }
     } catch (error) {
       console.error("Error al eliminar cliente:", error)
-      setModalValidationTitle("Error en el momento de ejecutar la eliminacion del cliente")
-      setModalValidationMessage("Error inesperado al eliminar el cliente")
-      setShowModalValidation(true)
+      setModalErrorTitle("Error en el momento de ejecutar la eliminacion del cliente")
+      setModalErrorMessage("Error inesperado al eliminar el cliente")
+      setShowModalError(true)
     }
   }
 
@@ -109,10 +117,22 @@ export default function EliminarClientePage() {
         isOpen={showModalValidation}
         onClose={() => {
           setShowModalValidation(false)
-          if (modalValidationTitle === "Cliente eliminado exitosamente") {
-            router.push("/clientes")
-          }
+          router.push("/clientes")
         }}
+      />
+
+      <PageModalAlert
+        Titulo={modalAlertTitle}
+        Mensaje={modalAlertMessage}
+        isOpen={showModalAlert}
+        onClose={() => setShowModalAlert(false)}
+      />
+
+      <PageModalError
+        Titulo={modalErrorTitle}
+        Mensaje={modalErrorMessage}
+        isOpen={showModalError}
+        onClose={() => setShowModalError(false)}
       />
 
       <PageTitlePlusNew
