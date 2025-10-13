@@ -267,7 +267,7 @@ export default function EditarClientePage() {
               {/* Right column: Image preview only */}
               <div className="space-y-2">
                 <Label>Previsualización de Imagen</Label>
-                <div className="border rounded-md flex items-center justify-center bg-muted max-h-[500px] h-[500px]">
+                <div className="border rounded-md flex items-center justify-center bg-muted max-h-[350px] h-[350px]">
                   {imagePreview ? (
                     <img
                       src={imagePreview || "/placeholder.svg"}
