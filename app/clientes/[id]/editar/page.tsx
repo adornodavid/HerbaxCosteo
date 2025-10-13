@@ -61,8 +61,8 @@ export default function EditarClientePage() {
       setShowProcessing(false)
 
       if (result.success) {
-        alert("Cliente creado exitosamente")
-        router.push("/clientes")
+        alert("Cliente actualizado exitosamente")
+        //router.push("/clientes")
       } else {
         setModalError({
           Titulo: "Error al crear cliente",
