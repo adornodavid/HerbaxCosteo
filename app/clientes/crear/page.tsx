@@ -88,12 +88,12 @@ export default function CrearClientePage() {
           <form id="frmCliente" onSubmit={ejecutarRegistro} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="txtNombre">Nombre</Label>
+                <Label htmlFor="txtNombre"><span className="text-red-500">*</span> Nombre</Label>
                 <Input id="txtNombre" name="nombre" type="text" placeholder="Ingrese el nombre del cliente" />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="txtClave">Clave</Label>
+                <Label htmlFor="txtClave"><span className="text-red-500">*</span> Clave</Label>
                 <Input id="txtClave" name="clave" type="text" placeholder="Ingrese la clave del cliente" />
               </div>
             </div>
