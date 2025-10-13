@@ -28,6 +28,8 @@ export interface Zona {
   nombre: string | null
   clave: string | null
   imgurl: string | null
+  echacreacion: Date | null
+  activo: boolean | null
 }
 
 export interface ZonaCrear {
