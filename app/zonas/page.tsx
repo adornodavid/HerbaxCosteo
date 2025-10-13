@@ -15,7 +15,7 @@ import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-re
 import { RolesAdmin, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
-import type { Cliente } from "@/types/clientes"
+import type { Zona } from "@/types/zonas"
 import type { ModalAlert, ModalError, ModalTutorial } from "@/types/common"
 // -- Librerias --
 // -- Componentes --
@@ -28,7 +28,7 @@ import { PageModalTutorial } from "@/components/page-modal-tutorial"
 
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
-import { obtenerClientes } from "@/app/actions/clientes"
+import { obtenerZonas } from "@/app/actions/zonas"
 
 
 /* ==================================================
