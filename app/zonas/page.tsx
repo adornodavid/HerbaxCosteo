@@ -414,10 +414,10 @@ export default function ZonasPage() {
                 {!isSearching &&
                   Listado?.map((elemento) => (
                     <tr key={elemento.ZonaId} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-4">{elemento.ClienteId}</td>
-                      <td className="py-3 px-4">{elemento.ClienteClave}</td>
-                      <td className="py-3 px-4">{elemento.ClienteNombre}</td>
-                      <td className="py-3 px-4">{elemento.ClienteDireccion}</td>
+                      <td className="py-3 px-4">{elemento.ZonaId}</td>
+                      <td className="py-3 px-4">{elemento.ZonaClave}</td>
+                      <td className="py-3 px-4">{elemento.ZonaNombre}</td>
+                      <td className="py-3 px-4">{elemento.ZonaDireccion}</td>
                       <td className="py-3 px-4">
                         <span
                           className={`px-2 py-1 text-xs rounded-xs font-semibold ${
