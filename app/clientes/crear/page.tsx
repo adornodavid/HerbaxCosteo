@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import { crearCliente } from "@/app/actions/clientes"
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageModalAlert } from "@/components/page-modal-alert"
+import { PageModalError } from "@/components/page-modal-error"
 import { PageProcessing } from "@/components/page-processing"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -62,8 +63,11 @@ export default function CrearClientePage() {
         alert("Cliente creado exitosamente")
         router.push("/clientes")
       } else {
-        alert(`Error al crear cliente: ${result.error}`)
-        
+        setModalError({
+          Titulo: "Error al crear cliente",
+          Mensaje: result.error || "Error desconocido",
+        })
+        setShowModalError(true)
       }
     } catch (error) {
       setShowProcessing(false)
@@ -81,6 +85,17 @@ export default function CrearClientePage() {
         Mensaje="Se necesita que la información obligatoria este correctamente llenada, favor de verificar......."
         isOpen={true}
         onClose={() => setShowValidationAlert(false)}
+      />
+    )
+  }
+
+  if (showModalError) {
+    return (
+      <PageModalError
+        title={modalError.Titulo}
+        message={modalError.Mensaje}
+        isOpen={true}
+        onClose={() => setShowModalError(false)}
       />
     )
   }
