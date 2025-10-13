@@ -76,6 +76,84 @@ export default function ZonasPage() {
     return Listado.slice(indiceInicio, indiceInicio + resultadosPorPagina)
   }, [Listado, paginaActual])
 
+  // -- Funciones --
+  // --- Función de búsqueda, no es la busqueda inicial ---
+  const ejecutarBusqueda = async (id: number, nombre: string, clave: string, estatus: string) => {
+    // Validar usuario activo
+    if (!user) return
+
+    // Actualizar estados
+    setIsSearching(true)
+    setPaginaActual(1)
+
+    // Formatear variables a mandar como parametros
+    const auxId = id != -1 ? id : -1
+    const auxEstatus =
+      estatus === "-1"
+        ? "Todos"
+        : arrActivoTrue.includes(estatus)
+          ? true
+          : arrActivoFalse.includes(estatus)
+            ? false
+            : "Todos"
+
+    // Ejecutar Consulta principal
+    try {
+      const result = await obtenerClientes(auxId, nombre, clave, "", "", "", auxEstatus)
+      if (result.success && result.data) {
+        console.log(result.success, " - data: ", result.data)
+        const transformedData: Cliente[] = result.data.map((c: Cliente) => ({
+          id: c.id,
+          nombre: c.nombre,
+          clave: c.clave,
+          direccion: c.direccion,
+          telefono: c.telefono,
+          email: c.email,
+          imgurl: c.imgurl,
+          fechacreacion: c.fechacreacion,
+          activo: c.activo,
+        }))
+
+        const Listado: Cliente[] = transformedData.map((c: Cliente) => ({
+          ClienteId: c.id,
+          ClienteNombre: c.nombre || "Sin nombre",
+          ClienteClave: c.clave || "Sin clave", // Added missing comma
+          ClienteDireccion: c.direccion || "Sin dirección",
+          ClienteTelefono: c.telefono || "Sin telefono",
+          ClienteEmail: c.email || "Sin email",
+          ClienteImgUrl: c.imgurl || "Sin imagen",
+          ClienteFechaCreacion: c.fechacreacion,
+          ClienteActivo: c.activo === true,
+        }))
+
+        setListado(Listado)
+        //setListadoFiltrados(Listado)
+        setTotalListado(Listado.length)
+        setListadoSinResultados(Listado.length === 0)
+
+        return { success: true, mensaje: "Se ejecuto correctamente cada proceso." }
+      } else {
+        console.log("No hay datos o la consulta falló.")
+        return { success: false, mensaje: "No hay datos o la consulta falló." }
+      }
+
+      if (!result.success) {
+        console.error("Error en búsqueda del filtro de búsqueda:", result.error)
+        console.log("Error en búsqueda del filtro de búsqueda:", result.error)
+        setListado([])
+        setListadoSinResultados(true)
+        return { success: false, mensaje: "Error en búsqueda del filtro de búsqueda: " + result.error }
+      }
+    } catch (error) {
+      console.log("Error inesperado al buscar productos:", error)
+      setListado([])
+      setListadoSinResultados(true)
+      return { error: true, mensaje: "Error inesperado al buscar productos: " + error }
+    } finally {
+      setIsSearching(false)
+    }
+  }
+  
   // Inicio (carga inicial y seguridad)
   const cargarDatosIniciales = async () => {
     if (!user) return
