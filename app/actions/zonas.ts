@@ -109,9 +109,9 @@ export async function crearZona(formData: FormData) {
 ================================================== */
 //Función: obtenerZonas: funcion para obtener todas las zonas
 export async function obtenerZonas(
-  id = -1,
-  nombre = "",
-  clave = "",
+  id: number = -1,
+  nombre: string = "",
+  clave: string = "",
 ) {
   try {
     // Paso 1: Preparar Query
