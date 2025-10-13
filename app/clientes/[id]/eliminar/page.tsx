@@ -16,16 +16,18 @@ import type { Cliente } from "@/types/clientes"
 // -- Componentes --
 import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
+import { PageModalAlert } from "@/components/page-modal-alert"
+import { PageModalError } from "@/components/page-modal-error"
 // -- Frontend --
 
 // -- Backend --
-import { obtenerClientes } from "@/app/actions/clientes"
+import { obtenerClientes, eliminarCliente } from "@/app/actions/clientes"
 
 /* ==================================================
 	Componente Principal (Pagina)
 ================================================== */
 export default function EliminarClientePage() {
- // --- Variables especiales ---
+  // --- Variables especiales ---
   const params = useParams()
   const router = useRouter()
   const clienteId = Number(params.id)
@@ -33,6 +35,9 @@ export default function EliminarClientePage() {
   const [cliente, setCliente] = useState<Cliente | null>(null)
   const [loading, setLoading] = useState(true)
   const [confirmText, setConfirmText] = useState("")
+  const [showModalAlert, setShowModalAlert] = useState(false)
+  const [showModalError, setShowModalError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
     const cargarCliente = async () => {
@@ -61,13 +66,26 @@ export default function EliminarClientePage() {
     }
 
     try {
-      
-      // Temporary success simulation until eliminarCliente is implemented
-      alert("Cliente eliminado exitosamente")
-      router.push("/clientes")
+      const result = await eliminarCliente(clienteId)
+
+      if (result.success) {
+        alert("Cliente eliminado exitosamente")
+        router.push("/clientes")
+      } else {
+        // If success is false and error message exists
+        if (result.error) {
+          setErrorMessage(result.error)
+          setShowModalAlert(true)
+        } else {
+          // If success is false but no error message
+          setErrorMessage("Ocurrió un error desconocido durante la eliminación")
+          setShowModalError(true)
+        }
+      }
     } catch (error) {
       console.error("Error al eliminar cliente:", error)
-      alert("Error al eliminar el cliente")
+      setErrorMessage("Error inesperado al eliminar el cliente")
+      setShowModalError(true)
     }
   }
 
@@ -85,6 +103,20 @@ export default function EliminarClientePage() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      <PageModalAlert
+        Titulo="Error durante ejecucion de eliminado"
+        Mensaje={errorMessage}
+        isOpen={showModalAlert}
+        onClose={() => setShowModalAlert(false)}
+      />
+
+      <PageModalError
+        Titulo="Error en el momento de ejecutar la eliminacion del cliente"
+        Mensaje={errorMessage}
+        isOpen={showModalError}
+        onClose={() => setShowModalError(false)}
+      />
+
       <PageTitlePlusNew
         Titulo="Información de cliente"
         Subtitulo="Información completa del cliente"
