@@ -6,7 +6,6 @@
 import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
 import { imagenSubir } from "@/app/actions/utilerias"
-import { createServerSupabaseClientWrapper } from "@/app/actions/supabaseWrapper"
 import { cookies } from "next/headers"
 
 /* ==================================================
