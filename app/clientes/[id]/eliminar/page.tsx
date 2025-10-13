@@ -73,6 +73,9 @@ export default function EliminarClientePage() {
       //alert("Debes escribir la palabra ELIMINAR para confirmar la eliminación")
       setModalValidationTitle("No se pudo eliminar el cliente seleccionado")
       setModalValidationMessage("Debes escribir la palabra ELIMINAR para confirmar la eliminación.")
+      setModalValidationClose(
+        setShowModalValidation(false)
+        router.push("/clientes"))
       setShowModalValidation(true)
       return
     }
