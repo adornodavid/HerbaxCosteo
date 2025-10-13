@@ -271,7 +271,7 @@ export default function ClientesPage() {
   // --- Contenido ---
   return (
     <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
-      { /* -- Componentes -- */ }
+      {/* -- Componentes -- */}
       {showModalAlert && (
         <PageModalAlert
           Titulo={ModalAlert.Titulo}
@@ -473,7 +473,12 @@ export default function ClientesPage() {
                         <span className="text-xs text-muted-foreground mt-1">Ver</span>
                       </div>
                       <div className="flex flex-col items-center">
-                        <Button variant="ghost" size="icon" title="Editar">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Editar"
+                          onClick={() => router.push(`/clientes/${elemento.ClienteId}/editar`)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <span className="text-xs text-muted-foreground mt-1">Editar</span>
