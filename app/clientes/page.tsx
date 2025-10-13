@@ -425,19 +425,19 @@ export default function ClientesPage() {
                 )}
 
                 {!isSearching &&
-                  Listado?.map((cliente) => (
-                    <tr key={cliente.ClienteId} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-4">{cliente.ClienteId}</td>
-                      <td className="py-3 px-4">{cliente.ClienteClave}</td>
-                      <td className="py-3 px-4">{cliente.ClienteNombre}</td>
-                      <td className="py-3 px-4">{cliente.ClienteDireccion}</td>
+                  Listado?.map((elemento) => (
+                    <tr key={elemento.ClienteId} className="border-b hover:bg-gray-50">
+                      <td className="py-3 px-4">{elemento.ClienteId}</td>
+                      <td className="py-3 px-4">{elemento.ClienteClave}</td>
+                      <td className="py-3 px-4">{elemento.ClienteNombre}</td>
+                      <td className="py-3 px-4">{elemento.ClienteDireccion}</td>
                       <td className="py-3 px-4">
                         <span
                           className={`px-2 py-1 text-xs rounded-xs font-semibold ${
-                            cliente.ClienteActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                            elemento.ClienteActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
                           }`}
                         >
-                          {cliente.ClienteActivo ? "Activo" : "Inactivo"}
+                          {elemento.ClienteActivo ? "Activo" : "Inactivo"}
                         </span>
                       </td>
                       <td className="py-3 px-4">
@@ -448,8 +448,8 @@ export default function ClientesPage() {
                           <Button variant="ghost" size="icon" title="Editar">
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" title={cliente.ClienteActivo ? "Inactivar" : "Activar"}>
-                            {cliente.ClienteActivo ? (
+                          <Button variant="ghost" size="icon" title={elemento.ClienteActivo ? "Inactivar" : "Activar"}>
+                            {elemento.ClienteActivo ? (
                               <ToggleRight className="h-4 w-4 text-red-500" />
                             ) : (
                               <ToggleLeft className="h-4 w-4 text-green-500" />
