@@ -6,6 +6,8 @@
 import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
 import { imagenSubir } from "@/app/actions/utilerias"
+import { createServerSupabaseClientWrapper } from "@/app/actions/supabaseWrapper"
+import { cookies } from "next/headers"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -54,7 +56,6 @@ export async function crearCliente(formData: FormData) {
         -1,
         formData.get("nombre") as string,
         formData.get("clave") as string,
-        //Number.parseInt(formData.get("clienteid") as string),
         "",
         "",
         "",
@@ -116,7 +117,10 @@ export async function crearCliente(formData: FormData) {
     return { success: true, data: data.id }
   } catch (error) {
     console.error("Error en crearCliente de actions/clientes:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar funcion crearCliente de actions/clientes: " + error }
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion crearCliente de actions/clientes: " + error,
+    }
   }
 }
 
@@ -125,13 +129,13 @@ export async function crearCliente(formData: FormData) {
 ================================================== */
 //Función: obtenerClientes: funcion para obtener todos los clientes
 export async function obtenerClientes(
-  id: number = -1,
-  nombre: string = "",
-  clave: string = "",
-  direccion: string = "",
-  telefono: string = "",
-  email: string = "",
-  activo: string = "Todos",
+  id = -1,
+  nombre = "",
+  clave = "",
+  direccion = "",
+  telefono = "",
+  email = "",
+  activo = "Todos",
 ) {
   try {
     // Paso 1: Preparar Query
@@ -202,37 +206,46 @@ export async function obtenerClientes(
 //Función: actualizarCliente / updCliente: funcion para actualizar un cliente
 export async function actualizarCliente(formData: FormData) {
   try {
+    const idString = formData.get("id") as string
+    const id = Number(idString)
+
     // Paso 1: Validar si no existe
     const existe: boolean = await (async () => {
       const resultado = await obtenerClientes(
         -1,
         formData.get("nombre") as string,
         formData.get("clave") as string,
-        //Number.parseInt(formData.get("clienteid") as string),
         "",
         "",
         "",
         "Todos",
       )
-      return resultado.success && resultado.data && resultado.data.length >= 1
+      return resultado.success && resultado.data && resultado.data.some((cliente) => cliente.id !== id)
     })()
 
     if (existe) {
-      return { success: false, error: "Los datos del cliente que desea actualizar ya los tiene otro registro y no se puede proceder, recuerde que la información debe ser unica." }
+      return {
+        success: false,
+        error:
+          "Los datos del cliente que desea actualizar ya los tiene otro registro y no se puede proceder, recuerde que la información debe ser unica.",
+      }
     }
 
-    // Paso 2: Subir imagen para obtener su url
-    
+    const imgurl = formData.get("imgurl") as string | null
 
+    // Paso 2: Subir imagen para obtener su url
     let imagenurl = ""
     const imagen = formData.get("imagen") as File
     const auxNombre = formData.get("nombre") as string
+
     if (imagen && imagen.size > 0) {
       const resultadoImagen = await imagenSubir(imagen, auxNombre, "clientes")
       if (!resultadoImagen.success) {
         return { success: false, error: resultadoImagen.error }
       }
       imagenurl = resultadoImagen.url || ""
+    } else {
+      imagenurl = imgurl || ""
     }
 
     // Paso 3: Pasar datos del formData a variables con tipado de datos
@@ -241,28 +254,24 @@ export async function actualizarCliente(formData: FormData) {
     const direccion = formData.get("direccion") as string
     const telefono = formData.get("telefono") as string
     const email = formData.get("email") as string
-    const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
-    const activo = true
 
-    // Paso 4: Ejecutar Query
     const { data, error } = await supabase
       .from("clientes")
-      .insert({
+      .update({
         nombre,
         clave,
         direccion,
         telefono,
         email,
         imgurl: imagenurl,
-        fechacreacion: fecha,
-        activo,
       })
+      .eq("id", id)
       .select("id")
       .single()
 
     // Return error
     if (error) {
-      console.error("Error creando cliente en query en crearcliente de actions/clientes:", error)
+      console.error("Error actualizando cliente en query en actualizarCliente de actions/clientes:", error)
       return { success: false, error: error.message }
     }
 
@@ -271,15 +280,17 @@ export async function actualizarCliente(formData: FormData) {
     // Return resultados
     return { success: true, data: data.id }
   } catch (error) {
-    console.error("Error en crearCliente de actions/clientes:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar funcion crearCliente de actions/clientes: " + error }
+    console.error("Error en actualizarCliente de actions/clientes:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion actualizarCliente de actions/clientes: " + error,
+    }
   }
 }
 
 /*==================================================
   * DELETES-ELIMINAR (DELETES)
 ================================================== */
-
 
 /*==================================================
   * SPECIALS-ESPECIALES ()
@@ -305,12 +316,8 @@ export async function estatusActivoCliente(id: number, activo: boolean): Promise
   }
 }
 
-
-
-
-
-//Función: obtenerClientesPorFiltros: funcion para obtener todos los clientes por el filtrado
-//Funcion: obtenerClientesFiltrados
+// Función: obtenerClientesPorFiltros: funcion para obtener todos los clientes por el filtrado
+// Funcion: obtenerClientesFiltrados
 export async function obtenerClientesFiltrados(nombre = "", page = 1, limit = 20) {
   const supabase = createServerSupabaseClientWrapper(cookies())
   const offset = (page - 1) * limit
@@ -350,13 +357,13 @@ export async function obtenerClientesFiltrados(nombre = "", page = 1, limit = 20
   }
 }
 
-//Función: obtenerClientePorId: funcion para obtener el cliente por Id del cliente
+// Función: obtenerClientePorId: funcion para obtener el cliente por Id del cliente
 
-//Funcion: obtenerTotalClientes
+// Funcion: obtenerTotalClientes
 export async function obtenerTotalClientes() {
   const supabase = createServerSupabaseClientWrapper(cookies())
   try {
-    const { count, error } = await supabase.from("clientes").select("*", { count: "exact", head: true }) 
+    const { count, error } = await supabase.from("clientes").select("*", { count: "exact", head: true })
     if (error) {
       console.error("Error al obtener total de clientes:", error)
       return { total: 0, error: error.message }
@@ -375,7 +382,7 @@ export async function listaDesplegableClientes(id = -1, nombre = "", activo = "T
     // Query principal
     let query = supabase.from("clientes").select("id, nombre")
 
-    //Filtros en query, dependiendo parametros
+    // Filtros en query, dependiendo parametros
     if (id !== -1) {
       query = query.eq("id", id)
     }
@@ -392,10 +399,10 @@ export async function listaDesplegableClientes(id = -1, nombre = "", activo = "T
       }
     }
 
-    //Ejecutar query
+    // Ejecutar query
     query = query.order("nombre", { ascending: true })
 
-    //Varaibles y resultados del query
+    // Varaibles y resultados del query
     const { data, error } = await query
 
     if (error) {

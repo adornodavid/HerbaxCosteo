@@ -4,7 +4,7 @@ import type React from "react"
 import type { ModalAlert, ModalError } from "@/types/modal"
 
 import { useState, useEffect } from "react"
-import { useRouter, useParams } from "next/navigation"
+import { useRouter, useParams } from 'next/navigation'
 import { obtenerClientes, actualizarCliente } from "@/app/actions/clientes"
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageModalError } from "@/components/page-modal-error"
@@ -187,6 +187,8 @@ export default function EditarClientePage() {
       <Card>
         <CardContent className="pt-6">
           <form id="frmCliente" onSubmit={ejecutarActualizacion} className="space-y-4">
+            <input type="hidden" name="id" value={clienteId} />
+            
             {existingImageUrl && <input type="hidden" name="imgurl" value={existingImageUrl} />}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
