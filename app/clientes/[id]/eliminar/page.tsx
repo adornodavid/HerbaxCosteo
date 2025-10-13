@@ -13,13 +13,15 @@ import { Edit, Eye, ArrowLeft } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type { Cliente } from "@/types/clientes"
 // -- Librerias --
-import { obtenerClientes, eliminarCliente } from "@/lib/clientes" // Declare the variables here
+
 // -- Componentes --
 import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageModalValidation } from "@/components/page-modal-validation"
 import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
+// -- Backend -- 
+import { obtenerClientes, eliminarCliente } from "@/lib/clientes" // Declare the variables here
 
 /* ==================================================
 	Componente Principal (Pagina)
