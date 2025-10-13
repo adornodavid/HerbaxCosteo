@@ -380,7 +380,7 @@ export default function ZonasPage() {
       <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
           <CardTitle>Resultados</CardTitle>
-          <CardDescription>Mostrando {zonas.length} zonas encontradas.</CardDescription>
+          <CardDescription>Mostrando {Listado?.length || 0} elementos encontrados.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -388,48 +388,70 @@ export default function ZonasPage() {
               <thead>
                 <tr className="border-b">
                   <th className="text-left py-3 px-4 font-medium">ID</th>
-                  <th className="text-left py-3 px-4 font-medium">Código</th>
+                  <th className="text-left py-3 px-4 font-medium">Clave</th>
                   <th className="text-left py-3 px-4 font-medium">Nombre</th>
-                  <th className="text-left py-3 px-4 font-medium">Descripción</th>
+                  <th className="text-left py-3 px-4 font-medium">Dirección</th>
                   <th className="text-left py-3 px-4 font-medium">Estatus</th>
                   <th className="text-left py-3 px-4 font-medium">Acciones</th>
                 </tr>
               </thead>
               <tbody>
-                {zonas.map((zona) => (
-                  <tr key={zona.id} className="border-b hover:bg-gray-50">
-                    <td className="py-3 px-4">{zona.id}</td>
-                    <td className="py-3 px-4">{zona.codigo}</td>
-                    <td className="py-3 px-4">{zona.nombre}</td>
-                    <td className="py-3 px-4">{zona.descripcion}</td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={`px-2 py-1 text-xs rounded-xs font-semibold ${
-                          zona.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                        }`}
-                      >
-                        {zona.activo ? "Activo" : "Inactivo"}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" title="Ver Detalles">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" title="Editar">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" title={zona.activo ? "Inactivar" : "Activar"}>
-                          {zona.activo ? (
-                            <ToggleRight className="h-4 w-4 text-red-500" />
-                          ) : (
-                            <ToggleLeft className="h-4 w-4 text-green-500" />
-                          )}
-                        </Button>
+                {isSearching && (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+                        <span>Buscando resultados.....</span>
                       </div>
                     </td>
                   </tr>
-                ))}
+                )}
+
+                {!isSearching && Listado.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <span>No se encontraron resultados con los parametros indicados, favor de verificar.</span>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+
+                {!isSearching &&
+                  Listado?.map((cliente) => (
+                    <tr key={cliente.ClienteId} className="border-b hover:bg-gray-50">
+                      <td className="py-3 px-4">{cliente.ClienteId}</td>
+                      <td className="py-3 px-4">{cliente.ClienteClave}</td>
+                      <td className="py-3 px-4">{cliente.ClienteNombre}</td>
+                      <td className="py-3 px-4">{cliente.ClienteDireccion}</td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`px-2 py-1 text-xs rounded-xs font-semibold ${
+                            cliente.ClienteActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                          }`}
+                        >
+                          {cliente.ClienteActivo ? "Activo" : "Inactivo"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" title="Ver Detalles">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" title="Editar">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" title={cliente.ClienteActivo ? "Inactivar" : "Activar"}>
+                            {cliente.ClienteActivo ? (
+                              <ToggleRight className="h-4 w-4 text-red-500" />
+                            ) : (
+                              <ToggleLeft className="h-4 w-4 text-green-500" />
+                            )}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
