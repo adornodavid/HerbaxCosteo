@@ -281,18 +281,15 @@ export default function ZonasPage() {
   return (
     <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
       {/* 1. Título y Botón */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Zonas</h1>
-          <p className="text-muted-foreground">Gestión completa de Zonas</p>
-        </div>
-        <Link href="/zonas/nuevo" passHref>
-          <Button className="bg-[#5d8f72] hover:bg-[#44785a] text-white">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Crear Nueva Zona
-          </Button>
-        </Link>
-      </div>
+      {showPageTituloMasNuevo && (
+        <PageTitlePlusNew
+          Titulo={PageTituloMasNuevo.Titulo}
+          Subtitulo={PageTituloMasNuevo.Subtitulo}
+          Visible={PageTituloMasNuevo.Visible}
+          BotonTexto={PageTituloMasNuevo.BotonTexto}
+          Ruta={PageTituloMasNuevo.Ruta}
+        />
+      )}
 
       {/* 2. Filtros de Búsqueda */}
       <Card className="rounded-xs border bg-card text-card-foreground shadow">
