@@ -76,7 +76,130 @@ export default function ZonasPage() {
     return Listado.slice(indiceInicio, indiceInicio + resultadosPorPagina)
   }, [Listado, paginaActual])
 
+  // Inicio (carga inicial y seguridad)
+  const cargarDatosIniciales = async () => {
+    if (!user) return
 
+    try {
+      const auxClienteId = esAdmin === true ? -1 : user.ClienteId
+
+      setPageTituloMasNuevo({
+        Titulo: "Clientes",
+        Subtitulo: "Gestión completa de Clientes",
+        Visible: esAdmin == true ? true : false,
+        BotonTexto: "Crear Nuevo Cliente",
+        Ruta: "/clientes/nuevo",
+      })
+      setShowPageTituloMasNuevo(true)
+
+      const Result = await ejecutarBusqueda(auxClienteId, "", "", "True")
+      if (!Result.success) {
+        setModalAlert({
+          Titulo: "En ejecucion de Busqueda de carga inicial",
+          Mensaje: Result.mensaje,
+        })
+        setShowModalAlert(true)
+      }
+    } catch (error) {
+      console.error("Error al cargar datos iniciales:", error)
+      console.log("Error al cargar datos iniciales:", error)
+
+      setModalError({
+        Titulo: "Error al cargar datos iniciales",
+        Mensaje: error,
+      })
+      setShowModalError(true)
+    } finally {
+      setPageLoading(false)
+    }
+  }
+
+  // --- Inicio (carga inicial y seguridad) ---
+  useEffect(() => {
+    if (!authLoading) {
+      // Validar
+      if (!user || user.RolId === 0) {
+        router.push("/login")
+        return
+      }
+      // Iniciar
+      const inicializar = async () => {
+        setPageLoading(true)
+        await cargarDatosIniciales()
+      }
+      inicializar()
+    }
+  }, [authLoading, user, router, esAdmin])
+
+  // -- Manejadores (Handles) --
+  // Busqueda - Ejecutar
+  const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
+    // Prevenir cambio de pagina
+    e.preventDefault()
+
+    // Variables auxiliares y formateadas para mandar como parametros
+    const Id = filtroId === "" || filtroId === "0" ? -1 : Number.parseInt(filtroId, 10)
+    const Nombre: string = filtroNombre.trim()
+    const Clave: string = filtroClave.trim()
+    const Estatus = filtroEstatus === "-1" ? "Todos" : filtroEstatus
+
+    ejecutarBusqueda(Id, Nombre, Clave, Estatus)
+  }
+
+  // Busqueda - Limpiar o Resetear
+  const handleLimpiar = () => {
+    setFiltroId("")
+    setFiltroClave("")
+    setFiltroNombre("")
+    setFiltroEstatus("-1")
+
+    cargarDatosIniciales()
+  }
+
+  // --- Renders (contenidos auxiliares) ---
+  // Loading
+  if (pageLoading) {
+    return <PageLoadingScreen message="Cargando Zonas..." />
+  }
+
+  // ModalAlert
+  if (showModalAlert) {
+    return (
+      <PageModalAlert
+        Titulo={ModalAlert.Titulo}
+        Mensaje={ModalAlert.Mensaje}
+        isOpen={true}
+        onClose={() => setShowModalAlert(false)}
+      />
+    )
+  }
+
+  // ModalError
+  if (showModalError) {
+    return (
+      <PageModalError
+        Titulo={ModalError.Titulo}
+        Mensaje={ModalError.Mensaje}
+        isOpen={true}
+        onClose={() => setShowModalError(false)}
+      />
+    )
+  }
+
+  // ModalTutorial
+  if (showModalTutorial) {
+    return (
+      <PageModalTutorial
+        Titulo={ModalTutorial.Titulo}
+        Subtitulo={ModalTutorial.Subtitulo}
+        VideoUrl={ModalTutorial.VideoUrl}
+        isOpen={true}
+        onClose={() => setShowModalTutorial(false)}
+      />
+    )
+  }
+
+  // --- Contenido ---
   return (
     <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
       {/* 1. Título y Botón */}
