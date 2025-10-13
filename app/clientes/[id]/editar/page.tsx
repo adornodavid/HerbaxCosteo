@@ -5,7 +5,7 @@ import type { ModalAlert, ModalError } from "@/types/modal"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { crearCliente } from "@/app/actions/clientes"
+import { actualizarCliente } from "@/app/actions/clientes"
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageModalError } from "@/components/page-modal-error"
 import { PageModalValidation } from "@/components/page-modal-validation"
