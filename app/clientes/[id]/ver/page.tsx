@@ -96,6 +96,35 @@ export default function VerClientePage() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      {/* -- Componentes -- */}
+      {showModalAlert && (
+        <PageModalAlert
+          Titulo={ModalAlert.Titulo}
+          Mensaje={ModalAlert.Mensaje}
+          isOpen={true}
+          onClose={() => setShowModalAlert(false)}
+        />
+      )}
+
+      {showModalError && (
+        <PageModalError
+          Titulo={ModalError.Titulo}
+          Mensaje={ModalError.Mensaje}
+          isOpen={true}
+          onClose={() => setShowModalError(false)}
+        />
+      )}
+
+      {showModalTutorial && (
+        <PageModalTutorial
+          Titulo={ModalTutorial.Titulo}
+          Subtitulo={ModalTutorial.Subtitulo}
+          VideoUrl={ModalTutorial.VideoUrl}
+          isOpen={true}
+          onClose={() => setShowModalTutorial(false)}
+        />
+      )}
+
       <PageTitlePlusNew
         Titulo="Información de cliente"
         Subtitulo="Información completa del cliente"
