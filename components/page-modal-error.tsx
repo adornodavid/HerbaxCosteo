@@ -2,15 +2,9 @@
 
 import { X, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import type { propsPageModalError } from "@/types/common"
 
-interface PageModalErrorProps {
-  Titulo: string
-  Mensaje: string
-  isOpen: boolean
-  onClose: () => void
-}
-
-export function PageModalError({ Titulo, Mensaje, isOpen, onClose }: PageModalErrorProps) {
+export function PageModalError({ Titulo, Mensaje, isOpen, onClose }: propsPageModalError) {
   if (!isOpen) return null
 
   return (
