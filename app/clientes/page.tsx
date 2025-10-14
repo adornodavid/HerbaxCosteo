@@ -45,6 +45,7 @@ export default function ClientesPage() {
 
   // --- Estados ---
   // Cargar contenido en variables
+  const [pageLoading, setPageLoading] = useState<PageLoadingScreen>()
   const [Listado, setListado] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
   const [paginaActual, setPaginaActual] = useState(1)
