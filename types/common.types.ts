@@ -49,6 +49,10 @@ export interface ddlItem {
 /* ==================================================
   Componentes
  ==================================================*/
+export interface PageLoadingScreen {
+  message?: string
+}
+
 export interface ModalAlert {
   Titulo?: string
   Mensaje?: string
