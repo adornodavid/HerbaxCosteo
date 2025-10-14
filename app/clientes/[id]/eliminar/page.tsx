@@ -170,8 +170,8 @@ export default function EliminarClientePage() {
     <div className="container mx-auto py-6 space-y-6">
       {/* -- Componentes -- */}
       <PageModalValidation
-        Titulo={modalValidationTitle}
-        Mensaje={modalValidationMessage}
+        Titulo={ModalValidation.Titulo}
+        Mensaje={ModalValidation.Mensaje}
         isOpen={showModalValidation}
         onClose={() => {
           setShowModalValidation(false)
@@ -180,15 +180,15 @@ export default function EliminarClientePage() {
       />
 
       <PageModalAlert
-        Titulo={modalAlertTitle}
-        Mensaje={modalAlertMessage}
+        Titulo={ModalAlert.Titulo}
+        Mensaje={ModalAlert.Mensaje}
         isOpen={showModalAlert}
         onClose={() => setShowModalAlert(false)}
       />
 
       <PageModalError
-        Titulo={modalErrorTitle}
-        Mensaje={modalErrorMessage}
+        Titulo={ModalError.Titulo}
+        Mensaje={ModalError.Mensaje}
         isOpen={showModalError}
         onClose={() => setShowModalError(false)}
       />
