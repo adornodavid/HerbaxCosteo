@@ -54,7 +54,7 @@ export async function crearFormula(formData: FormData) {
     // Paso 1: Validar variables obligatorias
     const nombre = (formData.get("nombre") as string)?.trim()
     if(!nombre || nombre.length < 3){
-      return { success: false, error: "El o los parametros recibidos, estan incompletos. Favor de verificar." }
+      return { success: false, error: "El parametro Nombre, esta incompleto. Favor de verificar." }
     }
 
     // Paso 2: Validar si no existe
