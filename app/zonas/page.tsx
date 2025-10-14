@@ -261,44 +261,7 @@ export default function ZonasPage() {
   // --- Renders (contenidos auxiliares) ---
   // Loading
   if (showPageLoading) {
-    return <PageLoadingScreen message="Cargando Zonas..." />
-  }
-
-  // ModalAlert
-  if (showModalAlert) {
-    return (
-      <PageModalAlert
-        Titulo={ModalAlert.Titulo}
-        Mensaje={ModalAlert.Mensaje}
-        isOpen={true}
-        onClose={() => setShowModalAlert(false)}
-      />
-    )
-  }
-
-  // ModalError
-  if (showModalError) {
-    return (
-      <PageModalError
-        Titulo={ModalError.Titulo}
-        Mensaje={ModalError.Mensaje}
-        isOpen={true}
-        onClose={() => setShowModalError(false)}
-      />
-    )
-  }
-
-  // ModalTutorial
-  if (showModalTutorial) {
-    return (
-      <PageModalTutorial
-        Titulo={ModalTutorial.Titulo}
-        Subtitulo={ModalTutorial.Subtitulo}
-        VideoUrl={ModalTutorial.VideoUrl}
-        isOpen={true}
-        onClose={() => setShowModalTutorial(false)}
-      />
-    )
+    return <PageLoadingScreen />
   }
 
   // --- Contenido ---
@@ -332,7 +295,7 @@ export default function ZonasPage() {
           onClose={() => setShowModalTutorial(false)}
         />
       )}
-      
+
       {/* 1. Título y Botón */}
       {showPageTituloMasNuevo && (
         <PageTitlePlusNew
