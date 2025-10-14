@@ -2,7 +2,6 @@
 /* ==================================================
 	Imports
 ================================================== */
-// -- Assets --
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -24,15 +23,18 @@ import type {
 // Configuraciones
 import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Componentes --
-import PageTitlePlusNew from "@/components/page-title-plus-new"
-import PageLoadingScreen from "@/components/page-loading-screen"
-import PageModalAlert from "@/components/page-modal-alert"
-import PageModalError from "@/components/page-modal-error"
-import PageModalTutorial from "@/components/page-modal-tutorial"
+import { PageTitlePlusNew } from "@/components/page-title-plus-new"
+import { PageLoadingScreen } from "@/components/page-loading-screen"
+import { PageModalAlert } from "@/components/page-modal-alert"
+import { PageModalError } from "@/components/page-modal-error"
+import { PageModalTutorial } from "@/components/page-modal-tutorial"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { useAuth } from "@/hooks/useAuth" // Import useAuth hook
-import { obtenerClientes } from "@/services/clientes" // Import obtenerClientes function
-import { estatusActivoCliente } from "@/services/clientes" // Import estatusActivoCliente function
+// -- Frontend --
+
+// -- Backend --
+import { useAuth } from "@/contexts/auth-context"
+import { obtenerClientes, estatusActivoCliente } from "@/app/actions/clientes"
+
 
 /* ==================================================
 	Componente Principal (Pagina)
