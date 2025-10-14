@@ -1,19 +1,42 @@
 "use client"
 
-import type React from "react"
-import type { ModalAlert, ModalError } from "@/types/modal"
-
+/* ==================================================
+  Imports:
+================================================== */
+// -- Assets --
+import { useState, useEffect, useMemo } from "react"
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { obtenerClientes, actualizarCliente } from "@/app/actions/clientes"
-import { PageTitlePlusNew } from "@/components/page-title-plus-new"
-import { PageModalError } from "@/components/page-modal-error"
-import { PageModalValidation } from "@/components/page-modal-validation"
-import { PageProcessing } from "@/components/page-processing"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
+// -- Tipados (interfaces, clases, objetos) --
+import type React from "react"
+import type { Zona } from "@/types/zonas"
+import type {
+  propsPageLoadingScreen,
+  propsPageTitlePlusNew,
+  propsPageModalAlert,
+  propsPageModalError,
+  propsPageModalTutoria,
+} from "@/types/common"
+// -- Librerias --
+// Configuraciones
+import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
+// -- Componentes --
+import { PageTitlePlusNew } from "@/components/page-title-plus-new"
+import { PageLoadingScreen } from "@/components/page-loading-screen"
+import { PageProcessing } from "@/components/page-processing"
+import { PageModalValidation } from "@/components/page-modal-validation"
+import { PageModalAlert } from "@/components/page-modal-alert"
+import { PageModalError } from "@/components/page-modal-error"
+import { PageModalTutorial } from "@/components/page-modal-tutorial"
+// -- Backend --
+import { useAuth } from "@/contexts/auth-context"
+import { obtenerClientes, actualizarCliente } from "@/app/actions/clientes"
+
+
 
 export default function EditarClientePage() {
   const router = useRouter()
