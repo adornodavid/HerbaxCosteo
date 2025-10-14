@@ -53,6 +53,14 @@ export interface PageLoadingScreen {
   message?: string
 }
 
+export interface PageProcessing {
+  message?: string
+}
+
+export interface PageTitlePlusNew {
+  message?: string
+}
+
 export interface ModalAlert {
   Titulo?: string
   Mensaje?: string
