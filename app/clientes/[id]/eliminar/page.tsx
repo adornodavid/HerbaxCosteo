@@ -159,6 +159,15 @@ export default function EliminarClientePage() {
     )
   }
 
+  // Si no se cargo el elemento principal
+  if (!esAdminDOs) {
+    return (
+      <div className="container mx-auto py-6">
+        <p>No tiene permisos para utilizar esta herramienta, si necesita ayuda solicitela con el personal encargado del sitio.</p>
+      </div>
+    )
+  }
+
   // Contenido principal
   return (
     <div className="container mx-auto py-6 space-y-6">
