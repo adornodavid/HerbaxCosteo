@@ -230,8 +230,8 @@ export default function EditarClientePage() {
 
       {showModalValidation && (
         <PageModalValidation
-          Titulo="Información necesaria incompleta."
-          Mensaje="Favor de completar los campos obligatorios (Nombre, Clave)."
+          Titulo={modalValidation.Titulo}
+          Mensaje={modalValidation.Mensaje}
           isOpen={true}
           onClose={() => setShowModalValidation(false)}
         />
