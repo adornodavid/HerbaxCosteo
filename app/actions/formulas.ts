@@ -203,6 +203,7 @@ export async function obtenerFormulas(
     // Paso 6: Retorno de data
     return { success: true, data }
   } catch (error) {
+    // Retorno de información
     console.error("Error en obtenerClientes de actions/clientes:", error)
     return { success: false, error: "Error interno del servidor, al ejecutar obtenerClientes de actions/clientes" }
   }
