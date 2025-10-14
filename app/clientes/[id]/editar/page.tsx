@@ -74,7 +74,44 @@ export default function EditarClientePage() {
   })
   
   // -- Funciones -- 
+  const ejecutarActualizacion = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
 
+    const formDataToSend = new FormData(e.currentTarget)
+    const nombre = formDataToSend.get("nombre") as string
+    const clave = formDataToSend.get("clave") as string
+
+    if (!nombre || nombre.trim().length < 3 || !clave || clave.trim().length < 1) {
+      setShowModalValidation(true)
+      return
+    }
+
+    setShowProcessing(true)
+    setIsSubmitting(true)
+
+    try {
+      const result = await actualizarCliente(formDataToSend)
+
+      setShowProcessing(false)
+
+      if (result.success) {
+        alert("Cliente actualizado exitosamente")
+        //router.push("/clientes")
+      } else {
+        setModalError({
+          Titulo: "Error al actualizar cliente",
+          Mensaje: result.error,
+        })
+        setShowModalError(true)
+      }
+    } catch (error) {
+      setShowProcessing(false)
+      alert("Error inesperado al actualizar cliente")
+      console.error(error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   // --- Inicio (carga inicial y seguridad) ---
   useEffect(() => {
@@ -147,45 +184,6 @@ export default function EditarClientePage() {
       ...prev,
       [name]: value,
     }))
-  }
-
-  const ejecutarActualizacion = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    const formDataToSend = new FormData(e.currentTarget)
-    const nombre = formDataToSend.get("nombre") as string
-    const clave = formDataToSend.get("clave") as string
-
-    if (!nombre || nombre.trim().length < 3 || !clave || clave.trim().length < 1) {
-      setShowModalValidation(true)
-      return
-    }
-
-    setShowProcessing(true)
-    setIsSubmitting(true)
-
-    try {
-      const result = await actualizarCliente(formDataToSend)
-
-      setShowProcessing(false)
-
-      if (result.success) {
-        alert("Cliente actualizado exitosamente")
-        //router.push("/clientes")
-      } else {
-        setModalError({
-          Titulo: "Error al actualizar cliente",
-          Mensaje: result.error,
-        })
-        setShowModalError(true)
-      }
-    } catch (error) {
-      setShowProcessing(false)
-      alert("Error inesperado al actualizar cliente")
-      console.error(error)
-    } finally {
-      setIsSubmitting(false)
-    }
   }
 
  // --- Renders ---
