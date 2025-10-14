@@ -57,30 +57,37 @@ export default function VerClientePage() {
 
   // --- Inicio (carga inicial y seguridad) ---
   useEffect(() => {
-    const cargarCliente = async () => {
-      try {
-        setShowPageLoading(true)
-        
-        const result = await obtenerClientes(clienteId, "", "", "", "", "", "Todos")
-        if (result.success && result.data && result.data.length > 0) {
-          setCliente(result.data[0])
-        }
-      } catch (error) {
-        console.error("Error al cargar información: ", error)
-        setModalError({
-          Titulo: "Error al cargar información",
-          Mensaje: error,
-        })
-        setShowModalError(true)
-      } finally {
-        setShowPageLoading(false)
+    if (!authLoading) {
+      // Validar
+      if (!user || user.RolId === 0) {
+        router.push("/login")
+        return
       }
-    }
-
-    // Si se obtuvo el id
-    if (clienteId) {
-      cargarCliente()
-    }
+      // Iniciar
+      const cargarCliente = async () => {
+        try {
+          setShowPageLoading(true)
+          
+          const result = await obtenerClientes(clienteId, "", "", "", "", "", "Todos")
+          if (result.success && result.data && result.data.length > 0) {
+            setCliente(result.data[0])
+          }
+        } catch (error) {
+          console.error("Error al cargar información: ", error)
+          setModalError({
+            Titulo: "Error al cargar información",
+            Mensaje: error,
+          })
+          setShowModalError(true)
+        } finally {
+          setShowPageLoading(false)
+        }
+      }
+      // Si se obtuvo el id
+      if (clienteId) {
+        cargarCliente()
+      }
+    }    
   }, [authLoading, user, router, esAdminDOs, clienteId])
 
   if (showPageLoading) {
