@@ -303,7 +303,7 @@ export async function eliminarCliente(id: number) {
     // Return si hay error en query
     if (error) {
       console.error("Error eliminando cliente en query en eliminarCliente de actions/clientes:", error)
-      return { success: false, message: "Error en query", error: error.message }
+      return { success: false, error: "Error en query: " + error.message }
     }
 
     revalidatePath("/clientes")
@@ -311,7 +311,8 @@ export async function eliminarCliente(id: number) {
     // Paso 3: Return resultados
     return { success: true }
   } catch (error) {
-    console.error("Error en eliminarCliente de actions/clientes:", error)
+    console.error("Error en eliminarCliente de actions/clientes: " + error)
+    // Return info
     return {
       success: false,
       error: "Error interno del servidor, al ejecutar funcion eliminarCliente de actions/clientes: " + error,
