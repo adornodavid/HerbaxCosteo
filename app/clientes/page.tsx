@@ -59,6 +59,7 @@ export default function ClientesPage() {
   const [ModalError, setModalError] = useState<propsPageModalError>()
   const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
   const [ListadoSinResultados, setListadoSinResultados] = useState(false)
+  const [clienteDetalles, setClienteDetalles] = useState<Cliente | null>(null)
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
@@ -67,7 +68,6 @@ export default function ClientesPage() {
   const [showModalTutorial, setShowModalTutorial] = useState(false)
   const [showPageTituloMasNuevo, setShowPageTituloMasNuevo] = useState(false)
   const [showDetallesModal, setShowDetallesModal] = useState(false)
-  const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null)
   // Cargar contenido en elementos
   const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState<propsPageTitlePlusNew>({
     Titulo: "",
