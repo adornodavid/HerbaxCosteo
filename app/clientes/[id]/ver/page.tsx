@@ -55,6 +55,7 @@ export default function VerClientePage() {
   const [showModalError, setShowModalError] = useState(false)
   const [showModalTutorial, setShowModalTutorial] = useState(false)
 
+  // --- Inicio (carga inicial y seguridad) ---
   useEffect(() => {
     const cargarCliente = async () => {
       try {
@@ -80,7 +81,7 @@ export default function VerClientePage() {
     if (clienteId) {
       cargarCliente()
     }
-  }, [clienteId])
+  }, [authLoading, user, router, esAdminDOs, clienteId])
 
   if (showPageLoading) {
     return <showPageLoading message="Cargando información del cliente..." />
