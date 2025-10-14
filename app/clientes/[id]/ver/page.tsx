@@ -24,6 +24,9 @@ import { PageModalTutorial } from "@/components/page-modal-tutorial"
 import { useAuth } from "@/contexts/auth-context"
 import { obtenerClientes } from "@/app/actions/clientes"
 
+/* ==================================================
+	Componente Principal (Pagina)
+================================================== */
 export default function VerClientePage() {
   const params = useParams()
   const router = useRouter()
