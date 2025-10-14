@@ -2,16 +2,9 @@
 
 import { AlertTriangle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { PageModalAlert } from "@/types/common"
+import type { propsPageModalAlert } from "@/types/common"
 
-interface PageModalAlertProps {
-  Titulo: string
-  Mensaje: string
-  isOpen: boolean
-  onClose: () => void
-}
-
-export function PageModalAlert({ Titulo, Mensaje, isOpen, onClose }: PageModalAlert) {
+export function PageModalAlert({ Titulo, Mensaje, isOpen, onClose }: propsPageModalAlert) {
   if (!isOpen) return null
 
   return (
