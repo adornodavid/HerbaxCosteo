@@ -51,13 +51,13 @@ export default function ClientesPage() {
 
   // --- Estados ---
   // Cargar contenido en variables
-  const [pageLoading, setPageLoading] = useState<PageLoadingScreenType>()
+  const [pageLoading, setPageLoading] = useState<PageLoadingScreen>()
   const [Listado, setListado] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
   const [paginaActual, setPaginaActual] = useState(1)
-  const [ModalAlert, setModalAlert] = useState<PageModalAlertType>()
-  const [ModalError, setModalError] = useState<PageModalErrorType>()
-  const [ModalTutorial, setModalTutorial] = useState<PageModalTutorialType>()
+  const [ModalAlert, setModalAlert] = useState<PageModalAlert>()
+  const [ModalError, setModalError] = useState<PageModalError>()
+  const [ModalTutorial, setModalTutorial] = useState<PageModalTutorial>()
   const [ListadoSinResultados, setListadoSinResultados] = useState(false)
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
@@ -69,7 +69,7 @@ export default function ClientesPage() {
   const [showDetallesModal, setShowDetallesModal] = useState(false)
   const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null)
   // Cargar contenido en elementos
-  const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState<PageTitlePlusNewType>({
+  const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState<PageTitlePlusNew>({
     Titulo: "",
     Subtitulo: "",
     Visible: false,
@@ -174,7 +174,7 @@ export default function ClientesPage() {
 
       const Result = await ejecutarBusqueda(auxClienteId, "", "", "True")
       if (Result.success) {
-        const modalAlertData: PageModalAlertType = {
+        const modalAlertData: PageModalAlert = {
           Titulo: "En ejecución de búsqueda de carga inicial",
           Mensaje: Result.mensaje,
         }
