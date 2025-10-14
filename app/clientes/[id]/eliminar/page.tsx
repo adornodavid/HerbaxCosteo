@@ -73,6 +73,44 @@ export default function EliminarClientePage() {
   const [modalErrorTitle, setModalErrorTitle] = useState("")
   const [modalErrorMessage, setModalErrorMessage] = useState("")
 
+  // -- Funciones -- 
+  const ejecutarEliminar = async () => {
+    if (confirmText.trim().toUpperCase() !== "ELIMINAR") {
+      //alert("Debes escribir la palabra ELIMINAR para confirmar la eliminación")
+      setModalValidation({
+        Titulo: "No se pudo eliminar el cliente seleccionado",
+        Mensaje: "Debes escribir la palabra ELIMINAR para confirmar la eliminación.",
+      })
+      setShowModalValidation(true)
+      return
+    }
+
+    try {
+      const result = await eliminarCliente(clienteId)
+
+      if (result.success) {
+        setModalValidationTitle("Cliente eliminado exitosamente")
+        setModalValidationMessage("El cliente ha sido eliminado correctamente del sistema.")
+        setShowModalValidation(true)
+      } else {
+        if (result.error) {
+          setModalAlertTitle("Error durante ejecucion de eliminado")
+          setModalAlertMessage(result.error)
+          setShowModalAlert(true)
+        } else {
+          setModalErrorTitle("Error en el momento de ejecutar la eliminacion del cliente")
+          setModalErrorMessage("Ocurrió un error desconocido durante la eliminación")
+          setShowModalError(true)
+        }
+      }
+    } catch (error) {
+      console.error("Error al eliminar cliente:", error)
+      setModalErrorTitle("Error en el momento de ejecutar la eliminacion del cliente")
+      setModalErrorMessage("Error inesperado al eliminar el cliente")
+      setShowModalError(true)
+    }
+  }
+
   // --- Inicio (carga inicial y seguridad) ---
   useEffect(() => {
     // Validar
@@ -105,44 +143,6 @@ export default function EliminarClientePage() {
       cargarCliente()
     }
   }, [authLoading, user, router, esAdminDOs, clienteId])
-
-  const ejecutarEliminar = async () => {
-    if (confirmText.trim().toUpperCase() !== "ELIMINAR") {
-      //alert("Debes escribir la palabra ELIMINAR para confirmar la eliminación")
-      setModalValidationTitle("No se pudo eliminar el cliente seleccionado")
-      setModalValidationMessage("Debes escribir la palabra ELIMINAR para confirmar la eliminación.")
-      setModalValidationClose(
-        setShowModalValidation(false)
-        router.push("/clientes"))
-      setShowModalValidation(true)
-      return
-    }
-
-    try {
-      const result = await eliminarCliente(clienteId)
-
-      if (result.success) {
-        setModalValidationTitle("Cliente eliminado exitosamente")
-        setModalValidationMessage("El cliente ha sido eliminado correctamente del sistema.")
-        setShowModalValidation(true)
-      } else {
-        if (result.error) {
-          setModalAlertTitle("Error durante ejecucion de eliminado")
-          setModalAlertMessage(result.error)
-          setShowModalAlert(true)
-        } else {
-          setModalErrorTitle("Error en el momento de ejecutar la eliminacion del cliente")
-          setModalErrorMessage("Ocurrió un error desconocido durante la eliminación")
-          setShowModalError(true)
-        }
-      }
-    } catch (error) {
-      console.error("Error al eliminar cliente:", error)
-      setModalErrorTitle("Error en el momento de ejecutar la eliminacion del cliente")
-      setModalErrorMessage("Error inesperado al eliminar el cliente")
-      setShowModalError(true)
-    }
-  }
 
   // --- Renders ---
   // Contenidos auxiliares
