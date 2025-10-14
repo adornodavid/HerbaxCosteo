@@ -76,11 +76,12 @@ export default function EditarClientePage() {
   // -- Funciones -- 
   const ejecutarActualizacion = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-
+    // Variables necesarias para el proceso
     const formDataToSend = new FormData(e.currentTarget)
     const nombre = formDataToSend.get("nombre") as string
     const clave = formDataToSend.get("clave") as string
 
+    // Validar variables obligatorias
     if (!nombre || nombre.trim().length < 3) {
       setModalValidation({
         Titulo: "Datos incompletos",
@@ -94,6 +95,7 @@ export default function EditarClientePage() {
     setIsSubmitting(true)
 
     try {
+      // Ejecutar funcion principal backend
       const result = await actualizarCliente(formDataToSend)
 
       setShowProcessing(false)
@@ -110,7 +112,11 @@ export default function EditarClientePage() {
       }
     } catch (error) {
       setShowProcessing(false)
-      alert("Error inesperado al actualizar cliente")
+      setModalError({
+          Titulo: "Error inesperado al actualizar cliente",
+          Mensaje: error,
+        })
+        setShowModalError(true)
       console.error(error)
     } finally {
       setIsSubmitting(false)
