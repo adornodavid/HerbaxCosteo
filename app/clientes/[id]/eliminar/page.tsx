@@ -45,9 +45,21 @@ export default function EliminarClientePage() {
   const esAdminDOs = useMemo(() => user && RolesAdminDOs.includes(user.RolId), [user])
   const clienteId = Number(params.id)
 
+  // --- Estados ---
+  // Cargar contenido en variables
+  const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
   const [cliente, setCliente] = useState<Cliente | null>(null)
   const [loading, setLoading] = useState(true)
   const [confirmText, setConfirmText] = useState("")
+  const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
+  const [ModalError, setModalError] = useState<propsPageModalError>()
+  const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
+  // Mostrar/Ocultar contenido
+  const [showPageLoading, setShowPageLoading] = useState(true)
+  const [showModalAlert, setShowModalAlert] = useState(false)
+  const [showModalError, setShowModalError] = useState(false)
+  const [showModalTutorial, setShowModalTutorial] = useState(false)
+
   const [showModalValidation, setShowModalValidation] = useState(false)
   const [modalValidationTitle, setModalValidationTitle] = useState("")
   const [modalValidationMessage, setModalValidationMessage] = useState("")
