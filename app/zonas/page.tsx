@@ -197,7 +197,6 @@ export default function ZonasPage() {
       if (resultado) {
         await cargarDatosIniciales()
       } else {
-        // Error
         setModalError({
           Titulo: "Error al cambiar estatus",
           Mensaje: "No se pudo cambiar el estatus del elemento seleccionado. Por favor, intente nuevamente.",
