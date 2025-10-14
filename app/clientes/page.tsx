@@ -13,7 +13,7 @@ import { Search, RotateCcw, Edit, ToggleLeft, ToggleRight, EyeOff, X, Eye } from
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
-import type { Cliente } from "@/types/common"
+import type { PageLoadingScreen, PageProcessing, PageTitlePlusNew, PageModalValidation, PageModalAlert, PageModalError, PageModalTutorial } from "@/types/common"
 // -- Librerias --
 // Configuraciones
 import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
@@ -24,7 +24,6 @@ import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
 import { PageModalTutorial } from "@/components/page-modal-tutorial"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import type { ModalAlert, ModalError, ModalTutorial } from "@/types/common" // Import ModalAlert, ModalError, ModalTutorial
 import { useAuth } from "@/hooks/useAuth" // Import useAuth hook
 import { obtenerClientes } from "@/services/clientes" // Import obtenerClientes function
 import { estatusActivoCliente } from "@/services/clientes" // Import estatusActivoCliente function
@@ -48,9 +47,9 @@ export default function ClientesPage() {
   const [Listado, setListado] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
   const [paginaActual, setPaginaActual] = useState(1)
-  const [ModalAlert, setModalAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
-  const [ModalError, setModalError] = useState<ModalError>({ Titulo: "", Mensaje: "" })
-  const [ModalTutorial, setModalTutorial] = useState<ModalTutorial>({ Titulo: "", Subtitulo: "", VideoUrl: "" })
+  const [ModalAlert, setModalAlert] = useState<PageModalAlert>({ Titulo: "", Mensaje: "" })
+  const [ModalError, setModalError] = useState<PageModalError>({ Titulo: "", Mensaje: "" })
+  const [ModalTutorial, setModalTutorial] = useState<PageModalTutorial>({ Titulo: "", Subtitulo: "", VideoUrl: "" })
   const [ListadoSinResultados, setListadoSinResultados] = useState(false)
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
