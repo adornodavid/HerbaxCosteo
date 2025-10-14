@@ -171,7 +171,7 @@ export default function ClientesPage() {
       setShowPageTituloMasNuevo(true)
 
       const Result = await ejecutarBusqueda(auxClienteId, "", "", "True")
-      if (!Result.success) {
+      if (Result.success) {
         const modalAlertData: PageModalAlertType = {
           Titulo: "En ejecución de búsqueda de carga inicial",
           Mensaje: Result.mensaje,
