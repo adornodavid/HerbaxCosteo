@@ -73,8 +73,17 @@ export default function EditarClientePage() {
     email: "",
   })
   
+  // -- Funciones -- 
 
+
+  // --- Inicio (carga inicial y seguridad) ---
   useEffect(() => {
+    // Validar
+    if (!user || user.RolId === 0) {
+      router.push("/login")
+      return
+    }
+    // Iniciar 
     const cargarDatosCliente = async () => {
       try {
         setIsLoading(true)
