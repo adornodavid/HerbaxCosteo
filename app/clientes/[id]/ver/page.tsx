@@ -11,6 +11,13 @@ import { Button } from "@/components/ui/button"
 import { Edit, Trash2, ArrowLeft } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type { Cliente } from "@/types/clientes"
+import type {
+  propsPageLoadingScreen,
+  propsPageTitlePlusNew,
+  propsPageModalAlert,
+  propsPageModalError,
+  propsPageModalTutorial,
+} from "@/types/common"
 // -- Librerias --
 // Configuraciones
 import { RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
