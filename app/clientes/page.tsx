@@ -13,11 +13,11 @@ import { Search, RotateCcw, Edit, ToggleLeft, ToggleRight, EyeOff, X, Eye } from
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
 import type {
-  PageLoadingScreen,
-  PageTitlePlusNew,
-  PageModalAlert,
-  PageModalError,
-  PageModalTutoria,
+  propsPageLoadingScreen,
+  propsPageTitlePlusNew,
+  propsPageModalAlert,
+  propsPageModalError,
+  propsPageModalTutoria,
 } from "@/types/common"
 // -- Librerias --
 // Configuraciones
@@ -51,13 +51,13 @@ export default function ClientesPage() {
 
   // --- Estados ---
   // Cargar contenido en variables
-  const [pageLoading, setPageLoading] = useState<PageLoadingScreen>()
+  const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
   const [Listado, setListado] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
   const [paginaActual, setPaginaActual] = useState(1)
-  const [ModalAlert, setModalAlert] = useState<PageModalAlert>()
-  const [ModalError, setModalError] = useState<PageModalError>()
-  const [ModalTutorial, setModalTutorial] = useState<PageModalTutorial>()
+  const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
+  const [ModalError, setModalError] = useState<propsPageModalError>()
+  const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
   const [ListadoSinResultados, setListadoSinResultados] = useState(false)
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
@@ -69,7 +69,7 @@ export default function ClientesPage() {
   const [showDetallesModal, setShowDetallesModal] = useState(false)
   const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null)
   // Cargar contenido en elementos
-  const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState<PageTitlePlusNew>({
+  const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState<propsPageTitlePlusNew>({
     Titulo: "",
     Subtitulo: "",
     Visible: false,
