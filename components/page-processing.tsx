@@ -1,12 +1,10 @@
 "use client"
 
 import { Loader2 } from "lucide-react"
+import type { propsPageProcessing } from "@/types/common"
 
-interface PageProcessingProps {
-  isOpen: boolean
-}
 
-export function PageProcessing({ isOpen }: PageProcessingProps) {
+export function PageProcessing({ isOpen }: propsPageProcessing) {
   if (!isOpen) return null
 
   return (
