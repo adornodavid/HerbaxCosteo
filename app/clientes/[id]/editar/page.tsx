@@ -126,7 +126,7 @@ export default function EditarClientePage() {
     if (clienteId) {
       cargarDatosCliente()
     }
-  }, [clienteId])
+  }, [authLoading, user, router, esAdminDOs, clienteId])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
