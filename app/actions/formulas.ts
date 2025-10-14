@@ -89,7 +89,7 @@ export async function crearFormula(formData: FormData) {
     const codigo = formData.get("codigo") as string
     const nombre = formData.get("nombre") as string
     const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || null
-    const costo = formData.get("costo") as string
+    const costo = parseFloat(formData.get("costo") as string) || 0
     const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
     const activo = true
 
