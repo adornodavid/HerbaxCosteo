@@ -15,6 +15,7 @@ import type { Cliente } from "@/types/clientes"
 import type {
   propsPageLoadingScreen,
   propsPageTitlePlusNew,
+  propsPageModalValidation,
   propsPageModalAlert,
   propsPageModalError,
   propsPageModalTutorial,
