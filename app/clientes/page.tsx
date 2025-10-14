@@ -13,16 +13,22 @@ import { Search, RotateCcw, Edit, ToggleLeft, ToggleRight, EyeOff, X, Eye } from
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
-import type { PageLoadingScreen, PageProcessing, PageTitlePlusNew, PageModalValidation, PageModalAlert, PageModalError, PageModalTutorial } from "@/types/common"
+import type {
+  PageLoadingScreenType,
+  PageTitlePlusNewType,
+  PageModalAlertType,
+  PageModalErrorType,
+  PageModalTutorialType,
+} from "@/types/common"
 // -- Librerias --
 // Configuraciones
 import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Componentes --
-import { PageTitlePlusNew } from "@/components/page-title-plus-new"
-import { PageLoadingScreen } from "@/components/page-loading-screen"
-import { PageModalAlert } from "@/components/page-modal-alert"
-import { PageModalError } from "@/components/page-modal-error"
-import { PageModalTutorial } from "@/components/page-modal-tutorial"
+import PageTitlePlusNew from "@/components/page-title-plus-new"
+import PageLoadingScreen from "@/components/page-loading-screen"
+import PageModalAlert from "@/components/page-modal-alert"
+import PageModalError from "@/components/page-modal-error"
+import PageModalTutorial from "@/components/page-modal-tutorial"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useAuth } from "@/hooks/useAuth" // Import useAuth hook
 import { obtenerClientes } from "@/services/clientes" // Import obtenerClientes function
@@ -43,13 +49,13 @@ export default function ClientesPage() {
 
   // --- Estados ---
   // Cargar contenido en variables
-  const [pageLoading, setPageLoading] = useState<PageLoadingScreen>()
+  const [pageLoading, setPageLoading] = useState<PageLoadingScreenType>()
   const [Listado, setListado] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
   const [paginaActual, setPaginaActual] = useState(1)
-  const [ModalAlert, setModalAlert] = useState<PageModalAlert>()
-  const [ModalError, setModalError] = useState<PageModalError>()
-  const [ModalTutorial, setModalTutorial] = useState<PageModalTutorial>()
+  const [ModalAlert, setModalAlert] = useState<PageModalAlertType>()
+  const [ModalError, setModalError] = useState<PageModalErrorType>()
+  const [ModalTutorial, setModalTutorial] = useState<PageModalTutorialType>()
   const [ListadoSinResultados, setListadoSinResultados] = useState(false)
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
@@ -61,7 +67,7 @@ export default function ClientesPage() {
   const [showDetallesModal, setShowDetallesModal] = useState(false)
   const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null)
   // Cargar contenido en elementos
-  const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState({
+  const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState<PageTitlePlusNewType>({
     Titulo: "",
     Subtitulo: "",
     Visible: false,
@@ -166,11 +172,11 @@ export default function ClientesPage() {
 
       const Result = await ejecutarBusqueda(auxClienteId, "", "", "True")
       if (!Result.success) {
-        
-        setModalAlert({
-          Titulo: "En ejecucion de Busqueda de carga inicial",
+        const modalAlertData: PageModalAlertType = {
+          Titulo: "En ejecución de búsqueda de carga inicial",
           Mensaje: Result.mensaje,
-        })
+        }
+        setModalAlert(modalAlertData)
         setShowModalAlert(true)
       }
     } catch (error) {
