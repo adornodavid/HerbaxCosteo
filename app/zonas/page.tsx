@@ -32,7 +32,7 @@ import { PageModalError } from "@/components/page-modal-error"
 import { PageModalTutorial } from "@/components/page-modal-tutorial"
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
-import { obtenerZonas } from "@/app/actions/zonas"
+import { obtenerZonas, estatusActivoZona } from "@/app/actions/zonas"
 
 
 /* ==================================================
