@@ -76,9 +76,8 @@ export async function crearCliente(formData: FormData) {
 
     // Paso 4: Subir imagen para obtener su url
     let imagenurl = ""    
-    const auxNombre = formData.get("nombre") as string
     if (imagen && imagen.size > 0) {
-      const resultadoImagen = await imagenSubir(imagen, auxNombre, "clientes")
+      const resultadoImagen = await imagenSubir(imagen, nombre, "clientes")
       if (!resultadoImagen.success) {
        imagenurl = resultadoImagen.url || "" 
       }
