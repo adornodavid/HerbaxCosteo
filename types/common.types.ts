@@ -5,7 +5,7 @@
     - PaginatedResponse
     - FilterParams
     - ddlItem
-    - ModalAlert
+    - Modales
 ================================================== */
 export interface ApiResponse<T> {
   success: boolean
