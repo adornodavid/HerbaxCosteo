@@ -61,7 +61,7 @@ export async function crearFormula(formData: FormData) {
     const activo = true
 
     // Paso 2: Validar variables obligatorias
-    if(!nombre || nombre.length < 3){
+    if(!nombre || nombre.length < 2){
       return { success: false, error: "El parametro Nombre, esta incompleto. Favor de verificar." }
     }
 
