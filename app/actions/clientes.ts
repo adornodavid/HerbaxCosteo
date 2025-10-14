@@ -50,12 +50,21 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 //Función: crearCliente: funcion para crear un cliente
 export async function crearCliente(formData: FormData) {
   try {
-    // Paso 1: Validar si no existe
+    // Paso 1: Recibir variables
+    const nombre = (formData.get("nombre") as string)?.trim()
+    const clave = (formData.get("clave") as string)?.trim()
+
+    // Paso 2: Validar variables obligatorias
+    if(!nombre || nombre.length < 3){
+      return { success: false, error: "El parametro Nombre, esta incompleto. Favor de verificar." }
+    }
+
+    // Paso 3: Validar si no existe
     const existe: boolean = await (async () => {
       const resultado = await obtenerClientes(
         -1,
-        formData.get("nombre") as string,
-        formData.get("clave") as string,
+        nombre,
+        clave,
         "",
         "",
         "",
@@ -63,7 +72,6 @@ export async function crearCliente(formData: FormData) {
       )
       return resultado.success && resultado.data && resultado.data.length >= 1
     })()
-
     if (existe) {
       return { success: false, error: "El cliente que se intenta ingresar ya existe y no se puede proceder" }
     }
