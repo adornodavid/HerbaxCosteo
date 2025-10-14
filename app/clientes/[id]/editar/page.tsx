@@ -176,6 +176,7 @@ export default function EditarClientePage() {
   }, [authLoading, user, router, esAdminDOs, clienteId])
 
   // Manejadores (Handles)
+  // Manejador: Cambiar imagen
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -189,6 +190,7 @@ export default function EditarClientePage() {
     }
   }
 
+  // Manejador cambio de input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({
