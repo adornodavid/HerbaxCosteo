@@ -59,10 +59,10 @@ export async function crearMateriaPrima(formData: FormData) {
     const activo = true
 
     // Paso 2: Validar variables obligatorias
-    if (!codigo || codigo.length < 3) {
+    if (!codigo || codigo.length < 2) {
       return { success: false, error: "El parametro codigo, esta incompleto. Favor de verificar." }
     }
-    if (!nombre || nombre.length < 3) {
+    if (!nombre || nombre.length < 2) {
       return { success: false, error: "El parametro Nombre, esta incompleto. Favor de verificar." }
     }
 
