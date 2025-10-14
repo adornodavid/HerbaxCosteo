@@ -256,7 +256,7 @@ export default function ZonasPage() {
       }
       inicializar()
     }
-  }, [authLoading, user, router, esAdmin])
+  }, [authLoading, user, router, esAdmin, esAdminDDLs, esAdminDOs])
 
   // --- Renders (contenidos auxiliares) ---
   // Loading
