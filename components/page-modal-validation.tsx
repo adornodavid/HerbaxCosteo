@@ -2,15 +2,9 @@
 
 import { CheckCircle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import type { propsPageModalValidation } from "@/types/common"
 
-interface PageModalValidationProps {
-  Titulo: string
-  Mensaje: string
-  isOpen: boolean
-  onClose: () => void
-}
-
-export function PageModalValidation({ Titulo, Mensaje, isOpen, onClose }: PageModalValidationProps) {
+export function PageModalValidation({ Titulo, Mensaje, isOpen, onClose }: propsPageModalValidation) {
   if (!isOpen) return null
 
   return (
