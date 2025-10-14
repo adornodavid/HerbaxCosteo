@@ -40,7 +40,6 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
   * SPECIALS-ESPECIALES ()
     - estatusActivoFormula / actFormula
     - estadisticasFormulasTotales / statsFormlasTotales
-    - verificarIngredienteDuplicado
 ================================================== */
 
 /*==================================================
