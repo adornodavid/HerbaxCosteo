@@ -66,14 +66,7 @@ export async function crearFormula(formData: FormData) {
 
     // Paso 3: Validar si no existe
     const existe: boolean = await (async () => {
-      const resultado = await obtenerFormulas(
-        -1,
-        formData.get("codigo") as string,
-        formData.get("nombre") as string,
-        "Todos",
-        -1,
-        -1,
-      )
+      const resultado = await obtenerFormulas(-1, codigo, nombre, "Todos", -1, -1)
       return resultado.success && resultado.data && resultado.data.length >= 1
     })()
     if (existe) {
