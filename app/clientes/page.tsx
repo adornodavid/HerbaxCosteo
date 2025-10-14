@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, RotateCcw, Edit, ToggleLeft, ToggleRight, EyeOff, X, Eye } from "lucide-react"
 // -- Configuraciones --
-import { RolesAdmin, arrActivoTrue, arrActivoFalse } from "@/lib/config"
+import { RolesAdmin, RolesAdmin2, RolesAdmin3, RolesCoordinador, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
