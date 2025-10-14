@@ -2,16 +2,9 @@
 
 import { Video, X, PlayCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import type { propsPageModalTutorial } from "@/types/common"
 
-interface PageModalTutorialProps {
-  Titulo: string
-  Subtitulo: string
-  VideoUrl: string
-  isOpen: boolean
-  onClose: () => void
-}
-
-export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose }: PageModalTutorialProps) {
+export function PageModalTutorial({ Titulo, Subtitulo, VideoUrl, isOpen, onClose }: propsPageModalTutorial) {
   if (!isOpen) return null
 
   // Convert YouTube URL to embed format
