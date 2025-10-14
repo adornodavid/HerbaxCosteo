@@ -50,21 +50,22 @@ export default function ZonasPage() {
 
   // --- Estados ---
   // Cargar contenido en variables
+  const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
   const [Listado, setListado] = useState<Zona[]>([])
   const [TotalListado, setTotalListado] = useState(0)
   const [paginaActual, setPaginaActual] = useState(1)
-  const [ModalAlert, setModalAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
-  const [ModalError, setModalError] = useState<ModalError>({ Titulo: "", Mensaje: "" })
-  const [ModalTutorial, setModalTutorial] = useState<ModalTutorial>({ Titulo: "", Subtitulo: "", VideoUrl: "" })
+  const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
+  const [ModalError, setModalError] = useState<propsPageModalError>()
+  const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
   // Mostrar/Ocultar contenido
-  const [pageLoading, setPageLoading] = useState(true)
+  const [showPageLoading, setShowPageLoading] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
   const [showModalAlert, setShowModalAlert] = useState(false)
   const [showModalError, setShowModalError] = useState(false)
   const [showModalTutorial, setShowModalTutorial] = useState(false)
   const [showPageTituloMasNuevo, setShowPageTituloMasNuevo] = useState(false)
   // Cargar contenido en elementos
-  const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState({
+  const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState<propsPageTitlePlusNew>({
     Titulo: "",
     Subtitulo: "",
     Visible: false,
@@ -157,7 +158,7 @@ export default function ZonasPage() {
       setPageTituloMasNuevo({
         Titulo: "Zonas",
         Subtitulo: "Gestión completa de Zonas",
-        Visible: esAdmin == true ? true : false,
+        Visible: esAdminDOs == true ? true : false,
         BotonTexto: "Crear Nueva Zona",
         Ruta: "/zonas/crear",
       })
@@ -182,6 +183,36 @@ export default function ZonasPage() {
       setShowModalError(true)
     } finally {
       setPageLoading(false)
+    }
+  }
+
+  / Estatus - Cambiar activo/inactivo
+  const handleToggleStatusClickActivo = async (Id: number, clienteActivo: boolean) => {
+    try {
+      // Toggle the status (if active, make inactive; if inactive, make active)
+      const nuevoEstatus = !clienteActivo
+
+      // Call the estatusActivoCliente function
+      const resultado = await estatusActivoZona(Id, nuevoEstatus)
+
+      if (resultado) {
+        // Success - refresh the list
+        await cargarDatosIniciales()
+      } else {
+        // Error
+        setModalError({
+          Titulo: "Error al cambiar estatus",
+          Mensaje: "No se pudo cambiar el estatus del elemento seleccionado. Por favor, intente nuevamente.",
+        })
+        setShowModalError(true)
+      }
+    } catch (error) {
+      console.error("Error en handleToggleStatusClickActivo:", error)
+      setModalError({
+        Titulo: "Error al cambiar estatus",
+        Mensaje: `Error inesperado: ${error}`,
+      })
+      setShowModalError(true)
     }
   }
 
