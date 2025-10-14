@@ -272,7 +272,7 @@ export default function EditarClientePage() {
                     <img
                       src={imagePreview || "/placeholder.svg"}
                       alt="Preview"
-                      className="max-h-full max-w-full object-contain"
+                      className="w-full h-auto object-cover"
                     />
                   ) : (
                     <span className="text-muted-foreground text-sm">Sin imagen seleccionada</span>
