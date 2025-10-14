@@ -76,6 +76,8 @@ export default function CrearClientePage() {
 
     try {
       const result = await crearCliente(formData)
+      console.log(result)
+      console.log(" - " + result.success)
       alert(result.error)
       setShowProcessing(false)
 
