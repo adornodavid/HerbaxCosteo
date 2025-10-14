@@ -144,10 +144,13 @@ export default function EliminarClientePage() {
     }
   }
 
-  if (loading) {
-    return <PageLoadingScreen message="Cargando información del cliente..." />
+  // --- Renders ---
+  // Contenidos auxiliares
+  if (showPageLoading) {
+    return <PageLoadingScreen message="Cargando información..." />
   }
 
+  // Si no se cargo el elemento principal
   if (!cliente) {
     return (
       <div className="container mx-auto py-6">
@@ -156,6 +159,7 @@ export default function EliminarClientePage() {
     )
   }
 
+  // Contenido principal
   return (
     <div className="container mx-auto py-6 space-y-6">
       <PageModalValidation
