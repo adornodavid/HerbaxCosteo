@@ -73,7 +73,7 @@ export async function crearFormula(formData: FormData) {
     const imagen = formData.get("imagen") as File
     const auxNombre = formData.get("nombre") as string
     if (imagen && imagen.size > 0) {
-      const resultadoImagen = await imagenSubir(imagen, auxNombre, "clientes")
+      const resultadoImagen = await imagenSubir(imagen, auxNombre, "formulas")
       if (!resultadoImagen.success) {
         return { success: false, error: resultadoImagen.error }
       }
@@ -105,8 +105,8 @@ export async function crearFormula(formData: FormData) {
 
     // Return error
     if (error) {
-      console.error("Error creando formula en query en crearFormula de actions/formulas:", error)
-      return { success: false, error: error.message }
+      console.error("Error creando formula en query en crearFormula de actions/formulas: ", error)
+      return { success: false, error: "Error creando formula en query en crearFormula de actions/formulas: " + error.message }
     }
 
     revalidatePath("/formulas")
