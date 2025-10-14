@@ -28,8 +28,13 @@ import { obtenerClientes } from "@/app/actions/clientes"
 	Componente Principal (Pagina)
 ================================================== */
 export default function VerClientePage() {
+  // --- Variables especiales ---
   const params = useParams()
   const router = useRouter()
+  const { user, isLoading: authLoading } = useAuth()
+  const esAdmin = useMemo(() => user && RolesAdmin.includes(user.RolId), [user])
+  const esAdminDDLs = useMemo(() => user && RolesAdminDDLs.includes(user.RolId), [user])
+  const esAdminDOs = useMemo(() => user && RolesAdminDOs.includes(user.RolId), [user])
   const clienteId = Number(params.id)
 
   const [cliente, setCliente] = useState<Cliente | null>(null)
