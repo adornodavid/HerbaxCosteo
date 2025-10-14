@@ -6,13 +6,13 @@
     - FilterParams
     - ddlItem
     - Componentes
-      - PageLoadingScreen
-      - PageProcessing
-      - PageTitlePlusNew
-      - PageModalValidation
-      - PageModalAlert
-      - PageModalError
-      - PageModalTutorial
+      - propsPageLoadingScreen
+      - propsPageProcessing
+      - propsPageTitlePlusNew
+      - propsPageModalValidation
+      - propsPageModalAlert
+      - propsPageModalError
+      - propsPageModalTutorial
 ================================================== */
 export interface ApiResponse<T> {
   success: boolean
@@ -49,15 +49,15 @@ export interface ddlItem {
 /* ==================================================
   Componentes
  ==================================================*/
-export interface PageLoadingScreen {
+export interface propsPageLoadingScreen {
   message?: string
 }
 
-export interface PageProcessing {
+export interface propsPageProcessing {
   isOpen: boolean
 }
 
-export interface PageTitlePlusNew {
+export interface propsPageTitlePlusNew {
   Titulo: string
   Subtitulo: string
   Visible: boolean
@@ -65,28 +65,28 @@ export interface PageTitlePlusNew {
   Ruta: string
 }
 
-export interface PageModalValidation {
+export interface propsPageModalValidation {
   Titulo: string
   Mensaje: string
   isOpen: boolean
   onClose: () => void
 }
 
-export interface PageModalAlert {
+export interface propsPageModalAlert {
   Titulo: string
   Mensaje: string
   isOpen: boolean
   onClose: () => void
 }
 
-export interface PageModalError {
+export interface propsPageModalError {
   Titulo: string
   Mensaje: string
   isOpen: boolean
   onClose: () => void
 }
 
-export interface PageModalTutorial {
+export interface propsPageModalTutorial {
   Titulo: string
   Subtitulo: string
   VideoUrl: string
