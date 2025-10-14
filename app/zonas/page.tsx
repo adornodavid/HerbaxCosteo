@@ -182,7 +182,7 @@ export default function ZonasPage() {
       })
       setShowModalError(true)
     } finally {
-      setPageLoading(false)
+      setShowPageLoading(false)
     }
   }
 
@@ -239,7 +239,7 @@ export default function ZonasPage() {
 
     cargarDatosIniciales()
   }
-  
+
   // --- Inicio (carga inicial y seguridad) ---
   useEffect(() => {
     if (!authLoading) {
