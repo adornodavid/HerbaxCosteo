@@ -65,7 +65,7 @@ export async function crearFormula(formData: FormData) {
     })()
 
     if (existe) {
-      return { success: false, error: "La formula que se intenta ingresar ya existe y no se puede proceder" }
+      return { success: false, error: "La formula que se intenta ingresar ya existe y no se puede proceder." }
     }
 
     // Paso 2: Subir imagen para obtener su url
