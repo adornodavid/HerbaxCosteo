@@ -178,7 +178,10 @@ export default function ClientesPage() {
           Titulo: "En ejecución de búsqueda de carga inicial",
           Mensaje: Result.mensaje,
         }
-        setModalAlert(modalAlertData)
+        setModalAlert({
+          Titulo: "En ejecución de búsqueda de carga inicial",
+          Mensaje: Result.mensaje,
+        })
         setShowModalAlert(true)
       }
     } catch (error) {
