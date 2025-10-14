@@ -35,7 +35,6 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
     - actualizarFormula / updFormula    
   * DELETES-ELIMINAR (DELETES)
     - eliminarFormula / delFormula
-    - eliminarIngredienteFormula
   * SPECIALS-ESPECIALES ()
     - estatusActivoFormula / actFormula
     - estadisticasFormulas / statsFormlas
