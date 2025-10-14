@@ -209,7 +209,7 @@ export default function CrearClientePage() {
 
               <div className="space-y-2">
                 <Label>Previsualización</Label>
-                <div className="border rounded-md h-[250px] flex items-center justify-center bg-muted">
+                <div className="border rounded-md h-[100px] flex items-center justify-center bg-muted">
                   {imagePreview ? (
                     <img
                       src={imagePreview || "/placeholder.svg"}
