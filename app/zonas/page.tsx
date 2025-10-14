@@ -57,6 +57,7 @@ export default function ZonasPage() {
   const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
   const [ModalError, setModalError] = useState<propsPageModalError>()
   const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
+  const [elementoDetalles, setElementoDetalles] = useState<Cliente | null>(null)
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
@@ -64,7 +65,8 @@ export default function ZonasPage() {
   const [showModalError, setShowModalError] = useState(false)
   const [showModalTutorial, setShowModalTutorial] = useState(false)
   const [showPageTituloMasNuevo, setShowPageTituloMasNuevo] = useState(false)
-  // Cargar contenido en elementos
+  const [showElementoDetallesModal, setShowElementoDetallesModal] = useState(false)
+  // Cargar componentes
   const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState<propsPageTitlePlusNew>({
     Titulo: "",
     Subtitulo: "",
@@ -72,6 +74,7 @@ export default function ZonasPage() {
     BotonTexto: "",
     Ruta: "",
   })
+  // Cargar inputs
   const [filtroId, setFiltroId] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
   const [filtroClave, setFiltroClave] = useState("")  
