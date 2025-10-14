@@ -109,7 +109,7 @@ export async function crearCliente(formData: FormData) {
 
     revalidatePath("/clientes")
 
-    // Return resultados
+    // Retorno de datos
     return { success: true, data: data.id }
   } catch (error) {
     console.error("Error en crearCliente de actions/clientes:", error)
