@@ -13,6 +13,7 @@ import { Search, RotateCcw, Edit, ToggleLeft, ToggleRight, EyeOff, X, Eye } from
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
+import type { Cliente } from "@/types/common"
 // -- Librerias --
 // Configuraciones
 import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
