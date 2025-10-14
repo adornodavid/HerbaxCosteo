@@ -52,7 +52,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 export async function crearFormula(formData: FormData) {
   try {
     // Paso 1: Recibir variables
-    const codigo = formData.get("codigo") as string
+    const codigo = (formData.get("codigo") as string)?.trim()
     const nombre = (formData.get("nombre") as string)?.trim()
     const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || null
     const costo = parseFloat(formData.get("costo") as string) || 0
