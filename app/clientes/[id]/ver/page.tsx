@@ -82,7 +82,7 @@ export default function VerClientePage() {
     }
   }, [clienteId])
 
-  if (loading) {
+  if (showPageLoading) {
     return <showPageLoading message="Cargando información del cliente..." />
   }
 
