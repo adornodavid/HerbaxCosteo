@@ -81,7 +81,7 @@ export default function EditarClientePage() {
     const nombre = formDataToSend.get("nombre") as string
     const clave = formDataToSend.get("clave") as string
 
-    if (!nombre || nombre.trim().length < 3 || !clave || clave.trim().length < 1) {
+    if (!nombre || nombre.trim().length < 3) {
       setModalValidation({
         Titulo: "Datos incompletos",
         Mensaje: "Completa los datos obligatorios, no se pueden quedar en blanco.",
