@@ -47,6 +47,20 @@ export default function EditarClientePage() {
   const esAdminDOs = useMemo(() => user && RolesAdminDOs.includes(user.RolId), [user])
   const clienteId = Number(params.id)
 
+  // --- Estados ---
+  // Cargar contenido en variables
+  const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
+  const [ModalValidation, setModalValidation] = useState<propsPageModalValidation>()
+  const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
+  const [ModalError, setModalError] = useState<propsPageModalError>()
+  const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
+  // Mostrar/Ocultar contenido
+  onst [showPageLoading, setShowPageLoading] = useState(true)
+  const [showModalValidation, setShowModalValidation] = useState(false)
+  const [showModalAlert, setShowModalAlert] = useState(false)
+  const [showModalError, setShowModalError] = useState(false)
+  const [showModalTutorial, setShowModalTutorial] = useState(false)
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
