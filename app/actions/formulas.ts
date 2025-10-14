@@ -114,8 +114,9 @@ export async function crearFormula(formData: FormData) {
     // Retorno de datos
     return { success: true, data: data.id }
   } catch (error) {
+    // Retorno de información
     console.error("Error en crearFormula de actions/formulas:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar funcion crearFormula de actions/formulas" }
+    return { success: false, error: "Error interno del servidor, al ejecutar funcion crearFormula de actions/formulas: " + error }
   }
 }
 
