@@ -54,18 +54,17 @@ export default function EditarClientePage() {
   const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
   const [ModalError, setModalError] = useState<propsPageModalError>()
   const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [existingImageUrl, setExistingImageUrl] = useState<string>("")
   // Mostrar/Ocultar contenido
-  onst [showPageLoading, setShowPageLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
+  const [showPageLoading, setShowPageLoading] = useState(true)
   const [showModalValidation, setShowModalValidation] = useState(false)
   const [showModalAlert, setShowModalAlert] = useState(false)
   const [showModalError, setShowModalError] = useState(false)
   const [showModalTutorial, setShowModalTutorial] = useState(false)
-
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [existingImageUrl, setExistingImageUrl] = useState<string>("")
-
+  const [showProcessing, setShowProcessing] = useState(false)
   const [formData, setFormData] = useState({
     nombre: "",
     clave: "",
@@ -73,14 +72,7 @@ export default function EditarClientePage() {
     telefono: "",
     email: "",
   })
-
-  const [modalAlert, setModalAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
-  const [modalError, setModalError] = useState<ModalError>({ Titulo: "", Mensaje: "" })
-  const [modalValidation, setModalValidation] = useState<ModalError>({ Titulo: "", Mensaje: "" })
-  const [showModalAlert, setShowModalAlert] = useState(false)
-  const [showModalError, setShowModalError] = useState(false)
-  const [showModalValidation, setShowModalValidation] = useState(false)
-  const [showProcessing, setShowProcessing] = useState(false)
+  
 
   useEffect(() => {
     const cargarDatosCliente = async () => {
