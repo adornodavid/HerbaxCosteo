@@ -304,6 +304,35 @@ export default function ZonasPage() {
   // --- Contenido ---
   return (
     <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
+      {/* -- Componentes -- */}
+      {showModalAlert && (
+        <PageModalAlert
+          Titulo={ModalAlert.Titulo}
+          Mensaje={ModalAlert.Mensaje}
+          isOpen={true}
+          onClose={() => setShowModalAlert(false)}
+        />
+      )}
+
+      {showModalError && (
+        <PageModalError
+          Titulo={ModalError.Titulo}
+          Mensaje={ModalError.Mensaje}
+          isOpen={true}
+          onClose={() => setShowModalError(false)}
+        />
+      )}
+
+      {showModalTutorial && (
+        <PageModalTutorial
+          Titulo={ModalTutorial.Titulo}
+          Subtitulo={ModalTutorial.Subtitulo}
+          VideoUrl={ModalTutorial.VideoUrl}
+          isOpen={true}
+          onClose={() => setShowModalTutorial(false)}
+        />
+      )}
+      
       {/* 1. Título y Botón */}
       {showPageTituloMasNuevo && (
         <PageTitlePlusNew
