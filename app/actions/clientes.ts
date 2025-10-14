@@ -37,6 +37,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   * SPECIALS-ESPECIALES ()
     - estatusActivoCliente / actCliente
     - listaDesplegableClientes / ddlClientes
+    - estadisticasFormulas / statsFormlas
 ================================================== */
 
 /*==================================================
