@@ -174,10 +174,6 @@ export default function ClientesPage() {
 
       const Result = await ejecutarBusqueda(auxClienteId, "", "", "True")
       if (Result.success) {
-        const modalAlertData: PageModalAlert = {
-          Titulo: "En ejecución de búsqueda de carga inicial",
-          Mensaje: Result.mensaje,
-        }
         setModalAlert({
           Titulo: "En ejecución de búsqueda de carga inicial",
           Mensaje: Result.mensaje,
