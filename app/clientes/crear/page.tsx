@@ -47,14 +47,18 @@ export default function CrearClientePage() {
 
   // --- Estados ---
   // Cargar contenido en variables
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [modalAlert, setModalAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
-  const [modalError, setModalError] = useState<ModalError>({ Titulo: "", Mensaje: "" })
-  const [modalValidation, setModalValidation] = useState<ModalError>({ Titulo: "", Mensaje: "" })
+  const [ModalValidation, setModalValidation] = useState<propsPageModalValidation>()
+  const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
+  const [ModalError, setModalError] = useState<propsPageModalError>()
+  const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
+  // Mostrar/Ocultar contenido
+  const [showPageLoading, setShowPageLoading] = useState(true)
+  const [showModalValidation, setShowModalValidation] = useState(false)
   const [showModalAlert, setShowModalAlert] = useState(false)
   const [showModalError, setShowModalError] = useState(false)
-  const [showModalValidation, setShowModalValidation] = useState(false)
+  const [showModalTutorial, setShowModalTutorial] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showProcessing, setShowProcessing] = useState(false)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
