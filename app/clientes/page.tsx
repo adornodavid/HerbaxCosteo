@@ -17,7 +17,7 @@ import type {
   propsPageTitlePlusNew,
   propsPageModalAlert,
   propsPageModalError,
-  propsPageModalTutoria,
+  propsPageModalTutorial,
 } from "@/types/common"
 // -- Librerias --
 // Configuraciones
