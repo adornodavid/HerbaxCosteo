@@ -90,6 +90,8 @@ export default function VerClientePage() {
     }    
   }, [authLoading, user, router, esAdminDOs, clienteId])
 
+  // --- Renders ---
+  // Contenidos auxiliares
   if (showPageLoading) {
     return <showPageLoading message="Cargando información..." />
   }
@@ -103,6 +105,7 @@ export default function VerClientePage() {
     )
   }
 
+  // Contenido principal
   return (
     <div className="container mx-auto py-6 space-y-6">
       {/* -- Componentes -- */}
