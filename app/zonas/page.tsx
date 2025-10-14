@@ -197,6 +197,7 @@ export default function ZonasPage() {
       if (resultado) {
         await cargarDatosIniciales()
       } else {
+        // Mostrar error
         setModalError({
           Titulo: "Error al cambiar estatus",
           Mensaje: "No se pudo cambiar el estatus del elemento seleccionado. Por favor, intente nuevamente.",
@@ -204,6 +205,7 @@ export default function ZonasPage() {
         setShowModalError(true)
       }
     } catch (error) {
+      // Mostrar error
       console.error("Error en handleToggleStatusClickActivo:", error)
       setModalError({
         Titulo: "Error al cambiar estatus",
