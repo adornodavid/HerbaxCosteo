@@ -191,11 +191,10 @@ export default function ZonasPage() {
     try {
       // Toggle the status (if active, make inactive; if inactive, make active)
       const nuevoEstatus = !clienteActivo
-
+      
+      // Ejecutar función
       const resultado = await estatusActivoZona(Id, nuevoEstatus)
-
       if (resultado) {
-        // Success - refresh the list
         await cargarDatosIniciales()
       } else {
         // Error
