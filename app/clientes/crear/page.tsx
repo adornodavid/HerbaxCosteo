@@ -69,7 +69,11 @@ export default function CrearClientePage() {
     const nombre = formData.get("nombre") as string
     const clave = formData.get("clave") as string
 
-    if (!nombre || nombre.trim().length < 3 || !clave || clave.trim().length < 1) {
+    if (!nombre || nombre.trim().length < 3) {
+      setModalValidation({
+            Titulo: "Información necesaria incompleta.",
+            Mensaje: "Favor de completar los campos obligatorios (Nombre, Clave).",
+          })
       setShowModalValidation(true)
       return
     }
@@ -130,8 +134,8 @@ export default function CrearClientePage() {
 
       {showModalValidation && (
         <PageModalValidation
-          Titulo="Información necesaria incompleta."
-          Mensaje="Favor de completar los campos obligatorios (Nombre, Clave)."
+          Titulo=
+          Mensaje=
           isOpen={true}
           onClose={() => setShowModalValidation(false)}
         />
