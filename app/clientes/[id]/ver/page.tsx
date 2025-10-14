@@ -1,14 +1,28 @@
 "use client"
 
+/* ==================================================
+	Imports
+================================================== */
+// -- Assets --
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { PageLoadingScreen } from "@/components/page-loading-screen"
-import { PageTitlePlusNew } from "@/components/page-title-plus-new"
-import { obtenerClientes } from "@/app/actions/clientes"
-import type { Cliente } from "@/types/clientes"
 import { Edit, Trash2, ArrowLeft } from "lucide-react"
+// -- Tipados (interfaces, clases, objetos) --
+import type { Cliente } from "@/types/clientes"
+// -- Librerias --
+// Configuraciones
+import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
+// -- Componentes --
+import { PageTitlePlusNew } from "@/components/page-title-plus-new"
+import { PageLoadingScreen } from "@/components/page-loading-screen"
+import { PageModalAlert } from "@/components/page-modal-alert"
+import { PageModalError } from "@/components/page-modal-error"
+import { PageModalTutorial } from "@/components/page-modal-tutorial"
+// -- Backend --
+import { useAuth } from "@/contexts/auth-context"
+import { obtenerClientes } from "@/app/actions/clientes"
 
 export default function VerClientePage() {
   const params = useParams()
