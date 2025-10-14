@@ -12,10 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
-import type { Cliente } from "@/types/clientes"
 import type {
-  propsPageLoadingScreen,
-  propsPageTitlePlusNew,
   propsPageModalValidation,
   propsPageModalAlert,
   propsPageModalError,
@@ -23,16 +20,12 @@ import type {
 } from "@/types/common"
 // -- Librerias --
 // Configuraciones
-import { RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
-// -- Componentes --
-import { PageLoadingScreen } from "@/components/page-loading-screen"
+import { RolesAdminDOs } from "@/lib/config"
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageProcessing } from "@/components/page-processing"
 import { PageModalValidation } from "@/components/page-modal-validation"
-import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
-import { PageModalTutorial } from "@/components/page-modal-tutorial"
-// -- Backend -- 
+// -- Backend --
 import { useAuth } from "@/contexts/auth-context"
 import { crearCliente } from "@/app/actions/clientes"
 
@@ -61,7 +54,7 @@ export default function CrearClientePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showProcessing, setShowProcessing] = useState(false)
 
-  // -- Funciones -- 
+  // -- Funciones --
   const ejecutarRegistro = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
@@ -71,9 +64,9 @@ export default function CrearClientePage() {
 
     if (!nombre || nombre.trim().length < 3) {
       setModalValidation({
-            Titulo: "Información necesaria incompleta.",
-            Mensaje: "Favor de completar los campos obligatorios (Nombre, Clave).",
-          })
+        Titulo: "Información necesaria incompleta.",
+        Mensaje: "Favor de completar los campos obligatorios (Nombre, Clave).",
+      })
       setShowModalValidation(true)
       return
     }
@@ -131,10 +124,10 @@ export default function CrearClientePage() {
     } else {
       setImagePreview(null)
     }
-  }  
+  }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">      
+    <div className="container mx-auto py-6 space-y-6">
       <PageProcessing isOpen={showProcessing} />
 
       {showModalValidation && (
@@ -157,8 +150,8 @@ export default function CrearClientePage() {
 
       {showModalError && (
         <PageModalError
-          Titulo={modalError.Titulo}
-          Mensaje={modalError.Mensaje}
+          Titulo={ModalError.Titulo}
+          Mensaje={ModalError.Mensaje}
           isOpen={true}
           onClose={() => setShowModalError(false)}
         />
@@ -221,7 +214,7 @@ export default function CrearClientePage() {
                     <img
                       src={imagePreview || "/placeholder.svg"}
                       alt="Preview"
-                      className="w-full h-auto object-cover"
+                      className="h-full w-auto object-cover"
                     />
                   ) : (
                     <span className="text-muted-foreground text-sm">Sin imagen seleccionada</span>
