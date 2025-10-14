@@ -35,7 +35,7 @@ export const AppConfig = {
 // Exportar arrays individualmente (opcional)
 export const RolesAdmin = [1, 2, 3] as const
 export const RolesAdminDDLs = [1, 2, 3] as const // Permisos similares en ddls
-export const RolesAdmin = [1, 2, 3] as const // Permisos similares en ddls
+export const RolesAdminDo = [1, 2, 3] as const // Permisos similares en ddls
 export const RolesAdminArkamia = 1 as const
 export const RolesAdminSistema = 1 as const
 export const RolesAdminDirector = 3 as const
