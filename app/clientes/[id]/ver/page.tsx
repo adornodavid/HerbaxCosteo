@@ -76,6 +76,7 @@ export default function VerClientePage() {
       }
     }
 
+    // Si se obtuvo el id
     if (clienteId) {
       cargarCliente()
     }
