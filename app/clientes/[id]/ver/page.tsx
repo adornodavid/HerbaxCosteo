@@ -13,14 +13,13 @@ import { Edit, Trash2, ArrowLeft } from "lucide-react"
 import type { Cliente } from "@/types/clientes"
 import type {
   propsPageLoadingScreen,
-  propsPageTitlePlusNew,
   propsPageModalAlert,
   propsPageModalError,
   propsPageModalTutorial,
 } from "@/types/common"
 // -- Librerias --
 // Configuraciones
-import { RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
+import { RolesAdminDOs } from "@/lib/config"
 // -- Componentes --
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageLoadingScreen } from "@/components/page-loading-screen"
@@ -67,7 +66,7 @@ export default function VerClientePage() {
       const cargarCliente = async () => {
         try {
           setShowPageLoading(true)
-          
+
           const result = await obtenerClientes(clienteId, "", "", "", "", "", "Todos")
           if (result.success && result.data && result.data.length > 0) {
             setCliente(result.data[0])
@@ -87,13 +86,13 @@ export default function VerClientePage() {
       if (clienteId) {
         cargarCliente()
       }
-    }    
+    }
   }, [authLoading, user, router, esAdminDOs, clienteId])
 
   // --- Renders ---
   // Contenidos auxiliares
   if (showPageLoading) {
-    return <showPageLoading message="Cargando información..." />
+    return <PageLoadingScreen message="Cargando información..." />
   }
 
   // Si no se cargo el elemento principal
@@ -157,7 +156,7 @@ export default function VerClientePage() {
                     : "/placeholder.svg?height=400&width=400&text=Cliente"
                 }
                 alt={cliente.nombre}
-                className="w-full h-full object-cover"
+                className="w-full h-auto object-cover"
               />
             </div>
 
