@@ -61,6 +61,10 @@ export default function CrearClientePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showProcessing, setShowProcessing] = useState(false)
 
+  // -- Funciones -- 
+
+
+  // -- Manejadores (Handles) --
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
