@@ -112,6 +112,7 @@ export async function crearCliente(formData: FormData) {
     // Retorno de datos
     return { success: true, data: data.id }
   } catch (error) {
+    // Retorno de información
     console.error("Error en crearCliente de actions/clientes:", error)
     return {
       success: false,
