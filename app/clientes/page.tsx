@@ -266,7 +266,7 @@ export default function ClientesPage() {
       }
       // Iniciar
       const inicializar = async () => {
-        setPageLoading(true)
+        setShowPageLoading(true)
         await cargarDatosIniciales()
       }
       inicializar()
@@ -275,7 +275,7 @@ export default function ClientesPage() {
 
   // --- Renders (contenidos auxiliares) ---
   // Loading
-  if (pageLoading) {
+  if (showPageLoading) {
     return <PageLoadingScreen message="Cargando Clientes..." />
   }
 
