@@ -229,7 +229,7 @@ export default function ZonasPage() {
 
   // --- Renders (contenidos auxiliares) ---
   // Loading
-  if (pageLoading) {
+  if (showPageLoading) {
     return <PageLoadingScreen message="Cargando Zonas..." />
   }
 
