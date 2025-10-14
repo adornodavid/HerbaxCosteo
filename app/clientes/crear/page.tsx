@@ -139,10 +139,19 @@ export default function CrearClientePage() {
 
       {showModalValidation && (
         <PageModalValidation
-          Titulo=
-          Mensaje=
+          Titulo={ModalValidation.Titulo}
+          Mensaje={ModalValidation.Mensaje}
           isOpen={true}
           onClose={() => setShowModalValidation(false)}
+        />
+      )}
+
+      {showModalAlert && (
+        <PageModalValidation
+          Titulo={ModalAlert.Titulo}
+          Mensaje={ModalAlert.Mensaje}
+          isOpen={true}
+          onClose={() => setShowModalAlert(false)}
         />
       )}
 
