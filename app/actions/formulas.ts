@@ -51,7 +51,12 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 // Función crearFormula / insFormula: función para crear una formula
 export async function crearFormula(formData: FormData) {
   try {
-    // Paso 1: Validar si no existe
+    // Paso 1: Validar variables obligatorias
+    if(!formData.get("nombre") || formData.get("nombre").length < 3){
+      return { success: false, error: "El o los parametros recibidos, estan incompletos. Favor de verificar." }
+    }
+
+    // Paso 2: Validar si no existe
     const existe: boolean = await (async () => {
       const resultado = await obtenerFormulas(
         -1,
@@ -63,7 +68,6 @@ export async function crearFormula(formData: FormData) {
       )
       return resultado.success && resultado.data && resultado.data.length >= 1
     })()
-
     if (existe) {
       return { success: false, error: "La formula que se intenta ingresar ya existe y no se puede proceder." }
     }
