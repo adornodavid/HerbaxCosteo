@@ -139,10 +139,10 @@ export default function ClientesPage() {
         return { success: false, mensaje: "No hay datos o la consulta falló." }
       }
     } catch (error) {
-      console.log("Error inesperado al buscar productos: ", error)
+      console.log("Error inesperado al buscar clientes: ", error)
       setListado([])
       setListadoSinResultados(true)
-      return { error: true, mensaje: "Error inesperado al buscar productos: " + error }
+      return { error: true, mensaje: "Error inesperado al buscar clientes: " + error }
     } finally {
       setIsSearching(false)
     }
