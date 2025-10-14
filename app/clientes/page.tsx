@@ -16,7 +16,7 @@ import type { Cliente } from "@/types/clientes"
 import type { ModalAlert, ModalError, ModalTutorial } from "@/types/common"
 // -- Librerias --
 // Configuraciones
-import { RolesAdmin, RolesAdminDLLs, RolesAdminDOs, RolesAdminArkamia, RolesAdminSistema, RolAdminDirector, RolAdminGerente, arrActivoTrue, arrActivoFalse } from "@/lib/config"
+import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, RolesAdminArkamia, RolesAdminSistema, RolAdminDirector, RolAdminGerente, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Componentes --
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageLoadingScreen } from "@/components/page-loading-screen"
@@ -38,7 +38,7 @@ export default function ClientesPage() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
   const esAdmin = useMemo(() => user && RolesAdmin.includes(user.RolId), [user])
-  const esAdminDDLs = useMemo(() => user && RolesAdminDLLs.includes(user.RolId), [user])
+  const esAdminDDLs = useMemo(() => user && RolesAdminDDLs.includes(user.RolId), [user])
   const esAdminDOs = useMemo(() => user && RolesAdminDOs.includes(user.RolId), [user])
   // Paginación
   const resultadosPorPagina = 20
@@ -162,7 +162,7 @@ export default function ClientesPage() {
     if (!user) return
 
     try {
-      const auxClienteId = esAdminDLLs === true ? -1 : user.ClienteId
+      const auxClienteId = esAdminDDLs === true ? -1 : user.ClienteId
 
       setPageTituloMasNuevo({
         Titulo: "Clientes",
@@ -270,7 +270,7 @@ export default function ClientesPage() {
       }
       inicializar()
     }
-  }, [authLoading, user, router, esAdmin, esAdminDLLs, esAdminDOs])
+  }, [authLoading, user, router, esAdmin, esAdminDDLs, esAdminDOs])
 
   // --- Renders (contenidos auxiliares) ---
   // Loading
