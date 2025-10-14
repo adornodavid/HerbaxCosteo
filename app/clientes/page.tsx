@@ -13,7 +13,6 @@ import { Search, RotateCcw, Edit, ToggleLeft, ToggleRight, EyeOff, X, Eye } from
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
-import type { PageLoadingScreen } from "@/types/common"
 // -- Librerias --
 // Configuraciones
 import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
@@ -24,11 +23,10 @@ import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
 import { PageModalTutorial } from "@/components/page-modal-tutorial"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-// -- Frontend --
-
-// -- Backend --
-import { useAuth } from "@/contexts/auth-context"
-import { obtenerClientes, estatusActivoCliente } from "@/app/actions/clientes"
+import type { ModalAlert, ModalError, ModalTutorial } from "@/types/common" // Import ModalAlert, ModalError, ModalTutorial
+import { useAuth } from "@/hooks/useAuth" // Import useAuth hook
+import { obtenerClientes } from "@/services/clientes" // Import obtenerClientes function
+import { estatusActivoCliente } from "@/services/clientes" // Import estatusActivoCliente function
 
 /* ==================================================
 	Componente Principal (Pagina)
@@ -139,14 +137,6 @@ export default function ClientesPage() {
       } else {
         console.log("No hay datos o la consulta falló.")
         return { success: false, mensaje: "No hay datos o la consulta falló." }
-      }
-
-      if (!result.success) {
-        console.error("Error en búsqueda del filtro de búsqueda: ", result.error)
-        console.log("Error en búsqueda del filtro de búsqueda: ", result.error)
-        setListado([])
-        setListadoSinResultados(true)
-        return { success: false, mensaje: "Error en búsqueda del filtro de búsqueda: " + result.error }
       }
     } catch (error) {
       console.log("Error inesperado al buscar productos: ", error)
@@ -266,7 +256,7 @@ export default function ClientesPage() {
       }
       // Iniciar
       const inicializar = async () => {
-        setPageLoading()
+        setPageLoading({ message: "Cargando Clientes..." })
         setShowPageLoading(true)
         await cargarDatosIniciales()
       }
