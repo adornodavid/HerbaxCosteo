@@ -39,7 +39,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
     - eliminarRegistroIncompleto
   * SPECIALS-ESPECIALES ()
     - estatusActivoFormula / actFormula
-    - estadisticasFormulasTotales / statsFormlasTotales
+    - estadisticasFormulas / statsFormlas
 ================================================== */
 
 /*==================================================
