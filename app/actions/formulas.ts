@@ -54,7 +54,7 @@ export async function crearFormula(formData: FormData) {
     // Paso 1: Recibir variables
     const codigo = (formData.get("codigo") as string)?.trim()
     const nombre = (formData.get("nombre") as string)?.trim()
-    const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || null
+    const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || 0
     const imagen = formData.get("imagen") as File
     const costo = parseFloat(formData.get("costo") as string) || 0
     const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
