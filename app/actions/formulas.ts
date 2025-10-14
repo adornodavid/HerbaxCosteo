@@ -81,8 +81,9 @@ export async function crearFormula(formData: FormData) {
       const resultadoImagen = await imagenSubir(imagen, auxNombre, "formulas")
       if (!resultadoImagen.success) {
         return { success: false, error: resultadoImagen.error }
-      }
-      imagenurl = resultadoImagen.url || ""
+      } else {
+        imagenurl = resultadoImagen.url || ""
+      }      
     }
 
     // Paso 3: Pasar datos del formData a variables con tipado de datos
