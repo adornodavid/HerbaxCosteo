@@ -320,7 +320,7 @@ export async function eliminarCliente(id: number) {
     revalidatePath("/clientes")
 
     // Paso 4: Return resultados
-    return { success: true }
+    return { success: true, data: { id, message: "Cliente eliminado exitosamente" } }
   } catch (error) {
     console.error("Error en eliminarCliente de actions/clientes: " + error)
     // Return info
