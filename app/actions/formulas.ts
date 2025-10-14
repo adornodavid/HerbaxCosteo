@@ -125,12 +125,12 @@ export async function crearFormula(formData: FormData) {
 ================================================== */
 //Función: obtenerFormulas: funcion para obtener todas las formulas
 export async function obtenerFormulas(
-  id = -1,
-  codigo = "",
-  nombre = "",
-  activo = "Todos",
-  clienteid = -1,
-  productoid = -1,
+  id: number = -1,
+  codigo: string = "",
+  nombre: string = "",
+  activo: string = "Todos",
+  clienteid: number = -1,
+  productoid: number = -1,
 ) {
   try {
     // Paso 1: Obtener arrays de las formulasid que esten por cliente y/o por producto
