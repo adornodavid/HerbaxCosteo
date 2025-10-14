@@ -170,29 +170,35 @@ export default function EliminarClientePage() {
   return (
     <div className="container mx-auto py-6 space-y-6">
       {/* -- Componentes -- */}
-      <PageModalValidation
-        Titulo={ModalValidation.Titulo}
-        Mensaje={ModalValidation.Mensaje}
-        isOpen={showModalValidation}
-        onClose={() => {
-          setShowModalValidation(false)
-          router.push("/clientes")
-        }}
-      />
+      {showModalValidation && (
+        <PageModalValidation
+          Titulo={ModalValidation.Titulo}
+          Mensaje={ModalValidation.Mensaje}
+          isOpen={showModalValidation}
+          onClose={() => {
+            setShowModalValidation(false)
+            router.push("/clientes")
+          }}
+        />
+      )}
 
-      <PageModalAlert
-        Titulo={ModalAlert.Titulo}
-        Mensaje={ModalAlert.Mensaje}
-        isOpen={showModalAlert}
-        onClose={() => setShowModalAlert(false)}
-      />
+      {showModalAlert && (
+        <PageModalAlert
+          Titulo={ModalAlert.Titulo}
+          Mensaje={ModalAlert.Mensaje}
+          isOpen={showModalAlert}
+          onClose={() => setShowModalAlert(false)}
+        />
+      )}
 
-      <PageModalError
-        Titulo={ModalError.Titulo}
-        Mensaje={ModalError.Mensaje}
-        isOpen={showModalError}
-        onClose={() => setShowModalError(false)}
-      />
+      {showModalError && (
+        <PageModalError
+          Titulo={ModalError.Titulo}
+          Mensaje={ModalError.Mensaje}
+          isOpen={showModalError}
+          onClose={() => setShowModalError(false)}
+        />
+      )}
 
       <PageTitlePlusNew
         Titulo="Eliminar cliente"
