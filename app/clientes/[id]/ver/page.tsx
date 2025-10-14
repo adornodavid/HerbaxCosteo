@@ -91,7 +91,7 @@ export default function VerClientePage() {
   }, [authLoading, user, router, esAdminDOs, clienteId])
 
   if (showPageLoading) {
-    return <showPageLoading message="Cargando información del cliente..." />
+    return <showPageLoading message="Cargando información..." />
   }
 
   if (!cliente) {
