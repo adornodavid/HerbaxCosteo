@@ -71,10 +71,11 @@ export async function crearFormula(formData: FormData) {
     // Paso 2: Subir imagen para obtener su url
     let imagenurl = ""
     const imagen = formData.get("imagen") as File
+    const auxNombre = formData.get("nombre") as string
     if (imagen && imagen.size > 0) {
-      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "formulas")
+      const resultadoImagen = await imagenSubir(imagen, auxNombre, "clientes")
       if (!resultadoImagen.success) {
-        return { success: false, error: resultadoImagen.error || "Error al subir la imagen" }
+        return { success: false, error: resultadoImagen.error }
       }
       imagenurl = resultadoImagen.url || ""
     }
