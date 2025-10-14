@@ -217,21 +217,25 @@ export default function VerClientePage() {
       </Card>
 
       <div className="flex gap-4 justify-center">
-        <Button
-          className="bg-yellow-400 hover:bg-yellow-500 text-black"
-          onClick={() => router.push(`/clientes/${clienteId}/editar`)}
-        >
-          <Edit className="mr-2 h-4 w-4" />
-          Actualizar
-        </Button>
+        {esAdminDOs && (
+          <>
+            <Button
+              className="bg-yellow-400 hover:bg-yellow-500 text-black"
+              onClick={() => router.push(`/clientes/${clienteId}/editar`)}
+            >
+              <Edit className="mr-2 h-4 w-4" />
+              Actualizar
+            </Button>
 
-        <Button
-          className="bg-red-600 hover:bg-red-700 text-white"
-          onClick={() => router.push(`/clientes/${clienteId}/eliminar`)}
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          Eliminar
-        </Button>
+            <Button
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={() => router.push(`/clientes/${clienteId}/eliminar`)}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Eliminar
+            </Button>
+          </>
+        )}
 
         <Button className="bg-gray-500 hover:bg-gray-600 text-white" onClick={() => router.push("/clientes")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
