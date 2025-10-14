@@ -102,15 +102,19 @@ export default function EliminarClientePage() {
           })
           setShowModalAlert(true)
         } else {
-          setModalErrorTitle("Error en el momento de ejecutar la eliminacion del cliente")
-          setModalErrorMessage("Ocurrió un error desconocido durante la eliminación")
+          setModalError({
+            Titulo: "Error en el momento de ejecutar la eliminacion del cliente",
+            Mensaje: "Ocurrió un error desconocido durante la eliminación",
+          })
           setShowModalError(true)
         }
       }
     } catch (error) {
       console.error("Error al eliminar cliente:", error)
-      setModalErrorTitle("Error en el momento de ejecutar la eliminacion del cliente")
-      setModalErrorMessage("Error inesperado al eliminar el cliente")
+      setModalError({
+        Titulo: "Error en el momento de ejecutar la eliminacion del cliente",
+        Mensaje: "Error inesperado al eliminar el cliente: " + error,
+      })
       setShowModalError(true)
     }
   }
