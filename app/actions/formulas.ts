@@ -79,10 +79,10 @@ export async function crearFormula(formData: FormData) {
     const auxNombre = formData.get("nombre") as string
     if (imagen && imagen.size > 0) {
       const resultadoImagen = await imagenSubir(imagen, auxNombre, "formulas")
-      if (!resultadoImagen.success) {
-        return { success: false, error: resultadoImagen.error }
-      } else {
+      if (resultadoImagen.success) {
         imagenurl = resultadoImagen.url || ""
+      } else {
+        return { success: false, error: resultadoImagen.error }
       }      
     }    
 
