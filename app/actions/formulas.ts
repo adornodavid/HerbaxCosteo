@@ -52,7 +52,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 export async function crearFormula(formData: FormData) {
   try {
     // Paso 1: Validar variables obligatorias
-    if(!formData.get("nombre") || formData.get("nombre").length < 3){
+    const nombre = (formData.get("nombre") as string)?.trim()
+    if(!nombre || nombre.length < 3){
       return { success: false, error: "El o los parametros recibidos, estan incompletos. Favor de verificar." }
     }
 
@@ -72,7 +73,7 @@ export async function crearFormula(formData: FormData) {
       return { success: false, error: "La formula que se intenta ingresar ya existe y no se puede proceder." }
     }
 
-    // Paso 2: Subir imagen para obtener su url
+    // Paso 3: Subir imagen para obtener su url
     let imagenurl = ""
     const imagen = formData.get("imagen") as File
     const auxNombre = formData.get("nombre") as string
