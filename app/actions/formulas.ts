@@ -111,7 +111,7 @@ export async function crearFormula(formData: FormData) {
 
     revalidatePath("/formulas")
 
-    // Return resultados
+    // Retorno de datos
     return { success: true, data: data.id }
   } catch (error) {
     console.error("Error en crearFormula de actions/formulas:", error)
