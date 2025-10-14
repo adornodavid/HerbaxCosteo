@@ -51,27 +51,16 @@ export default function EliminarClientePage() {
   const [cliente, setCliente] = useState<Cliente | null>(null)
   const [loading, setLoading] = useState(true)
   const [confirmText, setConfirmText] = useState("")
+  const [ModalValidation, setModalValidation] = useState<propsPageModalValidation>()
   const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
   const [ModalError, setModalError] = useState<propsPageModalError>()
   const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
+  const [showModalValidation, setShowModalValidation] = useState(false)
   const [showModalAlert, setShowModalAlert] = useState(false)
   const [showModalError, setShowModalError] = useState(false)
   const [showModalTutorial, setShowModalTutorial] = useState(false)
-
-  const [showModalValidation, setShowModalValidation] = useState(false)
-  const [modalValidationTitle, setModalValidationTitle] = useState("")
-  const [modalValidationMessage, setModalValidationMessage] = useState("")
-  const [modalValidationClose, setModalValidationClose] = useState("")
-
-  const [showModalAlert, setShowModalAlert] = useState(false)
-  const [modalAlertTitle, setModalAlertTitle] = useState("")
-  const [modalAlertMessage, setModalAlertMessage] = useState("")
-
-  const [showModalError, setShowModalError] = useState(false)
-  const [modalErrorTitle, setModalErrorTitle] = useState("")
-  const [modalErrorMessage, setModalErrorMessage] = useState("")
 
   // -- Funciones -- 
   const ejecutarEliminar = async () => {
