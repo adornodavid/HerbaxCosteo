@@ -46,22 +46,33 @@ export default function VerClientePage() {
   // Cargar contenido en variables
   const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
   const [cliente, setCliente] = useState<Cliente | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
+  const [ModalError, setModalError] = useState<propsPageModalError>()
+  const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
+  const [showModalAlert, setShowModalAlert] = useState(false)
+  const [showModalError, setShowModalError] = useState(false)
+  const [showModalTutorial, setShowModalTutorial] = useState(false)
 
   useEffect(() => {
     const cargarCliente = async () => {
       try {
+        setShowPageLoading(true)
+        
         const result = await obtenerClientes(clienteId, "", "", "", "", "", "Todos")
-
         if (result.success && result.data && result.data.length > 0) {
           setCliente(result.data[0])
         }
       } catch (error) {
-        console.error("Error al cargar cliente:", error)
+        console.error("Error al cargar información: ", error)
+        setModalError({
+          Titulo: "Error al cargar información",
+          Mensaje: error,
+        })
+        setShowModalError(true)
       } finally {
-        setLoading(false)
+        setShowPageLoading(false)
       }
     }
 
