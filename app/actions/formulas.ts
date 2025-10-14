@@ -55,6 +55,7 @@ export async function crearFormula(formData: FormData) {
     const codigo = (formData.get("codigo") as string)?.trim()
     const nombre = (formData.get("nombre") as string)?.trim()
     const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || null
+    const imagen = formData.get("imagen") as File
     const costo = parseFloat(formData.get("costo") as string) || 0
     const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
     const activo = true
@@ -75,7 +76,6 @@ export async function crearFormula(formData: FormData) {
 
     // Paso 4: Subir imagen para obtener su url
     let imagenurl = ""
-    const imagen = formData.get("imagen") as File
     const auxNombre = formData.get("nombre") as string
     if (imagen && imagen.size > 0) {
       const resultadoImagen = await imagenSubir(imagen, auxNombre, "formulas")
