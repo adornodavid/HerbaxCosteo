@@ -89,13 +89,17 @@ export default function EliminarClientePage() {
       const result = await eliminarCliente(clienteId)
 
       if (result.success) {
-        setModalValidationTitle("Cliente eliminado exitosamente")
-        setModalValidationMessage("El cliente ha sido eliminado correctamente del sistema.")
+        setModalValidation({
+          Titulo: "Cliente eliminado exitosamente",
+          Mensaje: "El cliente ha sido eliminado correctamente del sistema.",
+        })
         setShowModalValidation(true)
       } else {
         if (result.error) {
-          setModalAlertTitle("Error durante ejecucion de eliminado")
-          setModalAlertMessage(result.error)
+          setModalAlert({
+            Titulo: "Error durante ejecucion de eliminado",
+            Mensaje: result.error,
+          })
           setShowModalAlert(true)
         } else {
           setModalErrorTitle("Error en el momento de ejecutar la eliminacion del cliente")
