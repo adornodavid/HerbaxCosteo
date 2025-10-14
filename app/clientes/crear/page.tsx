@@ -100,6 +100,11 @@ export default function CrearClientePage() {
       setShowProcessing(false)
       alert("Error inesperado al crear cliente")
       console.error(error)
+      setModalAlert({
+        Titulo: "Información necesaria incompleta.",
+        Mensaje: "Favor de completar los campos obligatorios (Nombre, Clave).",
+      })
+      setShowModalAlert(true)
     } finally {
       setIsSubmitting(false)
     }
