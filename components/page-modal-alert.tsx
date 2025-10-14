@@ -11,7 +11,7 @@ interface PageModalAlertProps {
   onClose: () => void
 }
 
-export function PageModalAlert({ Titulo, Mensaje, isOpen, onClose }: PageModalAlertProps) {
+export function PageModalAlert({ Titulo, Mensaje, isOpen, onClose }: PageModalAlert) {
   if (!isOpen) return null
 
   return (
