@@ -73,9 +73,17 @@ export default function EliminarClientePage() {
   const [modalErrorTitle, setModalErrorTitle] = useState("")
   const [modalErrorMessage, setModalErrorMessage] = useState("")
 
+  // --- Inicio (carga inicial y seguridad) ---
   useEffect(() => {
+    // Validar
+    if (!user || user.RolId === 0) {
+      router.push("/login")
+      return
+    }
+    // Iniciar    
     const cargarCliente = async () => {
       try {
+        setShowPageLoading(true)
         const result = await obtenerClientes(clienteId, "", "", "", "", "", "Todos")
 
         if (result.success && result.data && result.data.length > 0) {
@@ -83,15 +91,20 @@ export default function EliminarClientePage() {
         }
       } catch (error) {
         console.error("Error al cargar cliente:", error)
+        setModalError({
+            Titulo: "Error al cargar información",
+            Mensaje: error,
+          })
+          setShowModalError(true)
       } finally {
-        setLoading(false)
+        setShowPageLoading(false)
       }
     }
 
     if (clienteId) {
       cargarCliente()
     }
-  }, [clienteId])
+  }, [authLoading, user, router, esAdminDOs, clienteId])
 
   const ejecutarEliminar = async () => {
     if (confirmText.trim().toUpperCase() !== "ELIMINAR") {
