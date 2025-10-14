@@ -587,48 +587,52 @@ export default function ClientesPage() {
                         <span className="text-xs text-muted-foreground mt-1">Ver</span>
                       </div>
 
-                      {/* Editar */}
-                      <div className="flex flex-col items-center">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          title="Editar"
-                          onClick={() => router.push(`/clientes/${elemento.ClienteId}/editar`)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <span className="text-xs text-muted-foreground mt-1">Editar</span>
-                      </div>
+                      {esAdminDOs && (
+                        <>
+                          {/* Editar */}
+                          <div className="flex flex-col items-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Editar"
+                              onClick={() => router.push(`/clientes/${elemento.ClienteId}/editar`)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <span className="text-xs text-muted-foreground mt-1">Editar</span>
+                          </div>
 
-                      {/* Estatus */}
-                      <div className="flex flex-col items-center">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          title={elemento.ClienteActivo ? "Inactivar" : "Activar"}
-                          onClick={() => handleToggleStatusClickActivo(elemento.ClienteId, elemento.ClienteActivo)}
-                        >
-                          {elemento.ClienteActivo ? (
-                            <ToggleRight className="h-4 w-4 text-red-500" />
-                          ) : (
-                            <ToggleLeft className="h-4 w-4 text-green-500" />
-                          )}
-                        </Button>
-                        <span className="text-xs text-muted-foreground mt-1">Estatus</span>
-                      </div>
+                          {/* Estatus */}
+                          <div className="flex flex-col items-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title={elemento.ClienteActivo ? "Inactivar" : "Activar"}
+                              onClick={() => handleToggleStatusClickActivo(elemento.ClienteId, elemento.ClienteActivo)}
+                            >
+                              {elemento.ClienteActivo ? (
+                                <ToggleRight className="h-4 w-4 text-red-500" />
+                              ) : (
+                                <ToggleLeft className="h-4 w-4 text-green-500" />
+                              )}
+                            </Button>
+                            <span className="text-xs text-muted-foreground mt-1">Estatus</span>
+                          </div>
 
-                      {/* Eliminar */}
-                      <div className="flex flex-col items-center">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          title="Eliminar"
-                          onClick={() => router.push(`/clientes/${elemento.ClienteId}/eliminar`)}
-                        >
-                          <X className="h-4 w-4 text-red-500" />
-                        </Button>
-                        <span className="text-xs text-muted-foreground mt-1">Eliminar</span>
-                      </div>
+                          {/* Eliminar */}
+                          <div className="flex flex-col items-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Eliminar"
+                              onClick={() => router.push(`/clientes/${elemento.ClienteId}/eliminar`)}
+                            >
+                              <X className="h-4 w-4 text-red-500" />
+                            </Button>
+                            <span className="text-xs text-muted-foreground mt-1">Eliminar</span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
