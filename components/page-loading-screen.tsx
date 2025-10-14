@@ -1,10 +1,8 @@
 import Image from "next/image"
+import type { propsPageLoadingScreen } from "@/types/common"
 
-interface Props {
-  message?: string
-}
 
-export function PageLoadingScreen({ message = "Cargando Pagina..." }: Props) {
+export function PageLoadingScreen({ message = "Cargando Pagina..." }: propsPageLoadingScreen) {
   return (
     <div className="flex h-screen w-full items-center justify-center">
       <div className="flex items-center justify-center min-h-screen">
