@@ -16,7 +16,7 @@ import type { Cliente } from "@/types/clientes"
 import type { ModalAlert, ModalError, ModalTutorial } from "@/types/common"
 // -- Librerias --
 // Configuraciones
-import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, RolesAdminArkamia, RolesAdminSistema, RolAdminDirector, RolAdminGerente, arrActivoTrue, arrActivoFalse } from "@/lib/config"
+import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Componentes --
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageLoadingScreen } from "@/components/page-loading-screen"
@@ -512,7 +512,7 @@ export default function ClientesPage() {
             </div>
           )}
 
-          {!isSearching && Listado.length > 0 && (
+          {!isSearching && esAdminDOs && Listado.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {Listado.map((elemento) => (
                 <Card
