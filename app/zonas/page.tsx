@@ -14,7 +14,13 @@ import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-re
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { Zona } from "@/types/zonas"
-import type { ModalAlert, ModalError, ModalTutorial } from "@/types/common"
+import type {
+  propsPageLoadingScreen,
+  propsPageTitlePlusNew,
+  propsPageModalAlert,
+  propsPageModalError,
+  propsPageModalTutoria,
+} from "@/types/common"
 // -- Librerias --
 // Configuraciones
 import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
