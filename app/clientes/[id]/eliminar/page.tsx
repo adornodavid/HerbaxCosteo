@@ -12,16 +12,28 @@ import { Input } from "@/components/ui/input"
 import { Edit, Eye, ArrowLeft } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type { Cliente } from "@/types/clientes"
+import type {
+  propsPageLoadingScreen,
+  propsPageTitlePlusNew,
+  propsPageModalAlert,
+  propsPageModalError,
+  propsPageModalTutorial,
+} from "@/types/common"
 // -- Librerias --
-
+// Configuraciones
+import { RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Componentes --
 import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageModalValidation } from "@/components/page-modal-validation"
 import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
+import { PageModalTutorial } from "@/components/page-modal-tutorial"
 // -- Backend -- 
-import { obtenerClientes, eliminarCliente } from "@/app/actions/clientes" // Declare the variables here
+import { useAuth } from "@/contexts/auth-context"
+import { obtenerClientes, eliminarCliente } from "@/app/actions/clientes" 
+
+
 
 /* ==================================================
 	Componente Principal (Pagina)
