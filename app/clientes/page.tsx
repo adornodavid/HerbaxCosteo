@@ -16,7 +16,7 @@ import type { Cliente } from "@/types/clientes"
 import type { ModalAlert, ModalError, ModalTutorial } from "@/types/common"
 // -- Librerias --
 // Configuraciones
-import { RolesAdmin, RolesAdminArkamia, RolesAdminSistema, RolAdminDirector, RolAdminGerente, arrActivoTrue, arrActivoFalse } from "@/lib/config"
+import { RolesAdmin, RolesAdminDLLs, RolesAdminDOs, RolesAdminArkamia, RolesAdminSistema, RolAdminDirector, RolAdminGerente, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Componentes --
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageLoadingScreen } from "@/components/page-loading-screen"
