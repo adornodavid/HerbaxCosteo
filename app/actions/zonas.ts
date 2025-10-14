@@ -89,6 +89,8 @@ export async function crearZona(formData: FormData) {
         nombre,
         clave,
         imgurl: imagenurl,
+        fechacreacion: fecha,
+        activo,
       })
       .select("id")
       .single()
