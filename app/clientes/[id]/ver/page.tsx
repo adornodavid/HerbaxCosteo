@@ -36,8 +36,11 @@ export default function VerClientePage() {
   const clienteId = Number(params.id)
 
   // --- Estados ---
+  const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
   const [cliente, setCliente] = useState<Cliente | null>(null)
   const [loading, setLoading] = useState(true)
+  // Mostrar/Ocultar contenido
+  const [showPageLoading, setShowPageLoading] = useState(true)
 
   useEffect(() => {
     const cargarCliente = async () => {
