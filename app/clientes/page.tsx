@@ -47,9 +47,9 @@ export default function ClientesPage() {
   const [Listado, setListado] = useState<Cliente[]>([])
   const [TotalListado, setTotalListado] = useState(0)
   const [paginaActual, setPaginaActual] = useState(1)
-  const [ModalAlert, setModalAlert] = useState<PageModalAlert>({ Titulo: "", Mensaje: "" })
-  const [ModalError, setModalError] = useState<PageModalError>({ Titulo: "", Mensaje: "" })
-  const [ModalTutorial, setModalTutorial] = useState<PageModalTutorial>({ Titulo: "", Subtitulo: "", VideoUrl: "" })
+  const [ModalAlert, setModalAlert] = useState<PageModalAlert>()
+  const [ModalError, setModalError] = useState<PageModalError>()
+  const [ModalTutorial, setModalTutorial] = useState<PageModalTutorial>()
   const [ListadoSinResultados, setListadoSinResultados] = useState(false)
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
