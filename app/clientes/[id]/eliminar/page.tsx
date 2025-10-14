@@ -162,6 +162,7 @@ export default function EliminarClientePage() {
   // Contenido principal
   return (
     <div className="container mx-auto py-6 space-y-6">
+      {/* -- Componentes -- */}
       <PageModalValidation
         Titulo={modalValidationTitle}
         Mensaje={modalValidationMessage}
@@ -187,8 +188,8 @@ export default function EliminarClientePage() {
       />
 
       <PageTitlePlusNew
-        Titulo="Información de cliente"
-        Subtitulo="Información completa del cliente"
+        Titulo="Eliminar cliente"
+        Subtitulo="Eliminar la información completa del cliente"
         Visible={false}
         BotonTexto={null}
         Ruta={null}
