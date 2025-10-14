@@ -62,22 +62,6 @@ export default function CrearClientePage() {
   const [showProcessing, setShowProcessing] = useState(false)
 
   // -- Funciones -- 
-
-
-  // -- Manejadores (Handles) --
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    } else {
-      setImagePreview(null)
-    }
-  }
-
   const ejecutarRegistro = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
@@ -116,6 +100,31 @@ export default function CrearClientePage() {
       setIsSubmitting(false)
     }
   }
+
+  // --- Inicio (carga inicial y seguridad) ---
+  useEffect(() => {
+    // Validar
+    if (!user || user.RolId === 0) {
+      router.push("/login")
+      return
+    }
+  }, [authLoading, user, router, esAdminDOs])
+
+  // -- Manejadores (Handles) --
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    } else {
+      setImagePreview(null)
+    }
+  }
+
+  
 
   return (
     <div className="container mx-auto py-6 space-y-6">      
