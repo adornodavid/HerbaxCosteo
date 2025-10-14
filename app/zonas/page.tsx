@@ -215,23 +215,6 @@ export default function ZonasPage() {
     }
   }
 
-  // --- Inicio (carga inicial y seguridad) ---
-  useEffect(() => {
-    if (!authLoading) {
-      // Validar
-      if (!user || user.RolId === 0) {
-        router.push("/login")
-        return
-      }
-      // Iniciar
-      const inicializar = async () => {
-        setPageLoading(true)
-        await cargarDatosIniciales()
-      }
-      inicializar()
-    }
-  }, [authLoading, user, router, esAdmin])
-
   // -- Manejadores (Handles) --
   // Busqueda - Ejecutar
   const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
@@ -256,6 +239,23 @@ export default function ZonasPage() {
 
     cargarDatosIniciales()
   }
+  
+  // --- Inicio (carga inicial y seguridad) ---
+  useEffect(() => {
+    if (!authLoading) {
+      // Validar
+      if (!user || user.RolId === 0) {
+        router.push("/login")
+        return
+      }
+      // Iniciar
+      const inicializar = async () => {
+        setPageLoading(true)
+        await cargarDatosIniciales()
+      }
+      inicializar()
+    }
+  }, [authLoading, user, router, esAdmin])
 
   // --- Renders (contenidos auxiliares) ---
   // Loading
