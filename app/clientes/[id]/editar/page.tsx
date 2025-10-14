@@ -175,6 +175,7 @@ export default function EditarClientePage() {
     }
   }, [authLoading, user, router, esAdminDOs, clienteId])
 
+  // Manejadores (Handles)
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
