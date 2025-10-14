@@ -3,16 +3,9 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { PlusCircle } from "lucide-react"
+import type { propsPageTitlePlusNew } from "@/types/common"
 
-interface PageTitlePlusNewProps {
-  Titulo: string
-  Subtitulo: string
-  Visible: boolean
-  BotonTexto: string
-  Ruta: string
-}
-
-export function PageTitlePlusNew({ Titulo, Subtitulo, Visible, BotonTexto, Ruta }: PageTitlePlusNewProps) {
+export function PageTitlePlusNew({ Titulo, Subtitulo, Visible, BotonTexto, Ruta }: propsPageTitlePlusNew) {
   return (
     <div className="flex flex-col gap-4">
       <div>

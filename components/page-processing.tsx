@@ -3,7 +3,6 @@
 import { Loader2 } from "lucide-react"
 import type { propsPageProcessing } from "@/types/common"
 
-
 export function PageProcessing({ isOpen }: propsPageProcessing) {
   if (!isOpen) return null
 
