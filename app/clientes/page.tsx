@@ -10,13 +10,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, RotateCcw, Edit, ToggleLeft, ToggleRight, EyeOff, X, Eye } from "lucide-react"
-// -- Configuraciones --
-import { RolesAdmin, RolesAdmin2, RolesAdmin3, RolesCoordinador, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
 import type { ModalAlert, ModalError, ModalTutorial } from "@/types/common"
 // -- Librerias --
+// Configuraciones
+import { RolesAdmin, RolesAdmin2, RolesAdmin3, RolesCoordinador, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Componentes --
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageLoadingScreen } from "@/components/page-loading-screen"
