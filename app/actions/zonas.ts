@@ -49,34 +49,40 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 // Función: crearZona / insZona: Función para insertar una Zona
 export async function crearZona(formData: FormData) {
   try {
-    // Paso 1: Validar si no existe
+    // Paso 1: Recibir variables
+    const nombre = (formData.get("nombre") as string)?.trim()
+    const clave = (formData.get("clave") as string)?.trim()
+    const imagen = formData.get("imagen") as File
+    const fecha = new Date().toISOString().split("T")[0]
+    const activo = true
+
+    // Paso 2: Validar variables obligatorias
+    if (!nombre || nombre.length < 3) {
+      return { success: false, error: "El parametro Nombre, esta incompleto. Favor de verificar." }
+    }
+
+    // Paso 3: Validar si no existe
     const existe: boolean = await (async () => {
-      const resultado = await obtenerZonas(-1, formData.get("nombre") as string, formData.get("clave") as string)
+      const resultado = await obtenerZonas(-1, nombre, clave)
       return resultado.success && resultado.data && resultado.data.length >= 1
     })()
 
     if (existe) {
-      return { success: false, error: "La zona que se intenta ingresar ya existe y no se puede proceder" }
+      return { success: false, error: "La zona que se intenta ingresar ya existe y no se puede proceder." }
     }
 
-    // Paso 2: Subir imagen para obtener su url
+    // Paso 4: Subir imagen para obtener su url
     let imagenurl = ""
-    const imagen = formData.get("imagen") as File
     if (imagen && imagen.size > 0) {
-      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "zonas")
-      if (!resultadoImagen.success) {
-        return { success: false, error: resultadoImagen.error || "Error al subir la imagen" }
+      const resultadoImagen = await imagenSubir(imagen, nombre, "zonas")
+      if (resultadoImagen.success) {
+        imagenurl = resultadoImagen.url || ""
+      } else {
+        return { success: false, error: resultadoImagen.error }
       }
-      imagenurl = resultadoImagen.url || ""
     }
 
-    // Paso 3: Pasar datos del formData a variables con tipado de datos
-    const nombre = formData.get("nombre") as string
-    const clave = formData.get("clave") as string
-    const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
-    const activo = true
-
-    // Paso 4: Ejecutar Query
+    // Paso 5: Ejecutar Query
     const { data, error } = await supabase
       .from("zonas")
       .insert({
@@ -89,17 +95,20 @@ export async function crearZona(formData: FormData) {
 
     // Return error
     if (error) {
-      console.error("Error en ejecucion de query en crearZona de actions/zonas:", error)
-      return { success: false, error: error.message }
+      console.error("Error creando zona en query en crearZona de actions/zonas: ", error)
+      return { success: false, error: "Error creando zona en query en crearZona de actions/zonas: " + error.message }
     }
 
     revalidatePath("/zonas")
 
-    // Return resultados
+    // Retorno de datos
     return { success: true, data: data.id }
   } catch (error) {
     console.error("Error en crearZona de actions/zonas:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar funcion crearZona de actions/zonas" }
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion crearZona de actions/zonas: " + error,
+    }
   }
 }
 

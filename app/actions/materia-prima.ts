@@ -49,43 +49,42 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 // Función crearMateriaPrima / insMateriaPrima: función para crear una materia prima
 export async function crearMateriaPrima(formData: FormData) {
   try {
-    // Paso 1: Validar si no existe
+    // Paso 1: Recibir variables
+    const codigo = (formData.get("codigo") as string)?.trim()
+    const nombre = (formData.get("nombre") as string)?.trim()
+    const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || 0
+    const imagen = formData.get("imagen") as File
+    const costo = Number.parseFloat(formData.get("costo") as string) || 0
+    const fecha = new Date().toISOString().split("T")[0]
+    const activo = true
+
+    // Paso 2: Validar variables obligatorias
+    if (!nombre || nombre.length < 3) {
+      return { success: false, error: "El parametro Nombre, esta incompleto. Favor de verificar." }
+    }
+
+    // Paso 3: Validar si no existe
     const existe: boolean = await (async () => {
-      const resultado = await obtenerMateriasPrimas(
-        -1,
-        formData.get("codigo") as string,
-        formData.get("nombre") as string,
-        "Todos",
-        -1,
-        -1,
-      )
+      const resultado = await obtenerMateriasPrimas(-1, codigo, nombre, "Todos", -1, -1)
       return resultado.success && resultado.data && resultado.data.length >= 1
     })()
 
     if (existe) {
-      return { success: false, error: "La materia prima que se intenta ingresar ya existe y no se puede proceder" }
+      return { success: false, error: "La materia prima que se intenta ingresar ya existe y no se puede proceder." }
     }
 
-    // Paso 2: Subir imagen para obtener su url
+    // Paso 4: Subir imagen para obtener su url
     let imagenurl = ""
-    const imagen = formData.get("imagen") as File
     if (imagen && imagen.size > 0) {
-      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "materiasprimas")
-      if (!resultadoImagen.success) {
-        return { success: false, error: resultadoImagen.error || "Error al subir la imagen" }
+      const resultadoImagen = await imagenSubir(imagen, nombre, "materiasprima")
+      if (resultadoImagen.success) {
+        imagenurl = resultadoImagen.url || ""
+      } else {
+        return { success: false, error: resultadoImagen.error }
       }
-      imagenurl = resultadoImagen.url || ""
     }
 
-    // Paso 3: Pasar datos del formData a variables con tipado de datos
-    const codigo = formData.get("codigo") as string
-    const nombre = formData.get("nombre") as string
-    const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || null
-    const costo = formData.get("costo") as string
-    const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
-    const activo = true
-
-    // Paso 4: Ejecutar Query
+    // Paso 5: Ejecutar Query
     const { data, error } = await supabase
       .from("materiasprima")
       .insert({
@@ -102,19 +101,22 @@ export async function crearMateriaPrima(formData: FormData) {
 
     // Return error
     if (error) {
-      console.error("Error creando materia prima en query en crearMateriaPrima de actions/materia-prima:", error)
-      return { success: false, error: error.message }
+      console.error("Error creando materia prima en query en crearMateriaPrima de actions/materia-prima: ", error)
+      return {
+        success: false,
+        error: "Error creando materia prima en query en crearMateriaPrima de actions/materia-prima: " + error.message,
+      }
     }
 
     revalidatePath("/materiaprima")
 
-    // Return resultados
+    // Retorno de datos
     return { success: true, data: data.id }
   } catch (error) {
     console.error("Error en crearMateriaPrima de actions/materia-prima:", error)
     return {
       success: false,
-      error: "Error interno del servidor, al ejecutar funcion crearMateriaPrima de actions/materia-prima",
+      error: "Error interno del servidor, al ejecutar funcion crearMateriaPrima de actions/materia-prima: " + error,
     }
   }
 }
