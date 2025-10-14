@@ -53,6 +53,12 @@ export async function crearCliente(formData: FormData) {
     // Paso 1: Recibir variables
     const nombre = (formData.get("nombre") as string)?.trim()
     const clave = (formData.get("clave") as string)?.trim()
+    const direccion = formData.get("direccion") as string
+    const telefono = formData.get("telefono") as string
+    const email = formData.get("email") as string
+    const imagen = formData.get("imagen") as File
+    const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
+    const activo = true
 
     // Paso 2: Validar variables obligatorias
     if(!nombre || nombre.length < 3){
@@ -76,9 +82,9 @@ export async function crearCliente(formData: FormData) {
       return { success: false, error: "El cliente que se intenta ingresar ya existe y no se puede proceder" }
     }
 
-    // Paso 2: Subir imagen para obtener su url
+    // Paso 4: Subir imagen para obtener su url
     let imagenurl = ""
-    const imagen = formData.get("imagen") as File
+    
     const auxNombre = formData.get("nombre") as string
     if (imagen && imagen.size > 0) {
       const resultadoImagen = await imagenSubir(imagen, auxNombre, "clientes")
@@ -89,13 +95,8 @@ export async function crearCliente(formData: FormData) {
     }
 
     // Paso 3: Pasar datos del formData a variables con tipado de datos
-    const nombre = formData.get("nombre") as string
-    const clave = formData.get("clave") as string
-    const direccion = formData.get("direccion") as string
-    const telefono = formData.get("telefono") as string
-    const email = formData.get("email") as string
-    const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
-    const activo = true
+
+    
 
     // Paso 4: Ejecutar Query
     const { data, error } = await supabase
