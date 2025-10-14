@@ -51,13 +51,15 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 // Función crearFormula / insFormula: función para crear una formula
 export async function crearFormula(formData: FormData) {
   try {
-    // Paso 1: Validar variables obligatorias
+    // Paso 1: Recibir variables
     const nombre = (formData.get("nombre") as string)?.trim()
+
+    // Paso 2: Validar variables obligatorias
     if(!nombre || nombre.length < 3){
       return { success: false, error: "El parametro Nombre, esta incompleto. Favor de verificar." }
     }
 
-    // Paso 2: Validar si no existe
+    // Paso 3: Validar si no existe
     const existe: boolean = await (async () => {
       const resultado = await obtenerFormulas(
         -1,
@@ -73,7 +75,7 @@ export async function crearFormula(formData: FormData) {
       return { success: false, error: "La formula que se intenta ingresar ya existe y no se puede proceder." }
     }
 
-    // Paso 3: Subir imagen para obtener su url
+    // Paso 4: Subir imagen para obtener su url
     let imagenurl = ""
     const imagen = formData.get("imagen") as File
     const auxNombre = formData.get("nombre") as string
@@ -86,7 +88,7 @@ export async function crearFormula(formData: FormData) {
       }      
     }
 
-    // Paso 3: Pasar datos del formData a variables con tipado de datos
+    // Paso 5: Pasar datos del formData a variables con tipado de datos
     const codigo = formData.get("codigo") as string
     const nombre = formData.get("nombre") as string
     const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || null
@@ -94,7 +96,7 @@ export async function crearFormula(formData: FormData) {
     const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
     const activo = true
 
-    // Paso 4: Ejecutar Query
+    // Paso : Ejecutar Query
     const { data, error } = await supabase
       .from("formulas")
       .insert({
