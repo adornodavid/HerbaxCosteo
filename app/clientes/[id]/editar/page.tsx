@@ -205,15 +205,6 @@ export default function EditarClientePage() {
   }
 
   // Si no se cargo el elemento principal
-  if (!cliente) {
-    return (
-      <div className="container mx-auto py-6">
-        <p>No se encontró el cliente.</p>
-      </div>
-    )
-  }
-
-  // Si no se cargo el elemento principal
   if (!esAdminDOs) {
     return (
       <div className="container mx-auto py-6">
