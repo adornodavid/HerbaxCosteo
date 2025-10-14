@@ -293,7 +293,12 @@ export async function actualizarCliente(formData: FormData) {
 //Función: eliminarCliente / delCliente: funcion para eliminar un cliente
 export async function eliminarCliente(id: number) {
   try {
-    // Paso 1: Ejecutar Query DELETE
+    // Paso 1: Validar que id tiene
+    if (!id || id < 1) {
+      return { success: false, message: "Error eliminando cliente en query en eliminarCliente de actions/clientes: No se obtulo el id a eliminar" }
+    }
+
+    // Paso 2: Ejecutar Query DELETE
     const { error } = await supabase.from("clientes").delete().eq("id", id)
 
     // Return error
