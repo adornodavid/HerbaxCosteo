@@ -35,7 +35,7 @@ export const AppConfig = {
 // Exportar arrays individualmente (opcional)
 export const RolesAdmin = [1, 2] as const
 export const RolesAdmin2 = [3] as const
-export const RolesAdmin2 = [4] as const
+export const RolesAdmin3 = [4] as const
 export const RolesCoordinador = [5] as const
 export const Estados = ['activo', 'inactivo', 'pendiente'] as const
 export const arrActivoTrue = ["True", "true", "TRUE", "Activo", "activo", "ACTIVO"] as const
