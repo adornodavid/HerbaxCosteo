@@ -407,7 +407,7 @@ export default function ClientesPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={showElementoDetallesModal} onOpenChange={showElementoDetallesModal}>
+      <Dialog open={showElementoDetallesModal} onOpenChange={setShowElementoDetallesModal}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Detalles del Cliente</DialogTitle>
