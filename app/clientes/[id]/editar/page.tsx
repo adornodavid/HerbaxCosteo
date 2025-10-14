@@ -86,7 +86,7 @@ export default function EditarClientePage() {
     // Iniciar 
     const cargarDatosCliente = async () => {
       try {
-        setIsLoading(true)
+        setShowPageLoading(true)
         const result = await obtenerClientes(clienteId, "", "", "", "", "", "Todos")
 
         if (result.success && result.data && result.data.length > 0) {
@@ -119,7 +119,7 @@ export default function EditarClientePage() {
         })
         setShowModalError(true)
       } finally {
-        setIsLoading(false)
+        setShowPageLoading(false)
       }
     }
 
@@ -188,14 +188,31 @@ export default function EditarClientePage() {
     }
   }
 
-  if (isLoading) {
+ // --- Renders ---
+  // Contenidos auxiliares
+  if (showPageLoading) {
+    return <PageLoadingScreen message="Cargando información..." />
+  }
+
+  // Si no se cargo el elemento principal
+  if (!cliente) {
     return (
-      <div className="container mx-auto py-6 space-y-6">
-        <PageProcessing isOpen={true} />
+      <div className="container mx-auto py-6">
+        <p>No se encontró el cliente.</p>
       </div>
     )
   }
 
+  // Si no se cargo el elemento principal
+  if (!esAdminDOs) {
+    return (
+      <div className="container mx-auto py-6">
+        <p>No tiene permisos para utilizar esta herramienta, si necesita ayuda solicitela con el personal encargado del sitio.</p>
+      </div>
+    )
+  }
+
+  // Contenido principal
   return (
     <div className="container mx-auto py-6 space-y-6">
       <PageProcessing isOpen={showProcessing} />
