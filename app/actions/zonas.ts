@@ -63,7 +63,7 @@ export async function crearZona(formData: FormData) {
 
     // Paso 3: Validar si no existe
     const existe: boolean = await (async () => {
-      const resultado = await obtenerZonas(-1, nombre, clave)
+      const resultado = await obtenerZonas(-1, nombre, clave, "Todos")
       return resultado.success && resultado.data && resultado.data.length >= 1
     })()
 
