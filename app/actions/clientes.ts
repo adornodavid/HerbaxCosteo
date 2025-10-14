@@ -300,8 +300,7 @@ export async function eliminarCliente(id: number) {
 
     // Paso 2: Ejecutar Query DELETE
     const { error } = await supabase.from("clientes").delete().eq("id", id)
-
-    // Return error
+    // Return si hay error en query
     if (error) {
       console.error("Error eliminando cliente en query en eliminarCliente de actions/clientes:", error)
       return { success: false, message: "Error en query", error: error.message }
@@ -309,7 +308,7 @@ export async function eliminarCliente(id: number) {
 
     revalidatePath("/clientes")
 
-    // Return resultados
+    // Paso 3: Return resultados
     return { success: true }
   } catch (error) {
     console.error("Error en eliminarCliente de actions/clientes:", error)
