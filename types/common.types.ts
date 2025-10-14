@@ -65,9 +65,11 @@ export interface PageTitlePlusNew {
   Ruta: string
 }
 
-export interface ModalAlert {
-  Titulo?: string
-  Mensaje?: string
+export interface PageModalValidation {
+  Titulo: string
+  Mensaje: string
+  isOpen: boolean
+  onClose: () => void
 }
 
 export interface ModalError {
