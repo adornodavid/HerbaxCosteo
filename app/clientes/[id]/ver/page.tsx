@@ -13,7 +13,7 @@ import { Edit, Trash2, ArrowLeft } from "lucide-react"
 import type { Cliente } from "@/types/clientes"
 // -- Librerias --
 // Configuraciones
-import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
+import { RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Componentes --
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageLoadingScreen } from "@/components/page-loading-screen"
@@ -32,7 +32,6 @@ export default function VerClientePage() {
   const params = useParams()
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
-  const esAdmin = useMemo(() => user && RolesAdmin.includes(user.RolId), [user])
   const esAdminDOs = useMemo(() => user && RolesAdminDOs.includes(user.RolId), [user])
   const clienteId = Number(params.id)
 
