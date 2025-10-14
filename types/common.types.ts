@@ -46,6 +46,9 @@ export interface ddlItem {
   text: string
 }
 
+/* ==================================================
+  Componentes
+ ==================================================*/
 export interface ModalAlert {
   Titulo?: string
   Mensaje?: string
