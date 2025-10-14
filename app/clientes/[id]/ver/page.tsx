@@ -43,6 +43,7 @@ export default function VerClientePage() {
   const clienteId = Number(params.id)
 
   // --- Estados ---
+  // Cargar contenido en variables
   const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
   const [cliente, setCliente] = useState<Cliente | null>(null)
   const [loading, setLoading] = useState(true)
@@ -70,7 +71,7 @@ export default function VerClientePage() {
   }, [clienteId])
 
   if (loading) {
-    return <PageLoadingScreen message="Cargando información del cliente..." />
+    return <showPageLoading message="Cargando información del cliente..." />
   }
 
   if (!cliente) {
