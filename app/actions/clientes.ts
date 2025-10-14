@@ -306,7 +306,7 @@ export async function eliminarCliente(id: number) {
 
     // Paso 2: Validar que id tiene valor
     if (!id || id < 1) {
-      return { success: false, error: "Error eliminando cliente en query en eliminarCliente de actions/clientes: No se obtulo el id a eliminar" }
+      return { success: false, error: "Error eliminando cliente en query en eliminarCliente de actions/clientes: No se obtuvo el id a eliminar" }
     }
 
     // Paso 3: Ejecutar Query DELETE
