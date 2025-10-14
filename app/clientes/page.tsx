@@ -266,6 +266,7 @@ export default function ClientesPage() {
       }
       // Iniciar
       const inicializar = async () => {
+        setPageLoading()
         setShowPageLoading(true)
         await cargarDatosIniciales()
       }
