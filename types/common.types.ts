@@ -72,13 +72,23 @@ export interface PageModalValidation {
   onClose: () => void
 }
 
-export interface ModalError {
-  Titulo?: string
-  Mensaje?: string
+export interface PageModalAlert {
+  Titulo: string
+  Mensaje: string
+  isOpen: boolean
+  onClose: () => void
 }
 
-export interface ModalTutorial {
-  Titulo?: string
-  Subtitulo?: string
-  VideoUrl?: string
+export interface PageModalError {
+  Titulo: string
+  Mensaje: string
+  isOpen: boolean
+  onClose: () => void
+}
+
+export interface PageModalTutorial {
+  Titulo: string
+  Mensaje: string
+  isOpen: boolean
+  onClose: () => void
 }
