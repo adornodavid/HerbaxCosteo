@@ -286,7 +286,7 @@ export default function EditarClientePage() {
                 {isSubmitting ? "Guardando..." : "Guardar Cliente"}
               </Button>
               <Button type="button" variant="outline" onClick={() => router.push("/clientes")}>
-                Regresar a Listados
+                Regresar
               </Button>
             </div>
           </form>
