@@ -162,7 +162,7 @@ export default function ClientesPage() {
     if (!user) return
 
     try {
-      const auxClienteId = esAdmin === true ? -1 : user.ClienteId
+      const auxClienteId = esAdminDLLs === true ? -1 : user.ClienteId
 
       setPageTituloMasNuevo({
         Titulo: "Clientes",
