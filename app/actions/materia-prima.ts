@@ -3,8 +3,10 @@
 /* ==================================================
   Imports
 ================================================== */
-import { createClient } from '@/lib/supabase'
+import { createClient } from "@/lib/supabase"
 import { obtenerFormulasXProductos } from "@/app/actions/productos"
+import { revalidatePath } from "next/cache"
+import { imagenSubir } from "@/app/actions/utilerias"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -110,7 +112,10 @@ export async function crearMateriaPrima(formData: FormData) {
     return { success: true, data: data.id }
   } catch (error) {
     console.error("Error en crearMateriaPrima de actions/materia-prima:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar funcion crearMateriaPrima de actions/materia-prima" }
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion crearMateriaPrima de actions/materia-prima",
+    }
   }
 }
 
@@ -190,7 +195,10 @@ export async function obtenerMateriasPrimas(
 
     // Error en query
     if (error) {
-      console.error("Error obteniendo materias primas en query en obtenerMateriasPrimas de actions/materia-prima:", error)
+      console.error(
+        "Error obteniendo materias primas en query en obtenerMateriasPrimas de actions/materia-prima:",
+        error,
+      )
       return { success: false, error: error.message }
     }
 
@@ -198,7 +206,10 @@ export async function obtenerMateriasPrimas(
     return { success: true, data }
   } catch (error) {
     console.error("Error en obtenerMateriasPrimas de actions/materia-prima:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar obtenerMateriasPrimas de actions/materia-prima" }
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerMateriasPrimas de actions/materia-prima",
+    }
   }
 }
 
@@ -251,7 +262,10 @@ export async function obtenerMateriasPrimasXFormulas(
       return { success: false, error: "ID de formula inválido" }
     }
 
-    const { data, error } = await supabase.from("materiasprimasxformula").select("materiaprimaid").eq("formulaid", formulaid)
+    const { data, error } = await supabase
+      .from("materiasprimasxformula")
+      .select("materiaprimaid")
+      .eq("formulaid", formulaid)
 
     if (error) {
       console.error("Error en query obtenerMateriasPrimasXFormulas de actions/materia-prima:", error)
@@ -281,7 +295,46 @@ export async function obtenerMateriasPrimasXFormulas(
 /*==================================================
   * DELETES-ELIMINAR (DELETES)
 ================================================== */
+// Función: eliminarMateriaPrima / delMateriaPrima: funcion para eliminar una materia prima
+export async function eliminarMateriaPrima(id: number) {
+  try {
+    // Paso 1: Validar que id tiene valor
+    if (!id || id < 1) {
+      return {
+        success: false,
+        error:
+          "Error eliminando materia prima en query en eliminarMateriaPrima de actions/materia-prima: No se obtuvo el id a eliminar",
+      }
+    }
 
+    // Paso 2: Verificar que la materia prima existe
+    const { data: materiaPrimaExiste } = await supabase.from("materiasprima").select("id").eq("id", id).single()
+
+    if (!materiaPrimaExiste) {
+      return { success: false, error: "La materia prima que intenta eliminar no existe" }
+    }
+
+    // Paso 3: Ejecutar Query DELETE
+    const { error } = await supabase.from("materiasprima").delete().eq("id", id)
+    // Return si hay error en query
+    if (error) {
+      console.error("Error eliminando materia prima en query en eliminarMateriaPrima de actions/materia-prima:", error)
+      return { success: false, error: "Error en query: " + error.message }
+    }
+
+    revalidatePath("/materiaprima")
+
+    // Paso 4: Return resultados
+    return { success: true, data: { id, message: "Materia prima eliminada exitosamente" } }
+  } catch (error) {
+    console.error("Error en eliminarMateriaPrima de actions/materia-prima: " + error)
+    // Return info
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion eliminarMateriaPrima de actions/materia-prima: " + error,
+    }
+  }
+}
 
 /*==================================================
   * SPECIALS-ESPECIALES ()

@@ -3,7 +3,9 @@
 /* ==================================================
   Imports
 ================================================== */
-import { createClient } from '@/lib/supabase'
+import { createClient } from "@/lib/supabase"
+import { revalidatePath } from "next/cache"
+import { imagenSubir } from "@/app/actions/utilerias"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -60,7 +62,10 @@ export async function crearMaterialEtiquetado(formData: FormData) {
     })()
 
     if (existe) {
-      return { success: false, error: "El material de etiquetado que se intenta ingresar ya existe y no se puede proceder" }
+      return {
+        success: false,
+        error: "El material de etiquetado que se intenta ingresar ya existe y no se puede proceder",
+      }
     }
 
     // Paso 2: Subir imagen para obtener su url
@@ -99,7 +104,10 @@ export async function crearMaterialEtiquetado(formData: FormData) {
 
     // Return error
     if (error) {
-      console.error("Error creando material de etiquetado en query en crearMaterialEtiquetado de actions/material-etiquetado:", error)
+      console.error(
+        "Error creando material de etiquetado en query en crearMaterialEtiquetado de actions/material-etiquetado:",
+        error,
+      )
       return { success: false, error: error.message }
     }
 
@@ -109,7 +117,10 @@ export async function crearMaterialEtiquetado(formData: FormData) {
     return { success: true, data: data.id }
   } catch (error) {
     console.error("Error en crearMaterialEtiquetado de actions/material-etiquetado:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar funcion crearMaterialEtiquetado de actions/material-etiquetado" }
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion crearMaterialEtiquetado de actions/material-etiquetado",
+    }
   }
 }
 
@@ -191,7 +202,10 @@ export async function obtenerMaterialesEtiquetados(
 
     // Error en query
     if (error) {
-      console.error("Error obteniendo materiales de etiquetado en query en obtenerMaterialesEtiquetados de actions/material-etiquetado:", error)
+      console.error(
+        "Error obteniendo materiales de etiquetado en query en obtenerMaterialesEtiquetados de actions/material-etiquetado:",
+        error,
+      )
       return { success: false, error: error.message }
     }
 
@@ -199,7 +213,10 @@ export async function obtenerMaterialesEtiquetados(
     return { success: true, data }
   } catch (error) {
     console.error("Error en obtenerMaterialesEtiquetados de actions/material-etiquetado:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar obtenerMaterialesEtiquetados de actions/material-etiquetado" }
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerMaterialesEtiquetados de actions/material-etiquetado",
+    }
   }
 }
 
@@ -212,7 +229,10 @@ export async function obtenerMaterialesEtiquetadosXProductos(
       return { success: false, error: "ID de producto inválido" }
     }
 
-    const { data, error } = await supabase.from("materialesetiquetadoxproductos").select("materialetiquetadoid").eq("productoid", productoid)
+    const { data, error } = await supabase
+      .from("materialesetiquetadoxproductos")
+      .select("materialetiquetadoid")
+      .eq("productoid", productoid)
 
     if (error) {
       console.error("Error en query obtenerMaterialesEtiquetadosXProductos de actions/material-etiquetado:", error)
@@ -230,7 +250,8 @@ export async function obtenerMaterialesEtiquetadosXProductos(
     console.error("Error en obtenerMaterialesEtiquetadosXProductos de actions/material-etiquetado:", error)
     return {
       success: false,
-      error: "Error interno del servidor, al ejecutar obtenerMaterialesEtiquetadosXProductos de actions/material-etiquetado",
+      error:
+        "Error interno del servidor, al ejecutar obtenerMaterialesEtiquetadosXProductos de actions/material-etiquetado",
     }
   }
 }
@@ -242,7 +263,55 @@ export async function obtenerMaterialesEtiquetadosXProductos(
 /*==================================================
   * DELETES-ELIMINAR (DELETES)
 ================================================== */
+// Función: eliminarMaterialEtiquetado / delMaterialEtiquetado: funcion para eliminar un material de etiquetado
+export async function eliminarMaterialEtiquetado(id: number) {
+  try {
+    // Paso 1: Validar que id tiene valor
+    if (!id || id < 1) {
+      return {
+        success: false,
+        error:
+          "Error eliminando material de etiquetado en query en eliminarMaterialEtiquetado de actions/material-etiquetado: No se obtuvo el id a eliminar",
+      }
+    }
 
+    // Paso 2: Verificar que el material de etiquetado existe
+    const { data: materialEtiquetadoExiste } = await supabase
+      .from("materialesetiquetado")
+      .select("id")
+      .eq("id", id)
+      .single()
+
+    if (!materialEtiquetadoExiste) {
+      return { success: false, error: "El material de etiquetado que intenta eliminar no existe" }
+    }
+
+    // Paso 3: Ejecutar Query DELETE
+    const { error } = await supabase.from("materialesetiquetado").delete().eq("id", id)
+    // Return si hay error en query
+    if (error) {
+      console.error(
+        "Error eliminando material de etiquetado en query en eliminarMaterialEtiquetado de actions/material-etiquetado:",
+        error,
+      )
+      return { success: false, error: "Error en query: " + error.message }
+    }
+
+    revalidatePath("/materialetiquetado")
+
+    // Paso 4: Return resultados
+    return { success: true, data: { id, message: "Material de etiquetado eliminado exitosamente" } }
+  } catch (error) {
+    console.error("Error en eliminarMaterialEtiquetado de actions/material-etiquetado: " + error)
+    // Return info
+    return {
+      success: false,
+      error:
+        "Error interno del servidor, al ejecutar funcion eliminarMaterialEtiquetado de actions/material-etiquetado: " +
+        error,
+    }
+  }
+}
 
 /*==================================================
   * SPECIALS-ESPECIALES ()

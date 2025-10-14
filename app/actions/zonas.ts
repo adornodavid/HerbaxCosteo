@@ -3,8 +3,10 @@
 /* ==================================================
   Imports
 ================================================== */
-import { createClient } from '@/lib/supabase'
-import { RolesAdmin, arrActivoTrue, arrActivoFalse } from "@/lib/config"
+import { createClient } from "@/lib/supabase"
+import { arrActivoTrue, arrActivoFalse } from "@/lib/config"
+import { revalidatePath } from "next/cache"
+import { imagenSubir } from "@/app/actions/utilerias"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -49,11 +51,7 @@ export async function crearZona(formData: FormData) {
   try {
     // Paso 1: Validar si no existe
     const existe: boolean = await (async () => {
-      const resultado = await obtenerZonas(
-        -1,
-        formData.get("nombre") as string,
-        formData.get("clave") as string,
-      )
+      const resultado = await obtenerZonas(-1, formData.get("nombre") as string, formData.get("clave") as string)
       return resultado.success && resultado.data && resultado.data.length >= 1
     })()
 
@@ -109,12 +107,7 @@ export async function crearZona(formData: FormData) {
   READS-OBTENER (SELECTS)
 ================================================== */
 //Función: obtenerZonas: funcion para obtener todas las zonas
-export async function obtenerZonas(
-  id: number = -1,
-  nombre: string = "",
-  clave: string = "",
-  activo: string = "Todos",
-) {
+export async function obtenerZonas(id = -1, nombre = "", clave = "", activo = "Todos") {
   try {
     // Paso 1: Preparar Query
     let query = supabase.from("zonas").select(`
@@ -173,7 +166,45 @@ export async function obtenerZonas(
 /*==================================================
   * DELETES-ELIMINAR (DELETES)
 ================================================== */
+//Función: eliminarZona / delZona: funcion para eliminar una zona
+export async function eliminarZona(id: number) {
+  try {
+    // Paso 1: Validar que id tiene valor
+    if (!id || id < 1) {
+      return {
+        success: false,
+        error: "Error eliminando zona en query en eliminarZona de actions/zonas: No se obtuvo el id a eliminar",
+      }
+    }
 
+    // Paso 2: Verificar que la zona existe
+    const { data: zonaExiste } = await supabase.from("zonas").select("id").eq("id", id).single()
+
+    if (!zonaExiste) {
+      return { success: false, error: "La zona que intenta eliminar no existe" }
+    }
+
+    // Paso 3: Ejecutar Query DELETE
+    const { error } = await supabase.from("zonas").delete().eq("id", id)
+    // Return si hay error en query
+    if (error) {
+      console.error("Error eliminando zona en query en eliminarZona de actions/zonas:", error)
+      return { success: false, error: "Error en query: " + error.message }
+    }
+
+    revalidatePath("/zonas")
+
+    // Paso 4: Return resultados
+    return { success: true, data: { id, message: "Zona eliminada exitosamente" } }
+  } catch (error) {
+    console.error("Error en eliminarZona de actions/zonas: " + error)
+    // Return info
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion eliminarZona de actions/zonas: " + error,
+    }
+  }
+}
 
 /*==================================================
   * SPECIALS-ESPECIALES ()
