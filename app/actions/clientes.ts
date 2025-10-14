@@ -293,12 +293,23 @@ export async function actualizarCliente(formData: FormData) {
 //Función: eliminarCliente / delCliente: funcion para eliminar un cliente
 export async function eliminarCliente(id: number) {
   try {
-    // Paso 1: Validar que id tiene
+    // Paso 1: Verificar que el cliente existe
+    const { data: clienteExiste } = await supabase
+      .from("clientes")
+      .select("id")
+      .eq("id", id)
+      .single()
+
+    if (!clienteExiste) {
+      return { success: false, error: "El cliente que intenta eliminar no existe" }
+    }
+
+    // Paso 2: Validar que id tiene
     if (!id || id < 1) {
       return { success: false, message: "Error eliminando cliente en query en eliminarCliente de actions/clientes: No se obtulo el id a eliminar" }
     }
 
-    // Paso 2: Ejecutar Query DELETE
+    // Paso 3: Ejecutar Query DELETE
     const { error } = await supabase.from("clientes").delete().eq("id", id)
     // Return si hay error en query
     if (error) {
@@ -308,7 +319,7 @@ export async function eliminarCliente(id: number) {
 
     revalidatePath("/clientes")
 
-    // Paso 3: Return resultados
+    // Paso 4: Return resultados
     return { success: true }
   } catch (error) {
     console.error("Error en eliminarCliente de actions/clientes: " + error)
