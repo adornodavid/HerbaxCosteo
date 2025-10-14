@@ -33,7 +33,6 @@ export default function VerClientePage() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
   const esAdmin = useMemo(() => user && RolesAdmin.includes(user.RolId), [user])
-  const esAdminDDLs = useMemo(() => user && RolesAdminDDLs.includes(user.RolId), [user])
   const esAdminDOs = useMemo(() => user && RolesAdminDOs.includes(user.RolId), [user])
   const clienteId = Number(params.id)
 
