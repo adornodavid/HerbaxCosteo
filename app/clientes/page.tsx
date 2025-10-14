@@ -192,7 +192,7 @@ export default function ClientesPage() {
       })
       setShowModalError(true)
     } finally {
-      setPageLoading(false)
+      setShowPageLoading(false)
     }
   }
 
