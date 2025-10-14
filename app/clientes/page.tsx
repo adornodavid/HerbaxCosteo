@@ -38,6 +38,9 @@ export default function ClientesPage() {
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
   const esAdmin = useMemo(() => user && RolesAdmin.includes(user.RolId), [user])
+  const esAdmin2 = useMemo(() => user && RolesAdmin2.includes(user.RolId), [user])
+  const esAdmin3 = useMemo(() => user && RolesAdmin3.includes(user.RolId), [user])
+  const esCoordinador = useMemo(() => user && RolesCoordinador.includes(user.RolId), [user])
   // Paginación
   const resultadosPorPagina = 20
 
