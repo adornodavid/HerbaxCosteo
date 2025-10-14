@@ -54,11 +54,15 @@ export interface PageLoadingScreen {
 }
 
 export interface PageProcessing {
-  message?: string
+  isOpen: boolean
 }
 
 export interface PageTitlePlusNew {
-  message?: string
+  Titulo: string
+  Subtitulo: string
+  Visible: boolean
+  BotonTexto: string
+  Ruta: string
 }
 
 export interface ModalAlert {
