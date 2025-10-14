@@ -59,7 +59,7 @@ export default function ClientesPage() {
   const [ModalError, setModalError] = useState<propsPageModalError>()
   const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
   const [ListadoSinResultados, setListadoSinResultados] = useState(false)
-  const [clienteDetalles, setClienteDetalles] = useState<Cliente | null>(null)
+  const [elementoDetalles, setElementoDetalles] = useState<Cliente | null>(null)
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
@@ -67,7 +67,7 @@ export default function ClientesPage() {
   const [showModalError, setShowModalError] = useState(false)
   const [showModalTutorial, setShowModalTutorial] = useState(false)
   const [showPageTituloMasNuevo, setShowPageTituloMasNuevo] = useState(false)
-  const [showDetallesModal, setShowDetallesModal] = useState(false)
+  const [setShowElementoDetallesModal, setShowElementoDetallesModal] = useState(false)
   // Cargar contenido en elementos
   const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState<propsPageTitlePlusNew>({
     Titulo: "",
@@ -225,8 +225,8 @@ export default function ClientesPage() {
   }
 
   const handleVerDetalles = (cliente: Cliente) => {
-    setClienteSeleccionado(cliente)
-    setShowDetallesModal(true)
+    setElementoDetalles(cliente)
+    setShowElementoDetallesModal(true)
   }
 
   // -- Manejadores (Handles) --
@@ -412,7 +412,7 @@ export default function ClientesPage() {
           <DialogHeader>
             <DialogTitle>Detalles del Cliente</DialogTitle>
           </DialogHeader>
-          {clienteSeleccionado && (
+          {elementoDetalles && (
             <Card className="overflow-hidden border-0 shadow-none">
               <CardContent className="p-0">
                 <div className="flex flex-col md:flex-row">
@@ -420,11 +420,11 @@ export default function ClientesPage() {
                   <div className="md:w-1/3 h-64 md:h-auto flex items-center justify-center bg-gray-300">
                     <img
                       src={
-                        clienteSeleccionado.ClienteImgUrl && clienteSeleccionado.ClienteImgUrl !== "Sin imagen"
-                          ? clienteSeleccionado.ClienteImgUrl
+                        elementoDetalles.ClienteImgUrl && elementoDetalles.ClienteImgUrl !== "Sin imagen"
+                          ? elementoDetalles.ClienteImgUrl
                           : "/placeholder.svg?height=400&width=400&text=Cliente"
                       }
-                      alt={clienteSeleccionado.ClienteNombre}
+                      alt={elementoDetalles.ClienteNombre}
                       className="w-full h-full object-contain"
                     />
                   </div>
@@ -436,50 +436,50 @@ export default function ClientesPage() {
                     <div className="space-y-3">
                       <div>
                         <span className="font-semibold text-gray-700">ID:</span>
-                        <span className="ml-2 text-gray-900">{clienteSeleccionado.ClienteId}</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.ClienteId}</span>
                       </div>
 
                       <div>
                         <span className="font-semibold text-gray-700">Nombre:</span>
-                        <span className="ml-2 text-gray-900">{clienteSeleccionado.ClienteNombre}</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.ClienteNombre}</span>
                       </div>
 
                       <div>
                         <span className="font-semibold text-gray-700">Clave:</span>
-                        <span className="ml-2 text-gray-900">{clienteSeleccionado.ClienteClave}</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.ClienteClave}</span>
                       </div>
 
                       <div>
                         <span className="font-semibold text-gray-700">Dirección:</span>
-                        <span className="ml-2 text-gray-900">{clienteSeleccionado.ClienteDireccion}</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.ClienteDireccion}</span>
                       </div>
 
                       <div>
                         <span className="font-semibold text-gray-700">Teléfono:</span>
-                        <span className="ml-2 text-gray-900">{clienteSeleccionado.ClienteTelefono}</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.ClienteTelefono}</span>
                       </div>
 
                       <div>
                         <span className="font-semibold text-gray-700">Email:</span>
-                        <span className="ml-2 text-gray-900">{clienteSeleccionado.ClienteEmail}</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.ClienteEmail}</span>
                       </div>
 
                       <div>
                         <span className="font-semibold text-gray-700">Estatus:</span>
                         <span
                           className={`ml-2 px-2 py-1 rounded text-sm font-semibold ${
-                            clienteSeleccionado.ClienteActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                            elementoDetalles.ClienteActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
                           }`}
                         >
-                          {clienteSeleccionado.ClienteActivo ? "Activo" : "Inactivo"}
+                          {elementoDetalles.ClienteActivo ? "Activo" : "Inactivo"}
                         </span>
                       </div>
 
                       <div>
                         <span className="font-semibold text-gray-700">Fecha de Creación:</span>
                         <span className="ml-2 text-gray-900">
-                          {clienteSeleccionado.ClienteFechaCreacion
-                            ? new Date(clienteSeleccionado.ClienteFechaCreacion).toLocaleDateString()
+                          {elementoDetalles.ClienteFechaCreacion
+                            ? new Date(elementoDetalles.ClienteFechaCreacion).toLocaleDateString()
                             : "N/A"}
                         </span>
                       </div>
