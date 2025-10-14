@@ -88,7 +88,8 @@ export interface PageModalError {
 
 export interface PageModalTutorial {
   Titulo: string
-  Mensaje: string
+  Subtitulo: string
+  VideoUrl: string
   isOpen: boolean
   onClose: () => void
 }
