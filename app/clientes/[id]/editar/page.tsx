@@ -36,11 +36,15 @@ import { PageModalTutorial } from "@/components/page-modal-tutorial"
 import { useAuth } from "@/contexts/auth-context"
 import { obtenerClientes, actualizarCliente } from "@/app/actions/clientes"
 
-
-
+/* ==================================================
+	Componente Principal (Pagina)
+================================================== */
 export default function EditarClientePage() {
-  const router = useRouter()
+  // --- Variables especiales ---
   const params = useParams()
+  const router = useRouter()
+  const { user, isLoading: authLoading } = useAuth()
+  const esAdminDOs = useMemo(() => user && RolesAdminDOs.includes(user.RolId), [user])
   const clienteId = Number(params.id)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
