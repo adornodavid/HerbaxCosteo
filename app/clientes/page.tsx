@@ -425,7 +425,7 @@ export default function ClientesPage() {
                           : "/placeholder.svg?height=400&width=400&text=Cliente"
                       }
                       alt={elementoDetalles.ClienteNombre}
-                      className="w-full h-full object-contain"
+                      className="w-full h-auto object-cover"
                     />
                   </div>
 
