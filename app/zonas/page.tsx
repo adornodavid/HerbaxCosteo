@@ -250,7 +250,8 @@ export default function ZonasPage() {
       }
       // Iniciar
       const inicializar = async () => {
-        setPageLoading(true)
+        setPageLoading({ message: "Cargando Zonas..." })
+        setShowPageLoading(true)
         await cargarDatosIniciales()
       }
       inicializar()
