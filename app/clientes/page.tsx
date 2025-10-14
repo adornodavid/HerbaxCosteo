@@ -168,7 +168,7 @@ export default function ClientesPage() {
       setPageTituloMasNuevo({
         Titulo: "Clientes",
         Subtitulo: "Gestión completa de Clientes",
-        Visible: esAdmin == true ? true : esAdmin2 == true ? true: false : false,
+        Visible: esAdmin == true ? true : esAdmin2 == true ? true: esAdmin3 == true ? true : false,
         BotonTexto: "Crear Nuevo Cliente",
         Ruta: "/clientes/crear",
       })
@@ -271,7 +271,7 @@ export default function ClientesPage() {
       }
       inicializar()
     }
-  }, [authLoading, user, router, esAdmin])
+  }, [authLoading, user, router, esAdmin, esAdmin2, esAdmin3, esCoordinador])
 
   // --- Renders (contenidos auxiliares) ---
   // Loading
