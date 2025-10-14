@@ -5,7 +5,14 @@
     - PaginatedResponse
     - FilterParams
     - ddlItem
-    - Modales
+    - Componentes
+      - PageLoadingScreen
+      - PageProcessing
+      - PageTitlePlusNew
+      - PageModalValidation
+      - PageModalAlert
+      - PageModalError
+      - PageModalTutorial
 ================================================== */
 export interface ApiResponse<T> {
   success: boolean
