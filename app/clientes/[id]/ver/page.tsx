@@ -94,6 +94,7 @@ export default function VerClientePage() {
     return <showPageLoading message="Cargando información..." />
   }
 
+  // Si no se cargo el elemento principal
   if (!cliente) {
     return (
       <div className="container mx-auto py-6">
