@@ -239,7 +239,7 @@ export default function EliminarClientePage() {
                     : "/placeholder.svg?height=400&width=400&text=Cliente"
                 }
                 alt={cliente.nombre}
-                className="w-full h-full object-cover"
+                className="w-full h-auto object-cover"
               />
             </div>
 
