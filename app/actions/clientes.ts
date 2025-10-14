@@ -67,15 +67,7 @@ export async function crearCliente(formData: FormData) {
 
     // Paso 3: Validar si no existe
     const existe: boolean = await (async () => {
-      const resultado = await obtenerClientes(
-        -1,
-        nombre,
-        clave,
-        "",
-        "",
-        "",
-        "Todos",
-      )
+      const resultado = await obtenerClientes(-1, nombre, clave, "", "", "", "Todos")
       return resultado.success && resultado.data && resultado.data.length >= 1
     })()
     if (existe) {
@@ -83,8 +75,7 @@ export async function crearCliente(formData: FormData) {
     }
 
     // Paso 4: Subir imagen para obtener su url
-    let imagenurl = ""
-    
+    let imagenurl = ""    
     const auxNombre = formData.get("nombre") as string
     if (imagen && imagen.size > 0) {
       const resultadoImagen = await imagenSubir(imagen, auxNombre, "clientes")
@@ -94,11 +85,7 @@ export async function crearCliente(formData: FormData) {
       imagenurl = resultadoImagen.url || ""
     }
 
-    // Paso 3: Pasar datos del formData a variables con tipado de datos
-
-    
-
-    // Paso 4: Ejecutar Query
+    // Paso 5: Ejecutar Query
     const { data, error } = await supabase
       .from("clientes")
       .insert({
