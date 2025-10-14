@@ -2,6 +2,13 @@
 
 import { AlertTriangle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import type {
+  PageLoadingScreenType,
+  PageTitlePlusNewType,
+  PageModalAlertType,
+  PageModalErrorType,
+  PageModalTutorialType,
+} from "@/types/common"
 
 interface PageModalAlertProps {
   Titulo: string

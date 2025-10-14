@@ -13,11 +13,11 @@ import { Search, RotateCcw, Edit, ToggleLeft, ToggleRight, EyeOff, X, Eye } from
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
 import type {
-  PageLoadingScreenType,
-  PageTitlePlusNewType,
-  PageModalAlertType,
-  PageModalErrorType,
-  PageModalTutorialType,
+  PageLoadingScreen,
+  PageTitlePlusNew,
+  PageModalAlert,
+  PageModalError,
+  PageModalTutoria,
 } from "@/types/common"
 // -- Librerias --
 // Configuraciones
