@@ -1,23 +1,52 @@
 "use client"
 
-import type React from "react"
-import type { ModalAlert, ModalError } from "@/types/modal" // Import ModalAlert and ModalError types
-
-import { useState } from "react"
+/* ==================================================
+	Imports
+================================================== */
+// -- Assets --
+import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { crearCliente } from "@/app/actions/clientes"
-import { PageTitlePlusNew } from "@/components/page-title-plus-new"
-import { PageModalAlert } from "@/components/page-modal-alert"
-import { PageModalError } from "@/components/page-modal-error"
-import { PageModalValidation } from "@/components/page-modal-validation"
-import { PageProcessing } from "@/components/page-processing"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
+// -- Tipados (interfaces, clases, objetos) --
+import type React from "react"
+import type { Cliente } from "@/types/clientes"
+import type {
+  propsPageLoadingScreen,
+  propsPageTitlePlusNew,
+  propsPageModalValidation,
+  propsPageModalAlert,
+  propsPageModalError,
+  propsPageModalTutorial,
+} from "@/types/common"
+// -- Librerias --
+// Configuraciones
+import { RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
+// -- Componentes --
+import { PageLoadingScreen } from "@/components/page-loading-screen"
+import { PageTitlePlusNew } from "@/components/page-title-plus-new"
+import { PageProcessing } from "@/components/page-processing"
+import { PageModalValidation } from "@/components/page-modal-validation"
+import { PageModalAlert } from "@/components/page-modal-alert"
+import { PageModalError } from "@/components/page-modal-error"
+import { PageModalTutorial } from "@/components/page-modal-tutorial"
+// -- Backend -- 
+import { useAuth } from "@/contexts/auth-context"
+import { crearCliente } from "@/app/actions/clientes"
 
+/* ==================================================
+	Componente Principal (Pagina)
+================================================== */
 export default function CrearClientePage() {
+  // --- Variables especiales ---
   const router = useRouter()
+  const { user, isLoading: authLoading } = useAuth()
+  const esAdminDOs = useMemo(() => user && RolesAdminDOs.includes(user.RolId), [user])
+
+  // --- Estados ---
+  // Cargar contenido en variables
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [modalAlert, setModalAlert] = useState<ModalAlert>({ Titulo: "", Mensaje: "" })
