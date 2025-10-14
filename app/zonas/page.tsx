@@ -186,7 +186,7 @@ export default function ZonasPage() {
     }
   }
 
-  / Estatus - Cambiar activo/inactivo
+  // Estatus - Cambiar activo/inactivo
   const handleToggleStatusClickActivo = async (Id: number, clienteActivo: boolean) => {
     try {
       // Toggle the status (if active, make inactive; if inactive, make active)
