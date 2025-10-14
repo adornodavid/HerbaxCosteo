@@ -91,12 +91,9 @@ export async function crearFormula(formData: FormData) {
       } else {
         imagenurl = resultadoImagen.url || ""
       }      
-    }
+    }    
 
-    // Paso 5: Pasar datos del formData a variables con tipado de datos
-    
-
-    // Paso 6: Ejecutar Query
+    // Paso 5: Ejecutar Query
     const { data, error } = await supabase
       .from("formulas")
       .insert({
