@@ -67,7 +67,7 @@ export default function ClientesPage() {
   const [showModalError, setShowModalError] = useState(false)
   const [showModalTutorial, setShowModalTutorial] = useState(false)
   const [showPageTituloMasNuevo, setShowPageTituloMasNuevo] = useState(false)
-  const [setShowElementoDetallesModal, setShowElementoDetallesModal] = useState(false)
+  const [showElementoDetallesModal, setShowElementoDetallesModal] = useState(false)
   // Cargar contenido en elementos
   const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState<propsPageTitlePlusNew>({
     Titulo: "",
