@@ -420,100 +420,29 @@ export async function eliminarFormula(id: number) {
   }
 }
 
-//Función: eliminarIngredienteFormula: funcion para eliminar ingrediente de fórmula
-export async function eliminarIngredienteFormula(ingredienteFormulaId: number) {
-  try {
-    const { error } = await supabase.from("ingredientesxformula").delete().eq("id", ingredienteFormulaId)
-
-    if (error) {
-      console.error("Error al eliminar ingrediente de fórmula:", error)
-      return { success: false, error: error.message }
-    }
-
-    return {
-      success: true,
-      message: "Ingrediente eliminado de la fórmula exitosamente",
-    }
-  } catch (error: any) {
-    console.error("Error en eliminarIngredienteFormula:", error)
-    return { success: false, error: error.message }
-  }
-}
-
-//Función: eliminarRegistroIncompleto: función para eliminar registros incompletos cuando el usuario sale del proceso
-export async function eliminarRegistroIncompleto(formulaId: number) {
-  try {
-    const { data: formulaData, error: formulaQueryError } = await supabase
-      .from("formulas")
-      .select("imgurl")
-      .eq("id", formulaId)
-      .single()
-
-    if (formulaQueryError) {
-      console.error("Error al obtener datos de fórmula:", formulaQueryError)
-      return { success: false, error: formulaQueryError.message }
-    }
-
-    if (formulaData?.imgurl) {
-      try {
-        const url = new URL(formulaData.imgurl)
-        const pathSegments = url.pathname.split("/")
-
-        // Buscar el segmento que contiene el nombre del archivo (después de 'formulas')
-        const formulasIndex = pathSegments.findIndex((segment) => segment === "formulas")
-        if (formulasIndex !== -1 && formulasIndex < pathSegments.length - 1) {
-          // Tomar el nombre del archivo que está después de 'formulas'
-          const fileName = pathSegments[formulasIndex + 1]
-          console.log("Intentando eliminar archivo:", fileName)
-
-          // Eliminar la imagen del bucket herbax con el path completo
-          const { error: deleteImageError } = await supabase.storage.from("herbax").remove([`formulas/${fileName}`])
-
-          if (deleteImageError) {
-            console.error("Error al eliminar imagen:", deleteImageError)
-            // No retornamos error aquí para que continúe con la eliminación de registros
-          } else {
-            console.log("Imagen eliminada exitosamente")
-          }
-        } else {
-          console.log("No se pudo extraer el nombre del archivo de la URL")
-        }
-      } catch (imageError) {
-        console.error("Error al procesar eliminación de imagen:", imageError)
-        // Continuar con la eliminación de registros aunque falle la imagen
-      }
-    }
-
-    // Primero eliminar los ingredientes asociados a la fórmula
-    const { error: ingredientesError } = await supabase.from("ingredientesxformula").delete().eq("formulaid", formulaId)
-
-    if (ingredientesError) {
-      console.error("Error al eliminar ingredientes de fórmula:", ingredientesError)
-      return { success: false, error: ingredientesError.message }
-    }
-
-    // Luego eliminar la fórmula
-    const { error: formulaError } = await supabase.from("formulas").delete().eq("id", formulaId)
-
-    if (formulaError) {
-      console.error("Error al eliminar fórmula:", formulaError)
-      return { success: false, error: formulaError.message }
-    }
-
-    return {
-      success: true,
-      message: "Registro incompleto eliminado exitosamente",
-    }
-  } catch (error: any) {
-    console.error("Error en eliminarRegistroIncompleto:", error)
-    return { success: false, error: error.message }
-  }
-}
-
 /*==================================================
   * SPECIALS-ESPECIALES ()
 ================================================== */
+//Función: estatusActivoFormula: función para cambiar el estatus de una formula por Id de la formula
+export async function estatusActivoFormula(id: number, activo: boolean): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("formulas").update({ activo: activo }).eq("id", id)
 
+    if (error) {
+      console.error(
+        "Error actualizando estatus activo de la formula en estatusActivoFormula de app/actions/formulas:",
+        error,
+      )
+      return false
+    }
+
+    revalidatePath("/formulas")
+    return true
+  } catch (error) {
+    console.error("Error en estatusActivoFormula de app/actions/formulas: ", error)
+    return false
+  }
+}
 //Función: listaDesplegableFormulas: funcion para obtener todas las formulas para el input dropdownlist
 export async function listaDesplegableFormulas() {
   try {
@@ -535,6 +464,12 @@ export async function listaDesplegableFormulas() {
   }
 }
 
+
+
+
+/*==================================================
+BORRAR
+================================================== */
 //Función: estadisticasFormulasTotales: Función estadística para conocer el total de formulas registradas en la base de datos
 export async function estadisticasFormulasTotales() {
   try {
@@ -942,23 +877,92 @@ export async function verificarIngredienteDuplicado(formulaId: number, ingredien
   }
 }
 
-//Función: estatusActivoFormula: función para cambiar el estatus de una formula por Id de la formula
-export async function estatusActivoFormula(id: number, activo: boolean): Promise<boolean> {
+//Función: eliminarIngredienteFormula: funcion para eliminar ingrediente de fórmula
+export async function eliminarIngredienteFormula(ingredienteFormulaId: number) {
   try {
-    const { error } = await supabase.from("formulas").update({ activo: activo }).eq("id", id)
+    const { error } = await supabase.from("ingredientesxformula").delete().eq("id", ingredienteFormulaId)
 
     if (error) {
-      console.error(
-        "Error actualizando estatus activo de la formula en estatusActivoFormula de app/actions/formulas:",
-        error,
-      )
-      return false
+      console.error("Error al eliminar ingrediente de fórmula:", error)
+      return { success: false, error: error.message }
     }
 
-    revalidatePath("/formulas")
-    return true
-  } catch (error) {
-    console.error("Error en estatusActivoFormula de app/actions/formulas: ", error)
-    return false
+    return {
+      success: true,
+      message: "Ingrediente eliminado de la fórmula exitosamente",
+    }
+  } catch (error: any) {
+    console.error("Error en eliminarIngredienteFormula:", error)
+    return { success: false, error: error.message }
+  }
+}
+
+//Función: eliminarRegistroIncompleto: función para eliminar registros incompletos cuando el usuario sale del proceso
+export async function eliminarRegistroIncompleto(formulaId: number) {
+  try {
+    const { data: formulaData, error: formulaQueryError } = await supabase
+      .from("formulas")
+      .select("imgurl")
+      .eq("id", formulaId)
+      .single()
+
+    if (formulaQueryError) {
+      console.error("Error al obtener datos de fórmula:", formulaQueryError)
+      return { success: false, error: formulaQueryError.message }
+    }
+
+    if (formulaData?.imgurl) {
+      try {
+        const url = new URL(formulaData.imgurl)
+        const pathSegments = url.pathname.split("/")
+
+        // Buscar el segmento que contiene el nombre del archivo (después de 'formulas')
+        const formulasIndex = pathSegments.findIndex((segment) => segment === "formulas")
+        if (formulasIndex !== -1 && formulasIndex < pathSegments.length - 1) {
+          // Tomar el nombre del archivo que está después de 'formulas'
+          const fileName = pathSegments[formulasIndex + 1]
+          console.log("Intentando eliminar archivo:", fileName)
+
+          // Eliminar la imagen del bucket herbax con el path completo
+          const { error: deleteImageError } = await supabase.storage.from("herbax").remove([`formulas/${fileName}`])
+
+          if (deleteImageError) {
+            console.error("Error al eliminar imagen:", deleteImageError)
+            // No retornamos error aquí para que continúe con la eliminación de registros
+          } else {
+            console.log("Imagen eliminada exitosamente")
+          }
+        } else {
+          console.log("No se pudo extraer el nombre del archivo de la URL")
+        }
+      } catch (imageError) {
+        console.error("Error al procesar eliminación de imagen:", imageError)
+        // Continuar con la eliminación de registros aunque falle la imagen
+      }
+    }
+
+    // Primero eliminar los ingredientes asociados a la fórmula
+    const { error: ingredientesError } = await supabase.from("ingredientesxformula").delete().eq("formulaid", formulaId)
+
+    if (ingredientesError) {
+      console.error("Error al eliminar ingredientes de fórmula:", ingredientesError)
+      return { success: false, error: ingredientesError.message }
+    }
+
+    // Luego eliminar la fórmula
+    const { error: formulaError } = await supabase.from("formulas").delete().eq("id", formulaId)
+
+    if (formulaError) {
+      console.error("Error al eliminar fórmula:", formulaError)
+      return { success: false, error: formulaError.message }
+    }
+
+    return {
+      success: true,
+      message: "Registro incompleto eliminado exitosamente",
+    }
+  } catch (error: any) {
+    console.error("Error en eliminarRegistroIncompleto:", error)
+    return { success: false, error: error.message }
   }
 }
