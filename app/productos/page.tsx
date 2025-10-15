@@ -576,6 +576,36 @@ export default function ProductosPage() {
     cargarDatosIniciales()
   }
 
+// --- Handles - Manejo de Eventos ---
+  const handleClienteChange = async (value: string) => {
+    setFiltroCliente(value)
+    setFiltroCatalogo("-1") // Resetear catálogo al cambiar cliente
+
+    try {
+      const clienteIdNum = Number.parseInt(value, 10)
+
+      let query = supabase.from("catalogos").select(`id, nombre`).eq("activo", true).order("nombre")
+
+      if (clienteIdNum !== -1) {
+        query = query.eq("clienteid", clienteIdNum)
+      }
+
+      const { data, error } = await query
+
+      if (!error) {
+        const catalogosConTodos = [
+          { id: -1, nombre: "Todos" },
+          ...(data || []).map((c: any) => ({ id: c.id, nombre: c.nombre })),
+        ]
+        setCatalogos(catalogosConTodos)
+      } else {
+        console.error("Error al cargar catálogos por cliente:", error)
+      }
+    } catch (error) {
+      console.error("Error al cambiar cliente:", error)
+    }
+  }
+  
   // ESTE ES EL ÚNICO LUGAR DONDE SE EJECUTA LA BÚSQUEDA
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
