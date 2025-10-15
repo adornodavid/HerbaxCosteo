@@ -180,24 +180,6 @@ export async function actualizarZona(formData: FormData) {
     const id = Number(idString)
 
     // Paso 1: Validar si no existe
-    const existe: boolean = await (async () => {
-      const resultado = await obtenerZonas(
-        -1,
-        formData.get("nombre") as string,
-        formData.get("clave") as string,
-        "Todos",
-      )
-      return resultado.success && resultado.data && resultado.data.some((zona) => zona.id !== id)
-    })()
-
-    if (existe) {
-      return {
-        success: false,
-        error:
-          "Los datos que desea actualizar ya los tiene otro registro y no se puede proceder, recuerde que la información debe ser unica.",
-      }
-    }
-    // Paso 1: Validar si no existe
     /*
     const existe: boolean = await (async () => {
       const resultado = await obtenerZonas(
