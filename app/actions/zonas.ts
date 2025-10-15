@@ -214,8 +214,9 @@ export async function actualizarZona(formData: FormData) {
       const resultadoImagen = await imagenSubir(imagen, auxNombre, "zonas")
       if (!resultadoImagen.success) {
         return { success: false, error: resultadoImagen.error }
+      } else{
+        imagenurl = resultadoImagen.url || ""
       }
-      imagenurl = resultadoImagen.url || ""
     } else {
       imagenurl = imgurl || ""
     }
