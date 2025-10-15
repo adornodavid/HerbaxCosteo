@@ -429,6 +429,9 @@ export default function ProductosPage() {
     }
   }
 
+  
+
+  // ESTE ES EL ÚNICO LUGAR DONDE SE EJECUTA LA BÚSQUEDA
   // Estatus - Cambiar activo/inactivo
   const handleToggleStatusClickActivo = async (productoId: number, productoActivo: boolean) => {
     try {
@@ -458,11 +461,6 @@ export default function ProductosPage() {
     setElementoDetalles(producto)
     setShowElementoDetallesModal(true)
   }
-
-  // ESTE ES EL ÚNICO LUGAR DONDE SE EJECUTA LA BÚSQUEDA
-  
-
-  
 
   const handleToggleStatusClickProducto = (id: number, activo: boolean) => {
     setProductoToToggle({ id, activo })
