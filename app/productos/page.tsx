@@ -576,6 +576,8 @@ export default function ProductosPage() {
     cargarDatosIniciales()
   }
 
+  //
+
   // --- Renders (contenidos auxiliares) ---
   // Loading
   /*if (showPageLoading) {
