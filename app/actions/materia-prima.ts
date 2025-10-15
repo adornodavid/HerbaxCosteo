@@ -4,6 +4,7 @@
   Imports
 ================================================== */
 import { createClient } from "@/lib/supabase"
+import { arrActivoTrue, arrActivoFalse } from "@/lib/config"
 import { obtenerFormulasXProductos } from "@/app/actions/productos"
 import { revalidatePath } from "next/cache"
 import { imagenSubir } from "@/app/actions/utilerias"
@@ -139,7 +140,7 @@ export async function obtenerMateriasPrimas(
   productoid = -1,
 ) {
   try {
-    // Paso 1: Obtener arrays de las formulasid que esten por cliente y/o por producto
+    // Paso 1: Obtener arrays de las materiasprimaid que esten por formula y/o por producto
     let IdsXFormula: number[] = []
     if (formulaid > 0) {
       const resultado = await obtenerMateriasPrimasXFormulas(formulaid)
@@ -165,7 +166,7 @@ export async function obtenerMateriasPrimas(
         nombre,
         imgurl,
         unidadmedidaid,
-        unidadesmedida!unidadmedidaid(descripcion),
+        unidadesmedida(descripcion),
         costo,
         fechacreacion,
         activo
@@ -182,16 +183,18 @@ export async function obtenerMateriasPrimas(
       query = query.ilike("nombre", `%${nombre}%`)
     }
     if (activo !== "Todos") {
-      const isActive = ["True", "true", "Activo", "1", true].includes(activo)
-      const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
+      const isActive = arrActivoTrue.includes(activo)
+      const isInactive = arrActivoFalse.includes(activo)
       if (isActive) {
         query = query.eq("activo", true)
       } else if (isInactive) {
         query = query.eq("activo", false)
       }
     }
-    if (IdsMerge.length > 0) {
-      query = query.in("id", IdsMerge)
+    if (formulaid > 0 || productoid > 0) {
+      if (IdsMerge.length > 0) {
+        query = query.in("id", IdsMerge)
+      }
     }
 
     // Paso 4: Ejecutar query
