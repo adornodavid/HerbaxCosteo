@@ -721,7 +721,7 @@ export default function ProductosPage() {
         <CardHeader>
           <CardTitle>Resultados</CardTitle>
           <CardDescription>
-            Mostrando {elementosPaginados.length} de {totalProductos} productos encontrados.
+            Mostrando {elementosPaginados.length} de {totalProductos} elementos encontrados.
           </CardDescription>
         </CardHeader>
         <CardContent>
