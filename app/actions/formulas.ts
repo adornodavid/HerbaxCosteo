@@ -142,8 +142,6 @@ export async function obtenerFormulas(
       const resultado = await obtenerFormulasXClientes(clienteid)
       if (resultado.success && resultado.data) {
         IdsXCliente = resultado.data
-      }else{
-        return { success: false, error: "Error obteniendo el array de los id de las formulas relacionadas con clientes" }
       }
     }
     let IdsXProducto: number[] = []
@@ -151,8 +149,6 @@ export async function obtenerFormulas(
       const resultado = await obtenerFormulasXProductos(productoid)
       if (resultado.success && resultado.data) {
         IdsXProducto = resultado.data
-      }else{
-        return { success: false, error: "Error obteniendo el array de los id de las formulas relacionadas con productos" }
       }
     }
     const IdsMerge: number[] = [...new Set([...IdsXCliente, ...IdsXProducto])]
