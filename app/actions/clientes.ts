@@ -119,7 +119,7 @@ export async function crearCliente(formData: FormData) {
     console.error("Error en crearCliente de actions/clientes:", error)
     return {
       success: false,
-      error: "Error interno del servidor, al ejecutar funcion crearCliente de actions/clientes: " + error,
+      mensaje: "Error interno del servidor, al ejecutar funcion crearCliente de actions/clientes: " + error,
     }
   }
 }
