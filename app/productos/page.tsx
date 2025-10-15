@@ -390,17 +390,18 @@ export default function ProductosPage() {
     setFiltroCatalogo("-1") 
 
     try {
+      // Transformar variable recibida
       const clienteIdNum = Number.parseInt(value, 10)
-
+      // Preparar query
       let query = supabase.from("catalogos").select(`id, nombre`).eq("activo", true).order("nombre")
-
+      // Filtros para el query
       if (clienteIdNum !== -1) {
         query = query.eq("clienteid", clienteIdNum)
       }
-
+      // Ejecutar Query
       const { data, error } = await query
-
       if (!error) {
+        // Cargar input de filtro
         const catalogosConTodos = [
           { id: -1, nombre: "Todos" },
           ...(data || []).map((c: any) => ({ id: c.id, nombre: c.nombre })),
