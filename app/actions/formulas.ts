@@ -160,7 +160,7 @@ export async function obtenerFormulas(
         nombre,
         imgurl,
         unidadmedidaid,
-        unidadesmedida!unidadmedidaid(descripcion),
+        unidadesmedida(descripcion),
         costo,
         fechacreacion,
         activo
