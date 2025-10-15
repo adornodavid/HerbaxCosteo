@@ -145,7 +145,6 @@ export async function obtenerFormulas(
         return { success: false, error: "Error obteniendo el array de los id de las formulas relacionadas con clientes" }
       }
     }
-
     let IdsXProducto: number[] = []
     if (productoid > 0) {
       const resultado = await obtenerFormulasXProductos(productoid)
