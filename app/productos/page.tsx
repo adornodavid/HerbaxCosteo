@@ -314,12 +314,13 @@ export default function ProductosPage() {
         return { success: false, mensaje: "No hay datos o la consulta falló." }
       }
 
-      if (!result.success) {
+      /*if (!result.success) {
         console.error("Error en búsqueda del filtro de búsqueda:", result.error)
         setProductos([])
         return
-      }
+      }*/
     } catch (error) {
+      // Retorno de información
       console.error("Error inesperado al buscar productos:", error)
       setProductos([])
       return { error: true, mensaje: "Error inesperado al buscar productos: " + error }
