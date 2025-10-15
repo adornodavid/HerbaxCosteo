@@ -867,10 +867,12 @@ export default function ProductosPage() {
                   <CardContent className="flex flex-col flex-grow p-4">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{p.ProductoNombre}</h3>
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                      {p.ProductoDescripcion || "Sin descripción."}
+                      Código: {p.ProductoCódigo || "Sin código."}
+                      <br/>
+                      Costo: { p,ProductoCosto  || "$0.00" }
                     </p>
+                    <p className="text-lg font-bold text-green-600">{formatCurrency(p.ProductoCosto)}</p>
                     <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
-                      <p className="text-lg font-bold text-green-600">{formatCurrency(p.ProductoCosto)}</p>
                       <div className="flex gap-1">
                         <Button
                           className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-7"
