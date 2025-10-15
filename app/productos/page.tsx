@@ -672,6 +672,13 @@ export default function ProductosPage() {
         </CardHeader>
 
         <CardContent>
+          {isSearching && (
+            <div className="flex justify-center items-center h-48">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+              <span className="ml-2">Buscando resultados.....</span>
+            </div>
+          )}
+          
           {isSearching ? (
             <div className="flex justify-center items-center h-48">
               <Loader2 className="mx-auto h-8 w-8 animate-spin" />
