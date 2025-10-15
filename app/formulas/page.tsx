@@ -163,7 +163,11 @@ export default function FormulasPage() {
   // Inicio (carga inicial y seguridad)
   const cargarDatosIniciales = async () => {
     if (!user) return
-
+    
+    let auxClienteId = -1
+    if(!esAdminDDLs){
+      auxClienteId = user.RolId
+    }
     try {
       setPageTituloMasNuevo({
         Titulo: "Fórmulas",
