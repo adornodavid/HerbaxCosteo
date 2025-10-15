@@ -414,7 +414,6 @@ export default function ProductosPage() {
       setShowModalError(true)
     } finally {
       setShowPageLoading(false)
-      //setPageLoading(false)
     }
   }
 
