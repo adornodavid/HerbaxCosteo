@@ -137,11 +137,24 @@ export default function ProductosPage() {
     
   // -- Funciones --
   const ejecutarBusquedaProductos = async (productonombre: string, clienteid: number, catalogoid: number, estatus: string) => {
+    // Validar usuario activo
     if (!user) return
+
+    // Actualizar estados
     setIsSearching(true)
     setPaginaActual(1)
 
+    // Formatear variables a mandar como parametros
     console.log("filtros: productonombre: " + productonombre + " _ clienteid: " + clienteid + " _ catalogoid: " + catalogoid + " _ estatus: " + estatus)
+    const auxEstatus =
+      estatus === "-1"
+        ? "Todos"
+        : arrActivoTrue.includes(estatus)
+          ? true
+          : arrActivoFalse.includes(estatus)
+            ? false
+            : "Todos"
+    // Ejecutar Consulta principal
     try {
       const result = await obtenerProductos(
         -1, // productoid
@@ -149,7 +162,7 @@ export default function ProductosPage() {
         clienteid, // clienteid
         -1, // zonaid
         catalogoid,
-        estatus === "-1" ? "Todos" : estatus === "true" ? "Activo" : "Inactivo", // activo
+        auxEstatus, // activo
       )
 
       if (result.success && result.data) {
@@ -287,11 +300,18 @@ export default function ProductosPage() {
           CatalogoNombre: p.productosxcatalogo[0]?.catalogos?.nombre || "N/A",
         }))
 
+        // Actualizar estados
         setProductos(productosListado)
         setProductosFiltrados(productosListado)
         setTotalProductos(productosListado.length)
+
+        // Retorno de información
+        return { success: true, mensaje: "Se ejecuto correctamente cada proceso." }
       } else {
+        // Retorno de información
         console.log("[v0] No hay datos o la consulta falló")
+        setProductos([])
+        return { success: false, mensaje: "No hay datos o la consulta falló." }
       }
 
       if (!result.success) {
@@ -302,6 +322,7 @@ export default function ProductosPage() {
     } catch (error) {
       console.error("Error inesperado al buscar productos:", error)
       setProductos([])
+      return { error: true, mensaje: "Error inesperado al buscar productos: " + error }
     } finally {
       setIsSearching(false)
     }
