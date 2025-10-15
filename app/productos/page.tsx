@@ -725,8 +725,9 @@ export default function ProductosPage() {
 
                   {/* Card content */}
                   <CardContent className="flex flex-col flex-grow p-4">
-                    {/* Name in bold */}
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{p.ProductoNombre}</h3>
+                    {/* Nombre */}
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{p.ProductoNombre}</h3>
+                    {/* Código */}
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-3 text-right">
                       Código: {p.ProductoCodigo || "Sin código."}
                     </p>
