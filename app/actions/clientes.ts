@@ -87,7 +87,7 @@ export async function crearCliente(formData: FormData) {
         return { success: false, error: resultadoImagen.error }
       }
     }
-return { success: false, error: "LLEGAMOS AL QUERY" }
+    
     // Paso 5: Ejecutar Query
     const { data, error } = await supabase
       .from("clientes")
