@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
-import { obtenerMateriasPrima } from "@/app/actions/materia-prima"
+import { obtenerMateriasPrimas } from "@/app/actions/materia-prima"
 import PageTitlePlusNew from "@/components/page-title-plus-new"
 
 export default async function VerMateriaPrimaPage({
