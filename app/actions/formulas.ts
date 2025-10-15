@@ -181,8 +181,8 @@ export async function obtenerFormulas(
       query = query.ilike("nombre", `%${nombre}%`)
     }
     if (activo !== "Todos") {
-      const isActive = ["True", "true", "Activo", "1", true].includes(activo)
-      const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
+      const isActive = arrActivoTrue.includes(activo)
+      const isInactive = arrActivoFalse.includes(activo)
       if (isActive) {
         query = query.eq("activo", true)
       } else if (isInactive) {
