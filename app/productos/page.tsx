@@ -25,6 +25,7 @@ import type {
   propsPageModalTutorial,
 } from "@/types/common"
 // -- Librerias --
+import { supabase } from "@/lib/supabase"
 // Configuraciones
 import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Componentes --
