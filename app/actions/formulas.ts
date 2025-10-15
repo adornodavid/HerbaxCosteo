@@ -3,6 +3,7 @@
   Imports
 ================================================== */
 import { createClient } from "@/lib/supabase"
+import { arrActivoTrue, arrActivoFalse } from "@/lib/config"
 import { obtenerProductosXClientes } from "@/app/actions/productos"
 import { imagenSubir } from "@/app/actions/utilerias"
 import { revalidatePath } from "next/cache"
