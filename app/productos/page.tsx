@@ -567,7 +567,7 @@ export default function ProductosPage() {
             id="frmProductosBuscar"
             name="frmProductosBuscar"
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 gap-4 items-end"
-            onSubmit={handleFormSubmit}
+            onSubmit={handleBuscar}
           >
             <div className="lg:col-span-2">
               <label htmlFor="txtProductoNombre" className="text-sm font-medium">
