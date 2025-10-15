@@ -378,7 +378,7 @@ export default function ProductosPage() {
         console.error("Error cargando clientes:", clientesError)
       }
 
-      // -- Cargar catalogos
+      // DDL catalogos
       const catalogosResult = await listaDesplegableCatalogos(-1, "", auxClienteId)
       if (!catalogosResult.error) {
         const catalogosConTodos = esAdminDDLs === true
