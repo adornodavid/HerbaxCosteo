@@ -687,91 +687,93 @@ export default function ProductosPage() {
             </div>
           ) : */}
           
-          {!isSearching && elementosPaginados.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-              {elementosPaginados.map((p, index) => (
-                <Card
-                  key={`${p.ProductoId}-${p.CatalogoId}-${index}`}
-                  className="border bg-card text-card-foreground relative flex flex-col overflow-hidden rounded-xs shadow-lg hover:shadow-xl transition-shadow duration-300 group"
-                >
-                  <div
-                    className="relative w-full h-48 overflow-hidden cursor-pointer"
-                    onClick={() => handleViewProductoDetails(p.ProductoId)}
-                    title="Ver detalles del producto"
+          {!isSearching && (}
+            {!isSearching && elementosPaginados.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                {elementosPaginados.map((p, index) => (
+                  <Card
+                    key={`${p.ProductoId}-${p.CatalogoId}-${index}`}
+                    className="border bg-card text-card-foreground relative flex flex-col overflow-hidden rounded-xs shadow-lg hover:shadow-xl transition-shadow duration-300 group"
                   >
-                    <Image
-                      src={p.ProductoImagenUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
-                      alt={p.ProductoNombre}
-                      layout="fill"
-                      objectFit="cover"
-                      className="rounded-t-xs transition-transform duration-300 group-hover:scale-105"
-                    />
-                    <div className="absolute top-2 right-2">
-                      <span
-                        className={`px-2 py-1 text-xs rounded-xs font-semibold ${p.ProductoActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
-                      >
-                        {p.ProductoActivo ? "Activo" : "Inactivo"}
-                      </span>
-                    </div>
-                  </div>
-                  <CardContent className="flex flex-col flex-grow p-4">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{p.ProductoNombre}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3 text-right">
-                      Código: {p.ProductoCodigo || "Sin código."}
-                    </p>
-                    <p className="text-lg font-bold text-green-600">{formatCurrency(p.ProductoCosto)}</p>
-                    <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
-                      <div className="flex gap-3 justify-center mt-auto">
-                        
-
-                        <Button
-                          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-7"
-                          variant="ghost"
-                          size="icon"
-                          title="Ver Detalles"
-                          onClick={() => handleViewProductoDetails(p.ProductoId)}
-                          disabled={isDetailsLoading}
+                    <div
+                      className="relative w-full h-48 overflow-hidden cursor-pointer"
+                      onClick={() => handleViewProductoDetails(p.ProductoId)}
+                      title="Ver detalles del producto"
+                    >
+                      <Image
+                        src={p.ProductoImagenUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
+                        alt={p.ProductoNombre}
+                        layout="fill"
+                        objectFit="cover"
+                        className="rounded-t-xs transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute top-2 right-2">
+                        <span
+                          className={`px-2 py-1 text-xs rounded-xs font-semibold ${p.ProductoActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
                         >
-                          {isDetailsLoading ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </Button>
-                        <Link href={`/productos/editar?getProductoId=${p.ProductoId}`} passHref>
+                          {p.ProductoActivo ? "Activo" : "Inactivo"}
+                        </span>
+                      </div>
+                    </div>
+                    <CardContent className="flex flex-col flex-grow p-4">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{p.ProductoNombre}</h3>
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3 text-right">
+                        Código: {p.ProductoCodigo || "Sin código."}
+                      </p>
+                      <p className="text-lg font-bold text-green-600">{formatCurrency(p.ProductoCosto)}</p>
+                      <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
+                        <div className="flex gap-3 justify-center mt-auto">
+                          
+
                           <Button
                             className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-7"
                             variant="ghost"
                             size="icon"
-                            title="Editar"
+                            title="Ver Detalles"
+                            onClick={() => handleViewProductoDetails(p.ProductoId)}
+                            disabled={isDetailsLoading}
                           >
-                            <Edit className="h-4 w-4" />
+                            {isDetailsLoading ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
                           </Button>
-                        </Link>
-                        <Button
-                          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2   focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  hover:bg-accent hover:text-accent-foreground h-10 w-7"
-                          variant="ghost"
-                          size="icon"
-                          title={p.ProductoActivo ? "Inactivar" : "Activar"}
-                          onClick={() => handleToggleStatusClickProducto(p.ProductoId, p.ProductoActivo)}
-                        >
-                          {p.ProductoActivo ? (
-                            <ToggleRight className="h-4 w-4 text-red-500" />
-                          ) : (
-                            <ToggleLeft className="h-4 w-4 text-green-500" />
-                          )}
-                        </Button>
+                          <Link href={`/productos/editar?getProductoId=${p.ProductoId}`} passHref>
+                            <Button
+                              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-7"
+                              variant="ghost"
+                              size="icon"
+                              title="Editar"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                          <Button
+                            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2   focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  hover:bg-accent hover:text-accent-foreground h-10 w-7"
+                            variant="ghost"
+                            size="icon"
+                            title={p.ProductoActivo ? "Inactivar" : "Activar"}
+                            onClick={() => handleToggleStatusClickProducto(p.ProductoId, p.ProductoActivo)}
+                          >
+                            {p.ProductoActivo ? (
+                              <ToggleRight className="h-4 w-4 text-red-500" />
+                            ) : (
+                              <ToggleLeft className="h-4 w-4 text-green-500" />
+                            )}
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">No se encontraron resultados.</div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">No se encontraron resultados.</div>
+            )}
           )}
 
-          
+
           {totalPaginas > 1 && (
             <div className="flex items-center justify-center space-x-2 pt-4">
               <Button
