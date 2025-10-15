@@ -74,12 +74,13 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from("healthylab")
       .upload(`${folder}/${fileName}`, imageFile)
-return { success: false, error: "SE SUBIOXX" }
+
     // Si se presentó un error
     if (uploadError) {
       console.error("Error subiendo imagen en actions/utilerias imagenSubir:", uploadError)
       return { success: false, error: "Error al subir la imagen: " + uploadError }
     }
+  return { success: false, error: "SE SUBIOXX" }
 
     // Obtener URL
     const { data: urlData, error: urlDataError } = supabase.storage.from("healthylab").getPublicUrl(`${folder}/${fileName}`)
