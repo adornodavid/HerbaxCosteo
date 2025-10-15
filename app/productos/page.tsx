@@ -670,6 +670,7 @@ export default function ProductosPage() {
             Mostrando {elementosPaginados.length} de {totalProductos} elementos encontrados.
           </CardDescription>
         </CardHeader>
+        
         <CardContent>
           {isSearching ? (
             <div className="flex justify-center items-center h-48">
