@@ -452,7 +452,7 @@ export default function ZonasPage() {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex gap-1">
-                        
+
                           <Button variant="ghost" size="icon" title="Ver">
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -466,6 +466,7 @@ export default function ZonasPage() {
                               <ToggleLeft className="h-4 w-4 text-green-500" />
                             )}
                           </Button>
+                          
                         </div>
                       </td>
                     </tr>
