@@ -220,3 +220,22 @@ export async function eliminarZona(id: number) {
 /*==================================================
   * SPECIALS-ESPECIALES ()
 ================================================== */
+export async function estatusActivoZona(id: number, activo: boolean): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("zonas").update({ activo: activo }).eq("id", id)
+
+    if (error) {
+      console.error(
+        "Error actualizando estatus activo de la zona en estatusActivoZona de app/actions/zonas:",
+        error,
+      )
+      return false
+    }
+
+    revalidatePath("/zonas")
+    return true
+  } catch (error) {
+    console.error("Error en estatusActivoZona de app/actions/zonas: ", error)
+    return false
+  }
+}
