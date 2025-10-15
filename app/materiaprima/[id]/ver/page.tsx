@@ -28,7 +28,7 @@ import { PageModalError } from "@/components/page-modal-error"
 import { PageModalTutorial } from "@/components/page-modal-tutorial"
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
-import { obtenerMateriasPrima } from "@/app/actions/materia-prima"
+import { obtenerMateriasPrimas } from "@/app/actions/materia-prima"
 
 /* ==================================================
 	Componente Principal (Pagina)
@@ -67,7 +67,7 @@ export default function VerMateriaPrimaPage() {
         try {
           setShowPageLoading(true)
 
-          const result = await obtenerMateriasPrima(materiaPrimaId, "", "", "Todos", -1, -1)
+          const result = await obtenerMateriasPrimas(materiaPrimaId, "", "", "Todos", -1, -1)
           if (result.success && result.data && result.data.length > 0) {
             setMateriaPrima(result.data[0])
           }
