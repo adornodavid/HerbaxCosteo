@@ -265,7 +265,8 @@ export default function ProductosPage() {
       }
     } catch (error) {
       // Retorno de información
-      console.error("Error inesperado al buscar productos:", error)
+      console.error("Error inesperado al buscar productos: ", error)
+      console.log("Error inesperado al buscar productos: ", error)
       setProductos([])
       return { error: true, mensaje: "Error inesperado al buscar productos: " + error }
     } finally {
