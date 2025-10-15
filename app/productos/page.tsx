@@ -770,8 +770,6 @@ export default function ProductosPage() {
           ) : (
             <div className="text-center py-8 text-muted-foreground">No se encontraron resultados.</div>
           )}
-        
-
 
           {totalPaginas > 1 && (
             <div className="flex items-center justify-center space-x-2 pt-4">
