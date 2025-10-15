@@ -155,7 +155,7 @@ export async function obtenerFormulas(
       }
     }
     const IdsMerge: number[] = [...new Set([...IdsXCliente, ...IdsXProducto])]
-
+return { success: false, error: "Error obteniendo el array de los id de las formulas relacionadas con productos" }
     // Paso 2: Preparar Query
     let query = supabase.from("formulas").select(`
         id,
