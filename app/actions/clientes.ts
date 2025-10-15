@@ -79,8 +79,8 @@ export async function crearCliente(formData: FormData) {
     if (imagen && imagen.size > 0) {
       const resultadoImagen = await imagenSubir(imagen, nombre, "clientes")
       if (!resultadoImagen.success) {
-      return { success: false, error: "SE EJECUTO LA FUNCION DE SUBIR IMAGEN -----------------------" }
         imagenurl = resultadoImagen.url || "" 
+        return { success: false, error: "SE EJECUTO LA FUNCION DE SUBIR IMAGEN -----------------------" + imagenurl }
         if(imagenurl.length < 3){
           return { success: false, error: "Se subio la imagen a supabase pero no se obtuvo el url."}
         }
