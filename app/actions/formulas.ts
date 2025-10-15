@@ -188,9 +188,6 @@ export async function obtenerFormulas(
     if (clienteid > 0 || productoid > 0) {
       if (IdsMerge.length > 0) {
         query = query.in("id", IdsMerge)
-      } else {
-        // Si no hay IDs, forzar un filtro que no retorne nada
-        query = query.in("id", [-1]) // ID que nunca existe
       }
     }
 
