@@ -514,6 +514,8 @@ export async function eliminarRegistroIncompleto(formulaId: number) {
 /*==================================================
   * SPECIALS-ESPECIALES ()
 ================================================== */
+
+
 //Función: listaDesplegableFormulas: funcion para obtener todas las formulas para el input dropdownlist
 export async function listaDesplegableFormulas() {
   try {
