@@ -5,7 +5,7 @@
 ================================================== */
 import { createClient } from "@/lib/supabase"
 import { arrActivoTrue, arrActivoFalse } from "@/lib/config"
-import { obtenerFormulasXProductos } from "@/app/actions/productos"
+import { obtenerFormulasXProductos } from "@/app/actions/formulas"
 import { revalidatePath } from "next/cache"
 import { imagenSubir } from "@/app/actions/utilerias"
 
