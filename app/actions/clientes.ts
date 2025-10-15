@@ -248,8 +248,9 @@ export async function actualizarCliente(formData: FormData) {
       const resultadoImagen = await imagenSubir(imagen, auxNombre, "clientes")
       if (!resultadoImagen.success) {
         return { success: false, error: resultadoImagen.error }
+      }else{
+        imagenurl = resultadoImagen.url || ""
       }
-      imagenurl = resultadoImagen.url || ""
     } else {
       imagenurl = imgurl || ""
     }
