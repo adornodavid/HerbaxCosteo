@@ -178,7 +178,7 @@ export default function FormulasPage() {
       })
       setShowPageTituloMasNuevo(true)
 
-      const Result = await ejecutarBusqueda(-1, "", "", "True")
+      const Result = await ejecutarBusqueda(-1, "", "", "True", auxClienteId)
       if (!Result.success) {
         setModalAlert({
           Titulo: "En ejecucion de Busqueda de carga inicial",
