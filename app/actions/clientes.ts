@@ -81,7 +81,7 @@ export async function crearCliente(formData: FormData) {
       if (!resultadoImagen.success) {
         imagenurl = resultadoImagen.url || "" 
         if(imagenurl.length > 3){
-          return { success: false, error: "Se subio la imagen a supabase pero no se obtuvo el url."}
+          return { success: false, error: "Se subio la imagen a supabase pero no se obtuvo el url." + imagenurl}
         }
       }else{
         return { success: false, error: resultadoImagen.error }
