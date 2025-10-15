@@ -771,7 +771,7 @@ export default function ProductosPage() {
             ) : (
               <div className="text-center py-8 text-muted-foreground">No se encontraron resultados.</div>
             )}
-          )}
+          {)}
 
 
           {totalPaginas > 1 && (
