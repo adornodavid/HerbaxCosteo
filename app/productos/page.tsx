@@ -374,10 +374,11 @@ export default function ProductosPage() {
 
   // Busqueda - Limpiar o Resetear
   const handleLimpiar = () => {
-    setFiltroId("")
-    setFiltroCodigo("")
     setFiltroNombre("")
+    setFiltroCliente("-1")
+    setFiltroCatalogo("-1")
     setFiltroEstatus("-1")
+    handleClienteChange("-1")
 
     cargarDatosIniciales()
   }
@@ -460,15 +461,7 @@ export default function ProductosPage() {
   // ESTE ES EL ÚNICO LUGAR DONDE SE EJECUTA LA BÚSQUEDA
   
 
-  const clearProductosBusqueda = () => {
-    setFiltroNombre("")
-    setFiltroCliente("-1")
-    setFiltroCatalogo("-1")
-    setFiltroEstatus("-1")
-    handleClienteChange("-1")
-
-    cargarDatosIniciales()
-  }
+  
 
   const handleToggleStatusClickProducto = (id: number, activo: boolean) => {
     setProductoToToggle({ id, activo })
@@ -650,7 +643,7 @@ export default function ProductosPage() {
                 variant="outline"
                 className="w-full md:w-auto bg-[#4a4a4a] text-white hover:bg-[#333333]"
                 style={{ fontSize: "12px" }}
-                onClick={clearProductosBusqueda}
+                onClick={handleLimpiar}
               >
                 <RotateCcw className="mr-2 h-3 w-3" /> Limpiar
               </Button>
