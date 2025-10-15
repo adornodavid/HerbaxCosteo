@@ -120,6 +120,18 @@ export default function ProductosPage() {
     return Listado.slice(indiceInicio, indiceInicio + resultadosPorPagina)
   }, [Listado, paginaActual])
 
+// --- Paginación ---
+  const productosPaginados = useMemo(() => {
+    const indiceInicio = (paginaActual - 1) * resultadosPorPagina
+    return productosFiltrados.slice(indiceInicio, indiceInicio + resultadosPorPagina)
+  }, [productosFiltrados, paginaActual])
+
+  const totalPaginas = Math.ceil(totalProductos / resultadosPorPagina)
+
+  const formatCurrency = (amount: number | null) =>
+    new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(amount || 0)
+
+    
   // -- Funciones --
   const ejecutarBusquedaProductos = async (productonombre: string, clienteid: number, catalogoid: number, estatus: string) => {
     if (!user) return
