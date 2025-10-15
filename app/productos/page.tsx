@@ -164,7 +164,6 @@ export default function ProductosPage() {
         catalogoid,
         auxEstatus,
       )
-
       if (result.success && result.data) {
         const transformedData: oProducto[] = result.data.map((p: oProducto) => ({
           id: p.id,
