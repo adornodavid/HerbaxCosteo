@@ -407,7 +407,6 @@ export default function ProductosPage() {
     } catch (error) {
       console.error("Error al cargar datos iniciales: ", error)
       console.log("Error al cargar datos iniciales: ", error)
-
       setModalError({
         Titulo: "Error al cargar datos iniciales",
         Mensaje: error,
