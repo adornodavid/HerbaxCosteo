@@ -211,6 +211,7 @@ export async function actualizarCliente(formData: FormData) {
     const id = Number(idString)
 
     // Paso 1: Validar si no existe
+    /*
     const existe: boolean = await (async () => {
       const resultado = await obtenerClientes(
         -1,
@@ -234,6 +235,7 @@ export async function actualizarCliente(formData: FormData) {
           "Los datos del cliente que desea actualizar ya los tiene otro registro y no se puede proceder, recuerde que la información debe ser unica.",
       }
     }
+    */
 
     const imgurl = formData.get("imgurl") as string | null
 
