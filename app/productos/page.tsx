@@ -613,8 +613,6 @@ export default function ProductosPage() {
       )}
 
       {/* 2. Filtros de Búsqueda */}
-      {/* 3. Filtros */}
-
       <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
           <CardTitle>Filtros de Búsqueda</CardTitle>
