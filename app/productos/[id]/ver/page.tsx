@@ -99,6 +99,7 @@ export default function VerProductoPage() {
   }
 
   // Si no se cargo el elemento principal
+  /*
   if (!producto) {
     return (
       <div className="container mx-auto py-6">
@@ -106,6 +107,7 @@ export default function VerProductoPage() {
       </div>
     )
   }
+  */
 
   // Contenido principal
   return (
