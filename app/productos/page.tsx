@@ -136,7 +136,6 @@ export default function ProductosPage() {
   const formatCurrency = (amount: number | null) =>
     new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(amount || 0)
 
-    
   // -- Funciones --
   const ejecutarBusquedaProductos = async (productonombre: string, clienteid: number, catalogoid: number, estatus: string) => {
     // Validar usuario activo
