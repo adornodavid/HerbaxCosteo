@@ -67,11 +67,11 @@ export default function EliminarClientePage() {
   const ejecutarEliminar = async () => {
     if (confirmText.trim().toUpperCase() !== "ELIMINAR") {
       //alert("Debes escribir la palabra ELIMINAR para confirmar la eliminación")
-      setModalValidation({
+      setModalAlert({
         Titulo: "No se pudo eliminar el cliente seleccionado",
         Mensaje: "Debes escribir la palabra ELIMINAR para confirmar la eliminación.",
       })
-      setShowModalValidation(true)
+      setShowModalAlert(true)
       return
     }
 
