@@ -354,13 +354,8 @@ export default function ProductosPage() {
         setShowModalAlert(true)
       }
 
-
-
-
-      
-
-      const userClienteId = [1, 2, 3, 4].includes(Number(user.RolId)) ? -1 : Number(user.ClienteId)
-      // -- Cargar clientes
+      // -- Cargar DDLs
+      // DDL Clientes
       const { data: clientesData, error: clientesError } = await listaDesplegableClientes(userClienteId,"")
 
       if (!clientesError) {
