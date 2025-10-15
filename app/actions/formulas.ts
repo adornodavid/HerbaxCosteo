@@ -263,7 +263,7 @@ export async function obtenerFormulasXProductos(
       return { success: false, error: "ID de producto inválido" }
     }
 
-    const { data, error } = await supabase.from("formulasXproducto").select("formulaid").eq("productoid", productoid)
+    const { data, error } = await supabase.from("formulasxproducto").select("formulaid").eq("productoid", productoid)
 
     if (error) {
       console.error("Error en query obtenerFormulasXProductos de actions/formulas:", error)
