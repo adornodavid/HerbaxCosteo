@@ -146,7 +146,6 @@ export default function ProductosPage() {
     setPaginaActual(1)
 
     // Formatear variables a mandar como parametros
-    console.log("filtros: productonombre: " + productonombre + " _ clienteid: " + clienteid + " _ catalogoid: " + catalogoid + " _ estatus: " + estatus)
     const auxEstatus =
       estatus === "-1"
         ? "Todos"
@@ -159,11 +158,11 @@ export default function ProductosPage() {
     try {
       const result = await obtenerProductos(
         -1, // productoid
-        productonombre, // productonombre
-        clienteid, // clienteid
+        productonombre,
+        clienteid,
         -1, // zonaid
         catalogoid,
-        auxEstatus, // activo
+        auxEstatus,
       )
 
       if (result.success && result.data) {
