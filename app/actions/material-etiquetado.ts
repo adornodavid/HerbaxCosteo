@@ -29,6 +29,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - crearMaterialEtiquetado / insMaterialEtiquetado
   * READS-OBTENER (SELECTS)
     - obtenerMaterialesEtiquetados / selMaterialesEtiquetados
+    - obtenerMaterialesEtiquetadosXProductos / selMaterialesEtiquetadosXProductos
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarMaterialEtiquetado / updMaterialEtiquetado
   * DELETES-ELIMINAR (DELETES)
