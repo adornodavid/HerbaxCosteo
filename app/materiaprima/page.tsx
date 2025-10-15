@@ -34,7 +34,7 @@ import { PageModalTutorial } from "@/components/page-modal-tutorial"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
-import { obtenerMateriasPrima, estatusActivoMateriaPrima } from "@/app/actions/materia-prima"
+import { obtenerMateriasPrimas, estatusActivoMateriaPrima } from "@/app/actions/materia-prima"
 
 /* ==================================================
 	Componente Principal (Pagina)
