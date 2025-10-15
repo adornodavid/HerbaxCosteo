@@ -80,7 +80,7 @@ export default function CrearClientePage() {
 
       if (result.success) {
         alert("Cliente creado exitosamente")
-        router.push("/clientes")
+        router.push(`/clientes/${result.data}/editar`)
       } else {
         setModalError({
           Titulo: "Error al crear cliente",
