@@ -880,7 +880,7 @@ export default function ProductosPage() {
                             variant="ghost"
                             size="icon"
                             title="Ver Detalles"
-                            onClick={() => handleVerDetalles(elemento)}
+                            {/*onClick={() => handleVerDetalles(elemento)}*/}
                           >
                             <EyeOff className="h-4 w-4" />
                           </Button>
@@ -893,7 +893,7 @@ export default function ProductosPage() {
                             variant="ghost"
                             size="icon"
                             title="Ver Cliente"
-                            onClick={() => router.push(`/clientes/${elemento.ClienteId}/ver`)}
+                            onClick={() => router.push(`/productos/${p.ProductoId}/ver`)}
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -908,7 +908,7 @@ export default function ProductosPage() {
                                 variant="ghost"
                                 size="icon"
                                 title="Editar"
-                                onClick={() => router.push(`/clientes/${elemento.ClienteId}/editar`)}
+                                onClick={() => router.push(`/productos/${p.ProductoId}/editar`)}
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
