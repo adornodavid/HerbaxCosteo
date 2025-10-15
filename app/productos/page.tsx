@@ -728,7 +728,7 @@ export default function ProductosPage() {
                     {/* Nombre */}
                     <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{p.ProductoNombre}</h3>
                     {/* Código */}
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3 text-right">
+                    <p className="text-sm text-gray-600 mb-2">
                       Código: {p.ProductoCodigo || "Sin código."}
                     </p>
                     <p className="text-lg font-bold text-green-600">{formatCurrency(p.ProductoCosto)}</p>
