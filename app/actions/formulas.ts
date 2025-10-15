@@ -194,7 +194,7 @@ export async function obtenerFormulas(
 
     // Paso 4: Ejecutar query
     query = query.order("nombre", { ascending: true })
-return { success: false, error: query }
+
     // Paso 5: Varaibles y resultados del query
     const { data, error } = await query
 
