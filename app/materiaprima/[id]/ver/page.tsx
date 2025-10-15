@@ -14,7 +14,7 @@ export default async function VerMateriaPrimaPage({
   const materiaId = Number.parseInt(id)
 
   // Obtener los datos de la materia prima
-  const result = await obtenerMateriasPrima(materiaId, "", "", "Todos", -1, -1)
+  const result = await obtenerMateriasPrimas(materiaId, "", "", "Todos", -1, -1)
 
   if (!result.success || !result.data || result.data.length === 0) {
     notFound()
