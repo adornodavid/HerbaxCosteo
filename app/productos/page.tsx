@@ -260,7 +260,6 @@ export default function ProductosPage() {
         return { success: true, mensaje: "Se ejecuto correctamente cada proceso." }
       } else {
         // Retorno de información
-        console.log("[v0] No hay datos o la consulta falló")
         setProductos([])
         return { success: false, mensaje: "No hay datos o la consulta falló." }
       }
