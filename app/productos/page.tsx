@@ -524,23 +524,6 @@ export default function ProductosPage() {
     }
   }
 
-  // --- Carga Inicial y Seguridad ---
-  useEffect(() => {
-    if (!authLoading) {
-      if (!user || user.RolId === 0) {
-        router.push("/login")
-        return
-      }
-
-      const inicializar = async () => {
-        setPageLoading({ message: "Cargando Productos..." })
-        setShowPageLoading(true)
-        await cargarDatosInicialesProductos()
-      }
-      inicializar()
-    }
-  }, [authLoading, user, router, esAdmin, esAdminDDLs, esAdminDOs])
-
   // Estatus - Cambiar activo/inactivo
   const handleToggleStatusClickActivo = async (productoId: number, productoActivo: boolean) => {
     try {
@@ -671,6 +654,22 @@ export default function ProductosPage() {
     setProductoToToggle(null)
   }
 
+  // --- Carga Inicial y Seguridad ---
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user || user.RolId === 0) {
+        router.push("/login")
+        return
+      }
+
+      const inicializar = async () => {
+        setPageLoading({ message: "Cargando Productos..." })
+        setShowPageLoading(true)
+        await cargarDatosInicialesProductos()
+      }
+      inicializar()
+    }
+  }, [authLoading, user, router, esAdmin, esAdminDDLs, esAdminDOs])
 
   // --- Renders (contenidos auxiliares) ---
   // Loading
