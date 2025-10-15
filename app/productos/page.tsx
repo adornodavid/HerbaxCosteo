@@ -235,54 +235,6 @@ export default function ProductosPage() {
             } || null,
           })) || [],
         }))
-        /*
-        const transformedData: Producto[] = result.data.map((p: Producto) => ({
-          id: p.id,
-          codigo: p.codigo,
-          clienteid: p.clienteid,
-          clientes: {
-            nombre: p.clientes?.nombre || null,
-          },
-          zonaid: p.zonaid,
-          zonas: {
-            nombre: p.zonas?.nombre || null,
-          },
-          nombre: p.nombre,
-          imgurl: p.imgurl,
-          unidadmedidaid: p.unidadmedidaid,
-          unidadesmedida: {
-            descripcion: p.unidadesmedida?.descripcion || null,
-          },
-          costo: p.costo,
-          activo: p.activo,
-          productoscaracteristicas: {
-            descripcion: p.productoscaracteristicas?.[0]?.descripcion || null,
-            presentacion: p.productoscaracteristicas?.[0]?.presentacion || null,
-            porcion: p.productoscaracteristicas?.[0]?.porcion || null,
-            modouso: p.productoscaracteristicas?.[0]?.modouso || null,
-            porcionenvase: p.productoscaracteristicas?.[0]?.porcionenvase || null,
-            categoriauso: p.productoscaracteristicas?.[0]?.categoriauso || null,
-            propositoprincipal: p.productoscaracteristicas?.[0]?.propositoprincipal || null,
-            propuestavalor: p.productoscaracteristicas?.[0]?.propuestavalor || null,
-            instruccionesingesta: p.productoscaracteristicas?.[0]?.instruccionesingesta || null,
-            edadminima: p.productoscaracteristicas?.[0]?.edadminima || null,
-            advertencia: p.productoscaracteristicas?.[0]?.advertencia || null,
-            condicionesalmacenamiento: p.productoscaracteristicas?.[0]?.condicionesalmacenamiento || null,
-          },
-          productosxcatalogo:
-            p.productosxcatalogo?.map((x: any) => ({
-              catalogoid: x.catalogoid || null,
-              precioventa: x.precioventa || null,
-              margenutilidad: x.margenutilidad || null,
-              catalogos: {
-                id: x.catalogos?.id || null,
-                nombre: x.catalogos?.nombre || null,
-                descripcion: x.catalogos?.descripcion || null,
-              },
-            })) || [],
-          
-        }))
-        */
 
         const productosListado: ProductoListado[] = transformedData.map((p: oProducto) => ({
           ProductoId: p.id,
@@ -312,12 +264,6 @@ export default function ProductosPage() {
         setProductos([])
         return { success: false, mensaje: "No hay datos o la consulta falló." }
       }
-
-      /*if (!result.success) {
-        console.error("Error en búsqueda del filtro de búsqueda:", result.error)
-        setProductos([])
-        return
-      }*/
     } catch (error) {
       // Retorno de información
       console.error("Error inesperado al buscar productos:", error)
