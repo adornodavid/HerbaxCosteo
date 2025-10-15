@@ -91,7 +91,7 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
     return { success: true, url: data }
   } catch (error) {
     console.error("Error procesando subida de imagen en imagenSubir de actiosn/utilerias: ", error)
-    return { success: false, error: "Error procesando subida de imagen en imagenSubir de actiosn/utilerias:" }
+    return { success: false, error: "Error procesando subida de imagen en imagenSubir de actionS/utilerias: " + error }
   }
 }
 
