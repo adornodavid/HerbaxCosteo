@@ -185,17 +185,16 @@ export async function actualizarZona(formData: FormData) {
         -1,
         formData.get("nombre") as string,
         formData.get("clave") as string,
-        "",
         "Todos",
       )
-      return resultado.success && resultado.data && resultado.data.some((cliente) => cliente.id !== id)
+      return resultado.success && resultado.data && resultado.data.some((zona) => zona.id !== id)
     })()
 
     if (existe) {
       return {
         success: false,
         error:
-          "Los datos del cliente que desea actualizar ya los tiene otro registro y no se puede proceder, recuerde que la información debe ser unica.",
+          "Los datos que desea actualizar ya los tiene otro registro y no se puede proceder, recuerde que la información debe ser unica.",
       }
     }
 
