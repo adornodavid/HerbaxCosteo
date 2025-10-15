@@ -220,6 +220,7 @@ export interface ProductoXCatalogoActualizar {
 // Especiales
 export interface ProductosListado {
   ProductoId: number
+  ProductoCodigo: string
   ProductoNombre: string
   ProductoDescripcion: string
   ProductoTiempo: string
