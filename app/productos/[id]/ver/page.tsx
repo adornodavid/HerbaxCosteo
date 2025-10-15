@@ -48,6 +48,9 @@ export default function VerProductoPage() {
   const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
   const [ModalError, setModalError] = useState<propsPageModalError>()
   const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
+  const [activeTab, setActiveTab] = useState<"informacion" | "caracteristicas" | "formulas" | "materialetiquetado">(
+    "informacion",
+  )
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
   const [showModalAlert, setShowModalAlert] = useState(false)
@@ -144,76 +147,156 @@ export default function VerProductoPage() {
         Ruta={null}
       />
 
-      {/* Card with product information */}
-      <Card className="overflow-hidden">
-        <CardContent className="p-0">
-          <div className="flex flex-col md:flex-row">
-            <div className="md:w-1/3 h-64 md:h-auto flex items-center justify-center bg-gray-100">
-              <img
-                src={
-                  producto.ProductoImgUrl && producto.ProductoImgUrl !== "Sin imagen"
-                    ? producto.ProductoImgUrl
-                    : "/placeholder.svg?height=400&width=400&text=Producto"
-                }
-                alt={producto.ProductoNombre}
-                className="w-full h-auto object-cover"
-              />
-            </div>
+      <div className="flex gap-2 border-b border-gray-200">
+        <button
+          onClick={() => setActiveTab("informacion")}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === "informacion"
+              ? "border-b-2 border-blue-500 text-blue-600"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          Información
+        </button>
+        <button
+          onClick={() => setActiveTab("caracteristicas")}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === "caracteristicas"
+              ? "border-b-2 border-blue-500 text-blue-600"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          Características
+        </button>
+        <button
+          onClick={() => setActiveTab("formulas")}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === "formulas" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          Fórmulas
+        </button>
+        <button
+          onClick={() => setActiveTab("materialetiquetado")}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === "materialetiquetado"
+              ? "border-b-2 border-blue-500 text-blue-600"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          Material de etiquetado
+        </button>
+      </div>
 
-            {/* Product data on the right */}
-            <div className="md:w-2/3 p-6 space-y-4">
-              <h1 className="text-3xl font-bold mb-6">Información del Producto</h1>
+      {activeTab === "informacion" && (
+        <Card className="overflow-hidden">
+          <CardContent className="p-0">
+            <div className="flex flex-col md:flex-row">
+              <div className="md:w-1/3 h-64 md:h-auto flex items-center justify-center bg-gray-100">
+                <img
+                  src={
+                    producto.ProductoImgUrl && producto.ProductoImgUrl !== "Sin imagen"
+                      ? producto.ProductoImgUrl
+                      : "/placeholder.svg?height=400&width=400&text=Producto"
+                  }
+                  alt={producto.ProductoNombre}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
 
-              <div className="space-y-3">
-                <div>
-                  <span className="font-semibold text-gray-700">ID:</span>
-                  <span className="ml-2 text-gray-900">{producto.ProductoId}</span>
-                </div>
+              {/* Product data on the right */}
+              <div className="md:w-2/3 p-6 space-y-4">
+                <h1 className="text-3xl font-bold mb-6">Información del Producto</h1>
 
-                <div>
-                  <span className="font-semibold text-gray-700">Nombre:</span>
-                  <span className="ml-2 text-gray-900">{producto.ProductoNombre || "Sin nombre"}</span>
-                </div>
+                <div className="space-y-3">
+                  <div>
+                    <span className="font-semibold text-gray-700">ID:</span>
+                    <span className="ml-2 text-gray-900">{producto.ProductoId}</span>
+                  </div>
 
-                <div>
-                  <span className="font-semibold text-gray-700">Código:</span>
-                  <span className="ml-2 text-gray-900">{producto.ProductoCodigo || "Sin código"}</span>
-                </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">Nombre:</span>
+                    <span className="ml-2 text-gray-900">{producto.ProductoNombre || "Sin nombre"}</span>
+                  </div>
 
-                <div>
-                  <span className="font-semibold text-gray-700">Cliente:</span>
-                  <span className="ml-2 text-gray-900">{producto.ClienteNombre || "Sin cliente"}</span>
-                </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">Código:</span>
+                    <span className="ml-2 text-gray-900">{producto.ProductoCodigo || "Sin código"}</span>
+                  </div>
 
-                <div>
-                  <span className="font-semibold text-gray-700">Fórmula:</span>
-                  <span className="ml-2 text-gray-900">{producto.FormulaNombre || "Sin fórmula"}</span>
-                </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">Cliente:</span>
+                    <span className="ml-2 text-gray-900">{producto.ClienteNombre || "Sin cliente"}</span>
+                  </div>
 
-                <div>
-                  <span className="font-semibold text-gray-700">Estatus:</span>
-                  <span
-                    className={`ml-2 px-2 py-1 rounded text-sm font-semibold ${
-                      producto.ProductoActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                    }`}
-                  >
-                    {producto.ProductoActivo ? "Activo" : "Inactivo"}
-                  </span>
-                </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">Fórmula:</span>
+                    <span className="ml-2 text-gray-900">{producto.FormulaNombre || "Sin fórmula"}</span>
+                  </div>
 
-                <div>
-                  <span className="font-semibold text-gray-700">Fecha de Creación:</span>
-                  <span className="ml-2 text-gray-900">
-                    {producto.ProductoFechaCreacion
-                      ? new Date(producto.ProductoFechaCreacion).toLocaleDateString()
-                      : "N/A"}
-                  </span>
+                  <div>
+                    <span className="font-semibold text-gray-700">Estatus:</span>
+                    <span
+                      className={`ml-2 px-2 py-1 rounded text-sm font-semibold ${
+                        producto.ProductoActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                      }`}
+                    >
+                      {producto.ProductoActivo ? "Activo" : "Inactivo"}
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="font-semibold text-gray-700">Fecha de Creación:</span>
+                    <span className="ml-2 text-gray-900">
+                      {producto.ProductoFechaCreacion
+                        ? new Date(producto.ProductoFechaCreacion).toLocaleDateString()
+                        : "N/A"}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
+
+      {activeTab === "caracteristicas" && (
+        <Card>
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Características del Producto</h2>
+            <div className="space-y-2">
+              <p className="text-gray-600">
+                Aquí se mostrarán las características del producto de acuerdo a la tabla productoscaracteristicas.
+              </p>
+              {/* TODO: Agregar lógica para cargar y mostrar características desde productoscaracteristicas */}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {activeTab === "formulas" && (
+        <Card>
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Fórmulas Asignadas</h2>
+            <div className="space-y-2">
+              <p className="text-gray-600">Aquí se mostrará el listado de fórmulas asignadas a este producto.</p>
+              {/* TODO: Agregar lógica para cargar y mostrar fórmulas asignadas */}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {activeTab === "materialetiquetado" && (
+        <Card>
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Material de Etiquetado</h2>
+            <div className="space-y-2">
+              <p className="text-gray-600">Aquí se mostrará el listado de material de etiquetado para este producto.</p>
+              {/* TODO: Agregar lógica para cargar y mostrar material de etiquetado */}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="flex gap-4 justify-center">
         {esAdminDOs && (
