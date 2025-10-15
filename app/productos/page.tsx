@@ -359,12 +359,11 @@ export default function ProductosPage() {
       const { data: clientesData, error: clientesError } = await listaDesplegableClientes(userClienteId,"")
 
       if (!clientesError) {
-        const clientesConTodos = [1, 2, 3, 4].includes(Number(user.RolId))
-          ? [{ id: -1, nombre: "Todos" }, ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))]
+        const clientesConTodos = esAdminDDLs === true ? [{ id: -1, nombre: "Todos" }, ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))]
           : (clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
         setClientes(clientesConTodos)
 
-        if ([1, 2, 3, 4].includes(Number(user.RolId))) {
+        if (esAdminDDLs) {
           setFiltroCliente("-1")
         } else {
           const aux = clientesData.id
