@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Eye, Edit, ToggleLeft, ToggleRight, Loader2, PlusCircle, RotateCcw } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
-import type { Producto } from "@/types/productos"
+import type { Producto, oProducto, ProductoCatalogo, ProductoListado, ProductosEstadisticas } from "@/types/productos"
 import type {
   propsPageLoadingScreen,
   propsPageTitlePlusNew,
