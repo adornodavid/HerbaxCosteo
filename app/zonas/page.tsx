@@ -546,35 +546,38 @@ export default function ZonasPage() {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title="Editar"
-                            onClick={() => router.push(`/zonas/${elemento.ZonaId}/editar`)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title={elemento.ZonaActivo ? "Inactivar" : "Activar"}
-                            onClick={() => handleToggleStatusClickActivo(elemento.ZonaId, elemento.ZonaActivo)}
-                          >
-                            {elemento.ZonaActivo ? (
-                              <ToggleRight className="h-4 w-4 text-red-500" />
-                            ) : (
-                              <ToggleLeft className="h-4 w-4 text-green-500" />
-                            )}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title="Eliminar"
-                            onClick={() => router.push(`/zonas/${elemento.ZonaId}/eliminar`)}
-                          >
-                            <Trash2 className="h-4 w-4 text-red-500" />
-                          </Button>
+                          {esAdminDOs && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Editar"
+                                onClick={() => router.push(`/zonas/${elemento.ZonaId}/editar`)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title={elemento.ZonaActivo ? "Inactivar" : "Activar"}
+                                onClick={() => handleToggleStatusClickActivo(elemento.ZonaId, elemento.ZonaActivo)}
+                              >
+                                {elemento.ZonaActivo ? (
+                                  <ToggleRight className="h-4 w-4 text-red-500" />
+                                ) : (
+                                  <ToggleLeft className="h-4 w-4 text-green-500" />
+                                )}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Eliminar"
+                                onClick={() => router.push(`/zonas/${elemento.ZonaId}/eliminar`)}
+                              >
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
