@@ -229,7 +229,7 @@ export async function actualizarZona(formData: FormData) {
     const email = formData.get("email") as string
 
     const { data, error } = await supabase
-      .from("clientes")
+      .from("zonas")
       .update({
         nombre,
         clave,
@@ -244,19 +244,19 @@ export async function actualizarZona(formData: FormData) {
 
     // Return error
     if (error) {
-      console.error("Error actualizando cliente en query en actualizarCliente de actions/clientes:", error)
+      console.error("Error actualizando zona en query en actualizarZona de actions/zonas:", error)
       return { success: false, error: error.message }
     }
 
-    revalidatePath("/clientes")
+    revalidatePath("/zonas")
 
     // Return resultados
     return { success: true, data: data.id }
   } catch (error) {
-    console.error("Error en actualizarCliente de actions/clientes:", error)
+    console.error("Error en actualizarZona de actions/zonas:", error)
     return {
       success: false,
-      error: "Error interno del servidor, al ejecutar funcion actualizarCliente de actions/clientes: " + error,
+      error: "Error interno del servidor, al ejecutar funcion actualizarZona de actions/zonas: " + error,
     }
   }
 }
