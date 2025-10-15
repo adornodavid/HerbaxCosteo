@@ -626,26 +626,19 @@ export default function ProductosPage() {
       )}
 
       {/* 2. Filtros de Búsqueda */}
+      {/* 3. Filtros */}
+
       <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
           <CardTitle>Filtros de Búsqueda</CardTitle>
         </CardHeader>
         <CardContent>
-          <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 gap-4 items-end" onSubmit={handleBuscar}>
-            <div className="lg:col-span-2">
-              <label htmlFor="txtProductoId" className="text-sm font-medium">
-                ID
-              </label>
-              <Input
-                id="txtProductoId"
-                name="txtProductoId"
-                type="number"
-                min="0"
-                placeholder="Buscar por ID..."
-                value={filtroId}
-                onChange={(e) => setFiltroId(e.target.value)}
-              />
-            </div>
+          <form
+            id="frmProductosBuscar"
+            name="frmProductosBuscar"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 gap-4 items-end"
+            onSubmit={handleFormSubmit}
+          >
             <div className="lg:col-span-2">
               <label htmlFor="txtProductoNombre" className="text-sm font-medium">
                 Nombre
@@ -661,18 +654,38 @@ export default function ProductosPage() {
               />
             </div>
             <div className="lg:col-span-2">
-              <label htmlFor="txtProductoCodigo" className="text-sm font-medium">
-                Código
+              <label htmlFor="ddlClientes" className="text-sm font-medium">
+                Cliente
               </label>
-              <Input
-                id="txtProductoCodigo"
-                name="txtProductoCodigo"
-                type="text"
-                placeholder="Buscar por código..."
-                maxLength={50}
-                value={filtroCodigo}
-                onChange={(e) => setFiltroCodigo(e.target.value)}
-              />
+              <Select name="ddlCliente" value={filtroCliente} onValueChange={handleClienteChange}>
+                <SelectTrigger id="ddlClientes">
+                  <SelectValue placeholder="Selecciona un cliente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {clientes.map((c) => (
+                    <SelectItem key={c.id} value={c.id.toString()}>
+                      {c.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="lg:col-span-2">
+              <label htmlFor="ddlCatalogo" className="text-sm font-medium">
+                Catálogo
+              </label>
+              <Select name="ddlCatalogo" value={filtroCatalogo} onValueChange={setFiltroCatalogo}>
+                <SelectTrigger id="ddlCatalogo">
+                  <SelectValue placeholder="Selecciona un catálogo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {catalogos.map((c) => (
+                    <SelectItem key={c.id} value={c.id.toString()}>
+                      {c.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="lg:col-span-2">
               <label htmlFor="ddlEstatus" className="text-sm font-medium">
@@ -691,23 +704,150 @@ export default function ProductosPage() {
             </div>
             <div className="flex gap-2 col-span-full md:col-span-2 lg:col-span-2 justify-end">
               <Button
+                id="btnProductosLimpiar"
+                name="btnProductosLimpiar"
                 type="button"
                 variant="outline"
                 className="w-full md:w-auto bg-[#4a4a4a] text-white hover:bg-[#333333]"
                 style={{ fontSize: "12px" }}
-                onClick={handleLimpiar}
+                onClick={clearProductosBusqueda}
               >
                 <RotateCcw className="mr-2 h-3 w-3" /> Limpiar
               </Button>
               <Button
+                id="btnProductosBuscar"
+                name="btnProductosBuscar"
                 type="submit"
                 className="w-full md:w-auto bg-[#4a4a4a] text-white hover:bg-[#333333]"
                 style={{ fontSize: "12px" }}
+                disabled={isSearching}
               >
-                <Search className="mr-2 h-3 w-3" /> Buscar
+                {isSearching ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <Search className="mr-2 h-3 w-3" />}{" "}
+                Buscar
               </Button>
             </div>
           </form>
+        </CardContent>
+      </Card>
+
+      {/* 4. Grid de Resultados - Ahora con Tarjetas */}
+      <Card className="rounded-xs border bg-card text-card-foreground shadow">
+        <CardHeader>
+          <CardTitle>Resultados</CardTitle>
+          <CardDescription>
+            Mostrando {productosPaginados.length} de {totalProductos} productos encontrados.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isSearching ? (
+            <div className="flex justify-center items-center h-48">
+              <Loader2 className="mx-auto h-8 w-8 animate-spin" />
+              <span className="ml-2 text-lg">Cargando productos...</span>
+            </div>
+          ) : productosPaginados.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+              {productosPaginados.map((p, index) => (
+                <Card
+                  key={`${p.ProductoId}-${p.CatalogoId}-${index}`}
+                  className="border bg-card text-card-foreground relative flex flex-col overflow-hidden rounded-xs shadow-lg hover:shadow-xl transition-shadow duration-300 group"
+                >
+                  <div
+                    className="relative w-full h-48 overflow-hidden cursor-pointer"
+                    onClick={() => handleViewProductoDetails(p.ProductoId)}
+                    title="Ver detalles del producto"
+                  >
+                    <Image
+                      src={p.ProductoImagenUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
+                      alt={p.ProductoNombre}
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded-t-xs transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute top-2 right-2">
+                      <span
+                        className={`px-2 py-1 text-xs rounded-xs font-semibold ${p.ProductoActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
+                      >
+                        {p.ProductoActivo ? "Activo" : "Inactivo"}
+                      </span>
+                    </div>
+                  </div>
+                  <CardContent className="flex flex-col flex-grow p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{p.ProductoNombre}</h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                      {p.ProductoDescripcion || "Sin descripción."}
+                    </p>
+                    <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
+                      <p className="text-lg font-bold text-green-600">{formatCurrency(p.ProductoCosto)}</p>
+                      <div className="flex gap-1">
+                        <Button
+                          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-7"
+                          variant="ghost"
+                          size="icon"
+                          title="Ver Detalles"
+                          onClick={() => handleViewProductoDetails(p.ProductoId)}
+                          disabled={isDetailsLoading}
+                        >
+                          {isDetailsLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Link href={`/productos/editar?getProductoId=${p.ProductoId}`} passHref>
+                          <Button
+                            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-7"
+                            variant="ghost"
+                            size="icon"
+                            title="Editar"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Button
+                          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2   focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50  hover:bg-accent hover:text-accent-foreground h-10 w-7"
+                          variant="ghost"
+                          size="icon"
+                          title={p.ProductoActivo ? "Inactivar" : "Activar"}
+                          onClick={() => handleToggleStatusClickProducto(p.ProductoId, p.ProductoActivo)}
+                        >
+                          {p.ProductoActivo ? (
+                            <ToggleRight className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <ToggleLeft className="h-4 w-4 text-green-500" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">No se encontraron resultados.</div>
+          )}
+          {totalPaginas > 1 && (
+            <div className="flex items-center justify-center space-x-2 pt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPaginaActual((p) => Math.max(1, p - 1))}
+                disabled={paginaActual === 1}
+              >
+                Anterior
+              </Button>
+              <span className="text-sm">
+                Página {paginaActual} de {totalPaginas}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPaginaActual((p) => Math.min(totalPaginas, p + 1))}
+                disabled={paginaActual === totalPaginas}
+              >
+                Siguiente
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -778,15 +918,6 @@ export default function ProductosPage() {
           )}
         </DialogContent>
       </Dialog>
-
-      {/* 3. Resultados - Listado */}
-      <Card className="rounded-xs border bg-card text-card-foreground shadow">
-        <CardHeader>
-          <CardTitle>Resultados</CardTitle>
-          <CardDescription>Mostrando {Listado?.length || 0} elementos encontrados.</CardDescription>
-        </CardHeader>
-        <CardContent>{/* User's existing card grid display will be preserved here */}</CardContent>
-      </Card>
     </div>
   )
 }
