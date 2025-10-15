@@ -82,8 +82,6 @@ export default function ProductosPage() {
     BotonTexto: "",
     Ruta: "",
   })
-  const [filtroId, setFiltroId] = useState("")
-  const [filtroCodigo, setFiltroCodigo] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
   const [filtroEstatus, setFiltroEstatus] = useState("-1")
   const [filtroCliente, setFiltroCliente] = useState("-1")
@@ -366,12 +364,18 @@ export default function ProductosPage() {
   // Busqueda - Ejecutar
   const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const Id = filtroId === "" || filtroId === "0" ? -1 : Number.parseInt(filtroId, 10)
     const Nombre: string = filtroNombre.trim()
-    const Codigo: string = filtroCodigo.trim()
+    const ClienteId = Number.parseInt(filtroCliente, 10)
+    const CatalogoId = Number.parseInt(filtroCatalogo, 10)
     const Estatus = filtroEstatus === "-1" ? "Todos" : filtroEstatus
 
     ejecutarBusquedaProductos(Id, Nombre, Codigo, Estatus)
+  }
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    
+    ejecutarBusquedaProductos(filtroNombre, clienteId, catalogoId, filtroEstatus)
   }
 
   // Busqueda - Limpiar o Resetear
@@ -460,12 +464,7 @@ export default function ProductosPage() {
   }
 
   // ESTE ES EL ÚNICO LUGAR DONDE SE EJECUTA LA BÚSQUEDA
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const clienteId = Number.parseInt(filtroCliente, 10)
-    const catalogoId = Number.parseInt(filtroCatalogo, 10)
-    ejecutarBusquedaProductos(filtroNombre, clienteId, catalogoId, filtroEstatus)
-  }
+  
 
   const clearProductosBusqueda = () => {
     setFiltroNombre("")
