@@ -356,7 +356,7 @@ export default function ProductosPage() {
 
       // -- Cargar DDLs
       // DDL Clientes
-      const { data: clientesData, error: clientesError } = await listaDesplegableClientes(userClienteId,"")
+      const { data: clientesData, error: clientesError } = await listaDesplegableClientes(auxClienteId,"")
 
       if (!clientesError) {
         const clientesConTodos = esAdminDDLs === true ? [{ id: -1, nombre: "Todos" }, ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))]
@@ -375,7 +375,7 @@ export default function ProductosPage() {
       }
 
       // -- Cargar catalogos
-      const catalogosResult = await listaDesplegableCatalogos(-1, "", userClienteId)
+      const catalogosResult = await listaDesplegableCatalogos(-1, "", auxClienteId)
 
       if (!catalogosResult.error) {
         const catalogosConTodos = [1, 2, 3, 4].includes(Number(user.RolId))
