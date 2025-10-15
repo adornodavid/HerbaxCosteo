@@ -700,6 +700,12 @@ export default function ProductosPage() {
                     onClick={() => handleViewProductoDetails(p.ProductoId)}
                     title="Ver detalles del producto"
                   >
+                    <img
+                      src={p.ProductoImagenUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
+                      alt={p.ProductoNombre}
+                      className="rounded-t-xs transition-transform duration-300 group-hover:scale-105"
+                    />
+                    {/*
                     <Image
                       src={p.ProductoImagenUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
                       alt={p.ProductoNombre}
@@ -707,6 +713,7 @@ export default function ProductosPage() {
                       objectFit="cover"
                       className="rounded-t-xs transition-transform duration-300 group-hover:scale-105"
                     />
+                    */}
                     <div className="absolute top-2 right-2">
                       <span
                         className={`px-2 py-1 text-xs rounded-xs font-semibold ${p.ProductoActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
