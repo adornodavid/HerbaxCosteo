@@ -89,7 +89,7 @@ export default function FormulasPage() {
 
   // -- Funciones --
   // --- Función de búsqueda, no es la busqueda inicial ---
-  const ejecutarBusqueda = async (id: number, nombre: string, codigo: string, estatus: string) => {
+  const ejecutarBusqueda = async (id: number, nombre: string, codigo: string, estatus: string, clienteid: number) => {
     // Validar usuario activo
     if (!user) return
 
