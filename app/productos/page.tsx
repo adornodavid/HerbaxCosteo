@@ -88,6 +88,8 @@ export default function ProductosPage() {
   const [filtroEstatus, setFiltroEstatus] = useState("-1")
   const [filtroCliente, setFiltroCliente] = useState("-1")
   const [filtroCatalogo, setFiltroCatalogo] = useState("-1")
+  const [clientes, setClientes] = useState<ddlItem[]>([])
+  const [catalogos, setCatalogos] = useState<ddlItem[]>([])
 
 
   // --- Estados ---
@@ -100,8 +102,7 @@ export default function ProductosPage() {
   })
   const [productosFiltrados, setProductosFiltrados] = useState<ProductoListado[]>([])
   const [totalProductos, setTotalProductos] = useState(0)
-  const [clientes, setClientes] = useState<ddlItem[]>([])
-  const [catalogos, setCatalogos] = useState<ddlItem[]>([])
+  
   
   
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
