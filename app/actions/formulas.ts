@@ -184,7 +184,6 @@ export async function obtenerFormulas(
       const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
       if (isActive) {
         query = query.eq("activo", true)
-        return { success: false, error: "id: " + id + " - codigo: " +  codigo + " - nombre: " + nombre + " merge: " + IdsMerge.length}
       } else if (isInactive) {
         query = query.eq("activo", false)
       }
