@@ -322,7 +322,7 @@ export default function ProductosPage() {
         Ruta: "/productos/crear",
       })
       setShowPageTituloMasNuevo(true)
-      productonombre: string, clienteid: number, catalogoid: number, estatus: string
+     
       const Result = await ejecutarBusquedaProductos("", auxClienteId, -1, "True")
       if (!Result.success) {
         setModalAlert({
