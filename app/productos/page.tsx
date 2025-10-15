@@ -82,8 +82,6 @@ export default function ProductosPage() {
 
 
   // --- Estados ---
-  const [pageLoading, setPageLoading] = useState(true)
-  const [isSearching, setIsSearching] = useState(false)
   const [productos, setProductos] = useState<ProductoListado[]>([])
   const [estadisticas, setEstadisticas] = useState<ProductosEstadisticas>({
     totalProductos: 0,
@@ -93,7 +91,6 @@ export default function ProductosPage() {
   })
   const [productosFiltrados, setProductosFiltrados] = useState<ProductoListado[]>([])
   const [totalProductos, setTotalProductos] = useState(0)
-  const [paginaActual, setPaginaActual] = useState(1)
   const [clientes, setClientes] = useState<ddlItem[]>([])
   const [catalogos, setCatalogos] = useState<ddlItem[]>([])
   
@@ -104,10 +101,8 @@ export default function ProductosPage() {
   const [productoToDelete, setProductoToDelete] = useState<number | null>(null)
 
    // Filtros
-  const [filtroNombre, setFiltroNombre] = useState("")
   const [filtroCliente, setFiltroCliente] = useState("-1")
   const [filtroCatalogo, setFiltroCatalogo] = useState("-1")
-  const [filtroEstatus, setFiltroEstatus] = useState("-1") // Nuevo filtro de estatus  
   
   // Estados para el modal de detalles mejorado
   const [showProductoDetailsModal, setShowProductoDetailsModal] = useState(false)
