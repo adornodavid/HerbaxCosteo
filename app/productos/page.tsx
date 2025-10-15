@@ -360,6 +360,28 @@ export default function ProductosPage() {
     }
   }
 
+  // -- Manejadores (Handles) --
+  // Busqueda - Ejecutar
+  const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const Id = filtroId === "" || filtroId === "0" ? -1 : Number.parseInt(filtroId, 10)
+    const Nombre: string = filtroNombre.trim()
+    const Codigo: string = filtroCodigo.trim()
+    const Estatus = filtroEstatus === "-1" ? "Todos" : filtroEstatus
+
+    ejecutarBusquedaProductos(Id, Nombre, Codigo, Estatus)
+  }
+
+  // Busqueda - Limpiar o Resetear
+  const handleLimpiar = () => {
+    setFiltroId("")
+    setFiltroCodigo("")
+    setFiltroNombre("")
+    setFiltroEstatus("-1")
+
+    cargarDatosIniciales()
+  }
+
   // Estatus - Cambiar activo/inactivo
   const handleToggleStatusClickActivo = async (productoId: number, productoActivo: boolean) => {
     try {
@@ -388,28 +410,6 @@ export default function ProductosPage() {
   const handleVerDetalles = (producto: Producto) => {
     setElementoDetalles(producto)
     setShowElementoDetallesModal(true)
-  }
-
-  // -- Manejadores (Handles) --
-  // Busqueda - Ejecutar
-  const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const Id = filtroId === "" || filtroId === "0" ? -1 : Number.parseInt(filtroId, 10)
-    const Nombre: string = filtroNombre.trim()
-    const Codigo: string = filtroCodigo.trim()
-    const Estatus = filtroEstatus === "-1" ? "Todos" : filtroEstatus
-
-    ejecutarBusquedaProductos(Id, Nombre, Codigo, Estatus)
-  }
-
-  // Busqueda - Limpiar o Resetear
-  const handleLimpiar = () => {
-    setFiltroId("")
-    setFiltroCodigo("")
-    setFiltroNombre("")
-    setFiltroEstatus("-1")
-
-    cargarDatosIniciales()
   }
 
 // --- Handles - Manejo de Eventos ---
