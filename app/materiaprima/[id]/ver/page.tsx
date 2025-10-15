@@ -1,100 +1,239 @@
-import { notFound } from "next/navigation"
-import { Button } from "@/components/ui/button"
+"use client"
+
+/* ==================================================
+	Imports
+================================================== */
+// -- Assets --
+import { useState, useEffect, useMemo } from "react"
+import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
-import Link from "next/link"
-import { obtenerMateriasPrimas } from "@/app/actions/materia-prima"
-import PageTitlePlusNew from "@/components/page-title-plus-new"
+import { Button } from "@/components/ui/button"
+import { Edit, Trash2, ArrowLeft } from "lucide-react"
+// -- Tipados (interfaces, clases, objetos) --
+import type { MateriaPrima } from "@/types/materia-prima"
+import type {
+  propsPageLoadingScreen,
+  propsPageModalAlert,
+  propsPageModalError,
+  propsPageModalTutorial,
+} from "@/types/common"
+// -- Librerias --
+// Configuraciones
+import { RolesAdminDOs } from "@/lib/config"
+// -- Componentes --
+import { PageTitlePlusNew } from "@/components/page-title-plus-new"
+import { PageLoadingScreen } from "@/components/page-loading-screen"
+import { PageModalAlert } from "@/components/page-modal-alert"
+import { PageModalError } from "@/components/page-modal-error"
+import { PageModalTutorial } from "@/components/page-modal-tutorial"
+// -- Backend --
+import { useAuth } from "@/contexts/auth-context"
+import { obtenerMateriasPrima } from "@/app/actions/materia-prima"
 
-export default async function VerMateriaPrimaPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params
-  const materiaId = Number.parseInt(id)
+/* ==================================================
+	Componente Principal (Pagina)
+================================================== */
+export default function VerMateriaPrimaPage() {
+  // --- Variables especiales ---
+  const params = useParams()
+  const router = useRouter()
+  const { user, isLoading: authLoading } = useAuth()
+  const esAdminDOs = useMemo(() => user && RolesAdminDOs.includes(user.RolId), [user])
+  const materiaPrimaId = Number(params.id)
 
-  // Obtener los datos de la materia prima
-  const result = await obtenerMateriasPrimas(materiaId, "", "", "Todos", -1, -1)
+  // --- Estados ---
+  // Cargar contenido en variables
+  const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
+  const [materiaPrima, setMateriaPrima] = useState<MateriaPrima | null>(null)
+  const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
+  const [ModalError, setModalError] = useState<propsPageModalError>()
+  const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
+  // Mostrar/Ocultar contenido
+  const [showPageLoading, setShowPageLoading] = useState(true)
+  const [showModalAlert, setShowModalAlert] = useState(false)
+  const [showModalError, setShowModalError] = useState(false)
+  const [showModalTutorial, setShowModalTutorial] = useState(false)
 
-  if (!result.success || !result.data || result.data.length === 0) {
-    notFound()
+  // --- Inicio (carga inicial y seguridad) ---
+  useEffect(() => {
+    if (!authLoading) {
+      // Validar
+      if (!user || user.RolId === 0) {
+        router.push("/login")
+        return
+      }
+      // Iniciar
+      const cargarMateriaPrima = async () => {
+        try {
+          setShowPageLoading(true)
+
+          const result = await obtenerMateriasPrima(materiaPrimaId, "", "", "Todos", -1, -1)
+          if (result.success && result.data && result.data.length > 0) {
+            setMateriaPrima(result.data[0])
+          }
+        } catch (error) {
+          console.error("Error al cargar información: ", error)
+          setModalError({
+            Titulo: "Error al cargar información",
+            Mensaje: error,
+          })
+          setShowModalError(true)
+        } finally {
+          setShowPageLoading(false)
+        }
+      }
+      // Si se obtuvo el id
+      if (materiaPrimaId) {
+        cargarMateriaPrima()
+      }
+    }
+  }, [authLoading, user, router, esAdminDOs, materiaPrimaId])
+
+  // --- Renders ---
+  // Contenidos auxiliares
+  if (showPageLoading) {
+    return <PageLoadingScreen message="Cargando información..." />
   }
 
-  const materia = result.data[0]
+  // Si no se cargo el elemento principal
+  if (!materiaPrima) {
+    return (
+      <div className="container mx-auto py-6">
+        <p>No se encontró la materia prima.</p>
+      </div>
+    )
+  }
 
+  // Contenido principal
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <PageTitlePlusNew title="Detalles de Materia Prima" showButton={false} buttonText="" buttonHref="" />
+      {/* -- Componentes -- */}
+      {showModalAlert && (
+        <PageModalAlert
+          Titulo={ModalAlert.Titulo}
+          Mensaje={ModalAlert.Mensaje}
+          isOpen={true}
+          onClose={() => setShowModalAlert(false)}
+        />
+      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Columna izquierda - Información */}
-        <Card>
-          <CardContent className="pt-6 space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Código</p>
-              <p className="text-lg font-semibold">{materia.Codigo}</p>
+      {showModalError && (
+        <PageModalError
+          Titulo={ModalError.Titulo}
+          Mensaje={ModalError.Mensaje}
+          isOpen={true}
+          onClose={() => setShowModalError(false)}
+        />
+      )}
+
+      {showModalTutorial && (
+        <PageModalTutorial
+          Titulo={ModalTutorial.Titulo}
+          Subtitulo={ModalTutorial.Subtitulo}
+          VideoUrl={ModalTutorial.VideoUrl}
+          isOpen={true}
+          onClose={() => setShowModalTutorial(false)}
+        />
+      )}
+
+      <PageTitlePlusNew
+        Titulo="Información de materia prima"
+        Subtitulo="Información completa de la materia prima"
+        Visible={false}
+        BotonTexto={null}
+        Ruta={null}
+      />
+
+      {/* Card with materia prima information */}
+      <Card className="overflow-hidden">
+        <CardContent className="p-0">
+          <div className="flex flex-col md:flex-row">
+            <div className="md:w-1/3 h-64 md:h-auto flex items-center justify-center bg-gray-100">
+              <img
+                src={
+                  materiaPrima.imgurl && materiaPrima.imgurl !== "Sin imagen"
+                    ? materiaPrima.imgurl
+                    : "/placeholder.svg?height=400&width=400&text=Materia+Prima"
+                }
+                alt={materiaPrima.nombre}
+                className="w-full h-auto object-cover"
+              />
             </div>
 
-            <div>
-              <p className="text-sm text-muted-foreground">Nombre</p>
-              <p className="text-lg font-semibold">{materia.Nombre}</p>
-            </div>
+            {/* Materia Prima data on the right */}
+            <div className="md:w-2/3 p-6 space-y-4">
+              <h1 className="text-3xl font-bold mb-6">Información de la Materia Prima</h1>
 
-            <div>
-              <p className="text-sm text-muted-foreground">Unidad de Medida ID</p>
-              <p className="text-lg">{materia.UnidadMedidaId || "N/A"}</p>
-            </div>
+              <div className="space-y-3">
+                <div>
+                  <span className="font-semibold text-gray-700">ID:</span>
+                  <span className="ml-2 text-gray-900">{materiaPrima.id}</span>
+                </div>
 
-            <div>
-              <p className="text-sm text-muted-foreground">Costo</p>
-              <p className="text-lg">${materia.Costo?.toFixed(2) || "0.00"}</p>
-            </div>
+                <div>
+                  <span className="font-semibold text-gray-700">Código:</span>
+                  <span className="ml-2 text-gray-900">{materiaPrima.codigo || "Sin código"}</span>
+                </div>
 
-            <div>
-              <p className="text-sm text-muted-foreground">Estado</p>
-              <p className="text-lg">
-                {materia.Activo ? (
-                  <span className="text-green-600">Activo</span>
-                ) : (
-                  <span className="text-red-600">Inactivo</span>
-                )}
-              </p>
-            </div>
+                <div>
+                  <span className="font-semibold text-gray-700">Nombre:</span>
+                  <span className="ml-2 text-gray-900">{materiaPrima.nombre || "Sin nombre"}</span>
+                </div>
 
-            <div>
-              <p className="text-sm text-muted-foreground">Fecha de Creación</p>
-              <p className="text-lg">
-                {materia.FechaCreacion ? new Date(materia.FechaCreacion).toLocaleDateString() : "N/A"}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+                <div>
+                  <span className="font-semibold text-gray-700">Costo:</span>
+                  <span className="ml-2 text-gray-900">
+                    {materiaPrima.costo ? `$${Number(materiaPrima.costo).toFixed(2)}` : "$0.00"}
+                  </span>
+                </div>
 
-        {/* Columna derecha - Imagen */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="border rounded-md h-[350px] flex items-center justify-center bg-gray-100">
-              {materia.ImgUrl ? (
-                <img
-                  src={materia.ImgUrl || "/placeholder.svg"}
-                  alt={materia.Nombre}
-                  className="w-full h-auto object-cover"
-                />
-              ) : (
-                <p className="text-muted-foreground">Sin imagen</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                <div>
+                  <span className="font-semibold text-gray-700">Estatus:</span>
+                  <span
+                    className={`ml-2 px-2 py-1 rounded text-sm font-semibold ${
+                      materiaPrima.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                    }`}
+                  >
+                    {materiaPrima.activo ? "Activo" : "Inactivo"}
+                  </span>
+                </div>
 
-      {/* Botones de acción */}
-      <div className="flex gap-4">
-        <Button asChild>
-          <Link href={`/materiaprima/${materiaId}/editar`}>Editar</Link>
-        </Button>
-        <Button variant="outline" asChild>
-          <Link href="/materiaprima">Volver al Listado</Link>
+                <div>
+                  <span className="font-semibold text-gray-700">Fecha de Creación:</span>
+                  <span className="ml-2 text-gray-900">
+                    {materiaPrima.fechacreacion ? new Date(materiaPrima.fechacreacion).toLocaleDateString() : "N/A"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="flex gap-4 justify-center">
+        {esAdminDOs && (
+          <>
+            <Button
+              className="bg-yellow-400 hover:bg-yellow-500 text-black"
+              onClick={() => router.push(`/materiaprima/${materiaPrimaId}/editar`)}
+            >
+              <Edit className="mr-2 h-4 w-4" />
+              Actualizar
+            </Button>
+
+            <Button
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={() => router.push(`/materiaprima/${materiaPrimaId}/eliminar`)}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Eliminar
+            </Button>
+          </>
+        )}
+
+        <Button className="bg-gray-500 hover:bg-gray-600 text-white" onClick={() => router.push("/materiaprima")}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Regresar a listado
         </Button>
       </div>
     </div>
