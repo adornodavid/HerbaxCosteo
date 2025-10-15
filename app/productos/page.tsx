@@ -33,7 +33,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
-import { estatusActivoProducto } from "@/app/actions/productos"
+import { obtenerProductos, estatusActivoProducto } from "@/app/actions/productos"
 
 /* ==================================================
 	Componente Principal (Pagina)
