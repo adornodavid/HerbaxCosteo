@@ -670,13 +670,13 @@ export default function ProductosPage() {
             Mostrando {elementosPaginados.length} de {totalProductos} elementos encontrados.
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           {isSearching ? (
             <div className="flex justify-center items-center h-48">
               <Loader2 className="mx-auto h-8 w-8 animate-spin" />
               <br/>
-              <span className="ml-2 text-lg">Cargando productos...</span>
+              <span className="ml-2 text-lg">xxxxxxxxCargando productos...</span>
             </div>
           ) : elementosPaginados.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
