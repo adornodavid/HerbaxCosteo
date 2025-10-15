@@ -308,7 +308,7 @@ export default function ProductosPage() {
   }
 
   // --- Carga inicial de datos ---
-  const cargarDatosInicialesProductos = async () => {
+  const cargarDatosIniciales = async () => {
     if (!user) return
 
     try {
@@ -621,7 +621,7 @@ export default function ProductosPage() {
     setFiltroEstatus("-1")
     handleClienteChange("-1")
 
-    cargarDatosInicialesProductos()
+    cargarDatosIniciales()
   }
 
   const handleToggleStatusClickProducto = (id: number, activo: boolean) => {
@@ -666,7 +666,7 @@ export default function ProductosPage() {
       const inicializar = async () => {
         setPageLoading({ message: "Cargando Productos..." })
         setShowPageLoading(true)
-        await cargarDatosInicialesProductos()
+        await cargarDatosIniciales()
       }
       inicializar()
     }
