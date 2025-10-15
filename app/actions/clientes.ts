@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
 import { imagenSubir } from "@/app/actions/utilerias"
 import { cookies } from "next/headers"
+import { createServerSupabaseClientWrapper } from "@/app/actions/utilerias"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -61,7 +62,7 @@ export async function crearCliente(formData: FormData) {
     const activo = true
 
     // Paso 2: Validar variables obligatorias
-    if(!nombre || nombre.length < 3){
+    if (!nombre || nombre.length < 3) {
       return { success: false, error: "El parametro Nombre, esta incompleto. Favor de verificar." }
     }
 
@@ -75,19 +76,19 @@ export async function crearCliente(formData: FormData) {
     }
 
     // Paso 4: Subir imagen para obtener su url
-    let imagenurl = ""   
+    let imagenurl = ""
     if (imagen && imagen.size > 0) {
       const resultadoImagen = await imagenSubir(imagen, nombre, "clientes")
       if (resultadoImagen.success) {
-        imagenurl = resultadoImagen.url || "" 
-        if(imagenurl.length < 3){
-          return { success: false, error: "Se subio la imagen a supabase pero no se obtuvo el url."}
+        imagenurl = resultadoImagen.url || ""
+        if (imagenurl.length < 3) {
+          return { success: false, error: "Se subio la imagen a supabase pero no se obtuvo el url." }
         }
-      }else{
+      } else {
         return { success: false, error: resultadoImagen.error }
       }
     }
-    
+
     // Paso 5: Ejecutar Query
     const { data, error } = await supabase
       .from("clientes")
@@ -221,8 +222,9 @@ export async function actualizarCliente(formData: FormData) {
         "Todos",
       )
       if (resultado.success && resultado.data) {
-        
-      } 
+        return resultado.data.some((cliente: any) => cliente.id !== id)
+      }
+      return false
     })()
 
     if (existe) {
@@ -298,15 +300,15 @@ export async function eliminarCliente(id: number) {
   try {
     // Paso 1: Validar que id tiene valor
     if (!id || id < 1) {
-      return { success: false, error: "Error eliminando cliente en query en eliminarCliente de actions/clientes: No se obtuvo el id a eliminar" }
+      return {
+        success: false,
+        error:
+          "Error eliminando cliente en query en eliminarCliente de actions/clientes: No se obtuvo el id a eliminar",
+      }
     }
 
     // Paso 2: Verificar que el cliente existe
-    const { data: clienteExiste } = await supabase
-      .from("clientes")
-      .select("id")
-      .eq("id", id)
-      .single()
+    const { data: clienteExiste } = await supabase.from("clientes").select("id").eq("id", id).single()
 
     if (!clienteExiste) {
       return { success: false, error: "El cliente que intenta eliminar no existe" }
@@ -358,8 +360,6 @@ export async function estatusActivoCliente(id: number, activo: boolean): Promise
   }
 }
 
-
-
 // Función: listaDesplegableClientes: función que se utiliza para los dropdownlist y puede contener id y / o nombre
 export async function listaDesplegableClientes(id = -1, nombre = "", activo = "Todos") {
   try {
@@ -400,6 +400,7 @@ export async function listaDesplegableClientes(id = -1, nombre = "", activo = "T
     return { success: false, error: "Error interno del servidor" }
   }
 }
+
 export async function listaDesplegableClientes2(id = "-1", nombre = "") {
   const supabaseClient = createServerSupabaseClientWrapper(cookies())
 
