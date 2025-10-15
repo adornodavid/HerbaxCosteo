@@ -197,6 +197,29 @@ export async function actualizarZona(formData: FormData) {
           "Los datos que desea actualizar ya los tiene otro registro y no se puede proceder, recuerde que la información debe ser unica.",
       }
     }
+    // Paso 1: Validar si no existe
+    /*
+    const existe: boolean = await (async () => {
+      const resultado = await obtenerZonas(
+        -1,
+        formData.get("nombre") as string,
+        formData.get("clave") as string,
+        "Todos",
+      )
+      if (resultado.success && resultado.data) {
+        return resultado.data.some((zona: any) => zona.id !== id)
+      }
+      return false
+    })()
+
+    if (existe) {
+      return {
+        success: false,
+        error:
+          "Los datos que desea actualizar ya los tiene otro registro y no se puede proceder, recuerde que la información debe ser unica.",
+      }
+    }
+    */
 
     const imgurl = formData.get("imgurl") as string | null
 
