@@ -503,6 +503,7 @@ export default function ProductosPage() {
       
     } finally {
       setPageLoading(false)
+      setShowPageLoading(false)
     }
   }
 
@@ -515,7 +516,8 @@ export default function ProductosPage() {
       }
 
       const inicializar = async () => {
-        setPageLoading(false)
+        setPageLoading({ message: "Cargando Productos..." })
+        setShowPageLoading(true)
         await cargarDatosInicialesProductos()
       }
       inicializar()
