@@ -56,12 +56,12 @@ export async function crearFormula(formData: FormData) {
     const nombre = (formData.get("nombre") as string)?.trim()
     const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || 0
     const imagen = formData.get("imagen") as File
-    const costo = parseFloat(formData.get("costo") as string) || 0
+    const costo = Number.parseFloat(formData.get("costo") as string) || 0
     const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
     const activo = true
 
     // Paso 2: Validar variables obligatorias
-    if(!nombre || nombre.length < 2){
+    if (!nombre || nombre.length < 2) {
       return { success: false, error: "El parametro Nombre, esta incompleto. Favor de verificar." }
     }
 
@@ -82,8 +82,8 @@ export async function crearFormula(formData: FormData) {
         imagenurl = resultadoImagen.url || ""
       } else {
         return { success: false, error: resultadoImagen.error }
-      }      
-    }    
+      }
+    }
 
     // Paso 5: Ejecutar Query
     const { data, error } = await supabase
@@ -103,7 +103,10 @@ export async function crearFormula(formData: FormData) {
     // Return error
     if (error) {
       console.error("Error creando formula en query en crearFormula de actions/formulas: ", error)
-      return { success: false, error: "Error creando formula en query en crearFormula de actions/formulas: " + error.message }
+      return {
+        success: false,
+        error: "Error creando formula en query en crearFormula de actions/formulas: " + error.message,
+      }
     }
 
     revalidatePath("/formulas")
@@ -113,7 +116,10 @@ export async function crearFormula(formData: FormData) {
   } catch (error) {
     // Retorno de información
     console.error("Error en crearFormula de actions/formulas:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar funcion crearFormula de actions/formulas: " + error }
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion crearFormula de actions/formulas: " + error,
+    }
   }
 }
 
@@ -122,12 +128,12 @@ export async function crearFormula(formData: FormData) {
 ================================================== */
 //Función: obtenerFormulas: funcion para obtener todas las formulas
 export async function obtenerFormulas(
-  id: number = -1,
-  codigo: string = "",
-  nombre: string = "",
-  activo: string = "Todos",
-  clienteid: number = -1,
-  productoid: number = -1,
+  id = -1,
+  codigo = "",
+  nombre = "",
+  activo = "Todos",
+  clienteid = -1,
+  productoid = -1,
 ) {
   try {
     // Paso 1: Obtener arrays de las formulasid que esten por cliente y/o por producto
@@ -281,7 +287,95 @@ export async function obtenerFormulasXProductos(
 /*==================================================
   UPDATES-ACTUALIZAR (UPDATES)
 ================================================== */
+//Función: actualizarFormula / updateFormula: funcion para actualizar una formula
+export async function actualizarFormula(formData: FormData) {
+  try {
+    // Paso 1: Recibir variables
+    const idString = formData.get("id") as string
+    const id = Number(idString)
+    const codigo = formData.get("codigo") as string
+    const nombre = formData.get("nombre") as string
+    const imgurl = formData.get("imgurl") as string | null
+    const imagen = formData.get("imagen") as File
+    const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || null
+    const costo = Number.parseFloat(formData.get("costo") as string) || 0
 
+    // Paso 2: Validar variables obligatorias
+    if (!nombre || nombre.length < 3) {
+      return { success: false, error: "El parametro Nombre, esta incompleto. Favor de verificar." }
+    }
+
+    // Paso 3: Validar si no existe
+    /*
+    const existe: boolean = await (async () => {
+      const resultado = await obtenerFormulas(
+        -1,
+        formData.get("codigo") as string,
+        formData.get("nombre") as string,
+        "Todos",
+        -1,
+        -1,
+      )
+      if (resultado.success && resultado.data) {
+        return resultado.data.some((formula: any) => formula.id !== id)
+      }
+      return false
+    })()
+
+    if (existe) {
+      return {
+        success: false,
+        error:
+          "Los datos que desea actualizar ya los tiene otro registro y no se puede proceder, recuerde que la información debe ser unica.",
+      }
+    }
+    */
+
+    // Paso 4: Subir imagen para obtener su url
+    let imagenurl = ""
+    if (imagen && imagen.size > 0) {
+      const resultadoImagen = await imagenSubir(imagen, nombre, "formulas")
+      if (!resultadoImagen.success) {
+        return { success: false, error: resultadoImagen.error }
+      } else {
+        imagenurl = resultadoImagen.url || ""
+      }
+    } else {
+      imagenurl = imgurl || ""
+    }
+
+    // Paso 5: Ejecutar Query
+    const { data, error } = await supabase
+      .from("formulas")
+      .update({
+        codigo,
+        nombre,
+        imgurl: imagenurl,
+        unidadmedidaid,
+        costo,
+      })
+      .eq("id", id)
+      .select("id")
+      .single()
+
+    // Return error
+    if (error) {
+      console.error("Error actualizando formula en query en actualizarFormula de actions/formulas:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/formulas")
+
+    // Retorno de datos
+    return { success: true, data: data.id }
+  } catch (error) {
+    console.error("Error en actualizarFormula de actions/formulas:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar actualizarFormula de actions/formulas",
+    }
+  }
+}
 
 /*==================================================
   * DELETES-ELIMINAR (DELETES)

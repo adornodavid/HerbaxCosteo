@@ -296,7 +296,98 @@ export async function obtenerMateriasPrimasXFormulas(
 /*==================================================
   UPDATES-ACTUALIZAR (UPDATES)
 ================================================== */
+// Función: actualizarMateriaPrima / updateMateriaPrima: funcion para actualizar una materia prima
+export async function actualizarMateriaPrima(formData: FormData) {
+  try {
+    // Paso 1: Recibir variables
+    const idString = formData.get("id") as string
+    const id = Number(idString)
+    const codigo = formData.get("codigo") as string
+    const nombre = formData.get("nombre") as string
+    const imgurl = formData.get("imgurl") as string | null
+    const imagen = formData.get("imagen") as File
+    const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || null
+    const costo = Number.parseFloat(formData.get("costo") as string) || 0
 
+    // Paso 2: Validar variables obligatorias
+    if (!nombre || nombre.length < 3) {
+      return { success: false, error: "El parametro Nombre, esta incompleto. Favor de verificar." }
+    }
+
+    // Paso 3: Validar si no existe
+    /*
+    const existe: boolean = await (async () => {
+      const resultado = await obtenerMateriasPrimas(
+        -1,
+        formData.get("codigo") as string,
+        formData.get("nombre") as string,
+        "Todos",
+        -1,
+        -1,
+      )
+      if (resultado.success && resultado.data) {
+        return resultado.data.some((materiaPrima: any) => materiaPrima.id !== id)
+      }
+      return false
+    })()
+
+    if (existe) {
+      return {
+        success: false,
+        error:
+          "Los datos que desea actualizar ya los tiene otro registro y no se puede proceder, recuerde que la información debe ser unica.",
+      }
+    }
+    */
+
+    // Paso 4: Subir imagen para obtener su url
+    let imagenurl = ""
+    if (imagen && imagen.size > 0) {
+      const resultadoImagen = await imagenSubir(imagen, nombre, "materiasprima")
+      if (!resultadoImagen.success) {
+        return { success: false, error: resultadoImagen.error }
+      } else {
+        imagenurl = resultadoImagen.url || ""
+      }
+    } else {
+      imagenurl = imgurl || ""
+    }
+
+    // Paso 5: Ejecutar Query
+    const { data, error } = await supabase
+      .from("materiasprima")
+      .update({
+        codigo,
+        nombre,
+        imgurl: imagenurl,
+        unidadmedidaid,
+        costo,
+      })
+      .eq("id", id)
+      .select("id")
+      .single()
+
+    // Return error
+    if (error) {
+      console.error(
+        "Error actualizando materia prima en query en actualizarMateriaPrima de actions/materia-prima:",
+        error,
+      )
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/materiaprima")
+
+    // Retorno de datos
+    return { success: true, data: data.id }
+  } catch (error) {
+    console.error("Error en actualizarMateriaPrima de actions/materia-prima:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar actualizarMateriaPrima de actions/materia-prima",
+    }
+  }
+}
 
 /*==================================================
   * DELETES-ELIMINAR (DELETES)
