@@ -80,7 +80,7 @@ export async function crearCliente(formData: FormData) {
       const resultadoImagen = await imagenSubir(imagen, nombre, "clientes")
       if (!resultadoImagen.success) {
         imagenurl = resultadoImagen.url || "" 
-        if(!imagenurl || imagenurl=""){
+        if(!imagenurl || imagenurl==""){
           return { success: false, error: "Se subio la imagen a supabase pero no se obtuvo el url."}
         }
       }else{
