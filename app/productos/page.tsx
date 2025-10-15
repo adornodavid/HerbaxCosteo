@@ -382,7 +382,7 @@ export default function ProductosPage() {
       // -- Cargar catalogos
       const catalogosResult = await listaDesplegableCatalogos(-1, "", auxClienteId)
       if (!catalogosResult.error) {
-        const catalogosConTodos = [1, 2, 3, 4].includes(Number(user.RolId))
+        const catalogosConTodos = esAdminDDLs === true
           ? [
               { id: -1, nombre: "Todos" },
               ...(catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre })),
