@@ -197,9 +197,7 @@ export default function VerProductoPage() {
               <div className="md:w-1/3 h-64 md:h-auto flex items-center justify-center bg-gray-100">
                 <img
                   src={
-                    producto.ProductoImgUrl && producto.ProductoImgUrl !== "Sin imagen"
-                      ? producto.ProductoImgUrl
-                      : "/placeholder.svg?height=400&width=400&text=Producto"
+                    "/placeholder.svg?height=400&width=400&text=Producto"
                   }
                   alt={producto.ProductoNombre}
                   className="w-full h-auto object-cover"
@@ -213,7 +211,7 @@ export default function VerProductoPage() {
                 <div className="space-y-3">
                   <div>
                     <span className="font-semibold text-gray-700">ID:</span>
-                    <span className="ml-2 text-gray-900">{producto.ProductoId}</span>
+                    <span className="ml-2 text-gray-900">{/*producto.ProductoId*/}</span>
                   </div>
 
                   <div>
