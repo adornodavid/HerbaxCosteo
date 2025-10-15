@@ -80,8 +80,9 @@ export async function crearCliente(formData: FormData) {
       const resultadoImagen = await imagenSubir(imagen, nombre, "clientes")
       if (!resultadoImagen.success) {
        imagenurl = resultadoImagen.url || "" 
+      }else{
+        return { success: false, error: resultadoImagen.error }
       }
-      return { success: false, error: resultadoImagen.error }
     }
 
     // Paso 5: Ejecutar Query
