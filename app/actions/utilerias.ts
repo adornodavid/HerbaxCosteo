@@ -82,13 +82,13 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
     }
 
     // Obtener URL
-    const { data: urlData, error: urlDataError } = supabase.storage.from("healthylab").getPublicUrl(`${folder}/${fileName}`)
+    const { data: urlData } = supabase.storage.from("healthylab").getPublicUrl(`${folder}/${fileName}`)
     if(urlDataError){
       return{ success: false, error: urlDataError}
     }
 
     // Retorno de resultado exitoso
-    return { success: true, url: urlData.publicUrl }
+    return { success: true, url: data }
   } catch (error) {
     console.error("Error procesando subida de imagen en imagenSubir de actiosn/utilerias: ", error)
     return { success: false, error: "Error procesando subida de imagen en imagenSubir de actiosn/utilerias:" }
