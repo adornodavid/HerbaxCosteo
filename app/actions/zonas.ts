@@ -176,10 +176,15 @@ export async function obtenerZonas(id = -1, nombre = "", clave = "", activo = "T
 //Función: actualizarZona / updZona: funcion para actualizar una Zona
 export async function actualizarZona(formData: FormData) {
   try {
+    // Paso 1: recibiendo variables
     const idString = formData.get("id") as string
     const id = Number(idString)
+    const nombre = formData.get("nombre") as string
+    const clave = formData.get("clave") as string
+    const imgurl = formData.get("imgurl") as string | null
+    const imagen = formData.get("imagen") as File
 
-    // Paso 1: Validar si no existe
+    // Paso 2: Validar si no existe
     /*
     const existe: boolean = await (async () => {
       const resultado = await obtenerZonas(
@@ -203,15 +208,12 @@ export async function actualizarZona(formData: FormData) {
     }
     */
 
-    const imgurl = formData.get("imgurl") as string | null
+    
 
-    // Paso 2: Subir imagen para obtener su url
+    // Paso 3: Subir imagen para obtener su url
     let imagenurl = ""
-    const imagen = formData.get("imagen") as File
-    const auxNombre = formData.get("nombre") as string
-
     if (imagen && imagen.size > 0) {
-      const resultadoImagen = await imagenSubir(imagen, auxNombre, "zonas")
+      const resultadoImagen = await imagenSubir(imagen, nombre, "zonas")
       if (!resultadoImagen.success) {
         return { success: false, error: resultadoImagen.error }
       } else{
@@ -221,21 +223,12 @@ export async function actualizarZona(formData: FormData) {
       imagenurl = imgurl || ""
     }
 
-    // Paso 3: Pasar datos del formData a variables con tipado de datos
-    const nombre = formData.get("nombre") as string
-    const clave = formData.get("clave") as string
-    const direccion = formData.get("direccion") as string
-    const telefono = formData.get("telefono") as string
-    const email = formData.get("email") as string
-
+    // Paso 4: Pasar datos del formData a variables con tipado de datos
     const { data, error } = await supabase
       .from("zonas")
       .update({
         nombre,
         clave,
-        direccion,
-        telefono,
-        email,
         imgurl: imagenurl,
       })
       .eq("id", id)
