@@ -86,6 +86,8 @@ export default function ProductosPage() {
   const [filtroCodigo, setFiltroCodigo] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
   const [filtroEstatus, setFiltroEstatus] = useState("-1")
+  const [filtroCliente, setFiltroCliente] = useState("-1")
+  const [filtroCatalogo, setFiltroCatalogo] = useState("-1")
 
 
   // --- Estados ---
@@ -108,8 +110,7 @@ export default function ProductosPage() {
   const [productoToDelete, setProductoToDelete] = useState<number | null>(null)
 
    // Filtros
-  const [filtroCliente, setFiltroCliente] = useState("-1")
-  const [filtroCatalogo, setFiltroCatalogo] = useState("-1")
+  
   
   // Estados para el modal de detalles mejorado
   const [showProductoDetailsModal, setShowProductoDetailsModal] = useState(false)
@@ -382,6 +383,37 @@ export default function ProductosPage() {
     cargarDatosIniciales()
   }
 
+  // Busqueda, camabiar cliente seleccionado
+  const handleClienteChange = async (value: string) => {
+    // Cambiar seleccion de filtro de cliente y resetear filtro de catálogo
+    setFiltroCliente(value)
+    setFiltroCatalogo("-1") 
+
+    try {
+      const clienteIdNum = Number.parseInt(value, 10)
+
+      let query = supabase.from("catalogos").select(`id, nombre`).eq("activo", true).order("nombre")
+
+      if (clienteIdNum !== -1) {
+        query = query.eq("clienteid", clienteIdNum)
+      }
+
+      const { data, error } = await query
+
+      if (!error) {
+        const catalogosConTodos = [
+          { id: -1, nombre: "Todos" },
+          ...(data || []).map((c: any) => ({ id: c.id, nombre: c.nombre })),
+        ]
+        setCatalogos(catalogosConTodos)
+      } else {
+        console.error("Error al cargar catálogos por cliente:", error)
+      }
+    } catch (error) {
+      console.error("Error al cambiar cliente:", error)
+    }
+  }
+
   // Estatus - Cambiar activo/inactivo
   const handleToggleStatusClickActivo = async (productoId: number, productoActivo: boolean) => {
     try {
@@ -412,36 +444,6 @@ export default function ProductosPage() {
     setShowElementoDetallesModal(true)
   }
 
-// --- Handles - Manejo de Eventos ---
-  const handleClienteChange = async (value: string) => {
-    setFiltroCliente(value)
-    setFiltroCatalogo("-1") // Resetear catálogo al cambiar cliente
-
-    try {
-      const clienteIdNum = Number.parseInt(value, 10)
-
-      let query = supabase.from("catalogos").select(`id, nombre`).eq("activo", true).order("nombre")
-
-      if (clienteIdNum !== -1) {
-        query = query.eq("clienteid", clienteIdNum)
-      }
-
-      const { data, error } = await query
-
-      if (!error) {
-        const catalogosConTodos = [
-          { id: -1, nombre: "Todos" },
-          ...(data || []).map((c: any) => ({ id: c.id, nombre: c.nombre })),
-        ]
-        setCatalogos(catalogosConTodos)
-      } else {
-        console.error("Error al cargar catálogos por cliente:", error)
-      }
-    } catch (error) {
-      console.error("Error al cambiar cliente:", error)
-    }
-  }
-  
   // ESTE ES EL ÚNICO LUGAR DONDE SE EJECUTA LA BÚSQUEDA
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
