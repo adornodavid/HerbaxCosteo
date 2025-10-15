@@ -120,13 +120,13 @@ export default function ProductosPage() {
   const [isDetailsLoading, setIsDetailsLoading] = useState(false)
 
   // --- Variables (post carga elementos) ---
-  const elementosPaginados = useMemo(() => {
+  const elementosPaginadosssssss = useMemo(() => {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
     return Listado.slice(indiceInicio, indiceInicio + resultadosPorPagina)
   }, [Listado, paginaActual])
 
 // --- Paginación ---
-  const productosPaginados = useMemo(() => {
+  const elementosPaginados = useMemo(() => {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
     return productosFiltrados.slice(indiceInicio, indiceInicio + resultadosPorPagina)
   }, [productosFiltrados, paginaActual])
@@ -721,7 +721,7 @@ export default function ProductosPage() {
         <CardHeader>
           <CardTitle>Resultados</CardTitle>
           <CardDescription>
-            Mostrando {productosPaginados.length} de {totalProductos} productos encontrados.
+            Mostrando {elementosPaginados.length} de {totalProductos} productos encontrados.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -730,9 +730,9 @@ export default function ProductosPage() {
               <Loader2 className="mx-auto h-8 w-8 animate-spin" />
               <span className="ml-2 text-lg">Cargando productos...</span>
             </div>
-          ) : productosPaginados.length > 0 ? (
+          ) : elementosPaginados.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-              {productosPaginados.map((p, index) => (
+              {elementosPaginados.map((p, index) => (
                 <Card
                   key={`${p.ProductoId}-${p.CatalogoId}-${index}`}
                   className="border bg-card text-card-foreground relative flex flex-col overflow-hidden rounded-xs shadow-lg hover:shadow-xl transition-shadow duration-300 group"
