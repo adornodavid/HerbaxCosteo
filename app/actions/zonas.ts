@@ -173,7 +173,88 @@ export async function obtenerZonas(id = -1, nombre = "", clave = "", activo = "T
 /*==================================================
   UPDATES-ACTUALIZAR (UPDATES)
 ================================================== */
+//Función: actualizarZona / updZona: funcion para actualizar una Zona
+export async function actualizarZona(formData: FormData) {
+  try {
+    const idString = formData.get("id") as string
+    const id = Number(idString)
 
+    // Paso 1: Validar si no existe
+    const existe: boolean = await (async () => {
+      const resultado = await obtenerZonas(
+        -1,
+        formData.get("nombre") as string,
+        formData.get("clave") as string,
+        "",
+        "Todos",
+      )
+      return resultado.success && resultado.data && resultado.data.some((cliente) => cliente.id !== id)
+    })()
+
+    if (existe) {
+      return {
+        success: false,
+        error:
+          "Los datos del cliente que desea actualizar ya los tiene otro registro y no se puede proceder, recuerde que la información debe ser unica.",
+      }
+    }
+
+    const imgurl = formData.get("imgurl") as string | null
+
+    // Paso 2: Subir imagen para obtener su url
+    let imagenurl = ""
+    const imagen = formData.get("imagen") as File
+    const auxNombre = formData.get("nombre") as string
+
+    if (imagen && imagen.size > 0) {
+      const resultadoImagen = await imagenSubir(imagen, auxNombre, "clientes")
+      if (!resultadoImagen.success) {
+        return { success: false, error: resultadoImagen.error }
+      }
+      imagenurl = resultadoImagen.url || ""
+    } else {
+      imagenurl = imgurl || ""
+    }
+
+    // Paso 3: Pasar datos del formData a variables con tipado de datos
+    const nombre = formData.get("nombre") as string
+    const clave = formData.get("clave") as string
+    const direccion = formData.get("direccion") as string
+    const telefono = formData.get("telefono") as string
+    const email = formData.get("email") as string
+
+    const { data, error } = await supabase
+      .from("clientes")
+      .update({
+        nombre,
+        clave,
+        direccion,
+        telefono,
+        email,
+        imgurl: imagenurl,
+      })
+      .eq("id", id)
+      .select("id")
+      .single()
+
+    // Return error
+    if (error) {
+      console.error("Error actualizando cliente en query en actualizarCliente de actions/clientes:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/clientes")
+
+    // Return resultados
+    return { success: true, data: data.id }
+  } catch (error) {
+    console.error("Error en actualizarCliente de actions/clientes:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion actualizarCliente de actions/clientes: " + error,
+    }
+  }
+}
 
 /*==================================================
   * DELETES-ELIMINAR (DELETES)
