@@ -566,9 +566,9 @@ export default function ProductosPage() {
 
   // --- Renders (contenidos auxiliares) ---
   // Loading
-  if (showPageLoading) {
+  /*if (showPageLoading) {
     return <PageLoadingScreen message="Cargando Productos..." />
-  }
+  }*/
 
   // --- Contenido ---
   return (
