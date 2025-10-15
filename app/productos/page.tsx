@@ -367,14 +367,13 @@ export default function ProductosPage() {
         const clientesConTodos = esAdminDDLs === true ? [{ id: -1, nombre: "Todos" }, ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))]
           : (clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
         setClientes(clientesConTodos)
-
+        // Seleccion de opcion en DDL por filtro de tipo de rol
         if (esAdminDDLs) {
           setFiltroCliente("-1")
         } else {
           const aux = clientesData.id
           setFiltroCliente(aux)
         }
-        //setFiltroCliente("-1")
       } else {
         console.error("Error cargando clientes:", clientesError)
       }
@@ -388,13 +387,11 @@ export default function ProductosPage() {
               ...(catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre })),
             ]
           : (catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre }))
-
         setCatalogos(catalogosConTodos)
-
-        if ([1, 2, 3, 4].includes(Number(user.RolId))) {
-          setFiltroCatalogo("-1") // Set to "Todos" for admin roles
+        // Seleccion de opcion en DDL por filtro de tipo de rol
+        if (esAdminDDLs === true) {
+          setFiltroCatalogo("-1")
         } else {
-          // Set to first available catalog for restricted users
           if (catalogosResult.data && catalogosResult.data.length > 0) {
             setFiltroCatalogo(catalogosResult.data[0].id.toString())
           }
