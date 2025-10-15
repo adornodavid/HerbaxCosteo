@@ -48,46 +48,51 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 ================================================== */
 //Función: imagenSubir / imageUpload: Subir una imagen a un repositorio/folder
 export async function imagenSubir(imageFile: File, name: string, folder: string) {
-  // Validar que se recibió archivo
-  if (!imageFile || imageFile.size === 0) {
-    return { success: false, error: "No se proporcionó una imagen válida" }
+  try{
+    // Validar que se recibió archivo
+    if (!imageFile || imageFile.size === 0) {
+      return { success: false, error: "No se proporcionó una imagen válida" }
+    }
+    return { success: false, error: "SE PROporcionó una imagen válida" }
+    // Validar tipo de archivo
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"]
+    if (!validTypes.includes(imageFile.type)) {
+      return { success: false, error: "Tipo de archivo no válido" }
+    }
+
+    // Validar tamaño máximo (10MB)
+    const MAX_SIZE = 10 * 1024 * 1024
+    if (imageFile.size > MAX_SIZE) {
+      return { success: false, error: "La imagen excede el tamaño máximo de 10MB" }
+    }
+
+    // Crear nombre con extensión
+    const fileExtension = imageFile.name.split(".").pop()
+    const fileName = `${name}-${Date.now()}.${fileExtension}`
+
+    // Subir imagen a repositorio
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("healthylab")
+      .upload(`${folder}/${fileName}`, imageFile)
+
+    // Si se presentó un error
+    if (uploadError) {
+      console.error("Error subiendo imagen en actions/utilerias imagenSubir:", uploadError)
+      return { success: false, error: "Error al subir la imagen: " + uploadError }
+    }
+
+    // Obtener URL
+    const { data: urlData, error: urlDataError } = supabase.storage.from("healthylab").getPublicUrl(`${folder}/${fileName}`)
+    if(urlDataError){
+      return{ success: false, error: urlDataError}
+    }
+
+    // Retorno de resultado exitoso
+    return { success: true, url: urlData.publicUrl }
+  } catch (error) {
+    console.error("Error procesando subida de imagen en imagenSubir de actiosn/utilerias: ", error)
+    return { success: false, error: "Error procesando subida de imagen en imagenSubir de actiosn/utilerias:" }
   }
-return { success: false, error: "SE PROporcionó una imagen válida" }
-  // Validar tipo de archivo
-  const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"]
-  if (!validTypes.includes(imageFile.type)) {
-    return { success: false, error: "Tipo de archivo no válido" }
-  }
-
-  // Validar tamaño máximo (10MB)
-  const MAX_SIZE = 10 * 1024 * 1024
-  if (imageFile.size > MAX_SIZE) {
-    return { success: false, error: "La imagen excede el tamaño máximo de 10MB" }
-  }
-
-  // Crear nombre con extensión
-  const fileExtension = imageFile.name.split(".").pop()
-  const fileName = `${name}-${Date.now()}.${fileExtension}`
-
-  // Subir imagen a repositorio
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from("healthylab")
-    .upload(`${folder}/${fileName}`, imageFile)
-
-  // Si se presentó un error
-  if (uploadError) {
-    console.error("Error subiendo imagen en actions/utilerias imagenSubir:", uploadError)
-    return { success: false, error: "Error al subir la imagen: " + uploadError }
-  }
-
-  // Obtener URL
-  const { data: urlData, error: urlDataError } = supabase.storage.from("healthylab").getPublicUrl(`${folder}/${fileName}`)
-  if(urlDataError){
-    return{ success: false, error: urlDataError}
-  }
-
-  // Retorno de resultado exitoso
-  return { success: true, url: urlData.publicUrl }
 }
 
 //Función: imagenBorrar / imageDelete: Eliminar una imagen de un repositorio/folder
