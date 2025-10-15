@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
 import { imagenSubir } from "@/app/actions/utilerias"
 import { cookies } from "next/headers"
-import { createServerSupabaseClientWrapper } from "@/app/actions/utilerias"
+//import { createServerSupabaseClientWrapper } from "@/app/actions/utilerias"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
