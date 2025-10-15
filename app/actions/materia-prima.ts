@@ -31,6 +31,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   * READS-OBTENER (SELECTS)
     - obtenerMateriasPrimas / selMateriasPrimas
     - obtenerMateriasPrimasXProductos / selMateriasPrimasXProductos
+    - obtenerMateriasPrimasXFormulas / selMateriasPrimasXFormulas
   * UPDATES-ACTUALIZAR (UPDATES)
     - actualizarMateriaPrima / updMateriaPrima
   * DELETES-ELIMINAR (DELETES)
