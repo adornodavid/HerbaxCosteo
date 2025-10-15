@@ -1,70 +1,337 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
-import Link from "next/link"
+/* ==================================================
+  Imports:
+================================================== */
+// -- Assets --
+import { useState, useEffect, useMemo } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, PlusCircle, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
+import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight, EyeOff, Trash2 } from "lucide-react"
+// -- Tipados (interfaces, clases, objetos) --
+import type React from "react"
+import type { MaterialEtiquetado } from "@/types/material-etiquetado"
+import type {
+  propsPageLoadingScreen,
+  propsPageTitlePlusNew,
+  propsPageModalAlert,
+  propsPageModalError,
+  propsPageModalTutorial,
+} from "@/types/common"
+// -- Librerias --
+// Configuraciones
+import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
+// -- Componentes --
+import { PageTitlePlusNew } from "@/components/page-title-plus-new"
+import { PageLoadingScreen } from "@/components/page-loading-screen"
+import { PageModalAlert } from "@/components/page-modal-alert"
+import { PageModalError } from "@/components/page-modal-error"
+import { PageModalTutorial } from "@/components/page-modal-tutorial"
+// -- Dialog components for details modal
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+// -- Backend --
+import { useAuth } from "@/contexts/auth-context"
+import { obtenerMaterialesEtiquetados, estatusActivoMaterialEtiquetado } from "@/app/actions/material-etiquetado"
 
+/* ==================================================
+	Componente Principal (Pagina)
+================================================== */
 export default function MaterialEtiquetadoPage() {
-  // Estados para filtros
+  // --- Variables especiales ---
+  const router = useRouter()
+  const { user, isLoading: authLoading } = useAuth()
+  const esAdmin = useMemo(() => user && RolesAdmin.includes(user.RolId), [user])
+  const esAdminDDLs = useMemo(() => user && RolesAdminDDLs.includes(user.RolId), [user])
+  const esAdminDOs = useMemo(() => user && RolesAdminDOs.includes(user.RolId), [user])
+  // Paginación
+  const resultadosPorPagina = 20
+
+  // --- Estados ---
+  // Cargar contenido en variables
+  const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
+  const [Listado, setListado] = useState<MaterialEtiquetado[]>([])
+  const [TotalListado, setTotalListado] = useState(0)
+  const [paginaActual, setPaginaActual] = useState(1)
+  const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
+  const [ModalError, setModalError] = useState<propsPageModalError>()
+  const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
+  const [elementoDetalles, setElementoDetalles] = useState<MaterialEtiquetado | null>(null)
+  // Mostrar/Ocultar contenido
+  const [showPageLoading, setShowPageLoading] = useState(true)
+  const [isSearching, setIsSearching] = useState(false)
+  const [showModalAlert, setShowModalAlert] = useState(false)
+  const [showModalError, setShowModalError] = useState(false)
+  const [showModalTutorial, setShowModalTutorial] = useState(false)
+  const [showPageTituloMasNuevo, setShowPageTituloMasNuevo] = useState(false)
+  const [showElementoDetallesModal, setShowElementoDetallesModal] = useState(false)
+  // Cargar componentes
+  const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState<propsPageTitlePlusNew>({
+    Titulo: "",
+    Subtitulo: "",
+    Visible: false,
+    BotonTexto: "",
+    Ruta: "",
+  })
+  // Cargar inputs
   const [filtroId, setFiltroId] = useState("")
-  const [filtroCodigo, setFiltroCodigo] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
+  const [filtroCodigo, setFiltroCodigo] = useState("")
   const [filtroEstatus, setFiltroEstatus] = useState("-1")
 
-  // Datos de ejemplo para el listado
-  const [materialesEtiquetado] = useState([
-    { id: 1, codigo: "ME001", nombre: "Etiqueta Adhesiva Premium", costo: 50.0, activo: true },
-    { id: 2, codigo: "ME002", nombre: "Etiqueta Térmica Estándar", costo: 75.0, activo: true },
-    { id: 3, codigo: "ME003", nombre: "Etiqueta Holográfica", costo: 120.0, activo: false },
-  ])
+  // --- Variables (post carga elementos) ---
+  const elementosPaginados = useMemo(() => {
+    const indiceInicio = (paginaActual - 1) * resultadosPorPagina
+    return Listado.slice(indiceInicio, indiceInicio + resultadosPorPagina)
+  }, [Listado, paginaActual])
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    // Aquí irá la lógica de búsqueda
-    console.log("Buscando con filtros:", { filtroId, filtroCodigo, filtroNombre, filtroEstatus })
+  // -- Funciones --
+  // --- Función de búsqueda, no es la busqueda inicial ---
+  const ejecutarBusqueda = async (id: number, nombre: string, codigo: string, estatus: string) => {
+    // Validar usuario activo
+    if (!user) return
+
+    // Actualizar estados
+    setIsSearching(true)
+    setPaginaActual(1)
+
+    // Formatear variables a mandar como parametros
+    const auxId = id != -1 ? id : -1
+    const auxEstatus =
+      estatus === "-1"
+        ? "Todos"
+        : arrActivoTrue.includes(estatus)
+          ? "True"
+          : arrActivoFalse.includes(estatus)
+            ? "False"
+            : "Todos"
+
+    // Ejecutar Consulta principal
+    try {
+      const result = await obtenerMaterialesEtiquetados(auxId, codigo, nombre, auxEstatus)
+      if (result.success && result.data) {
+        const transformedData: MaterialEtiquetado[] = result.data.map((x: MaterialEtiquetado) => ({
+          id: x.id,
+          codigo: x.codigo,
+          nombre: x.nombre,
+          imgurl: x.imgurl,
+          unidadmedidaid: x.unidadmedidaid,
+          descripcion: x.descripcion,
+          costo: x.costo,
+          fechacreacion: x.fechacreacion,
+          activo: x.activo,
+        }))
+
+        const Listado: MaterialEtiquetado[] = transformedData.map((x: MaterialEtiquetado) => ({
+          MaterialEtiquetadoId: x.id,
+          MaterialEtiquetadoCodigo: x.codigo || "Sin código",
+          MaterialEtiquetadoNombre: x.nombre || "Sin nombre",
+          MaterialEtiquetadoImgUrl: x.imgurl || "Sin imagen",
+          MaterialEtiquetadoUnidadMedidaId: x.unidadmedidaid,
+          MaterialEtiquetadoUnidadMedidaDescripcion: x.descripcion || "Sin unidad",
+          MaterialEtiquetadoCosto: x.costo || 0,
+          MaterialEtiquetadoFechaCreacion: x.fechacreacion,
+          MaterialEtiquetadoActivo: x.activo === true,
+        }))
+
+        setListado(Listado)
+        setTotalListado(Listado.length)
+
+        return { success: true, mensaje: "Se ejecuto correctamente cada proceso." }
+      } else {
+        console.log("No hay datos o la consulta falló.")
+        return { success: false, mensaje: "No hay datos o la consulta falló." + result.error }
+      }
+
+      if (!result.success) {
+        console.error("Error en búsqueda del filtro de búsqueda: " + result.error)
+        console.log("Error en búsqueda del filtro de búsqueda: " + result.error)
+        setListado([])
+        return { success: false, mensaje: "Error en búsqueda del filtro de búsqueda: " + result.error }
+      }
+    } catch (error) {
+      console.log("Error inesperado al buscar elementos: " + error)
+      setListado([])
+      return { error: true, mensaje: "Error inesperado al buscar elementos: " + error }
+    } finally {
+      setIsSearching(false)
+    }
   }
 
+  // Inicio (carga inicial y seguridad)
+  const cargarDatosIniciales = async () => {
+    if (!user) return
+
+    try {
+      setPageTituloMasNuevo({
+        Titulo: "Material Etiquetado",
+        Subtitulo: "Gestión completa de Material Etiquetado",
+        Visible: esAdminDOs == true ? true : false,
+        BotonTexto: "Crear Nuevo Material Etiquetado",
+        Ruta: "/materialetiquetado/crear",
+      })
+      setShowPageTituloMasNuevo(true)
+
+      const Result = await ejecutarBusqueda(-1, "", "", "True")
+      if (!Result.success) {
+        setModalAlert({
+          Titulo: "En ejecucion de Busqueda de carga inicial",
+          Mensaje: Result.mensaje,
+        })
+        setShowModalAlert(true)
+      }
+    } catch (error) {
+      console.error("Error al cargar datos iniciales:", error)
+      console.log("Error al cargar datos iniciales:", error)
+
+      setModalError({
+        Titulo: "Error al cargar datos iniciales",
+        Mensaje: error,
+      })
+      setShowModalError(true)
+    } finally {
+      setShowPageLoading(false)
+    }
+  }
+
+  // Estatus - Cambiar activo/inactivo
+  const handleToggleStatusClickActivo = async (Id: number, materialEtiquetadoActivo: boolean) => {
+    try {
+      // Toggle the status (if active, make inactive; if inactive, make active)
+      const nuevoEstatus = !materialEtiquetadoActivo
+
+      // Ejecutar función
+      const resultado = await estatusActivoMaterialEtiquetado(Id, nuevoEstatus)
+      if (resultado) {
+        await cargarDatosIniciales()
+      } else {
+        // Mostrar error
+        setModalError({
+          Titulo: "Error al cambiar estatus",
+          Mensaje: "No se pudo cambiar el estatus del elemento seleccionado. Por favor, intente nuevamente.",
+        })
+        setShowModalError(true)
+      }
+    } catch (error) {
+      // Mostrar error
+      console.error("Error en handleToggleStatusClickActivo:", error)
+      setModalError({
+        Titulo: "Error al cambiar estatus",
+        Mensaje: `Error inesperado: ${error}`,
+      })
+      setShowModalError(true)
+    }
+  }
+
+  const handleVerDetalles = (materialEtiquetado: MaterialEtiquetado) => {
+    setElementoDetalles(materialEtiquetado)
+    setShowElementoDetallesModal(true)
+  }
+
+  // -- Manejadores (Handles) --
+  // Busqueda - Ejecutar
+  const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
+    // Prevenir cambio de pagina
+    e.preventDefault()
+
+    // Variables auxiliares y formateadas para mandar como parametros
+    const Id = filtroId === "" || filtroId === "0" ? -1 : Number.parseInt(filtroId, 10)
+    const Nombre: string = filtroNombre.trim()
+    const Codigo: string = filtroCodigo.trim()
+    const Estatus = filtroEstatus === "-1" ? "Todos" : filtroEstatus
+
+    ejecutarBusqueda(Id, Nombre, Codigo, Estatus)
+  }
+
+  // Busqueda - Limpiar o Resetear
   const handleLimpiar = () => {
     setFiltroId("")
-    setFiltroCodigo("")
     setFiltroNombre("")
+    setFiltroCodigo("")
     setFiltroEstatus("-1")
+
+    cargarDatosIniciales()
   }
 
-  const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(amount)
+  // --- Inicio (carga inicial y seguridad) ---
+  useEffect(() => {
+    if (!authLoading) {
+      // Validar
+      if (!user || user.RolId === 0) {
+        router.push("/login")
+        return
+      }
+      // Iniciar
+      const inicializar = async () => {
+        setPageLoading({ message: "Cargando Material Etiquetado..." })
+        setShowPageLoading(true)
+        await cargarDatosIniciales()
+      }
+      inicializar()
+    }
+  }, [authLoading, user, router, esAdmin, esAdminDDLs, esAdminDOs])
 
+  // --- Renders (contenidos auxiliares) ---
+  // Loading
+  if (showPageLoading) {
+    return <PageLoadingScreen message="Cargando Material Etiquetado..." />
+  }
+
+  // --- Contenido ---
   return (
     <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
-      {/* 1. Título y Botón */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Material Etiquetado</h1>
-          <p className="text-muted-foreground">Gestión completa de Material Etiquetado</p>
-        </div>
-        <Link href="/materialetiquetado/nuevo" passHref>
-          <Button className="bg-[#5d8f72] hover:bg-[#44785a] text-white">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Crear Nuevo Material Etiquetado
-          </Button>
-        </Link>
-      </div>
+      {/* -- Componentes -- */}
+      {showModalAlert && (
+        <PageModalAlert
+          Titulo={ModalAlert.Titulo}
+          Mensaje={ModalAlert.Mensaje}
+          isOpen={true}
+          onClose={() => setShowModalAlert(false)}
+        />
+      )}
 
+      {showModalError && (
+        <PageModalError
+          Titulo={ModalError.Titulo}
+          Mensaje={ModalError.Mensaje}
+          isOpen={true}
+          onClose={() => setShowModalError(false)}
+        />
+      )}
+
+      {showModalTutorial && (
+        <PageModalTutorial
+          Titulo={ModalTutorial.Titulo}
+          Subtitulo={ModalTutorial.Subtitulo}
+          VideoUrl={ModalTutorial.VideoUrl}
+          isOpen={true}
+          onClose={() => setShowModalTutorial(false)}
+        />
+      )}
+
+      {/* 1. Título y Botón */}
+      {showPageTituloMasNuevo && (
+        <PageTitlePlusNew
+          Titulo={PageTituloMasNuevo.Titulo}
+          Subtitulo={PageTituloMasNuevo.Subtitulo}
+          Visible={PageTituloMasNuevo.Visible}
+          BotonTexto={PageTituloMasNuevo.BotonTexto}
+          Ruta={PageTituloMasNuevo.Ruta}
+        />
+      )}
+
+      {/* 2. Filtros de Búsqueda */}
       <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
           <CardTitle>Filtros de Búsqueda</CardTitle>
         </CardHeader>
         <CardContent>
-          <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 gap-4 items-end" onSubmit={handleFormSubmit}>
+          <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 gap-4 items-end" onSubmit={handleBuscar}>
             <div className="lg:col-span-2">
               <label htmlFor="txtMaterialEtiquetadoId" className="text-sm font-medium">
-                ID
+                Id
               </label>
               <Input
                 id="txtMaterialEtiquetadoId"
@@ -73,20 +340,6 @@ export default function MaterialEtiquetadoPage() {
                 placeholder="Buscar por ID..."
                 value={filtroId}
                 onChange={(e) => setFiltroId(e.target.value)}
-              />
-            </div>
-            <div className="lg:col-span-2">
-              <label htmlFor="txtMaterialEtiquetadoCodigo" className="text-sm font-medium">
-                Código
-              </label>
-              <Input
-                id="txtMaterialEtiquetadoCodigo"
-                name="txtMaterialEtiquetadoCodigo"
-                type="text"
-                placeholder="Buscar por código..."
-                maxLength={50}
-                value={filtroCodigo}
-                onChange={(e) => setFiltroCodigo(e.target.value)}
               />
             </div>
             <div className="lg:col-span-2">
@@ -101,6 +354,20 @@ export default function MaterialEtiquetadoPage() {
                 maxLength={150}
                 value={filtroNombre}
                 onChange={(e) => setFiltroNombre(e.target.value)}
+              />
+            </div>
+            <div className="lg:col-span-2">
+              <label htmlFor="txtMaterialEtiquetadoCodigo" className="text-sm font-medium">
+                Código
+              </label>
+              <Input
+                id="txtMaterialEtiquetadoCodigo"
+                name="txtMaterialEtiquetadoCodigo"
+                type="text"
+                placeholder="Buscar por código..."
+                maxLength={50}
+                value={filtroCodigo}
+                onChange={(e) => setFiltroCodigo(e.target.value)}
               />
             </div>
             <div className="lg:col-span-2">
@@ -140,12 +407,99 @@ export default function MaterialEtiquetadoPage() {
         </CardContent>
       </Card>
 
+      {/* Dialog modal for material etiquetado details */}
+      <Dialog open={showElementoDetallesModal} onOpenChange={setShowElementoDetallesModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detalles del Material Etiquetado</DialogTitle>
+          </DialogHeader>
+          {elementoDetalles && (
+            <Card className="overflow-hidden border-0 shadow-none">
+              <CardContent className="p-0">
+                <div className="flex flex-col md:flex-row">
+                  {/* Image on the left - centered vertically */}
+                  <div className="md:w-1/3 h-64 md:h-auto flex items-center justify-center bg-gray-300">
+                    <img
+                      src={
+                        elementoDetalles.MaterialEtiquetadoImgUrl &&
+                        elementoDetalles.MaterialEtiquetadoImgUrl !== "Sin imagen"
+                          ? elementoDetalles.MaterialEtiquetadoImgUrl
+                          : "/placeholder.svg?height=400&width=400&text=Material+Etiquetado"
+                      }
+                      alt={elementoDetalles.MaterialEtiquetadoNombre}
+                      className="w-full h-auto object-cover"
+                    />
+                  </div>
+
+                  {/* Material Etiquetado data on the right */}
+                  <div className="md:w-2/3 p-6 space-y-4">
+                    <h2 className="text-2xl font-bold mb-4">Información del Material Etiquetado</h2>
+
+                    <div className="space-y-3">
+                      <div>
+                        <span className="font-semibold text-gray-700">ID:</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.MaterialEtiquetadoId}</span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Código:</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.MaterialEtiquetadoCodigo}</span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Nombre:</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.MaterialEtiquetadoNombre}</span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Unidad de Medida:</span>
+                        <span className="ml-2 text-gray-900">
+                          {elementoDetalles.MaterialEtiquetadoUnidadMedidaDescripcion}
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Costo:</span>
+                        <span className="ml-2 text-gray-900">
+                          ${elementoDetalles.MaterialEtiquetadoCosto.toFixed(2)}
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Estatus:</span>
+                        <span
+                          className={`ml-2 px-2 py-1 rounded text-sm font-semibold ${
+                            elementoDetalles.MaterialEtiquetadoActivo
+                              ? "bg-green-500 text-white"
+                              : "bg-red-500 text-white"
+                          }`}
+                        >
+                          {elementoDetalles.MaterialEtiquetadoActivo ? "Activo" : "Inactivo"}
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Fecha de Creación:</span>
+                        <span className="ml-2 text-gray-900">
+                          {elementoDetalles.MaterialEtiquetadoFechaCreacion
+                            ? new Date(elementoDetalles.MaterialEtiquetadoFechaCreacion).toLocaleDateString()
+                            : "N/A"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* 3. Resultados - Listado */}
       <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
           <CardTitle>Resultados</CardTitle>
-          <CardDescription>
-            Mostrando {materialesEtiquetado.length} materiales de etiquetado encontrados.
-          </CardDescription>
+          <CardDescription>Mostrando {Listado?.length || 0} elementos encontrados.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -161,40 +515,107 @@ export default function MaterialEtiquetadoPage() {
                 </tr>
               </thead>
               <tbody>
-                {materialesEtiquetado.map((me) => (
-                  <tr key={me.id} className="border-b hover:bg-gray-50">
-                    <td className="py-3 px-4">{me.id}</td>
-                    <td className="py-3 px-4">{me.codigo}</td>
-                    <td className="py-3 px-4">{me.nombre}</td>
-                    <td className="py-3 px-4">{formatCurrency(me.costo)}</td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={`px-2 py-1 text-xs rounded-xs font-semibold ${
-                          me.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                        }`}
-                      >
-                        {me.activo ? "Activo" : "Inactivo"}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" title="Ver Detalles">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" title="Editar">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" title={me.activo ? "Inactivar" : "Activar"}>
-                          {me.activo ? (
-                            <ToggleRight className="h-4 w-4 text-red-500" />
-                          ) : (
-                            <ToggleLeft className="h-4 w-4 text-green-500" />
-                          )}
-                        </Button>
+                {isSearching && (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+                        <span>Buscando resultados.....</span>
                       </div>
                     </td>
                   </tr>
-                ))}
+                )}
+
+                {!isSearching && Listado.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <span>No se encontraron resultados con los parametros indicados, favor de verificar.</span>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+
+                {!isSearching &&
+                  Listado?.map((elemento) => (
+                    <tr key={elemento.MaterialEtiquetadoId} className="border-b hover:bg-gray-50">
+                      <td className="py-3 px-4">{elemento.MaterialEtiquetadoId}</td>
+                      <td className="py-3 px-4">{elemento.MaterialEtiquetadoCodigo}</td>
+                      <td className="py-3 px-4">{elemento.MaterialEtiquetadoNombre}</td>
+                      <td className="py-3 px-4">${elemento.MaterialEtiquetadoCosto.toFixed(2)}</td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`px-2 py-1 text-xs rounded-xs font-semibold ${
+                            elemento.MaterialEtiquetadoActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                          }`}
+                        >
+                          {elemento.MaterialEtiquetadoActivo ? "Activo" : "Inactivo"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Detalles"
+                            onClick={() => handleVerDetalles(elemento)}
+                          >
+                            <EyeOff className="h-4 w-4" />
+                          </Button>
+
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Ver"
+                            onClick={() => router.push(`/materialetiquetado/${elemento.MaterialEtiquetadoId}/ver`)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          {esAdminDOs && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Editar"
+                                onClick={() =>
+                                  router.push(`/materialetiquetado/${elemento.MaterialEtiquetadoId}/editar`)
+                                }
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title={elemento.MaterialEtiquetadoActivo ? "Inactivar" : "Activar"}
+                                onClick={() =>
+                                  handleToggleStatusClickActivo(
+                                    elemento.MaterialEtiquetadoId,
+                                    elemento.MaterialEtiquetadoActivo,
+                                  )
+                                }
+                              >
+                                {elemento.MaterialEtiquetadoActivo ? (
+                                  <ToggleRight className="h-4 w-4 text-red-500" />
+                                ) : (
+                                  <ToggleLeft className="h-4 w-4 text-green-500" />
+                                )}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Eliminar"
+                                onClick={() =>
+                                  router.push(`/materialetiquetado/${elemento.MaterialEtiquetadoId}/eliminar`)
+                                }
+                              >
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
