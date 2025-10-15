@@ -111,6 +111,7 @@ export default function FormulasPage() {
     // Ejecutar Consulta principal
     try {
       const result = await obtenerFormulas(auxId, codigo, nombre, auxEstatus, -1, -1)
+      consolo.log("Success: " + result.success + " Data: " + result.data)
       if (result.success && result.data) {
         const transformedData: Formula[] = result.data.map((x: Formula) => ({
           id: x.id,
