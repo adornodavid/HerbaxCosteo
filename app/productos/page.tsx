@@ -503,7 +503,7 @@ export default function ProductosPage() {
       }
 
       const inicializar = async () => {
-        setPageLoading(true)
+        setPageLoading(false)
         await cargarDatosInicialesProductos()
       }
       inicializar()
