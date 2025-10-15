@@ -53,7 +53,7 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
     if (!imageFile || imageFile.size === 0) {
       return { success: false, error: "No se proporcionó una imagen válida" }
     }
-    return { success: false, error: "SE PROporcionó una imagen válida" }
+    
     // Validar tipo de archivo
     const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"]
     if (!validTypes.includes(imageFile.type)) {
