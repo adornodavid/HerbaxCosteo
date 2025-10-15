@@ -449,6 +449,7 @@ export default function ProductosPage() {
 
         const productosListado: ProductoListado[] = transformedData.map((p: oProducto) => ({
           ProductoId: p.id,
+          ProductoCodigo: p.codigo || "Sin codigo",
           ProductoNombre: p.nombre || "Sin nombre",
           ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
           ProductoTiempo: "N/A",
