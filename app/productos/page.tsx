@@ -4,13 +4,14 @@
 ================================================== */
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Eye, Edit, ToggleLeft, ToggleRight, Loader2, PlusCircle, RotateCcw, EyeOff, X } from "lucide-react"
+
+import Link from "next/link"
+import Image from "next/image"
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { Producto, oProducto, ProductoCatalogo, ProductoListado, ProductosEstadisticas } from "@/types/productos"
@@ -23,7 +24,7 @@ import type {
 } from "@/types/common"
 // -- Librerias --
 // Configuraciones
-import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs } from "@/lib/config"
+import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
 // -- Componentes --
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageLoadingScreen } from "@/components/page-loading-screen"
