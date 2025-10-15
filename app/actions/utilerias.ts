@@ -83,8 +83,8 @@ export async function imagenSubir(imageFile: File, name: string, folder: string)
 
     // Obtener URL
     const { data: urlData } = supabase.storage.from("healthylab").getPublicUrl(`${folder}/${fileName}`)
-    if(urlDataError){
-      return{ success: false, error: urlDataError}
+    if(!urlData){
+      return{ success: false, error: "No se obtuvo la url en imagenSubir de actions/utilerias."}
     }
 
     // Retorno de resultado exitoso
