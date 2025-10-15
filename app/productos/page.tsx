@@ -876,6 +876,79 @@ export default function ProductosPage() {
                     <p className="text-lg font-bold text-green-600">{formatCurrency(p.ProductoCosto)}</p>
                     <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
                       <div className="flex gap-3 justify-center mt-auto">
+                        {/* Detalles - Opens modal */}
+                        <div className="flex flex-col items-center">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Ver Detalles"
+                            onClick={() => handleVerDetalles(elemento)}
+                          >
+                            <EyeOff className="h-4 w-4" />
+                          </Button>
+                          <span className="text-xs text-muted-foreground mt-1">Detalles</span>
+                        </div>
+
+                        {/* Ver - Navigates to ver page */}
+                        <div className="flex flex-col items-center">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Ver Cliente"
+                            onClick={() => router.push(`/clientes/${elemento.ClienteId}/ver`)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <span className="text-xs text-muted-foreground mt-1">Ver</span>
+                        </div>
+
+                        {esAdminDOs && (
+                          <>
+                            {/* Editar */}
+                            <div className="flex flex-col items-center">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Editar"
+                                onClick={() => router.push(`/clientes/${elemento.ClienteId}/editar`)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <span className="text-xs text-muted-foreground mt-1">Editar</span>
+                            </div>
+
+                            {/* Estatus */}
+                            <div className="flex flex-col items-center">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title={elemento.ClienteActivo ? "Inactivar" : "Activar"}
+                                onClick={() => handleToggleStatusClickActivo(elemento.ClienteId, elemento.ClienteActivo)}
+                              >
+                                {elemento.ClienteActivo ? (
+                                  <ToggleRight className="h-4 w-4 text-red-500" />
+                                ) : (
+                                  <ToggleLeft className="h-4 w-4 text-green-500" />
+                                )}
+                              </Button>
+                              <span className="text-xs text-muted-foreground mt-1">Estatus</span>
+                            </div>
+
+                            {/* Eliminar */}
+                            <div className="flex flex-col items-center">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Eliminar"
+                                onClick={() => router.push(`/clientes/${elemento.ClienteId}/eliminar`)}
+                              >
+                                <X className="h-4 w-4 text-red-500" />
+                              </Button>
+                              <span className="text-xs text-muted-foreground mt-1">Eliminar</span>
+                            </div>
+                          </>
+                        )}
+
                         <Button
                           className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-7"
                           variant="ghost"
