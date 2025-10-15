@@ -657,11 +657,12 @@ export default function ProductosPage() {
   // --- Carga Inicial y Seguridad ---
   useEffect(() => {
     if (!authLoading) {
+      // Validar usuario
       if (!user || user.RolId === 0) {
         router.push("/login")
         return
       }
-
+      // Iniciar carga de pagina
       const inicializar = async () => {
         setPageLoading({ message: "Cargando Productos..." })
         setShowPageLoading(true)
