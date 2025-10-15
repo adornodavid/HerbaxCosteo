@@ -110,7 +110,7 @@ export default function MateriaPrimaPage() {
 
     // Ejecutar Consulta principal
     try {
-      const result = await obtenerMateriasPrima(auxId, codigo, nombre, auxEstatus, -1, -1)
+      const result = await obtenerMateriasPrimas(auxId, codigo, nombre, auxEstatus, -1, -1)
       if (result.success && result.data) {
         const transformedData: MateriaPrima[] = result.data.map((x: any) => ({
           id: x.id,
