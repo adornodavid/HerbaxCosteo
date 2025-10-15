@@ -920,10 +920,10 @@ export default function ProductosPage() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                title={elemento.ClienteActivo ? "Inactivar" : "Activar"}
-                                onClick={() => handleToggleStatusClickActivo(elemento.ClienteId, elemento.ClienteActivo)}
+                                title={p.ProductoActivo ? "Inactivar" : "Activar"}
+                                {/*onClick={() => handleToggleStatusClickActivo(p.ProductoId, p.ProductoActivo)}*/}
                               >
-                                {elemento.ClienteActivo ? (
+                                {p.ProductoActivo ? (
                                   <ToggleRight className="h-4 w-4 text-red-500" />
                                 ) : (
                                   <ToggleLeft className="h-4 w-4 text-green-500" />
@@ -938,7 +938,7 @@ export default function ProductosPage() {
                                 variant="ghost"
                                 size="icon"
                                 title="Eliminar"
-                                onClick={() => router.push(`/clientes/${elemento.ClienteId}/eliminar`)}
+                                onClick={() => router.push(`/productos/${p.ProductoId}/eliminar`)}
                               >
                                 <X className="h-4 w-4 text-red-500" />
                               </Button>
