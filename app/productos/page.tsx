@@ -333,11 +333,14 @@ export default function ProductosPage() {
 
   // --- Carga inicial de datos ---
   const cargarDatosIniciales = async () => {
+    // Validar existe usuario
     if (!user) return
 
     try {
+      // Auxiliar para definir DDLs
       const auxClienteId = esAdminDDLs === true ? -1 : user.ClienteId
 
+      // Titulo de la página
       setPageTituloMasNuevo({
         Titulo: "Productos",
         Subtitulo: "Gestión completa de Productos",
@@ -347,6 +350,7 @@ export default function ProductosPage() {
       })
       setShowPageTituloMasNuevo(true)
      
+      // Ejecutar funcio de busqueda para cargar listado inicial
       const Result = await ejecutarBusquedaProductos("", auxClienteId, -1, "True")
       if (!Result.success) {
         setModalAlert({
@@ -359,7 +363,6 @@ export default function ProductosPage() {
       // -- Cargar DDLs
       // DDL Clientes
       const { data: clientesData, error: clientesError } = await listaDesplegableClientes(auxClienteId,"")
-
       if (!clientesError) {
         const clientesConTodos = esAdminDDLs === true ? [{ id: -1, nombre: "Todos" }, ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))]
           : (clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
