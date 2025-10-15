@@ -154,7 +154,6 @@ export async function obtenerFormulas(
         return { success: false, error: "Error obteniendo el array de los id de las formulas relacionadas con productos" }
       }
     }
-
     const IdsMerge: number[] = [...new Set([...IdsXCliente, ...IdsXProducto])]
 
     // Paso 2: Preparar Query
