@@ -176,7 +176,7 @@ export async function obtenerZonas(id = -1, nombre = "", clave = "", activo = "T
 //Función: actualizarZona / updZona: funcion para actualizar una Zona
 export async function actualizarZona(formData: FormData) {
   try {
-    // Paso 1: recibiendo variables
+    // Paso 1: Recibir variables
     const idString = formData.get("id") as string
     const id = Number(idString)
     const nombre = formData.get("nombre") as string
@@ -184,7 +184,12 @@ export async function actualizarZona(formData: FormData) {
     const imgurl = formData.get("imgurl") as string | null
     const imagen = formData.get("imagen") as File
 
-    // Paso 2: Validar si no existe
+    // Paso 2: Validar variables obligatorias
+    if (!nombre || nombre.length < 3) {
+      return { success: false, error: "El parametro Nombre, esta incompleto. Favor de verificar." }
+    }
+
+    // Paso 3: Validar si no existe
     /*
     const existe: boolean = await (async () => {
       const resultado = await obtenerZonas(
@@ -208,9 +213,7 @@ export async function actualizarZona(formData: FormData) {
     }
     */
 
-    
-
-    // Paso 3: Subir imagen para obtener su url
+    // Paso 4: Subir imagen para obtener su url
     let imagenurl = ""
     if (imagen && imagen.size > 0) {
       const resultadoImagen = await imagenSubir(imagen, nombre, "zonas")
@@ -223,7 +226,7 @@ export async function actualizarZona(formData: FormData) {
       imagenurl = imgurl || ""
     }
 
-    // Paso 4: Pasar datos del formData a variables con tipado de datos
+    // Paso 4: Ejecutar Query
     const { data, error } = await supabase
       .from("zonas")
       .update({
@@ -240,12 +243,13 @@ export async function actualizarZona(formData: FormData) {
       console.error("Error actualizando zona en query en actualizarZona de actions/zonas:", error)
       return { success: false, error: error.message }
     }
-
+ 
     revalidatePath("/zonas")
 
-    // Return resultados
+    // Retorno de datos
     return { success: true, data: data.id }
   } catch (error) {
+    // Retorno de información
     console.error("Error en actualizarZona de actions/zonas:", error)
     return {
       success: false,
