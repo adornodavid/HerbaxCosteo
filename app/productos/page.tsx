@@ -34,6 +34,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
 import { obtenerProductos, estatusActivoProducto } from "@/app/actions/productos"
+import { listaDesplegableClientes } from "@/app/actions/clientes"
+import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
 
 /* ==================================================
 	Componente Principal (Pagina)
