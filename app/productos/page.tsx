@@ -87,15 +87,396 @@ export default function ProductosPage() {
   }, [Listado, paginaActual])
 
   // -- Funciones --
-  const ejecutarBusquedaProductos = async (id: number, nombre: string, codigo: string, estatus: string) => {
-    // User's existing function - DO NOT MODIFY
-    // This function will be preserved from the original file
+  const ejecutarBusquedaProductos = async (productonombre: string, clienteid: number, catalogoid: number, estatus: string) => {
+    if (!user) return
+    setIsSearching(true)
+    setPaginaActual(1)
+
+    console.log("filtros: productonombre: " + productonombre + " _ clienteid: " + clienteid + " _ catalogoid: " + catalogoid + " _ estatus: " + estatus)
+    try {
+      const result = await obtenerProductos(
+        -1, // productoid
+        productonombre, // productonombre
+        clienteid, // clienteid
+        -1, // zonaid
+        catalogoid,
+        estatus === "-1" ? "Todos" : estatus === "true" ? "Activo" : "Inactivo", // activo
+      )
+
+      if (result.success && result.data) {
+        const transformedData: oProducto[] = result.data.map((p: oProducto) => ({
+          id: p.id,
+          codigo: p.codigo,
+          clienteid: p.clienteid,
+          clientes: {
+            nombre: p.clientes?.nombre || null,
+          },
+          zonaid: p.zonaid,
+          zonas: {
+            nombre: p.zonas?.nombre || null,
+          },
+          nombre: p.nombre,
+          imgurl: p.imgurl,
+          unidadmedidaid: p.unidadmedidaid,
+          unidadesmedida: {
+            descripcion: p.unidadesmedida?.descripcion || null,
+          },
+          costo: p.costo,
+          activo: p.activo,
+          productoscaracteristicas: {
+            descripcion: p.productoscaracteristicas?.descripcion || null,
+            presentacion: p.productoscaracteristicas?.presentacion || null,
+            porcion: p.productoscaracteristicas?.porcion || null,
+            modouso: p.productoscaracteristicas?.modouso || null,
+            porcionenvase: p.productoscaracteristicas?.porcionenvase || null,
+            categoriauso: p.productoscaracteristicas?.categoriauso || null,
+            propositoprincipal: p.productoscaracteristicas?.propositoprincipal || null,
+            propuestavalor: p.productoscaracteristicas?.propuestavalor || null,
+            instruccionesingesta: p.productoscaracteristicas?.instruccionesingesta || null,
+            edadminima: p.productoscaracteristicas?.edadminima || null,
+            advertencia: p.productoscaracteristicas?.advertencia || null,
+            condicionesalmacenamiento: p.productoscaracteristicas?.condicionesalmacenamiento || null,
+          },
+          productosxcatalogo: p.productosxcatalogo?.map((cat) => ({
+            catalogoid: cat.catalogoid || null,
+            precioventa: cat.precioventa || null,
+            margenutilidad: cat.margenutilidad || null,
+            catalogos: {
+              nombre: cat.catalogos?.nombre || null,
+              descripcion: cat.catalogos?.descripcion || null,
+            },
+          })) || [],
+
+          formulasxproducto: p.formulasxproducto?.map((fxp) => ({
+            formulaid: fxp.formulaid || null,
+            formulas: {
+              codigo: fxp.formulas?.codigo || null,
+              nombre: fxp.formulas?.nombre || null,
+              unidadmedidaid: fxp.formulas?.unidadmedidaid || null,
+              unidadesmedida: {
+                descripcion: fxp.unidadesmedida?.descripcion || null,
+              },
+              costo: fxp.formulas?.costo || null,
+              materiasprimasxformula: fxp.materiasprimasxformula?.map((mxf) => ({
+                materiaprimaid: mxf.materiaprimaid || null,
+                cantidad: mxf.cantidad || null,
+                costoparcial: mxf.costoparcial || null,
+                materiasprima: {
+                  codigo: mxf.materiasprima?.codigo || null,
+                  nombre: mxf.materiasprima?.nombre || null,
+                  unidadmedidaid: mxf.materiasprima?.codigo || null,
+                  unidadesmedida: {
+                    descripcion: mxf.unidadesmedida?.descripcion || null,
+                  },
+                  costo: mxf.materiasprima?.codigo || null,
+                },
+              })) || [],
+            } || null,
+          })) || [],
+        }))
+        /*
+        const transformedData: Producto[] = result.data.map((p: Producto) => ({
+          id: p.id,
+          codigo: p.codigo,
+          clienteid: p.clienteid,
+          clientes: {
+            nombre: p.clientes?.nombre || null,
+          },
+          zonaid: p.zonaid,
+          zonas: {
+            nombre: p.zonas?.nombre || null,
+          },
+          nombre: p.nombre,
+          imgurl: p.imgurl,
+          unidadmedidaid: p.unidadmedidaid,
+          unidadesmedida: {
+            descripcion: p.unidadesmedida?.descripcion || null,
+          },
+          costo: p.costo,
+          activo: p.activo,
+          productoscaracteristicas: {
+            descripcion: p.productoscaracteristicas?.[0]?.descripcion || null,
+            presentacion: p.productoscaracteristicas?.[0]?.presentacion || null,
+            porcion: p.productoscaracteristicas?.[0]?.porcion || null,
+            modouso: p.productoscaracteristicas?.[0]?.modouso || null,
+            porcionenvase: p.productoscaracteristicas?.[0]?.porcionenvase || null,
+            categoriauso: p.productoscaracteristicas?.[0]?.categoriauso || null,
+            propositoprincipal: p.productoscaracteristicas?.[0]?.propositoprincipal || null,
+            propuestavalor: p.productoscaracteristicas?.[0]?.propuestavalor || null,
+            instruccionesingesta: p.productoscaracteristicas?.[0]?.instruccionesingesta || null,
+            edadminima: p.productoscaracteristicas?.[0]?.edadminima || null,
+            advertencia: p.productoscaracteristicas?.[0]?.advertencia || null,
+            condicionesalmacenamiento: p.productoscaracteristicas?.[0]?.condicionesalmacenamiento || null,
+          },
+          productosxcatalogo:
+            p.productosxcatalogo?.map((x: any) => ({
+              catalogoid: x.catalogoid || null,
+              precioventa: x.precioventa || null,
+              margenutilidad: x.margenutilidad || null,
+              catalogos: {
+                id: x.catalogos?.id || null,
+                nombre: x.catalogos?.nombre || null,
+                descripcion: x.catalogos?.descripcion || null,
+              },
+            })) || [],
+          
+        }))
+        */
+
+        const productosListado: ProductoListado[] = transformedData.map((p: oProducto) => ({
+          ProductoId: p.id,
+          ProductoNombre: p.nombre || "Sin nombre",
+          ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
+          ProductoTiempo: "N/A",
+          ProductoCosto: p.costo || 0,
+          ProductoActivo: p.activo === true,
+          ProductoImagenUrl: p.imgurl,
+          ClienteId: p.clienteid || -1,
+          ClienteNombre: p.clientes?.nombre || "N/A",
+          CatalogoId: p.productosxcatalogo[0]?.catalogoid || -1,
+          CatalogoNombre: p.productosxcatalogo[0]?.catalogos?.nombre || "N/A",
+        }))
+
+        setProductos(productosListado)
+        setProductosFiltrados(productosListado)
+        setTotalProductos(productosListado.length)
+      } else {
+        console.log("[v0] No hay datos o la consulta falló")
+      }
+
+      if (!result.success) {
+        console.error("Error en búsqueda del filtro de búsqueda:", result.error)
+        setProductos([])
+        return
+      }
+    } catch (error) {
+      console.error("Error inesperado al buscar productos:", error)
+      setProductos([])
+    } finally {
+      setIsSearching(false)
+    }
   }
 
-  const cargarDatosIniciales = async () => {
-    // User's existing function - DO NOT MODIFY
-    // This function will be preserved from the original file
+  // --- Carga inicial de datos ---
+  const cargarDatosInicialesProductos = async () => {
+    if (!user) return
+
+    try {
+      //const rolId = Number.parseInt(user.RolId?.toString() || 0, 10)
+      //const clienteId = Number.parseInt(user.ClienteId?.toString() || -1, 10)
+
+      // Carga inicial de listado de productos
+      /*const productoid = -1
+      const productonombre = ""
+      const clienteid = -1
+      const zonaid = -1
+      const catalogoid = -1
+      const activo = "True"*/
+      const productosResult = await obtenerProductos(-1, "", -1, -1, -1, "True")
+
+      console.log("[v0] Resultado completo de obtenerProductos:", productosResult)
+      console.log("[v0] Datos raw del query:", productosResult.data)
+      console.log("[v0] Cantidad de registros:", productosResult.data?.length)
+      console.log("[v0] Success status:", productosResult.success)
+      console.log("[v0] Error (if any):", productosResult.error)
+
+      if (productosResult.success && productosResult.data) {
+        console.log("[v0] Primer registro raw:", productosResult.data[0])
+
+        const transformedData: oProducto[] = productosResult.data.map((p: oProducto) => ({
+          id: p.id,
+          codigo: p.codigo,
+          clienteid: p.clienteid,
+          clientes: {
+            nombre: p.clientes?.nombre || null,
+          },
+          zonaid: p.zonaid,
+          zonas: {
+            nombre: p.zonas?.nombre || null,
+          },
+          nombre: p.nombre,
+          imgurl: p.imgurl,
+          unidadmedidaid: p.unidadmedidaid,
+          unidadesmedida: {
+            descripcion: p.unidadesmedida?.descripcion || null,
+          },
+          costo: p.costo,
+          activo: p.activo,
+          productoscaracteristicas: {
+            /*
+            descripcion: p.productoscaracteristicas?.[0]?.descripcion || null,
+            presentacion: p.productoscaracteristicas?.[0]?.presentacion || null,
+            porcion: p.productoscaracteristicas?.[0]?.porcion || null,
+            modouso: p.productoscaracteristicas?.[0]?.modouso || null,
+            porcionenvase: p.productoscaracteristicas?.[0]?.porcionenvase || null,
+            categoriauso: p.productoscaracteristicas?.[0]?.categoriauso || null,
+            propositoprincipal: p.productoscaracteristicas?.[0]?.propositoprincipal || null,
+            propuestavalor: p.productoscaracteristicas?.[0]?.propuestavalor || null,
+            instruccionesingesta: p.productoscaracteristicas?.[0]?.instruccionesingesta || null,
+            edadminima: p.productoscaracteristicas?.[0]?.edadminima || null,
+            advertencia: p.productoscaracteristicas?.[0]?.advertencia || null,
+            condicionesalmacenamiento: p.productoscaracteristicas?.[0]?.condicionesalmacenamiento || null,
+            */
+            descripcion: p.productoscaracteristicas?.descripcion || null,
+            presentacion: p.productoscaracteristicas?.presentacion || null,
+            porcion: p.productoscaracteristicas?.porcion || null,
+            modouso: p.productoscaracteristicas?.modouso || null,
+            porcionenvase: p.productoscaracteristicas?.porcionenvase || null,
+            categoriauso: p.productoscaracteristicas?.categoriauso || null,
+            propositoprincipal: p.productoscaracteristicas?.propositoprincipal || null,
+            propuestavalor: p.productoscaracteristicas?.propuestavalor || null,
+            instruccionesingesta: p.productoscaracteristicas?.instruccionesingesta || null,
+            edadminima: p.productoscaracteristicas?.edadminima || null,
+            advertencia: p.productoscaracteristicas?.advertencia || null,
+            condicionesalmacenamiento: p.productoscaracteristicas?.condicionesalmacenamiento || null,
+          },
+          /*
+          productosxcatalogo:
+            p.productosxcatalogo?.map((cat: any) => ({
+              catalogoid: cat.catalogoid || null,
+              precioventa: cat.precioventa || null,
+              margenutilidad: cat.margenutilidad || null,
+              catalogos: {
+                id: cat.catalogos?.id || null,
+                nombre: cat.catalogos?.nombre || null,
+                descripcion: cat.catalogos?.descripcion || null,
+              },
+            })) || [],
+            */
+          productosxcatalogo: p.productosxcatalogo?.map((cat) => ({
+            catalogoid: cat.catalogoid || null,
+            precioventa: cat.precioventa || null,
+            margenutilidad: cat.margenutilidad || null,
+            catalogos: {
+              nombre: cat.catalogos?.nombre || null,
+              descripcion: cat.catalogos?.descripcion || null,
+            },
+          })) || [],
+
+          formulasxproducto: p.formulasxproducto?.map((fxp) => ({
+            formulaid: fxp.formulaid || null,
+            formulas: {
+              codigo: fxp.formulas?.codigo || null,
+              nombre: fxp.formulas?.nombre || null,
+              unidadmedidaid: fxp.formulas?.unidadmedidaid || null,
+              unidadesmedida: {
+                descripcion: fxp.unidadesmedida?.descripcion || null,
+              },
+              costo: fxp.formulas?.costo || null,
+              materiasprimasxformula: fxp.materiasprimasxformula?.map((mxf) => ({
+                materiaprimaid: mxf.materiaprimaid || null,
+                cantidad: mxf.cantidad || null,
+                costoparcial: mxf.costoparcial || null,
+                materiasprima: {
+                  codigo: mxf.materiasprima?.codigo || null,
+                  nombre: mxf.materiasprima?.nombre || null,
+                  unidadmedidaid: mxf.materiasprima?.codigo || null,
+                  unidadesmedida: {
+                    descripcion: mxf.unidadesmedida?.descripcion || null,
+                  },
+                  costo: mxf.materiasprima?.codigo || null,
+                },
+              })) || [],
+            } || null,
+          })) || [],
+        }))
+
+        console.log("[v0] Primer registro transformado:", transformedData[0])
+        console.log(
+          "[v0] Campos undefined encontrados:",
+          Object.entries(transformedData[0]).filter(([key, value]) => value === undefined),
+        )
+        console.log("[v0] Total registros transformados:", transformedData.length)
+
+        const productosListado: ProductoListado[] = transformedData.map((p: oProducto) => ({
+          ProductoId: p.id,
+          ProductoNombre: p.nombre || "Sin nombre",
+          ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
+          ProductoTiempo: "N/A",
+          ProductoCosto: p.costo || 0,
+          ProductoActivo: p.activo === true,
+          ProductoImagenUrl: p.imgurl,
+          ClienteId: p.clienteid || -1,
+          ClienteNombre: p.clientes?.nombre || "N/A",
+          CatalogoId: p.productosxcatalogo[0]?.catalogoid || -1,
+          CatalogoNombre: p.productosxcatalogo[0]?.catalogos?.nombre || "N/A",
+        }))
+
+        setProductos(productosListado)
+        setProductosFiltrados(productosListado)
+        setTotalProductos(productosListado.length)
+      } else {
+        console.log("[v0] No hay datos o la consulta falló")
+      }
+
+      const userClienteId = [1, 2, 3, 4].includes(Number(user.RolId)) ? -1 : Number(user.ClienteId)
+      // -- Cargar clientes
+      const { data: clientesData, error: clientesError } = await listaDesplegableClientes(userClienteId,"")
+
+      if (!clientesError) {
+        const clientesConTodos = [1, 2, 3, 4].includes(Number(user.RolId))
+          ? [{ id: -1, nombre: "Todos" }, ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))]
+          : (clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
+        setClientes(clientesConTodos)
+
+        if ([1, 2, 3, 4].includes(Number(user.RolId))) {
+          setFiltroCliente("-1")
+        } else {
+          const aux = clientesData.id
+          setFiltroCliente(aux)
+        }
+        //setFiltroCliente("-1")
+      } else {
+        console.error("Error cargando clientes:", clientesError)
+      }
+
+      // -- Cargar catalogos
+      const catalogosResult = await listaDesplegableCatalogos(-1, "", userClienteId)
+
+      if (!catalogosResult.error) {
+        const catalogosConTodos = [1, 2, 3, 4].includes(Number(user.RolId))
+          ? [
+              { id: -1, nombre: "Todos" },
+              ...(catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre })),
+            ]
+          : (catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre }))
+
+        setCatalogos(catalogosConTodos)
+
+        if ([1, 2, 3, 4].includes(Number(user.RolId))) {
+          setFiltroCatalogo("-1") // Set to "Todos" for admin roles
+        } else {
+          // Set to first available catalog for restricted users
+          if (catalogosResult.data && catalogosResult.data.length > 0) {
+            setFiltroCatalogo(catalogosResult.data[0].id.toString())
+          }
+        }
+      } else {
+        console.error("Error cargando catálogos iniciales:", catalogosResult.error)
+      }
+    } catch (error) {
+      console.error("Error al cargar datos iniciales:", error)
+      toast.error("Error al cargar datos iniciales")
+    } finally {
+      setPageLoading(false)
+    }
   }
+
+  // --- Carga Inicial y Seguridad ---
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user || user.RolId === 0) {
+        router.push("/login")
+        return
+      }
+
+      const inicializar = async () => {
+        setPageLoading(true)
+        await cargarDatosInicialesProductos()
+      }
+      inicializar()
+    }
+  }, [authLoading, user, router, esAdmin, esAdminDDLs, esAdminDOs])
 
   // Estatus - Cambiar activo/inactivo
   const handleToggleStatusClickActivo = async (productoId: number, productoActivo: boolean) => {
@@ -148,12 +529,6 @@ export default function ProductosPage() {
 
     cargarDatosIniciales()
   }
-
-  // --- Inicio (carga inicial y seguridad) ---
-  useEffect(() => {
-    // User's existing useEffect - DO NOT MODIFY
-    // This useEffect will be preserved from the original file
-  }, [authLoading, user, router, esAdmin, esAdminDDLs, esAdminDOs])
 
   // --- Renders (contenidos auxiliares) ---
   // Loading
