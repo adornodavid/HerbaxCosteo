@@ -220,8 +220,8 @@ export default function EditarClientePage() {
 
       {showModalValidation && (
         <PageModalValidation
-          Titulo={modalValidation.Titulo}
-          Mensaje={modalValidation.Mensaje}
+          Titulo={ModalValidation.Titulo}
+          Mensaje={ModalValidation.Mensaje}
           isOpen={true}
           onClose={() => setShowModalValidation(false)}
         />
@@ -229,8 +229,8 @@ export default function EditarClientePage() {
 
       {showModalError && (
         <PageModalError
-          Titulo={modalError.Titulo}
-          Mensaje={modalError.Mensaje}
+          Titulo={ModalError.Titulo}
+          Mensaje={ModalError.Mensaje}
           isOpen={true}
           onClose={() => setShowModalError(false)}
         />

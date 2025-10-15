@@ -206,7 +206,7 @@ export async function actualizarZona(formData: FormData) {
     const auxNombre = formData.get("nombre") as string
 
     if (imagen && imagen.size > 0) {
-      const resultadoImagen = await imagenSubir(imagen, auxNombre, "clientes")
+      const resultadoImagen = await imagenSubir(imagen, auxNombre, "zonas")
       if (!resultadoImagen.success) {
         return { success: false, error: resultadoImagen.error }
       }
