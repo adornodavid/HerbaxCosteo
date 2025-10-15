@@ -716,7 +716,7 @@ export default function ProductosPage() {
         </CardContent>
       </Card>
 
-      {/* 4. Grid de Resultados - Ahora con Tarjetas */}
+      {/* 3. Grid de Resultados - Ahora con Tarjetas */}
       <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
           <CardTitle>Resultados</CardTitle>
