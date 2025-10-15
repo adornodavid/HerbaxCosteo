@@ -369,13 +369,7 @@ export default function ProductosPage() {
     const CatalogoId = Number.parseInt(filtroCatalogo, 10)
     const Estatus = filtroEstatus === "-1" ? "Todos" : filtroEstatus
 
-    ejecutarBusquedaProductos(Id, Nombre, Codigo, Estatus)
-  }
-
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    
-    ejecutarBusquedaProductos(filtroNombre, clienteId, catalogoId, filtroEstatus)
+    ejecutarBusquedaProductos(Nombre, ClienteId, CatalogoId, Estatus)
   }
 
   // Busqueda - Limpiar o Resetear
