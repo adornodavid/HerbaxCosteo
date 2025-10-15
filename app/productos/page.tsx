@@ -456,7 +456,7 @@ export default function ProductosPage() {
       }
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error)
-      toast.error("Error al cargar datos iniciales")
+      
     } finally {
       setPageLoading(false)
     }
