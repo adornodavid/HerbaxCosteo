@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight, EyeOff, Trash2 } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
-import type { MaterialEtiquetado } from "@/types/material-etiquetado"
+import type { MaterialEtiquetado } from "@/types/materiales-etiquetado"
 import type {
   propsPageLoadingScreen,
   propsPageTitlePlusNew,
