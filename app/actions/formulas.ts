@@ -191,7 +191,7 @@ export async function obtenerFormulas(
     if (IdsMerge.length > 0) {
       query = query.in("id", IdsMerge)
     }
-    return { success: false, error: "id: " + id + " - codigo: " +  codigo + " - nombre: " + nombre}
+    return { success: false, error: "id: " + id + " - codigo: " +  codigo + " - nombre: " + nombre + " merge: " + IdsMerge.length}
 
     // Paso 4: Ejecutar query
     query = query.order("nombre", { ascending: true })
