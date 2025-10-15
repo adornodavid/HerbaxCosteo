@@ -576,7 +576,54 @@ export default function ProductosPage() {
     cargarDatosIniciales()
   }
 
-  //
+  // ESTE ES EL ÚNICO LUGAR DONDE SE EJECUTA LA BÚSQUEDA
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const clienteId = Number.parseInt(filtroCliente, 10)
+    const catalogoId = Number.parseInt(filtroCatalogo, 10)
+    ejecutarBusquedaProductos(filtroNombre, clienteId, catalogoId, filtroEstatus)
+  }
+
+  const clearProductosBusqueda = () => {
+    setFiltroNombre("")
+    setFiltroCliente("-1")
+    setFiltroCatalogo("-1")
+    setFiltroEstatus("-1")
+    handleClienteChange("-1")
+
+    cargarDatosInicialesProductos()
+  }
+
+  const handleToggleStatusClickProducto = (id: number, activo: boolean) => {
+    setProductoToToggle({ id, activo })
+    setShowConfirmDialog(true)
+  }
+
+  const cambiarEstadoProducto = async () => {
+    if (!productoToToggle) return
+
+    try {
+      const { id, activo } = productoToToggle
+      const nuevoEstado = !activo
+      const { error } = await supabase.from("productos").update({ activo: nuevoEstado }).eq("id", id)
+
+      if (error) {
+        console.error("Error al cambiar estado:", error)
+        toast.error(`Error al cambiar estado del producto.`)
+      } else {
+        // Actualizar el estado local para reflejar el cambio sin recargar todo
+        setProductos((prev) => prev.map((p) => (p.ProductoId === id ? { ...p, ProductoActivo: nuevoEstado } : p)))
+        toast.success(`Producto ${nuevoEstado ? "activado" : "inactivado"} correctamente.`)
+      }
+    } catch (error) {
+      console.error("Error inesperado al cambiar estado:", error)
+      toast.error("Error inesperado al cambiar estado")
+    }
+
+    setShowConfirmDialog(false)
+    setProductoToToggle(null)
+  }
+
 
   // --- Renders (contenidos auxiliares) ---
   // Loading
