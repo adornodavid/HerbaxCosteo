@@ -296,6 +296,16 @@ export default function ProductosPage() {
     if (!user) return
 
     try {
+      const auxClienteId = esAdminDDLs === true ? -1 : user.ClienteId
+
+      setPageTituloMasNuevo({
+        Titulo: "Productos",
+        Subtitulo: "Gestión completa de Productos",
+        Visible: esAdminDOs == true ? true : false,
+        BotonTexto: "Crear Nuevo Producto",
+        Ruta: "/productos/crear",
+      })
+      setShowPageTituloMasNuevo(true)
       //const rolId = Number.parseInt(user.RolId?.toString() || 0, 10)
       //const clienteId = Number.parseInt(user.ClienteId?.toString() || -1, 10)
 
