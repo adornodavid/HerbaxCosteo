@@ -82,6 +82,7 @@ export async function crearCliente(formData: FormData) {
       return{success:false, error: resultadoImagen}
       return { success: false, error: "SE EJECUTO LA FUNCION DE SUBIR IMAGEN XXXXXX" }
       if (!resultadoImagen.success) {
+      return { success: false, error: "SE EJECUTO LA FUNCION DE S-----" }
         imagenurl = resultadoImagen.url || "" 
         return { success: false, error: "SE EJECUTO LA FUNCION DE SUBIR IMAGEN -----------------------" + imagenurl }
         if(imagenurl.length < 3){
