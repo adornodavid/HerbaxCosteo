@@ -397,7 +397,12 @@ export default function ProductosPage() {
           }
         }
       } else {
-        console.error("Error cargando catálogos iniciales:", catalogosResult.error)
+        console.error("Error cargando catálogos iniciales: ", catalogosResult.error)
+        setModalError({
+          Titulo: "Error cargando catálogos iniciales",
+          Mensaje: catalogosResult.error,
+        })
+        setShowModalError(true)
       }
     } catch (error) {
       console.error("Error al cargar datos iniciales: ", error)
