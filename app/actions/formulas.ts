@@ -200,7 +200,7 @@ export async function obtenerFormulas(
 
     // Error en query
     if (error) {
-      console.error("Error obteniendo clientes en query en obtenerClientes de actions/clientes:", error)
+      console.error("Error obteniendo formulas en query en obtenerFormulas de actions/formulas:", error)
       return { success: false, error: error.message }
     }
 
