@@ -692,7 +692,7 @@ export default function ProductosPage() {
               {elementosPaginados.map((p, index) => (
                 <Card
                   key={`${p.ProductoId}-${p.CatalogoId}-${index}`}
-                  className="border bg-card text-card-foreground relative flex flex-col overflow-hidden rounded-xs shadow-lg hover:shadow-xl transition-shadow duration-300 group"
+                  className="border bg-card text-card-foreground relative flex flex-col overflow-hidden rounded-xs shadow-lg hover:shadow-xl transition-shadow duration-300"
                 >
                   <div
                     className="relative w-full h-48 overflow-hidden cursor-pointer"
