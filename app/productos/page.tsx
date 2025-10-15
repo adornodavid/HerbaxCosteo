@@ -871,7 +871,7 @@ export default function ProductosPage() {
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                       Código: {p.ProductoCodigo || "Sin código."}
                       <br/>
-                      Costo: { p,ProductoCosto  || "$0.00" }
+                      Costo: { p.ProductoCosto  || "$0.00" }
                     </p>
                     <p className="text-lg font-bold text-green-600">{formatCurrency(p.ProductoCosto)}</p>
                     <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
