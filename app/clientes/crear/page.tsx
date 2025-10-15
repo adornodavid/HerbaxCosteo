@@ -87,7 +87,7 @@ export default function CrearClientePage() {
       } else {
         setModalError({
           Titulo: "Error al crear cliente",
-          Mensaje: result.error,
+          Mensaje: result.success,
         })
         setShowModalError(true)
       }
