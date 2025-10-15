@@ -409,10 +409,23 @@ export default function ProductosPage() {
         ]
         setCatalogos(catalogosConTodos)
       } else {
-        console.error("Error al cargar catálogos por cliente:", error)
+        // Mostrar error
+        console.error("Error al cargar catálogos por cliente: ", error)
+        console.log("Error al cargar catálogos por cliente: ", error)
+        setModalError({
+          Titulo: "Error al cargar catálogos por cliente",
+          Mensaje: error,
+        })
+        setShowModalError(true)
       }
     } catch (error) {
-      console.error("Error al cambiar cliente:", error)
+      console.error("Error al cambiar cliente: ", error)
+      console.log("Error al cambiar cliente: ", error)
+      setModalError({
+        Titulo: "Error al cambiar cliente",
+        Mensaje: error,
+      })
+      setShowModalError(true)
     }
   }
 
