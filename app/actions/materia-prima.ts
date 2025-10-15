@@ -436,3 +436,23 @@ export async function eliminarMateriaPrima(id: number) {
 /*==================================================
   * SPECIALS-ESPECIALES ()
 ================================================== */
+// Función: estatusActivoMateriaPrima / actMateriaPrima: funcion para actualizar el estatus activo de una materia prima
+export async function estatusActivoMateriaPrima(id: number, activo: boolean): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("materiasprima").update({ activo: activo }).eq("id", id)
+
+    if (error) {
+      console.error(
+        "Error actualizando estatus activo de la materia prima en estatusActivoMateriaPrima de app/actions/materia-prima:",
+        error,
+      )
+      return false
+    }
+
+    revalidatePath("/materiaprima")
+    return true
+  } catch (error) {
+    console.error("Error en estatusActivoMateriaPrima de app/actions/materia-prima: ", error)
+    return false
+  }
+}

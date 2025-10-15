@@ -36,7 +36,6 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
   * DELETES-ELIMINAR (DELETES)
     - eliminarFormula / delFormula
   * SPECIALS-ESPECIALES ()
-    - estatusActivoFormula / actFormula
     - listaDesplegableFormulas / ddlFormulas
     - estadisticasFormulas / statsFormulas
 ================================================== */
@@ -515,7 +514,6 @@ export async function eliminarRegistroIncompleto(formulaId: number) {
   * SPECIALS-ESPECIALES ()
 ================================================== */
 
-
 //Función: listaDesplegableFormulas: funcion para obtener todas las formulas para el input dropdownlist
 export async function listaDesplegableFormulas() {
   try {
@@ -945,25 +943,22 @@ export async function verificarIngredienteDuplicado(formulaId: number, ingredien
 }
 
 //Función: estatusActivoFormula: función para cambiar el estatus de una formula por Id de la formula
-export async function estatusActivoFormula(folio: number, estadoActual: boolean) {
+export async function estatusActivoFormula(id: number, activo: boolean): Promise<boolean> {
   try {
-    const nuevoEstado = !estadoActual
-
-    const { data, error } = await supabase.from("formulas").update({ activo: nuevoEstado }).eq("id", folio).select()
+    const { error } = await supabase.from("formulas").update({ activo: activo }).eq("id", id)
 
     if (error) {
-      console.error("Error al cambiar estado de fórmula:", error)
-      return { success: false, error: error.message }
+      console.error(
+        "Error actualizando estatus activo de la formula en estatusActivoFormula de app/actions/formulas:",
+        error,
+      )
+      return false
     }
 
-    return {
-      success: true,
-      data: data[0],
-      nuevoEstado,
-      message: `Fórmula ${nuevoEstado ? "activada" : "inactivada"} correctamente`,
-    }
-  } catch (error: any) {
-    console.error("Error en estatusActivoFormula:", error)
-    return { success: false, error: error.message }
+    revalidatePath("/formulas")
+    return true
+  } catch (error) {
+    console.error("Error en estatusActivoFormula de app/actions/formulas: ", error)
+    return false
   }
 }

@@ -417,3 +417,22 @@ export async function eliminarMaterialEtiquetado(id: number) {
 /*==================================================
   * SPECIALS-ESPECIALES ()
 ================================================== */
+export async function estatusActivoMaterialEtiquetado(id: number, activo: boolean): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("materialesetiquetado").update({ activo: activo }).eq("id", id)
+
+    if (error) {
+      console.error(
+        "Error actualizando estatus activo del material etiquetado en estatusActivoMaterialEtiquetado de app/actions/material-etiquetado:",
+        error,
+      )
+      return false
+    }
+
+    revalidatePath("/materialetiquetado")
+    return true
+  } catch (error) {
+    console.error("Error en estatusActivoMaterialEtiquetado de app/actions/material-etiquetado: ", error)
+    return false
+  }
+}
