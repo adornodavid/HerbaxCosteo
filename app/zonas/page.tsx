@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight } from "lucide-react"
+import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight, EyeOff, Trash2 } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { Zona } from "@/types/zonas"
@@ -19,7 +19,7 @@ import type {
   propsPageTitlePlusNew,
   propsPageModalAlert,
   propsPageModalError,
-  propsPageModalTutoria,
+  propsPageModalTutorial,
 } from "@/types/common"
 // -- Librerias --
 // Configuraciones
@@ -30,10 +30,11 @@ import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
 import { PageModalTutorial } from "@/components/page-modal-tutorial"
+// -- Dialog components for details modal
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
 import { obtenerZonas, estatusActivoZona } from "@/app/actions/zonas"
-
 
 /* ==================================================
 	Componente Principal (Pagina)
@@ -57,7 +58,7 @@ export default function ZonasPage() {
   const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
   const [ModalError, setModalError] = useState<propsPageModalError>()
   const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
-  const [elementoDetalles, setElementoDetalles] = useState<Cliente | null>(null)
+  const [elementoDetalles, setElementoDetalles] = useState<Zona | null>(null)
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
@@ -77,7 +78,7 @@ export default function ZonasPage() {
   // Cargar inputs
   const [filtroId, setFiltroId] = useState("")
   const [filtroNombre, setFiltroNombre] = useState("")
-  const [filtroClave, setFiltroClave] = useState("")  
+  const [filtroClave, setFiltroClave] = useState("")
   const [filtroEstatus, setFiltroEstatus] = useState("-1")
 
   // --- Variables (post carga elementos) ---
@@ -194,7 +195,7 @@ export default function ZonasPage() {
     try {
       // Toggle the status (if active, make inactive; if inactive, make active)
       const nuevoEstatus = !clienteActivo
-      
+
       // Ejecutar función
       const resultado = await estatusActivoZona(Id, nuevoEstatus)
       if (resultado) {
@@ -216,6 +217,11 @@ export default function ZonasPage() {
       })
       setShowModalError(true)
     }
+  }
+
+  const handleVerDetalles = (zona: Zona) => {
+    setElementoDetalles(zona)
+    setShowElementoDetallesModal(true)
   }
 
   // -- Manejadores (Handles) --
@@ -395,6 +401,77 @@ export default function ZonasPage() {
         </CardContent>
       </Card>
 
+      {/* Dialog modal for zona details */}
+      <Dialog open={showElementoDetallesModal} onOpenChange={setShowElementoDetallesModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detalles de la Zona</DialogTitle>
+          </DialogHeader>
+          {elementoDetalles && (
+            <Card className="overflow-hidden border-0 shadow-none">
+              <CardContent className="p-0">
+                <div className="flex flex-col md:flex-row">
+                  {/* Image on the left - centered vertically */}
+                  <div className="md:w-1/3 h-64 md:h-auto flex items-center justify-center bg-gray-300">
+                    <img
+                      src={
+                        elementoDetalles.ZonaImgUrl && elementoDetalles.ZonaImgUrl !== "Sin imagen"
+                          ? elementoDetalles.ZonaImgUrl
+                          : "/placeholder.svg?height=400&width=400&text=Zona"
+                      }
+                      alt={elementoDetalles.ZonaNombre}
+                      className="w-full h-auto object-cover"
+                    />
+                  </div>
+
+                  {/* Zona data on the right */}
+                  <div className="md:w-2/3 p-6 space-y-4">
+                    <h2 className="text-2xl font-bold mb-4">Información de la Zona</h2>
+
+                    <div className="space-y-3">
+                      <div>
+                        <span className="font-semibold text-gray-700">ID:</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.ZonaId}</span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Nombre:</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.ZonaNombre}</span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Clave:</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.ZonaClave}</span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Estatus:</span>
+                        <span
+                          className={`ml-2 px-2 py-1 rounded text-sm font-semibold ${
+                            elementoDetalles.ZonaActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                          }`}
+                        >
+                          {elementoDetalles.ZonaActivo ? "Activo" : "Inactivo"}
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="font-semibold text-gray-700">Fecha de Creación:</span>
+                        <span className="ml-2 text-gray-900">
+                          {elementoDetalles.ZonaFechaCreacion
+                            ? new Date(elementoDetalles.ZonaFechaCreacion).toLocaleDateString()
+                            : "N/A"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* 3. Resultados - Listado */}
       <Card className="rounded-xs border bg-card text-card-foreground shadow">
         <CardHeader>
@@ -452,21 +529,51 @@ export default function ZonasPage() {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Detalles"
+                            onClick={() => handleVerDetalles(elemento)}
+                          >
+                            <EyeOff className="h-4 w-4" />
+                          </Button>
 
-                          <Button variant="ghost" size="icon" title="Ver">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Ver"
+                            onClick={() => router.push(`/zonas/${elemento.ZonaId}/ver`)}
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" title="Editar">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Editar"
+                            onClick={() => router.push(`/zonas/${elemento.ZonaId}/editar`)}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" title={elemento.ZonaActivo ? "Inactivar" : "Activar"}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title={elemento.ZonaActivo ? "Inactivar" : "Activar"}
+                            onClick={() => handleToggleStatusClickActivo(elemento.ZonaId, elemento.ZonaActivo)}
+                          >
                             {elemento.ZonaActivo ? (
                               <ToggleRight className="h-4 w-4 text-red-500" />
                             ) : (
                               <ToggleLeft className="h-4 w-4 text-green-500" />
                             )}
                           </Button>
-                          
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Eliminar"
+                            onClick={() => router.push(`/zonas/${elemento.ZonaId}/eliminar`)}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
                         </div>
                       </td>
                     </tr>
