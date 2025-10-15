@@ -188,10 +188,10 @@ export async function obtenerFormulas(
         query = query.eq("activo", false)
       }
     }
-    return { success: false, error: "Error obteniendo el array de los id de las formulas relacionadas con cacacacacacac" }
     if (IdsMerge.length > 0) {
       query = query.in("id", IdsMerge)
     }
+    return { success: false, error: "Error obteniendo el array de los id de las formulas relacionadas con bbbbbbbbb" }
 
     // Paso 4: Ejecutar query
     query = query.order("nombre", { ascending: true })
