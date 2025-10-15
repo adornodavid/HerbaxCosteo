@@ -170,7 +170,6 @@ export async function obtenerFormulas(
       `)
 
     // Paso 3: Filtros en query, dependiendo parametros
-    return { success: false, error: "Error obteniendo el array de los id de las formulas relacionadas con productosxxxxxxxxxxxxxxx" }
     if (id !== -1) {
       query = query.eq("id", id)
     }
@@ -189,6 +188,7 @@ export async function obtenerFormulas(
         query = query.eq("activo", false)
       }
     }
+    return { success: false, error: "Error obteniendo el array de los id de las formulas relacionadas con cacacacacacac" }
     if (IdsMerge.length > 0) {
       query = query.in("id", IdsMerge)
     }
