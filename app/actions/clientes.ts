@@ -220,7 +220,9 @@ export async function actualizarCliente(formData: FormData) {
         "",
         "Todos",
       )
-      return resultado.success && resultado.data && resultado.data.some((cliente) => cliente.id !== idString)
+      if (resultado.success && resultado.data) {
+        
+      } 
     })()
 
     if (existe) {
