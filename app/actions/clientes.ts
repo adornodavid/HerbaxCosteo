@@ -59,7 +59,7 @@ export async function crearCliente(formData: FormData) {
     const imagen = formData.get("imagen") as File
     const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
     const activo = true
-
+return { success: false, error: "PASAMOS LAS VARIABLES" }
     // Paso 2: Validar variables obligatorias
     if(!nombre || nombre.length < 3){
       return { success: false, error: "El parametro Nombre, esta incompleto. Favor de verificar." }
@@ -87,7 +87,7 @@ export async function crearCliente(formData: FormData) {
         return { success: false, error: resultadoImagen.error }
       }
     }
-
+return { success: false, error: "LLEGAMOS AL QUERY" }
     // Paso 5: Ejecutar Query
     const { data, error } = await supabase
       .from("clientes")
