@@ -728,6 +728,7 @@ export default function ProductosPage() {
           {isSearching ? (
             <div className="flex justify-center items-center h-48">
               <Loader2 className="mx-auto h-8 w-8 animate-spin" />
+              <br/>
               <span className="ml-2 text-lg">Cargando productos...</span>
             </div>
           ) : elementosPaginados.length > 0 ? (
