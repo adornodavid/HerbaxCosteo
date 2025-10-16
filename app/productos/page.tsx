@@ -814,16 +814,12 @@ export default function ProductosPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              title={p.ProductoActivo ? "Inactivar" : "Activar"}
-                              onClick={() => handleToggleStatusClickActivo(p.ProductoId, p.ProductoActivo)}
+                              title="Editar"
+                              onClick={() => router.push(`/productos/${p.ProductoId}/editar`)}
                             >
-                              {p.ProductoActivo ? (
-                                <ToggleRight className="h-4 w-4 text-red-500" />
-                              ) : (
-                                <ToggleLeft className="h-4 w-4 text-green-500" />
-                              )}
+                              <Edit className="h-4 w-4" />
                             </Button>
-                            <span className="text-xs text-muted-foreground mt-1">Estatus</span>
+                            <span className="text-xs text-muted-foreground mt-1">Editar</span>
                           </div>
                         )}
                       </div>
