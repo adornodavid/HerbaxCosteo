@@ -711,7 +711,7 @@ export default function ProductosPage() {
                 >
                   {/* Image at top */}
                   <div
-                    className="relative w-full h-48 overflow-hidden cursor-pointer"
+                    className="relative w-full h-48 overflow-hidden cursor-pointer bg-blue-500"
                     onClick={() => handleViewProductoDetails(p.ProductoId)}
                     title="Ver detalles del producto"
                   >
