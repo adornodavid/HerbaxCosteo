@@ -799,17 +799,49 @@ export default function ProductosPage() {
 
                         {/* Conditional div to show "hola" if esAdminDOs is true */}
                         {esAdminDOs && (
-                          <div className="flex flex-col items-center">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              title="Editar"
-                              onClick={() => router.push(`/productos/${p.ProductoId}/editar`)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <span className="text-xs text-muted-foreground mt-1">Editar</span>
-                          </div>
+                          <>
+                            <div className="flex flex-col items-center">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Editar"
+                                onClick={() => router.push(`/productos/${p.ProductoId}/editar`)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <span className="text-xs text-muted-foreground mt-1">Editar</span>
+                            </div>
+
+                            {/* Toggle status button */}
+                            <div className="flex flex-col items-center">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title={p.ProductoActivo ? "Inactivar" : "Activar"}
+                                onClick={() => handleToggleStatusClickActivo(p.ProductoId, p.ProductoActivo)}
+                              >
+                                {p.ProductoActivo ? (
+                                  <ToggleRight className="h-4 w-4 text-red-500" />
+                                ) : (
+                                  <ToggleLeft className="h-4 w-4 text-green-500" />
+                                )}
+                              </Button>
+                              <span className="text-xs text-muted-foreground mt-1">Estatus</span>
+                            </div>
+
+                            {/* Delete button */}
+                            <div className="flex flex-col items-center">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Eliminar"
+                                onClick={() => router.push(`/productos/${p.ProductoId}/eliminar`)}
+                              >
+                                <X className="h-4 w-4 text-red-500" />
+                              </Button>
+                              <span className="text-xs text-muted-foreground mt-1">Eliminar</span>
+                            </div>
+                          </>
                         )}
 
                         <div className="flex flex-col items-center">
@@ -817,7 +849,7 @@ export default function ProductosPage() {
                             variant="ghost"
                             size="icon"
                             title={p.ProductoActivo ? "Inactivar" : "Activar"}
-                            onClick={() => handleToggleStatusClickActivo(p.ProductoId, p.ProductoActivo)}
+                            onClick={() => handleToggleStatusClickProducto(p.ProductoId, p.ProductoActivo)}
                           >
                             {p.ProductoActivo ? (
                               <ToggleRight className="h-4 w-4 text-red-500" />
@@ -826,18 +858,6 @@ export default function ProductosPage() {
                             )}
                           </Button>
                           <span className="text-xs text-muted-foreground mt-1">Estatus</span>
-                        </div>
-
-                        <div className="flex flex-col items-center">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title="Eliminar"
-                            onClick={() => router.push(`/productos/${p.ProductoId}/eliminar`)}
-                          >
-                            <X className="h-4 w-4 text-red-500" />
-                          </Button>
-                          <span className="text-xs text-muted-foreground mt-1">Eliminar</span>
                         </div>
                       </div>
                     </div>
