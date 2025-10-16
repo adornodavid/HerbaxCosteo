@@ -3,20 +3,18 @@
 /* ==================================================
 	Imports
 ================================================== */
-// -- Assets -- 
+// -- Assets --
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Eye, Edit, ToggleLeft, ToggleRight, Loader2, PlusCircle, RotateCcw, EyeOff, X } from "lucide-react"
-
-import Link from "next/link"
-import Image from "next/image"
+import { Search, Eye, Loader2, RotateCcw, EyeOff } from "lucide-react"
+import toast from "react-hot-toast" // Import for toast
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
-import type { Producto, oProducto, ProductoCatalogo, ProductoListado, ProductosEstadisticas } from "@/types/productos"
+import type { Producto, oProducto, ProductoListado, ProductosEstadisticas } from "@/types/productos"
 import type {
   propsPageLoadingScreen,
   propsPageTitlePlusNew,
@@ -24,6 +22,13 @@ import type {
   propsPageModalError,
   propsPageModalTutorial,
 } from "@/types/common"
+import type {
+  ddlItem,
+  ProductoDetail,
+  ProductoDetalleCompleto,
+  FormulaAsociada,
+  IngredienteAsociado,
+} from "@/types/common" // Import for ddlItem, ProductoDetail, ProductoDetalleCompleto, FormulaAsociada, IngredienteAsociado
 // -- Librerias --
 import { supabase } from "@/lib/supabase"
 // Configuraciones
@@ -90,6 +95,12 @@ export default function ProductosPage() {
   const [clientes, setClientes] = useState<ddlItem[]>([])
   const [catalogos, setCatalogos] = useState<ddlItem[]>([])
 
+  // Estados para el modal de detalles mejorado
+  const [selectedProductoDetails, setSelectedProductoDetails] = useState<ProductoDetail[] | null>(null)
+  const [selectedProductoCompleto, setSelectedProductoCompleto] = useState<ProductoDetalleCompleto | null>(null)
+  const [selectedFormulasAsociadas, setSelectedFormulasAsociadas] = useState<FormulaAsociada[]>([])
+  const [selectedIngredientesAsociados, setSelectedIngredientesAsociados] = useState<IngredienteAsociado[]>([])
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false)
 
   // --- Estados ---
   const [productos, setProductos] = useState<ProductoListado[]>([])
@@ -101,24 +112,13 @@ export default function ProductosPage() {
   })
   const [productosFiltrados, setProductosFiltrados] = useState<ProductoListado[]>([])
   const [totalProductos, setTotalProductos] = useState(0)
-  
-  
-  
+
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [productoToToggle, setProductoToToggle] = useState<{ id: number; activo: boolean } | null>(null)
   const [searchTerm, setSearchTerm] = useState("") // Este estado no se usa en la búsqueda actual, pero se mantiene
   const [productoToDelete, setProductoToDelete] = useState<number | null>(null)
 
-   // Filtros
-  
-  
-  // Estados para el modal de detalles mejorado
-  const [showProductoDetailsModal, setShowProductoDetailsModal] = useState(false)
-  const [selectedProductoDetails, setSelectedProductoDetails] = useState<ProductoDetail[] | null>(null)
-  const [selectedProductoCompleto, setSelectedProductoCompleto] = useState<ProductoDetalleCompleto | null>(null)
-  const [selectedFormulasAsociadas, setSelectedFormulasAsociadas] = useState<FormulaAsociada[]>([])
-  const [selectedIngredientesAsociados, setSelectedIngredientesAsociados] = useState<IngredienteAsociado[]>([])
-  const [isDetailsLoading, setIsDetailsLoading] = useState(false)
+  // Filtros
 
   // --- Variables (post carga elementos) ---
   const elementosPaginadosssssss = useMemo(() => {
@@ -126,7 +126,7 @@ export default function ProductosPage() {
     return Listado.slice(indiceInicio, indiceInicio + resultadosPorPagina)
   }, [Listado, paginaActual])
 
-// --- Paginación ---
+  // --- Paginación ---
   const elementosPaginados = useMemo(() => {
     const indiceInicio = (paginaActual - 1) * resultadosPorPagina
     return productosFiltrados.slice(indiceInicio, indiceInicio + resultadosPorPagina)
@@ -138,7 +138,12 @@ export default function ProductosPage() {
     new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(amount || 0)
 
   // -- Funciones --
-  const ejecutarBusquedaProductos = async (productonombre: string, clienteid: number, catalogoid: number, estatus: string) => {
+  const ejecutarBusquedaProductos = async (
+    productonombre: string,
+    clienteid: number,
+    catalogoid: number,
+    estatus: string,
+  ) => {
     // Validar usuario activo
     if (!user) return
 
@@ -199,42 +204,46 @@ export default function ProductosPage() {
             advertencia: p.productoscaracteristicas?.advertencia || null,
             condicionesalmacenamiento: p.productoscaracteristicas?.condicionesalmacenamiento || null,
           },
-          productosxcatalogo: p.productosxcatalogo?.map((cat) => ({
-            catalogoid: cat.catalogoid || null,
-            precioventa: cat.precioventa || null,
-            margenutilidad: cat.margenutilidad || null,
-            catalogos: {
-              nombre: cat.catalogos?.nombre || null,
-              descripcion: cat.catalogos?.descripcion || null,
-            },
-          })) || [],
-
-          formulasxproducto: p.formulasxproducto?.map((fxp) => ({
-            formulaid: fxp.formulaid || null,
-            formulas: {
-              codigo: fxp.formulas?.codigo || null,
-              nombre: fxp.formulas?.nombre || null,
-              unidadmedidaid: fxp.formulas?.unidadmedidaid || null,
-              unidadesmedida: {
-                descripcion: fxp.unidadesmedida?.descripcion || null,
+          productosxcatalogo:
+            p.productosxcatalogo?.map((cat) => ({
+              catalogoid: cat.catalogoid || null,
+              precioventa: cat.precioventa || null,
+              margenutilidad: cat.margenutilidad || null,
+              catalogos: {
+                nombre: cat.catalogos?.nombre || null,
+                descripcion: cat.catalogos?.descripcion || null,
               },
-              costo: fxp.formulas?.costo || null,
-              materiasprimasxformula: fxp.materiasprimasxformula?.map((mxf) => ({
-                materiaprimaid: mxf.materiaprimaid || null,
-                cantidad: mxf.cantidad || null,
-                costoparcial: mxf.costoparcial || null,
-                materiasprima: {
-                  codigo: mxf.materiasprima?.codigo || null,
-                  nombre: mxf.materiasprima?.nombre || null,
-                  unidadmedidaid: mxf.materiasprima?.codigo || null,
+            })) || [],
+
+          formulasxproducto:
+            p.formulasxproducto?.map((fxp) => ({
+              formulaid: fxp.formulaid || null,
+              formulas:
+                {
+                  codigo: fxp.formulas?.codigo || null,
+                  nombre: fxp.formulas?.nombre || null,
+                  unidadmedidaid: fxp.formulas?.unidadmedidaid || null,
                   unidadesmedida: {
-                    descripcion: mxf.unidadesmedida?.descripcion || null,
+                    descripcion: fxp.unidadesmedida?.descripcion || null,
                   },
-                  costo: mxf.materiasprima?.codigo || null,
-                },
-              })) || [],
-            } || null,
-          })) || [],
+                  costo: fxp.formulas?.costo || null,
+                  materiasprimasxformula:
+                    fxp.materiasprimasxformula?.map((mxf) => ({
+                      materiaprimaid: mxf.materiaprimaid || null,
+                      cantidad: mxf.cantidad || null,
+                      costoparcial: mxf.costoparcial || null,
+                      materiasprima: {
+                        codigo: mxf.materiasprima?.codigo || null,
+                        nombre: mxf.materiasprima?.nombre || null,
+                        unidadmedidaid: mxf.materiasprima?.codigo || null,
+                        unidadesmedida: {
+                          descripcion: mxf.unidadesmedida?.descripcion || null,
+                        },
+                        costo: mxf.materiasprima?.codigo || null,
+                      },
+                    })) || [],
+                } || null,
+            })) || [],
         }))
 
         const productosListado: ProductoListado[] = transformedData.map((p: oProducto) => ({
@@ -293,7 +302,7 @@ export default function ProductosPage() {
         Ruta: "/productos/crear",
       })
       setShowPageTituloMasNuevo(true)
-     
+
       // Ejecutar funcio de busqueda para cargar listado inicial
       const Result = await ejecutarBusquedaProductos("", auxClienteId, -1, "True")
       if (!Result.success) {
@@ -306,10 +315,12 @@ export default function ProductosPage() {
 
       // -- Cargar DDLs
       // DDL Clientes
-      const { data: clientesData, error: clientesError } = await listaDesplegableClientes(auxClienteId,"")
+      const { data: clientesData, error: clientesError } = await listaDesplegableClientes(auxClienteId, "")
       if (!clientesError) {
-        const clientesConTodos = esAdminDDLs === true ? [{ id: -1, nombre: "Todos" }, ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))]
-          : (clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
+        const clientesConTodos =
+          esAdminDDLs === true
+            ? [{ id: -1, nombre: "Todos" }, ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))]
+            : (clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
         setClientes(clientesConTodos)
         // Seleccion de opcion en DDL por filtro de tipo de rol
         if (esAdminDDLs) {
@@ -325,12 +336,13 @@ export default function ProductosPage() {
       // DDL catalogos
       const catalogosResult = await listaDesplegableCatalogos(-1, "", auxClienteId)
       if (!catalogosResult.error) {
-        const catalogosConTodos = esAdminDDLs === true
-          ? [
-              { id: -1, nombre: "Todos" },
-              ...(catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre })),
-            ]
-          : (catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre }))
+        const catalogosConTodos =
+          esAdminDDLs === true
+            ? [
+                { id: -1, nombre: "Todos" },
+                ...(catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre })),
+              ]
+            : (catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre }))
         setCatalogos(catalogosConTodos)
         // Seleccion de opcion en DDL por filtro de tipo de rol
         if (esAdminDDLs === true) {
@@ -388,7 +400,7 @@ export default function ProductosPage() {
   const handleClienteChange = async (value: string) => {
     // Cambiar seleccion de filtro de cliente y resetear filtro de catálogo
     setFiltroCliente(value)
-    setFiltroCatalogo("-1") 
+    setFiltroCatalogo("-1")
 
     try {
       // Transformar variable recibida
@@ -428,8 +440,6 @@ export default function ProductosPage() {
       setShowModalError(true)
     }
   }
-
-  
 
   // ESTE ES EL ÚNICO LUGAR DONDE SE EJECUTA LA BÚSQUEDA
   // Estatus - Cambiar activo/inactivo
@@ -490,6 +500,11 @@ export default function ProductosPage() {
 
     setShowConfirmDialog(false)
     setProductoToToggle(null)
+  }
+
+  const handleViewProductoDetails = (productId: number) => {
+    // Placeholder function to handle view product details
+    console.log(`View details for product ID: ${productId}`)
   }
 
   // --- Carga Inicial y Seguridad ---
@@ -686,7 +701,7 @@ export default function ProductosPage() {
               <span className="ml-2 text-lg">Cargando productos...</span>
             </div>
           ) : */}
-          
+
           {!isSearching && elementosPaginados.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {elementosPaginados.map((p, index) => (
@@ -728,24 +743,14 @@ export default function ProductosPage() {
                     {/* Nombre */}
                     <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{p.ProductoNombre}</h3>
                     {/* Código */}
-                    <p className="text-sm text-gray-600 mb-2">
-                      Código: {p.ProductoCodigo || "Sin código."}
-                    </p>
+                    <p className="text-sm text-gray-600 mb-2">Código: {p.ProductoCodigo || "Sin código."}</p>
                     <p className="text-lg font-bold text-green-600">{formatCurrency(p.ProductoCosto)}</p>
-                    
-                    <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
-                    
-                      <div className="flex gap-3 justify-center mt-auto">
-                        
 
+                    <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
+                      <div className="flex gap-3 justify-center mt-auto">
                         {/* Detalles - Opens modal */}
                         <div className="flex flex-col items-center">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title="Ver Detalles"
-                            onClick={() => handleVerDetalles(p)}
-                          >
+                          <Button variant="ghost" size="icon" title="Ver Detalles" onClick={() => handleVerDetalles(p)}>
                             <EyeOff className="h-4 w-4" />
                           </Button>
                           <span className="text-xs text-muted-foreground mt-1">Detalles</span>
@@ -808,7 +813,8 @@ export default function ProductosPage() {
                         </Button>
                         */}
 
-                        
+                        {/* Conditional div to show "hola" if esAdminDOs is true */}
+                        {esAdminDOs && <div>hola</div>}
                       </div>
                     </div>
                   </CardContent>
@@ -857,11 +863,11 @@ export default function ProductosPage() {
                   <div className="md:w-1/3 h-64 md:h-auto flex items-center justify-center bg-gray-300">
                     <img
                       src={
-                        elementoDetalles.ProductoImgUrl && elementoDetalles.ProductoImgUrl !== "Sin imagen"
-                          ? elementoDetalles.ProductoImgUrl
+                        elementoDetalles.imgurl && elementoDetalles.imgurl !== "Sin imagen"
+                          ? elementoDetalles.imgurl
                           : "/placeholder.svg?height=400&width=400&text=Producto"
                       }
-                      alt={elementoDetalles.ProductoNombre}
+                      alt={elementoDetalles.nombre}
                       className="w-full h-auto object-cover"
                     />
                   </div>
@@ -872,27 +878,27 @@ export default function ProductosPage() {
                     <div className="space-y-3">
                       <div>
                         <span className="font-semibold text-gray-700">ID:</span>
-                        <span className="ml-2 text-gray-900">{elementoDetalles.ProductoId}</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.id}</span>
                       </div>
 
                       <div>
                         <span className="font-semibold text-gray-700">Nombre:</span>
-                        <span className="ml-2 text-gray-900">{elementoDetalles.ProductoNombre}</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.nombre}</span>
                       </div>
 
                       <div>
                         <span className="font-semibold text-gray-700">Código:</span>
-                        <span className="ml-2 text-gray-900">{elementoDetalles.ProductoCodigo}</span>
+                        <span className="ml-2 text-gray-900">{elementoDetalles.codigo}</span>
                       </div>
 
                       <div>
                         <span className="font-semibold text-gray-700">Estatus:</span>
                         <span
                           className={`ml-2 px-2 py-1 rounded text-sm font-semibold ${
-                            elementoDetalles.ProductoActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                            elementoDetalles.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"
                           }`}
                         >
-                          {elementoDetalles.ProductoActivo ? "Activo" : "Inactivo"}
+                          {elementoDetalles.activo ? "Activo" : "Inactivo"}
                         </span>
                       </div>
 
