@@ -718,7 +718,7 @@ export default function ProductosPage() {
                     <img
                       src={p.ProductoImagenUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
                       alt={p.ProductoNombre}
-                      className="rounded-t-xs transition-transform duration-300 group-hover:scale-105"
+                      className="w-full h-full object-cover rounded-t-xs"
                     />
                     {/*
                     <Image
