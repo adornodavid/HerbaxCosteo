@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Eye, Loader2, RotateCcw, EyeOff, Edit } from "lucide-react"
+import { Search, Eye, Loader2, RotateCcw, EyeOff, Edit, ToggleRight, ToggleLeft, X } from "lucide-react"
 //import toast from "react-hot-toast" // Import for toast
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
@@ -798,7 +798,7 @@ export default function ProductosPage() {
                         */}
 
                         {/* Conditional div to show "hola" if esAdminDOs is true */}
-                        {esAdminDOs && (   
+                        {esAdminDOs && (
                           <div className="flex flex-col items-center">
                             <Button
                               variant="ghost"
@@ -810,8 +810,35 @@ export default function ProductosPage() {
                             </Button>
                             <span className="text-xs text-muted-foreground mt-1">Editar</span>
                           </div>
-                          
                         )}
+
+                        <div className="flex flex-col items-center">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title={p.ProductoActivo ? "Inactivar" : "Activar"}
+                            onClick={() => handleToggleStatusClickActivo(p.ProductoId, p.ProductoActivo)}
+                          >
+                            {p.ProductoActivo ? (
+                              <ToggleRight className="h-4 w-4 text-red-500" />
+                            ) : (
+                              <ToggleLeft className="h-4 w-4 text-green-500" />
+                            )}
+                          </Button>
+                          <span className="text-xs text-muted-foreground mt-1">Estatus</span>
+                        </div>
+
+                        <div className="flex flex-col items-center">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Eliminar"
+                            onClick={() => router.push(`/productos/${p.ProductoId}/eliminar`)}
+                          >
+                            <X className="h-4 w-4 text-red-500" />
+                          </Button>
+                          <span className="text-xs text-muted-foreground mt-1">Eliminar</span>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
