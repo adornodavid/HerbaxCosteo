@@ -808,9 +808,7 @@ export default function ProductosPage() {
                         </Button>
                         */}
 
-                        {esAdminDOs && (
-
-                        )}
+                        
                       </div>
                     </div>
                   </CardContent>
