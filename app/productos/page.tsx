@@ -718,17 +718,8 @@ export default function ProductosPage() {
                     <img
                       src={p.ProductoImagenUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
                       alt={p.ProductoNombre}
-                      className="w-full h-full object-cover rounded-t-xs"
+                      className="w-full h-full object-contain rounded-t-xs"
                     />
-                    {/*
-                    <Image
-                      src={p.ProductoImagenUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
-                      alt={p.ProductoNombre}
-                      layout="fill"
-                      objectFit="cover"
-                      className="rounded-t-xs transition-transform duration-300 group-hover:scale-105"
-                    />
-                    */}
                     <div className="absolute top-2 right-2">
                       <span
                         className={`px-2 py-1 text-xs rounded-xs font-semibold ${p.ProductoActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
@@ -755,22 +746,6 @@ export default function ProductosPage() {
                           </Button>
                           <span className="text-xs text-muted-foreground mt-1">Detalles</span>
                         </div>
-                        {/*
-                        <Button
-                          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-7"
-                          variant="ghost"
-                          size="icon"
-                          title="Ver Detalles"
-                          onClick={() => handleViewProductoDetails(p.ProductoId)}
-                          disabled={isDetailsLoading}
-                        >
-                          {isDetailsLoading ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </Button>
-                        */}
 
                         {/* Ver - Navigates to ver page */}
                         <div className="flex flex-col items-center">
@@ -784,18 +759,6 @@ export default function ProductosPage() {
                           </Button>
                           <span className="text-xs text-muted-foreground mt-1">Ver</span>
                         </div>
-                        {/*
-                        <Link href={`/productos/editar?getProductoId=${p.ProductoId}`} passHref>
-                          <Button
-                            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-7"
-                            variant="ghost"
-                            size="icon"
-                            title="Editar"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </Link>
-                        */}
 
                         {/* Conditional div to show "hola" if esAdminDOs is true */}
                         {esAdminDOs && (
