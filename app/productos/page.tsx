@@ -812,35 +812,7 @@ export default function ProductosPage() {
                             <span className="text-xs text-muted-foreground mt-1">Editar</span>
                           </div>
 
-                          {/* Estatus */}
-                          <div className="flex flex-col items-center">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              title={p.ProductoActivo ? "Inactivar" : "Activar"}
-                              onClick={() => handleToggleStatusClickActivo(p.ProductoId, p.ProductoActivo)}
-                            >
-                              {p.ProductoActivo ? (
-                                <ToggleRight className="h-4 w-4 text-red-500" />
-                              ) : (
-                                <ToggleLeft className="h-4 w-4 text-green-500" />
-                              )}
-                            </Button>
-                            <span className="text-xs text-muted-foreground mt-1">Estatus</span>
-                          </div>
-
-                          {/* Eliminar */}
-                          <div className="flex flex-col items-center">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              title="Eliminar"
-                              onClick={() => router.push(`/productos/${p.ProductosId}/eliminar`)}
-                            >
-                              <X className="h-4 w-4 text-red-500" />
-                            </Button>
-                            <span className="text-xs text-muted-foreground mt-1">Eliminar</span>
-                          </div>
+                          
                         )}
                       </div>
                     </div>
