@@ -733,6 +733,7 @@ export default function ProductosPage() {
                     </p>
                     <p className="text-lg font-bold text-green-600">{formatCurrency(p.ProductoCosto)}</p>
                     <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
+                    
                       <div className="flex gap-3 justify-center mt-auto">
                         
 
