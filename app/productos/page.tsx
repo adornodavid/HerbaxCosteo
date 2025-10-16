@@ -738,6 +738,19 @@ export default function ProductosPage() {
                       <div className="flex gap-3 justify-center mt-auto">
                         
 
+                        {/* Detalles - Opens modal */}
+                        <div className="flex flex-col items-center">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Ver Detalles"
+                            onClick={() => handleVerDetalles(p)}
+                          >
+                            <EyeOff className="h-4 w-4" />
+                          </Button>
+                          <span className="text-xs text-muted-foreground mt-1">Detalles</span>
+                        </div>
+                        {/*
                         <Button
                           className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-7"
                           variant="ghost"
@@ -752,6 +765,7 @@ export default function ProductosPage() {
                             <Eye className="h-4 w-4" />
                           )}
                         </Button>
+                        */}
 
 
                         <Link href={`/productos/editar?getProductoId=${p.ProductoId}`} passHref>
