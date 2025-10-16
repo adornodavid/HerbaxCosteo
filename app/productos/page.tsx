@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Eye, Loader2, RotateCcw, EyeOff, Edit } from "lucide-react"
-import toast from "react-hot-toast" // Import for toast
+//import toast from "react-hot-toast" // Import for toast
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { Producto, oProducto, ProductoListado, ProductosEstadisticas } from "@/types/productos"
@@ -487,15 +487,15 @@ export default function ProductosPage() {
 
       if (error) {
         console.error("Error al cambiar estado:", error)
-        toast.error(`Error al cambiar estado del producto.`)
+        //toast.error(`Error al cambiar estado del producto.`)
       } else {
         // Actualizar el estado local para reflejar el cambio sin recargar todo
         setProductos((prev) => prev.map((p) => (p.ProductoId === id ? { ...p, ProductoActivo: nuevoEstado } : p)))
-        toast.success(`Producto ${nuevoEstado ? "activado" : "inactivado"} correctamente.`)
+        //toast.success(`Producto ${nuevoEstado ? "activado" : "inactivado"} correctamente.`)
       }
     } catch (error) {
       console.error("Error inesperado al cambiar estado:", error)
-      toast.error("Error inesperado al cambiar estado")
+      //toast.error("Error inesperado al cambiar estado")
     }
 
     setShowConfirmDialog(false)
