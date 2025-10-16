@@ -843,22 +843,6 @@ export default function ProductosPage() {
                             </div>
                           </>
                         )}
-
-                        <div className="flex flex-col items-center">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title={p.ProductoActivo ? "Inactivar" : "Activar"}
-                            onClick={() => handleToggleStatusClickProducto(p.ProductoId, p.ProductoActivo)}
-                          >
-                            {p.ProductoActivo ? (
-                              <ToggleRight className="h-4 w-4 text-red-500" />
-                            ) : (
-                              <ToggleLeft className="h-4 w-4 text-green-500" />
-                            )}
-                          </Button>
-                          <span className="text-xs text-muted-foreground mt-1">Estatus</span>
-                        </div>
                       </div>
                     </div>
                   </CardContent>
