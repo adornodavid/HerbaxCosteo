@@ -799,7 +799,7 @@ export default function ProductosPage() {
 
                         {/* Conditional div to show "hola" if esAdminDOs is true */}
                         {esAdminDOs && (
-                          {/* Editar */}
+                         
                           <div className="flex flex-col items-center">
                             <Button
                               variant="ghost"
