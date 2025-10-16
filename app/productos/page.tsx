@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Eye, Loader2, RotateCcw, EyeOff } from "lucide-react"
+import { Search, Eye, Loader2, RotateCcw, EyeOff, Edit } from "lucide-react"
 import toast from "react-hot-toast" // Import for toast
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
@@ -798,7 +798,19 @@ export default function ProductosPage() {
                         */}
 
                         {/* Conditional div to show "hola" if esAdminDOs is true */}
-                        {esAdminDOs && <div>hola</div>}
+                        {esAdminDOs && (
+                          <div className="flex flex-col items-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Editar"
+                              onClick={() => router.push(`/clientes/${p.ClienteId}/editar`)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <span className="text-xs text-muted-foreground mt-1">Editar</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </CardContent>
