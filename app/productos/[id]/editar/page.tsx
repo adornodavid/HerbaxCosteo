@@ -133,9 +133,6 @@ export default function EditarProductoPage() {
     if (!user) return
   
     try{
-      // Auxiliar para definir DDLs
-      const auxClienteId = esAdminDDLs === true ? -1 : user.ClienteId
-
       // Ejecutar funcion de busqueda para carga inicial
       const cargarDatos = async () => {
         try {
