@@ -280,12 +280,13 @@ export default function EditarProductoPage() {
     }
     if (productoId) {
       inicializar()
-    }
-    setModalError({
+    } else {
+      setModalError({
         Titulo: "Error en el inicio",
         Mensaje: "El id del producto no se establecio.",
       })
       setShowModalError(true)
+    }
   }, [authLoading, user, router, esAdminDOs, productoId])
 
   // Manejadores (Handles)
