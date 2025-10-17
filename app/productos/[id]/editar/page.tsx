@@ -144,7 +144,7 @@ export default function EditarProductoPage() {
       })
       setShowPageTituloMasNuevo(true)
 
-      // Ejecutar funcio de busqueda para carga inicial
+      // Ejecutar funcion de busqueda para carga inicial
 
     } catch (error) {
       console.error("Error al cargar datos iniciales: ", error)
