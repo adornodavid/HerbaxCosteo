@@ -131,6 +131,21 @@ export default function EditarProductoPage() {
     if (!user) return
   
     try{
+      // Auxiliar para definir DDLs
+      const auxClienteId = esAdminDDLs === true ? -1 : user.ClienteId
+
+      // Titulo de la página
+      setPageTituloMasNuevo({
+        Titulo: "Actualizar producto",
+        Subtitulo: "Gestión completa de Productos",
+        Visible: esAdminDOs == true ? true : false,
+        BotonTexto: "Crear Nuevo Producto",
+        Ruta: "/productos/crear",
+      })
+      setShowPageTituloMasNuevo(true)
+
+      // Ejecutar funcio de busqueda para carga inicial
+
     } catch (error) {
       console.error("Error al cargar datos iniciales: ", error)
       console.log("Error al cargar datos iniciales: ", error)
