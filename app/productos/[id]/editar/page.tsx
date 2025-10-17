@@ -127,7 +127,22 @@ export default function EditarProductoPage() {
   }
 
   // -- Carga inicial -- 
+  const cargarDatosIniciales = async () => {
+    if (!user) return
   
+    try{
+    } catch (error) {
+      console.error("Error al cargar datos iniciales: ", error)
+      console.log("Error al cargar datos iniciales: ", error)
+      setModalError({
+        Titulo: "Error al cargar datos iniciales",
+        Mensaje: error,
+      })
+      setShowModalError(true)
+    } finally {
+      setShowPageLoading(false)
+    }
+  }
 
   // --- Inicio (carga inicial y seguridad) ---
   useEffect(() => {
@@ -137,6 +152,13 @@ export default function EditarProductoPage() {
       return
     }
     // Iniciar
+    const inicializar = async () => {
+        setPageLoading({ message: "Cargando Producto..." })
+        setShowPageLoading(true)
+        await cargarDatosIniciales()
+      }
+      inicializar()
+    
     const cargarDatosProducto = async () => {
       try {
         setShowPageLoading(true)
