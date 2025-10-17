@@ -22,6 +22,39 @@ import { createClient } from "@/lib/supabase"
 		- xxxXXXXX
     - listaDesplegableCatalogos / ddlCatalogos
 ================================================== */
+// Función: listaDesplegableClientes: función que se utiliza para los dropdownlist y puede contener id y / o nombre
+export async function listaDesplegableUnidadesMedida(id = -1, descripcion = "") {
+  try {
+    // Query principal
+    let query = supabase.from("unidadesmedida").select("id, descripcion")
+
+    // Filtros en query, dependiendo parametros
+    if (id !== -1) {
+      query = query.eq("id", id)
+    }
+    if (descripcion !== "") {
+      query = query.ilike("descripcion", `%${descripcion}%`)
+    }
+  
+    // Ejecutar query
+    query = query.order("nombre", { ascending: true })
+
+    // Varaibles y resultados del query
+    const { data, error } = await query
+
+    if (error) {
+      console.error("Error obteniendo la lista desplegable de unidades de medida:", error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en listaDesplegableUnidadesMedida:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+
 //Función: selCatalogosXFiltros / obtenerCatalogosFiltrados: funcio que ejecuta el bloque de busqueda en la pagina de listado
 export async function obtenerCatalogosFiltrados(
   nombre = "",
