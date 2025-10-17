@@ -59,6 +59,7 @@ export default function EditarProductoPage() {
   const [existingImageUrl, setExistingImageUrl] = useState<string>("")
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [formulas, setFormulas] = useState<Formula[]>([])
+  const [activeTab, setActiveTab] = useState<"informacion" | "caracteristicas" | "elaboracion">("informacion")
   // Mostrar/Ocultar contenido
   const [isLoading, setIsLoading] = useState(true)
   const [showPageLoading, setShowPageLoading] = useState(true)
@@ -271,122 +272,209 @@ export default function EditarProductoPage() {
         Ruta={null}
       />
 
-      <Card>
-        <CardContent className="pt-6">
-          <form id="frmProducto" onSubmit={ejecutarActualizacion} className="space-y-4">
-            <input type="hidden" name="id" value={productoId} />
+      <div className="flex gap-2 border-b">
+        <button
+          type="button"
+          onClick={() => setActiveTab("informacion")}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === "informacion"
+              ? "border-b-2 border-primary text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Información
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("caracteristicas")}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === "caracteristicas"
+              ? "border-b-2 border-primary text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Características
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("elaboracion")}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === "elaboracion"
+              ? "border-b-2 border-primary text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Elaboración
+        </button>
+      </div>
 
-            {existingImageUrl && <input type="hidden" name="imgurl" value={existingImageUrl} />}
+      {activeTab === "informacion" && (
+        <Card>
+          <CardContent className="pt-6">
+            <form id="formInformacion" onSubmit={ejecutarActualizacion} className="space-y-4">
+              <input type="hidden" name="id" value={productoId} />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Left column: All inputs */}
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="txtNombre">
-                    <span className="text-red-500">*</span> Nombre
-                  </Label>
-                  <Input
-                    id="txtNombre"
-                    name="nombre"
-                    type="text"
-                    placeholder="Ingrese el nombre del producto"
-                    value={formData.nombre}
-                    onChange={handleInputChange}
-                  />
-                </div>
+              {existingImageUrl && <input type="hidden" name="imgurl" value={existingImageUrl} />}
 
-                <div className="space-y-2">
-                  <Label htmlFor="txtCodigo">
-                    <span className="text-red-500">*</span> Código
-                  </Label>
-                  <Input
-                    id="txtCodigo"
-                    name="codigo"
-                    type="text"
-                    placeholder="Ingrese el código del producto"
-                    value={formData.codigo}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="ddlCliente">
-                    <span className="text-red-500">*</span> Cliente
-                  </Label>
-                  <Select
-                    name="clienteid"
-                    value={formData.clienteid}
-                    onValueChange={(value) => handleSelectChange("clienteid", value)}
-                  >
-                    <SelectTrigger id="ddlCliente">
-                      <SelectValue placeholder="Selecciona un cliente" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {clientes.map((cliente) => (
-                        <SelectItem key={cliente.id} value={cliente.id.toString()}>
-                          {cliente.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="ddlFormula">
-                    <span className="text-red-500">*</span> Fórmula
-                  </Label>
-                  <Select
-                    name="formulaid"
-                    value={formData.formulaid}
-                    onValueChange={(value) => handleSelectChange("formulaid", value)}
-                  >
-                    <SelectTrigger id="ddlFormula">
-                      <SelectValue placeholder="Selecciona una fórmula" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {formulas.map((formula) => (
-                        <SelectItem key={formula.id} value={formula.id.toString()}>
-                          {formula.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="imageImg">Imagen</Label>
-                  <Input id="imageImg" name="imagen" type="file" accept="image/*" onChange={handleImageChange} />
-                </div>
-              </div>
-
-              {/* Right column: Image preview only */}
-              <div className="space-y-2">
-                <Label>Previsualización de Imagen</Label>
-                <div className="border rounded-md flex items-center justify-center bg-muted max-h-[350px] h-[350px]">
-                  {imagePreview ? (
-                    <img
-                      src={imagePreview || "/placeholder.svg"}
-                      alt="Preview"
-                      className="w-full h-auto object-cover"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Left column: All inputs */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="txtNombre">
+                      <span className="text-red-500">*</span> Nombre
+                    </Label>
+                    <Input
+                      id="txtNombre"
+                      name="nombre"
+                      type="text"
+                      placeholder="Ingrese el nombre del producto"
+                      value={formData.nombre}
+                      onChange={handleInputChange}
                     />
-                  ) : (
-                    <span className="text-muted-foreground text-sm">Sin imagen seleccionada</span>
-                  )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="txtCodigo">
+                      <span className="text-red-500">*</span> Código
+                    </Label>
+                    <Input
+                      id="txtCodigo"
+                      name="codigo"
+                      type="text"
+                      placeholder="Ingrese el código del producto"
+                      value={formData.codigo}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="ddlCliente">
+                      <span className="text-red-500">*</span> Cliente
+                    </Label>
+                    <Select
+                      name="clienteid"
+                      value={formData.clienteid}
+                      onValueChange={(value) => handleSelectChange("clienteid", value)}
+                    >
+                      <SelectTrigger id="ddlCliente">
+                        <SelectValue placeholder="Selecciona un cliente" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {clientes.map((cliente) => (
+                          <SelectItem key={cliente.id} value={cliente.id.toString()}>
+                            {cliente.nombre}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="ddlFormula">
+                      <span className="text-red-500">*</span> Fórmula
+                    </Label>
+                    <Select
+                      name="formulaid"
+                      value={formData.formulaid}
+                      onValueChange={(value) => handleSelectChange("formulaid", value)}
+                    >
+                      <SelectTrigger id="ddlFormula">
+                        <SelectValue placeholder="Selecciona una fórmula" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {formulas.map((formula) => (
+                          <SelectItem key={formula.id} value={formula.id.toString()}>
+                            {formula.nombre}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="imageImg">Imagen</Label>
+                    <Input id="imageImg" name="imagen" type="file" accept="image/*" onChange={handleImageChange} />
+                  </div>
+                </div>
+
+                {/* Right column: Image preview only */}
+                <div className="space-y-2">
+                  <Label>Previsualización de Imagen</Label>
+                  <div className="border rounded-md flex items-center justify-center bg-muted max-h-[350px] h-[350px]">
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview || "/placeholder.svg"}
+                        alt="Preview"
+                        className="w-full h-auto object-cover"
+                      />
+                    ) : (
+                      <span className="text-muted-foreground text-sm">Sin imagen seleccionada</span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex gap-4 pt-4">
-              <Button type="submit" disabled={isSubmitting} className="bg-[#5d8f72] hover:bg-[#44785a] text-white">
-                {isSubmitting ? "Guardando..." : "Guardar Producto"}
-              </Button>
-              <Button type="button" variant="outline" onClick={() => router.push("/productos")}>
-                Regresar
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="flex gap-4 pt-4">
+                <Button type="submit" disabled={isSubmitting} className="bg-[#5d8f72] hover:bg-[#44785a] text-white">
+                  Actualizar
+                </Button>
+                <Button type="button" variant="outline" onClick={() => router.push("/productos")}>
+                  Regresar
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {activeTab === "caracteristicas" && (
+        <Card>
+          <CardContent className="pt-6">
+            <form id="formCaracteristicas" className="space-y-4">
+              <div className="space-y-4">
+                <p className="text-muted-foreground">
+                  Aquí se mostrará la información de características del producto desde la tabla
+                  productoscaracteristicas
+                </p>
+                {/* Contenido de características se agregará más adelante */}
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <Button type="submit" className="bg-[#5d8f72] hover:bg-[#44785a] text-white">
+                  Actualizar
+                </Button>
+                <Button type="button" variant="outline" onClick={() => router.push("/productos")}>
+                  Regresar
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {activeTab === "elaboracion" && (
+        <Card>
+          <CardContent className="pt-6">
+            <form id="formElaboracion" className="space-y-4">
+              <div className="space-y-4">
+                <p className="text-muted-foreground">
+                  Aquí se mostrará el listado de relaciones del producto con las fórmulas y material de etiquetado
+                </p>
+                {/* Contenido de elaboración se agregará más adelante */}
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <Button type="submit" className="bg-[#5d8f72] hover:bg-[#44785a] text-white">
+                  Actualizar
+                </Button>
+                <Button type="button" variant="outline" onClick={() => router.push("/productos")}>
+                  Regresar
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
