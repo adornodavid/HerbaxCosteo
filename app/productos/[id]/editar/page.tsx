@@ -57,7 +57,7 @@ export default function EditarProductoPage() {
   const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [existingImageUrl, setExistingImageUrl] = useState<string>("")
-  const [clientes, setClientes] = useState<Cliente>()
+  const [clientes, setClientes] = useState<Cliente>([])
   const [formulas, setFormulas] = useState<Formula[]>([])
   const [activeTab, setActiveTab] = useState<"informacion" | "caracteristicas" | "elaboracion">("informacion")
   // Mostrar/Ocultar contenido
@@ -140,7 +140,7 @@ export default function EditarProductoPage() {
           setShowPageLoading(true)
 
           // Cargar clientes
-          const clientesResult = await obtenerClientes(productoId, "", "", "", "", "", "True")
+          const clientesResult = await obtenerClientes(-1, "", "", "", "", "", "True")
           if (clientesResult.success && clientesResult.data) {
             setClientes(clientesResult.data)
           }
