@@ -134,15 +134,6 @@ export default function EditarProductoPage() {
       // Auxiliar para definir DDLs
       const auxClienteId = esAdminDDLs === true ? -1 : user.ClienteId
 
-      // Titulo de la página
-      setPageTituloMasNuevo({
-        Titulo: "Actualizar producto",
-        Subtitulo: "Gestión completa de Productos",
-        Visible: esAdminDOs == true ? true : false,
-        BotonTexto: "Crear Nuevo Producto",
-        Ruta: "/productos/crear",
-      })
-      setShowPageTituloMasNuevo(true)
 
       // Ejecutar funcion de busqueda para carga inicial
       const cargarDatosProducto = async () => {
