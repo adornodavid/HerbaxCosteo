@@ -57,7 +57,7 @@ export default function EditarProductoPage() {
   const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [existingImageUrl, setExistingImageUrl] = useState<string>("")
-  const [clientes, setClientes] = useState<Cliente[]>([])
+  const [clientes, setClientes] = useState<Cliente>()
   const [formulas, setFormulas] = useState<Formula[]>([])
   const [activeTab, setActiveTab] = useState<"informacion" | "caracteristicas" | "elaboracion">("informacion")
   // Mostrar/Ocultar contenido
@@ -134,14 +134,13 @@ export default function EditarProductoPage() {
       // Auxiliar para definir DDLs
       const auxClienteId = esAdminDDLs === true ? -1 : user.ClienteId
 
-
       // Ejecutar funcion de busqueda para carga inicial
-      const cargarDatosProducto = async () => {
+      const cargarDatos = async () => {
         try {
           setShowPageLoading(true)
 
           // Cargar clientes
-          const clientesResult = await obtenerClientes(-1, "", "", "", "", "", "True")
+          const clientesResult = await obtenerClientes(productoId, "", "", "", "", "", "True")
           if (clientesResult.success && clientesResult.data) {
             setClientes(clientesResult.data)
           }
