@@ -241,35 +241,6 @@ export default function EditarProductoPage() {
             oProductoData()
             return { success: false, mensaje: "No hay datos o la consulta falló." }
           }
-
-
-
-          if (result.success && result.data && result.data.length > 0) {
-            const producto = result.data[0]
-            setFormData({
-              nombre: producto.ProductoNombre || "",
-              codigo: producto.ProductoCodigo || "",
-              clienteid: producto.ClienteId?.toString() || "",
-              formulaid: producto.FormulaId?.toString() || "",
-            })
-
-            // Set existing image URL and preview
-            if (producto.ProductoImgUrl) {
-              setExistingImageUrl(producto.ProductoImgUrl)
-              setImagePreview(producto.ProductoImgUrl)
-            }
-          } else {
-            setModalError({
-              Titulo: "Error al cargar producto",
-              Mensaje: "No se pudo encontrar el producto solicitado",
-            })
-            setShowModalError(true)
-          }
-
-
-
-
-
         } catch (error) {
           console.error("Error cargando datos del producto:", error)
           setModalError({
