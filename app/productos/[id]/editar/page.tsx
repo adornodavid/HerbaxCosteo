@@ -145,7 +145,57 @@ export default function EditarProductoPage() {
       setShowPageTituloMasNuevo(true)
 
       // Ejecutar funcion de busqueda para carga inicial
+      const cargarDatosProducto = async () => {
+        try {
+          setShowPageLoading(true)
 
+          // Cargar clientes
+          const clientesResult = await obtenerClientes(-1, "", "", "", "", "", "True")
+          if (clientesResult.success && clientesResult.data) {
+            setClientes(clientesResult.data)
+          }
+
+          // Cargar formulas
+          const formulasResult = await obtenerFormulas(-1, "", "", "True", -1, -1)
+          if (formulasResult.success && formulasResult.data) {
+            setFormulas(formulasResult.data)
+          }
+
+          // Cargar producto
+          const result = await obtenerProductos(productoId, -1, -1, "", "", "Todos")
+
+          if (result.success && result.data && result.data.length > 0) {
+            const producto = result.data[0]
+            setFormData({
+              nombre: producto.ProductoNombre || "",
+              codigo: producto.ProductoCodigo || "",
+              clienteid: producto.ClienteId?.toString() || "",
+              formulaid: producto.FormulaId?.toString() || "",
+            })
+
+            // Set existing image URL and preview
+            if (producto.ProductoImgUrl) {
+              setExistingImageUrl(producto.ProductoImgUrl)
+              setImagePreview(producto.ProductoImgUrl)
+            }
+          } else {
+            setModalError({
+              Titulo: "Error al cargar producto",
+              Mensaje: "No se pudo encontrar el producto solicitado",
+            })
+            setShowModalError(true)
+          }
+        } catch (error) {
+          console.error("Error cargando datos del producto:", error)
+          setModalError({
+            Titulo: "Error al cargar producto",
+            Mensaje: "Ocurrió un error al cargar los datos del producto",
+          })
+          setShowModalError(true)
+        } finally {
+          setShowPageLoading(false)
+        }
+      }
     } catch (error) {
       console.error("Error al cargar datos iniciales: ", error)
       console.log("Error al cargar datos iniciales: ", error)
@@ -168,67 +218,18 @@ export default function EditarProductoPage() {
     }
     // Iniciar
     const inicializar = async () => {
-        setPageLoading({ message: "Cargando Producto..." })
-        setShowPageLoading(true)
-        await cargarDatosIniciales()
-      }
-      inicializar()
-    
-    const cargarDatosProducto = async () => {
-      try {
-        setShowPageLoading(true)
-
-        // Cargar clientes
-        const clientesResult = await obtenerClientes(-1, "", "", "", "", "", "True")
-        if (clientesResult.success && clientesResult.data) {
-          setClientes(clientesResult.data)
-        }
-
-        // Cargar formulas
-        const formulasResult = await obtenerFormulas(-1, "", "", "True", -1, -1)
-        if (formulasResult.success && formulasResult.data) {
-          setFormulas(formulasResult.data)
-        }
-
-        // Cargar producto
-        const result = await obtenerProductos(productoId, -1, -1, "", "", "Todos")
-
-        if (result.success && result.data && result.data.length > 0) {
-          const producto = result.data[0]
-          setFormData({
-            nombre: producto.ProductoNombre || "",
-            codigo: producto.ProductoCodigo || "",
-            clienteid: producto.ClienteId?.toString() || "",
-            formulaid: producto.FormulaId?.toString() || "",
-          })
-
-          // Set existing image URL and preview
-          if (producto.ProductoImgUrl) {
-            setExistingImageUrl(producto.ProductoImgUrl)
-            setImagePreview(producto.ProductoImgUrl)
-          }
-        } else {
-          setModalError({
-            Titulo: "Error al cargar producto",
-            Mensaje: "No se pudo encontrar el producto solicitado",
-          })
-          setShowModalError(true)
-        }
-      } catch (error) {
-        console.error("Error cargando datos del producto:", error)
-        setModalError({
-          Titulo: "Error al cargar producto",
-          Mensaje: "Ocurrió un error al cargar los datos del producto",
-        })
-        setShowModalError(true)
-      } finally {
-        setShowPageLoading(false)
-      }
+      setPageLoading({ message: "Cargando Producto..." })
+      setShowPageLoading(true)
+      await cargarDatosIniciales()
     }
-
     if (productoId) {
-      cargarDatosProducto()
+      inicializar()
     }
+    setModalError({
+        Titulo: "Error en el inicio",
+        Mensaje: "El id del producto no se establecio.",
+      })
+      setShowModalError(true)
   }, [authLoading, user, router, esAdminDOs, productoId])
 
   // Manejadores (Handles)
