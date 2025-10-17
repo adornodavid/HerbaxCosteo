@@ -61,6 +61,7 @@ export default function EditarProductoPage() {
   const [clientes, setClientes] = useState<Cliente>([])
   const [formulas, setFormulas] = useState<Formula[]>([])
   const [activeTab, setActiveTab] = useState<"informacion" | "caracteristicas" | "elaboracion">("informacion")
+  const [productos, setProductos] = useState<oProducto>()
   // Mostrar/Ocultar contenido
   const [isLoading, setIsLoading] = useState(true)
   const [showPageLoading, setShowPageLoading] = useState(true)
@@ -155,7 +156,7 @@ export default function EditarProductoPage() {
           // Cargar producto
           const result = await obtenerProductos(productoId, -1, -1, "", "", "Todos")
           if (result.success && result.data) {
-            const transformedData: oProducto = result.data.map((p: oProducto) => ({
+            const oProductoData: oProducto = result.data.map((p: oProducto) => ({
               id: p.id,
               codigo: p.codigo,
               clienteid: p.clienteid,
@@ -230,31 +231,14 @@ export default function EditarProductoPage() {
                 })) || [],
             }))
 
-            const productosListado: ProductoListado[] = transformedData.map((p: oProducto) => ({
-              ProductoId: p.id,
-              ProductoCodigo: p.codigo || "Sin codigo",
-              ProductoNombre: p.nombre || "Sin nombre",
-              ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
-              ProductoTiempo: "N/A",
-              ProductoCosto: p.costo || 0,
-              ProductoActivo: p.activo === true,
-              ProductoImagenUrl: p.imgurl,
-              ClienteId: p.clienteid || -1,
-              ClienteNombre: p.clientes?.nombre || "N/A",
-              CatalogoId: p.productosxcatalogo[0]?.catalogoid || -1,
-              CatalogoNombre: p.productosxcatalogo[0]?.catalogos?.nombre || "N/A",
-            }))
-
             // Actualizar estados
-            setProductos(productosListado)
-            setProductosFiltrados(productosListado)
-            setTotalProductos(productosListado.length)
+            setProductos(oProductoData)
 
             // Retorno de información
             return { success: true, mensaje: "Se ejecuto correctamente cada proceso." }
           } else {
             // Retorno de información
-            setProductos([])
+            oProductoData()
             return { success: false, mensaje: "No hay datos o la consulta falló." }
           }
 
