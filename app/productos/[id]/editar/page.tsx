@@ -126,6 +126,9 @@ export default function EditarProductoPage() {
     }
   }
 
+  // -- Carga inicial -- 
+  
+
   // --- Inicio (carga inicial y seguridad) ---
   useEffect(() => {
     // Validar
