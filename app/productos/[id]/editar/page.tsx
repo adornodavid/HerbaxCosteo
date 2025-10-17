@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
 import type { Formula } from "@/types/formulas"
+import type { Producto, oProducto, ProductoListado, ProductosEstadisticas } from "@/types/productos"
 import type {
   propsPageLoadingScreen,
   propsPageModalAlert,
@@ -153,6 +154,111 @@ export default function EditarProductoPage() {
 
           // Cargar producto
           const result = await obtenerProductos(productoId, -1, -1, "", "", "Todos")
+          if (result.success && result.data) {
+            const transformedData: oProducto = result.data.map((p: oProducto) => ({
+              id: p.id,
+              codigo: p.codigo,
+              clienteid: p.clienteid,
+              clientes: {
+                nombre: p.clientes?.nombre || null,
+              },
+              zonaid: p.zonaid,
+              zonas: {
+                nombre: p.zonas?.nombre || null,
+              },
+              nombre: p.nombre,
+              imgurl: p.imgurl,
+              unidadmedidaid: p.unidadmedidaid,
+              unidadesmedida: {
+                descripcion: p.unidadesmedida?.descripcion || null,
+              },
+              costo: p.costo,
+              activo: p.activo,
+              productoscaracteristicas: {
+                descripcion: p.productoscaracteristicas?.descripcion || null,
+                presentacion: p.productoscaracteristicas?.presentacion || null,
+                porcion: p.productoscaracteristicas?.porcion || null,
+                modouso: p.productoscaracteristicas?.modouso || null,
+                porcionenvase: p.productoscaracteristicas?.porcionenvase || null,
+                categoriauso: p.productoscaracteristicas?.categoriauso || null,
+                propositoprincipal: p.productoscaracteristicas?.propositoprincipal || null,
+                propuestavalor: p.productoscaracteristicas?.propuestavalor || null,
+                instruccionesingesta: p.productoscaracteristicas?.instruccionesingesta || null,
+                edadminima: p.productoscaracteristicas?.edadminima || null,
+                advertencia: p.productoscaracteristicas?.advertencia || null,
+                condicionesalmacenamiento: p.productoscaracteristicas?.condicionesalmacenamiento || null,
+              },
+              productosxcatalogo:
+                p.productosxcatalogo?.map((cat) => ({
+                  catalogoid: cat.catalogoid || null,
+                  precioventa: cat.precioventa || null,
+                  margenutilidad: cat.margenutilidad || null,
+                  catalogos: {
+                    nombre: cat.catalogos?.nombre || null,
+                    descripcion: cat.catalogos?.descripcion || null,
+                  },
+                })) || [],
+
+              formulasxproducto:
+                p.formulasxproducto?.map((fxp) => ({
+                  formulaid: fxp.formulaid || null,
+                  formulas:
+                    {
+                      codigo: fxp.formulas?.codigo || null,
+                      nombre: fxp.formulas?.nombre || null,
+                      unidadmedidaid: fxp.formulas?.unidadmedidaid || null,
+                      unidadesmedida: {
+                        descripcion: fxp.unidadesmedida?.descripcion || null,
+                      },
+                      costo: fxp.formulas?.costo || null,
+                      materiasprimasxformula:
+                        fxp.materiasprimasxformula?.map((mxf) => ({
+                          materiaprimaid: mxf.materiaprimaid || null,
+                          cantidad: mxf.cantidad || null,
+                          costoparcial: mxf.costoparcial || null,
+                          materiasprima: {
+                            codigo: mxf.materiasprima?.codigo || null,
+                            nombre: mxf.materiasprima?.nombre || null,
+                            unidadmedidaid: mxf.materiasprima?.codigo || null,
+                            unidadesmedida: {
+                              descripcion: mxf.unidadesmedida?.descripcion || null,
+                            },
+                            costo: mxf.materiasprima?.codigo || null,
+                          },
+                        })) || [],
+                    } || null,
+                })) || [],
+            }))
+
+            const productosListado: ProductoListado[] = transformedData.map((p: oProducto) => ({
+              ProductoId: p.id,
+              ProductoCodigo: p.codigo || "Sin codigo",
+              ProductoNombre: p.nombre || "Sin nombre",
+              ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
+              ProductoTiempo: "N/A",
+              ProductoCosto: p.costo || 0,
+              ProductoActivo: p.activo === true,
+              ProductoImagenUrl: p.imgurl,
+              ClienteId: p.clienteid || -1,
+              ClienteNombre: p.clientes?.nombre || "N/A",
+              CatalogoId: p.productosxcatalogo[0]?.catalogoid || -1,
+              CatalogoNombre: p.productosxcatalogo[0]?.catalogos?.nombre || "N/A",
+            }))
+
+            // Actualizar estados
+            setProductos(productosListado)
+            setProductosFiltrados(productosListado)
+            setTotalProductos(productosListado.length)
+
+            // Retorno de información
+            return { success: true, mensaje: "Se ejecuto correctamente cada proceso." }
+          } else {
+            // Retorno de información
+            setProductos([])
+            return { success: false, mensaje: "No hay datos o la consulta falló." }
+          }
+
+
 
           if (result.success && result.data && result.data.length > 0) {
             const producto = result.data[0]
@@ -175,6 +281,11 @@ export default function EditarProductoPage() {
             })
             setShowModalError(true)
           }
+
+
+
+
+
         } catch (error) {
           console.error("Error cargando datos del producto:", error)
           setModalError({
