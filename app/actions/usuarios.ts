@@ -2,13 +2,14 @@
 
 import { createClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
-import bcrypt from "bcryptjs"
+//import bcrypt from "bcryptjs"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
+/*
 export async function insUsuario(formData: FormData) {
   // Extraer los valores del FormData
   const nombrecompleto = formData.get("nombrecompleto") as string
@@ -45,3 +46,4 @@ export async function insUsuario(formData: FormData) {
     return { success: false, message: `Error en el servidor: ${error.message}` }
   }
 }
+*/
