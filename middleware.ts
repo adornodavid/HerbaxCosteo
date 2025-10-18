@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
     '/login',
     '/logout',
     '/pruebas', // Añadido para permitir acceso sin sesión
-    '/test',    // Añadido para permitir acceso sin sesión
+    '/admin/encrypt',    // Añadido para permitir acceso sin sesión
     '/',        // La página de inicio también puede ser pública
   ]
 
