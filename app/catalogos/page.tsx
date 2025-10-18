@@ -43,7 +43,6 @@ import {
   obtenerDetalleCatalogo,
   crearCatalogo,
 } from "@/app/actions/catalogos-actions"
-import { listaDesplegableClientes } from "@/app/actions/clientes-actions"
 import { supabase } from "@/lib/supabase"
 
 interface Catalogo {

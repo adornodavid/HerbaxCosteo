@@ -20,14 +20,7 @@ import { getSession } from "@/app/actions/session-actions"
 import { ArrowLeft, Plus, ShoppingCart, Edit, Trash2 } from "lucide-react"
 import { Loader2 } from "@/components/ui/loader2"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
-import {
-  obtenerProductosCatalogo,
-  obtenerProductosDisponiblesParaCatalogo,
-  asociarProductoACatalogo,
-  obtenerDetalleCatalogo,
-  eliminarProductoDeCatalogo,
-  actualizarPrecioProductoCatalogo,
-} from "@/app/actions/catalogos-actions"
+
 import {
   obtenerProductoDetalladoCompleto,
   obtenerFormulasAsociadasProducto,
