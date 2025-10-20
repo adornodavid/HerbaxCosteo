@@ -157,7 +157,7 @@ export default function EditarFormulaPage() {
         }
 
         // Cargar unidades de medida
-        const unidadesResult = await obtenerUnidadesMedida()
+        const unidadesResult = await listaDesplegableUnidadesMedida(-1,"")
         if (unidadesResult.success && unidadesResult.data) {
           setUnidadesMedida(unidadesResult.data)
         }
