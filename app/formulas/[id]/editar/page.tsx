@@ -32,7 +32,7 @@ import { PageModalError } from "@/components/page-modal-error"
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
 import { obtenerFormulas, actualizarFormula } from "@/app/actions/formulas"
-import { obtenerUnidadesMedida } from "@/app/actions/catalogos"
+import { listaDesplegableUnidadesMedida } from "@/app/actions/catalogos"
 
 /* ==================================================
 	Componente Principal (Pagina)
