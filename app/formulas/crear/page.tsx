@@ -29,7 +29,7 @@ import { PageModalError } from "@/components/page-modal-error"
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
 import { crearFormula } from "@/app/actions/formulas"
-import { obtenerUnidadesMedida } from "@/app/actions/catalogos"
+import { listaDesplegableUnidadesMedida } from "@/app/actions/catalogos"
 
 /* ==================================================
 	Componente Principal (Pagina)
@@ -116,7 +116,7 @@ export default function CrearFormulaPage() {
     // Cargar unidades de medida
     const cargarUnidadesMedida = async () => {
       try {
-        const result = await obtenerUnidadesMedida()
+        const result = await listaDesplegableUnidadesMedida(-1,"")
         if (result.success && result.data) {
           setUnidadesMedida(result.data)
         }
