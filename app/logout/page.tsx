@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { LogOut, CheckCircle } from "lucide-react"
-import { procesarCerrarSesion } from "app/actions/login"
+import { procesarCerrarSesion } from "@/app/actions/login"
 
 export default function LogoutPage() {
   const router = useRouter()
