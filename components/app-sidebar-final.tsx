@@ -56,58 +56,6 @@ export function AppSidebar() {
       icon: Icons.LayoutDashboard,
       hasSubmenu: false,
     },
-
-    {
-      name: "Materiales",
-      icon: Icons.Pill,
-      hasSubmenu: true,
-      submenu: [
-        { name: "Materia Prima", href: "/materiaprima", icon: Icons.Pill },
-        { name: "Etiquetado", href: "/materialetiquetado", icon: Icons.Package },
-      ],
-    },
-    {
-      name: "Productos",
-      icon: Icons.PillBottle,
-      hasSubmenu: true,
-      submenu: [
-        { name: "Productos", href: "/productos", icon: Icons.PillBottle },
-        { name: "Formulas", href: "/formulas", icon: Icons.FlaskRound },
-      ],
-    },
-    {
-      name: "Catalogos",
-      icon: Icons.FileText,
-      hasSubmenu: true,
-      submenu: [{ name: "Gestión de Catalogos", href: "/catalogos", icon: Icons.FileText }],
-    },
-    {
-      name: "Reporte y Análisis",
-      icon: Icons.BarChart,
-      hasSubmenu: true,
-      submenu: [
-        { name: "Análisis de Costos", href: "/analisiscostos", icon: Icons.TrendingUp },
-        { name: "Márgenes de Utilidad", href: "/margenesutilidad", icon: Icons.PieChart },
-      ],
-    },
-
-    {
-      name: "Gestión",
-      icon: Icons.Hotel,
-      hasSubmenu: true,
-      submenu: [
-        { name: "Clientes", href: "/clientes", icon: Icons.Hotel },
-        { name: "Zonas", href: "/zonas", icon: Icons.Building },
-      ],
-    },
-
-    {
-      name: "Cotizador",
-      icon: Icons.NotebookPen,
-      hasSubmenu: true,
-      submenu: [{ name: "Cotizacion", href: "", icon: Icons.NotebookPen }],
-    },
-
     {
       name: "Perfil",
       icon: Icons.User,
@@ -115,6 +63,41 @@ export function AppSidebar() {
       submenu: [
         { name: "Perfil", href: "/perfil", icon: Icons.User },
         { name: "Cerrar Sesión", href: "/logout", icon: Icons.LogOut },
+      ],
+    },
+    {
+      name: "Healthy Lab",
+      icon: Icons.FlaskRound,
+      hasSubmenu: true,
+      submenu: [
+        { name: "Productos", href: "/productos", icon: Icons.PillBottle },
+        { name: "Fórmulas", href: "/formulas", icon: Icons.FlaskRound },
+        { name: "Empaque", href: "/materialetiquetado", icon: Icons.Package },
+        { name: "Materia Prima", href: "/materiaprima", icon: Icons.Pill },
+        { name: "Clientes", href: "/clientes", icon: Icons.Hotel },
+        { name: "Zonas", href: "/zonas", icon: Icons.Building },
+      ],
+    },
+    {
+      name: "Gestión",
+      icon: Icons.Settings,
+      hasSubmenu: true,
+      submenu: [{ name: "Mis Productos", href: "/mis-productos", icon: Icons.PillBottle }],
+    },
+    {
+      name: "Costeos",
+      icon: Icons.NotebookPen,
+      hasSubmenu: true,
+      submenu: [{ name: "Costear", href: "/costear", icon: Icons.NotebookPen }],
+    },
+    {
+      name: "Reportes",
+      icon: Icons.BarChart,
+      hasSubmenu: true,
+      submenu: [
+        { name: "Reporte Costeo", href: "/reportecosteo", icon: Icons.FileBarChart },
+        { name: "Análisis de Costos", href: "/analisiscostos", icon: Icons.TrendingUp },
+        { name: "Márgenes de Utilidad", href: "/margenesutilidad", icon: Icons.PieChart },
       ],
     },
   ]

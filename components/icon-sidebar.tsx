@@ -48,9 +48,29 @@ export function IconSidebar({ onToggleNavigation }: IconSidebarProps) {
         <span className="text-xs text-gray-600">Productos</span>
       </Link>
 
+      {/* Mis productos Icon */}
+      <Link
+        href="/mis-productos"
+        className="flex flex-col items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-6 p-2"
+        title="Mis productos"
+      >
+        <Icons.Package className="w-6 h-6 text-gray-700 mb-1" />
+        <span className="text-xs text-gray-600">Mis productos</span>
+      </Link>
+
+      {/* Costear Icon */}
+      <Link
+        href="/costear"
+        className="flex flex-col items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-6 p-2"
+        title="Costear"
+      >
+        <Icons.NotebookPen className="w-6 h-6 text-gray-700 mb-1" />
+        <span className="text-xs text-gray-600">Costear</span>
+      </Link>
+
       {/* Reports Icon */}
       <Link
-        href="/reportes"
+        href="/reportecosteo"
         className="flex flex-col items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-6 p-2"
         title="Reportes"
       >

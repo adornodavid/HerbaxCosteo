@@ -1,12 +1,86 @@
 "use server"
 
+/* ==================================================
+  Imports
+================================================== */
 import { createClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
 
+/* ==================================================
+  Conexion a la base de datos: Supabase
+================================================== */
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the supabase variable
 
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+/* ==================================================
+	  --------------------
+  Objetos / Clases
+  --------------------
+  * Objetos
+    - objetoUsuario / oUsuario (Individual)
+    - objetoUsuarios / oUsuarios (Listado / Array)
+  
+  --------------------
+  Funciones
+  --------------------
+  * INSERTS: CREATE/CREAR/INSERT
+    - crearUsuario / insUsuario
+
+  * SELECTS: READ/OBTENER/SELECT
+    - obtenerUsuarios / selUsuarios
+
+  * UPDATES: EDIT/ACTUALIZAR/UPDATE
+    - actualizarUsuario / updUsuario
+
+  * DELETES: DROP/ELIMINAR/DELETE
+    - eliminarUsuario / delUsuario
+
+  * SPECIALS: PROCESS/ESPECIAL/SPECIAL
+    - estatusActivoUsuario / actUsuario
+    - listaDesplegableUsuarios / ddlUsuarios
+================================================== */
+
+/*==================================================
+    OBJETOS / CLASES
+================================================== */
+// Función: objetoUsuario / oUsuario (Individual): Esta Función crea de manera individual un objeto/clase
+
+
+// Función: objetoUsuarios / oUsuarios (Listado): Esta Función crea un listado de objetos/clases, es un array
+
+
+/*==================================================
+    INSERTS: CREATE / CREAR / INSERT
+================================================== */
+// Función: crearUsuario / insUsuario: Función para insertar
+
+
+/*==================================================
+  SELECTS: READ / OBTENER / SELECT
+================================================== */
+// Función: obtenerUsuarios / selUsuarios: Función para obtener 
+
+
+/*==================================================
+  UPDATES: EDIT / ACTUALIZAR / UPDATE
+================================================== */
+// Función: actualizarUsuario / updUsuario: Función para actualizar
+
+
+/*==================================================
+  * DELETES: DROP / ELIMINAR / DELETE
+================================================== */
+// Función: eliminarUsuario / delUsuario: Función para eliminar
+
+
+/*==================================================
+  * SPECIALS: PROCESS / ESPECIAL / SPECIAL
+================================================== */
+// Función: estatusActivoUsuario / actUsuario: Función especial para cambiar columna activo, el valor debe ser boolean
+
+
+// Función: listaDesplegableUsuarios / ddlUsuarios: Función que se utiliza para los dropdownlist
 
 /*
 export async function insUsuario(formData: FormData) {

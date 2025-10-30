@@ -24,38 +24,41 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   * Objetos
     - objetoProducto / oProducto (Individual)
     - objetoProductos / oProductos (Listado / Array)
+    - objetoProductoXCliente / oProductoXCliente (Individual)
+    - objetoProductosXClientes / oProductosXCliente (Listado / Array)
   
   --------------------
   Funciones
   --------------------
-	* CREATES-CREAR (INSERTS)
+  * INSERTS: CREATE/CREAR/INSERT
     - crearProducto / insProducto
     - crearProductoCaracteristicas / insProductoCaracteristicas
     - crearProductoXCatalogo / insProductoXCatalogo
 
-  * READS-OBTENER (SELECTS)
+  * SELECTS: READ/OBTENER/SELECT
     - obtenerProductos / selProductos
     - obtenerProductosCaracteristicas / selProductosCaracteristicas
     - obtenerProductosXCatalogos / selProductosXCatalogos
     - obtenerProductosXClientes / selProductosXClientes
     
-  * UPDATES-ACTUALIZAR (UPDATES)
+  * UPDATES: EDIT/ACTUALIZAR/UPDATE
     - actualizarProducto / updProducto
     - actualizarProductoCaracteristicas / updProductoCaracteristicas
     - actualizarProductoXCatalogo / updProductoXCatalogo
+    - actualizarCosteoProducto
 
     x actualizarProductoEtapa1
     x actualizarCostoProducto
     x finalizarProducto (actualizar costo de producto)
 
-  * DELETES-ELIMINAR (DELETES)
+  * DELETES: DROP/ELIMINAR/DELETE
     - eliminarProducto / delProducto
     - eliminarProductoCaracteristicas / delProductoCaracteristicas
     - eliminarProductoXCatalogo / delProductoXCatalogo
 
     x eliminarProductoIncompleto
 
-  * SPECIALS-ESPECIALES ()
+  * SPECIALS: PROCESS/ESPECIAL/SPECIAL
     - estatusActivoProducto / actProducto
     - listaDesplegableProductos / ddlProductos
 ================================================== */
@@ -63,7 +66,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 /*==================================================
     OBJETOS / CLASES
 ================================================== */
-//Función: objetoProducto / oProducto (Individual): Esta funcion crea un objeto/clase de un producto de manera individual
+// Función: objetoProducto / oProducto (Individual): Esta Función crea de manera individual un objeto/clase
 export async function objetoProducto(
   productoid = -1,
   productonombre = "",
@@ -92,7 +95,7 @@ export async function objetoProducto(
   }
 }
 
-//Función: objetoProductos / oProductos (Listado): Esta funcion crea un objeto/clase de un listado de productos, es un array
+// Función: objetoProductos / oProductos (Listado): Esta Función crea un listado de objetos/clases, es un array
 export async function objetoProductos(
   productoid = -1,
   productonombre = "",
@@ -118,9 +121,9 @@ export async function objetoProductos(
 }
 
 /*==================================================
-    CREATES-CREAR (INSERTS)
+    INSERTS: CREATE / CREAR / INSERT
 ================================================== */
-//Función: crearProducto: función para crear un producto, información basica
+// Función: crearProducto / insProducto: función para insertar (Información basica)
 export async function crearProducto(formData: FormData) {
   try {
     //Validar si no existe
@@ -196,7 +199,7 @@ export async function crearProducto(formData: FormData) {
   }
 }
 
-//Función: crearProductoCaracteristicas: función para crear las caracteristicas de un producto, información secundaria
+// Función: crearProductoCaracteristicas / insProductoCaracteristicas: Función para crear las caracteristicas de un producto (Información secundaria)
 export async function crearProductoCaracteristicas(productoid: number): Promise<boolean> {
   try {
     const { error } = await supabase.from("productoscaracteristicas").insert({
@@ -231,7 +234,7 @@ export async function crearProductoCaracteristicas(productoid: number): Promise<
   }
 }
 
-//Función: crearProductoXCatalogo: función para crear la relacion de un producto con un catalogo
+// Función: crearProductoXCatalogo / insProductoXCatalogo: función para crear la relacion de un producto con un catalogo
 export async function crearProductoXCatalogo(
   productoid: number,
   catalogoid: number,
@@ -265,9 +268,9 @@ export async function crearProductoXCatalogo(
 }
 
 /*==================================================
-  READS-OBTENER (SELECTS)
+  SELECTS: READ / OBTENER / SELECT
 ================================================== */
-//Funcion: obtenerProductos / selProductos: Funcion para obtener el o los productos, puede ser individual o listado
+// Funcion: obtenerProductos / selProductos: Funcion para obtener
 export async function obtenerProductos(
   productoid = -1,
   productonombre = "",
@@ -296,7 +299,19 @@ export async function obtenerProductos(
         imgurl,
         unidadmedidaid,
         unidadesmedida!unidadmedidaid(descripcion),
+        mp,
+        me,
+        ms,
         costo,
+        mp_porcentaje,
+        me_porcentaje,
+        ms_porcentaje,
+        mp_costeado,
+        me_costeado,
+        ms_costeado,
+        preciohl,
+        utilidadhl,
+        forecasthl,
         activo,
         productoscaracteristicas!productoid(
           descripcion,
@@ -311,15 +326,6 @@ export async function obtenerProductos(
           edadminima,
           advertencia,
           condicionesalmacenamiento
-        ),
-        productosxcatalogo!productoid(
-          catalogoid,
-          precioventa,
-          margenutilidad,
-          catalogos!catalogoid(
-            nombre,
-            descripcion
-          )
         ),
         materialesetiquetadoxproducto!productoid(
           materialetiquetadoid,
@@ -347,6 +353,18 @@ export async function obtenerProductos(
               cantidad,
               costoparcial,
               materiasprima!materiaprimaid(
+                codigo, 
+                nombre,
+                unidadmedidaid,
+                unidadesmedida!unidadmedidaid(descripcion),
+                costo
+              )
+            ),
+            formulasxformula!formulaid(
+              secundariaid,
+              cantidad,
+              costoparcial,
+              formulas!secundariaid(
                 codigo, 
                 nombre,
                 unidadmedidaid,
@@ -408,7 +426,7 @@ export async function obtenerProductos(
   }
 }
 
-//Funcion: obtenerProductosCaracteristicas / selProductosCaracteristicas: Funcion para obtener las características de un producto
+// Funcion: obtenerProductosCaracteristicas / selProductosCaracteristicas: Funcion para obtener las características de un producto
 export async function obtenerProductosCaracteristicas(
   idrec = -1,
   productoid = -1,
@@ -501,7 +519,7 @@ export async function obtenerProductosCaracteristicas(
   }
 }
 
-//Función: obtenerProductosXCatalogos / selProductosXCatalogos, funcion para obtener en un array el listado de los ids de productos
+// Función: obtenerProductosXCatalogos / selProductosXCatalogos: Funcion para obtener en un array el listado de los ids de productos
 export async function obtenerProductosXCatalogos(
   catalogoid = -1,
 ): Promise<{ success: boolean; data?: number[]; error?: string }> {
@@ -530,8 +548,156 @@ export async function obtenerProductosXCatalogos(
   }
 }
 
-// Función: obtenerProductosXClientes / selProductosXClientes: función para obtener array de los ids de productos
+// Función: obtenerProductosXClientes / selProductosXClientes: Función para obtener array de los ids de productos
 export async function obtenerProductosXClientes(
+  clienteid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (clienteid <= 0) {
+      return { success: false, error: "ID de cliente inválido" }
+    }
+
+    //const { data, error } = await supabase.from("productos").select("productoid").eq("clienteid", clienteid)
+    const { data, error } = await supabase
+      .from("productos")
+      .selectselect(`
+        idrec,
+        clienteid,
+        clientes!clienteid(nombre),
+        productoid,
+        productos!productoid(
+          codigo,
+          nombre,
+          mp,
+          me,
+          ms,
+          costo,
+          mp_porcentaje,
+          me_porcentaje,
+          ms_porcentaje,
+          mp_costeado,
+          me_costeado,
+          ms_costeado,
+          preciohl,
+          utilidadhl
+        ),
+        categoria,
+        forecast,
+        precioventasiniva,
+        precioventaconiva,
+        preciohl,
+        plangeneracional,
+        plannivel,
+        planinfinito,
+        ivapagado,
+        cda,
+        bonoiniciorapido,
+        constructoriniciorapido,
+        rutaexito,
+        reembolsos,
+        tarjetacredito,
+        envio,
+        porcentajecosto,
+        totalcosto,
+        utilidadmarginal,
+        precioactualporcentajeutilidad,        
+        fechacreacion,
+        fechamodificacion,
+        activo,
+        costoanual,
+        utilidadanual,
+        costoutilidadanual,
+        precioventaconivaaa,
+        preciopublicoconiva,
+        preciopublicosiniva
+      `)
+      .eq("clienteid", clienteid)
+
+    if (error) {
+      console.error("Error en query obtenerProductosXClientes de actions/productos:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const DataIds: number[] = data.map((item) => item.productoid)
+
+    return { success: true, data: DataIds }
+  } catch (error) {
+    console.error("Error en obtenerProductosXClientes de actions/productos:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerProductosXClientes de actions/productos",
+    }
+  }
+}
+
+// Funcion: obtenerProductos / selProductos: Funcion para obtener
+export async function obtenerProductosXClientesOptima(productoid = -1, clienteid = -1) {
+  try {
+    let query = supabase.from("productosxcliente").select(`
+        idrec,
+        clienteid,
+        clientes!clienteid(nombre),
+        productoid,
+        productos!productoid(
+          codigo,
+          nombre,
+          mp,
+          me,
+          ms,
+          costo,
+          mp_porcentaje,
+          me_porcentaje,
+          ms_porcentaje,
+          mp_costeado,
+          me_costeado,
+          ms_costeado,
+          preciohl,
+          utilidadhl
+        ),
+        utilidadoptima,
+        comisiones_porcentaje,
+        costo_porcentaje,
+        comisionesmascosto,
+        preciometa,
+        preciometaconiva,
+        diferenciautilidadesperada,
+        precioventaconivaaa
+      `)
+
+    //Filtros en query, dependiendo parametros
+    if (productoid !== -1) {
+      query = query.eq("productoid", productoid)
+    }
+    if (clienteid !== -1) {
+      query = query.eq("clienteid", clienteid)
+    }
+
+    //Ejecutar query
+    query = query.order("productoid", { ascending: true })
+
+    //Varaibles y resultados del query
+    const { data, error } = await query
+
+    //Error en query
+    if (error) {
+      console.error("Error obteniendo productos:", error)
+      return { success: false, error: error.message }
+    }
+
+    //Retorno de data
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en app/actions/productos en obtenerProductos:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: obtenerProductosXClientes / selProductosXClientes: Función para obtener array de los ids de productos
+export async function obtenerProductosXClientesArray(
   clienteid = -1,
 ): Promise<{ success: boolean; data?: number[]; error?: string }> {
   try {
@@ -555,14 +721,17 @@ export async function obtenerProductosXClientes(
     return { success: true, data: DataIds }
   } catch (error) {
     console.error("Error en obtenerProductosXClientes de actions/productos:", error)
-    return { success: false, error: "Error interno del servidor, al ejecutar obtenerProductosXClientes de actions/productos" }
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerProductosXClientes de actions/productos",
+    }
   }
 }
 
 /*==================================================
-  UPDATES-ACTUALIZAR (UPDATES)
+  UPDATES: EDIT / ACTUALIZAR / UPDATE
 ================================================== */
-//Funcion: actualizarProducto / updProducto: Actualizar información del producto, basica?
+// Funcion: actualizarProducto / updProducto: Función para actualizar
 export async function actualizarProducto(formData: FormData) {
   try {
     const productoid = Number.parseInt(formData.get("productoid") as string)
@@ -620,7 +789,7 @@ export async function actualizarProducto(formData: FormData) {
   }
 }
 
-//Función: actualizarProductoCaracteristicas / updProductoCaracteristicas: Actualizar características de un producto
+// Función: actualizarProductoCaracteristicas / updProductoCaracteristicas: Actualizar características de un producto
 export async function actualizarProductoCaracteristicas(
   productoid: number,
   caracteristicasData: any,
@@ -675,10 +844,38 @@ export async function actualizarProductoXCatalogo(
   }
 }
 
+// Función: actualizarCosteoProducto: función para actualizar el costeo de un producto
+export async function actualizarCosteoProducto(
+  productosid: number,
+  clientesid: number,
+  preciosiniva: number,
+  forecasts: number,
+): Promise<{ success: boolean; data?: any; error?: string }> {
+  try {
+    const { data, error } = await supabase.rpc("actualizarcotizacion", {
+      productosid,
+      clientesid,
+      preciosiniva,
+      forecasts,
+    })
+
+    if (error) {
+      console.error("Error actualizando costeo del producto en actualizarCosteoProducto:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/costear")
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en app/actions/productos en actualizarCosteoProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
 /*==================================================
-  * DELETES-ELIMINAR (DELETES)
+  * DELETES: DROP / ELIMINAR / DELETE
 ================================================== */
-// Función: eliminarProducto / delProducto: Eliminar el registro de la tabla productos por productoid
+// Función: eliminarProducto / delProducto: Función para eliminar (Filtro indispensable: productoid)
 export async function eliminarProducto(productoid: number): Promise<boolean> {
   try {
     if (productoid <= 0) {
@@ -757,7 +954,7 @@ export async function eliminarProductoXCatalogo(productoid: number, catalogoid: 
   }
 }
 
-// Función: eliminarProductoIncompleto: función para eliminar un producto incompleto y sus detalles
+// XXXXXXXXXXXXXX Función: eliminarProductoIncompleto: función para eliminar un producto incompleto y sus detalles
 export async function eliminarProductoIncompleto(productoId: number) {
   try {
     // First, get the product info to delete the image if it exists
@@ -942,7 +1139,7 @@ export async function estatusActivoProducto(productoid: number, activo: boolean)
 }
 
 // Función: listaDesplegableProductos / ddlProductos: Lista desplegable de productos para agregar
-export async function listaDesplegableProductos(buscar: string): Promise<ddlItem[]> {
+export async function listaDesplegableProductosBuscar(buscar: string): Promise<ddlItem[]> {
   try {
     let query = supabase.from("productos").select("id, codigo, nombre").eq("activo", true)
 
@@ -974,3 +1171,64 @@ export async function listaDesplegableProductos(buscar: string): Promise<ddlItem
     return []
   }
 }
+
+// Función: listaDesplegableProductosXClientes: Lista de productos filtrados por cliente
+export async function listaDesplegableProductosXClientes(
+  clienteid: number,
+): Promise<{ success: boolean; data?: oProducto[]; error?: string }> {
+  try {
+    // Variable productos de tipo oProducto[]
+    let productos: oProducto[] = []
+
+    // Ejecutar la función obtenerProductos con los parámetros por default excepto clienteid
+    const resultado = await obtenerProductos(
+      -1, // productoid (default)
+      "", // productonombre (default)
+      clienteid, // clienteid (parámetro recibido)
+      -1, // zonaid (default)
+      -1, // catalogoid (default)
+      "True", // activo (default)
+    )
+
+    // Verificar si hubo error
+    if (!resultado.success || !resultado.data) {
+      return {
+        success: false,
+        error: resultado.error || "No se encontraron productos para el cliente especificado",
+      }
+    }
+
+    // Asignar los productos obtenidos
+    productos = resultado.data as oProducto[]
+
+    // Retornar success con los productos
+    return {
+      success: true,
+      data: productos,
+    }
+  } catch (error) {
+    console.error("Error en app/actions/productos en listaDesplegableProductosXClientes:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor al ejecutar listaDesplegableProductosXClientes",
+    }
+  }
+}
+
+// Función: operacionMP: Suma de la materia prima utilizada
+
+// Función: operacionME: Suma del material de etiquteado de un producto
+
+// Función: operacionMS: (MP(suma de materia prima) x ME(suma de material etiquetado)) x 0.05
+
+// Función: operacionElaboracion: Suma de MP(suma de materia prima) + ME(suma de material etiquetado) + MS((MP(suma de materia prima) x ME(suma de material etiquetado)) x 0.05)
+
+// Función: operacionMP_Porcentaje: MP/% MP, por lo general es 35%
+
+// Función: operacionME_Porcentaje: ME/% ME, por lo general es 35%
+
+// Función: operacionMS_Porcentaje: MS/% MS, por lo general es 35%
+
+// Función: operacionPrecioHL: Suma de MP_Porcentaje + ME_Porcentaje + MS_Porcentaje
+
+// Función: operacionUtilidadHL:

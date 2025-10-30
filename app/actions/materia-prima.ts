@@ -3,10 +3,10 @@
 /* ==================================================
   Imports
 ================================================== */
+import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase"
 import { arrActivoTrue, arrActivoFalse } from "@/lib/config"
 import { obtenerFormulasXProductos } from "@/app/actions/formulas"
-import { revalidatePath } from "next/cache"
 import { imagenSubir } from "@/app/actions/utilerias"
 
 /* ==================================================
@@ -27,17 +27,17 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   --------------------
   Funciones
   --------------------
-  * CREATES-CREAR (INSERTS)
+  * INSERTS: CREATE/CREAR/INSERT
     - crearMateriaPrima / insMateriaPrima
-  * READS-OBTENER (SELECTS)
+  * SELECTS: READ/OBTENER/SELECT
     - obtenerMateriasPrimas / selMateriasPrimas
     - obtenerMateriasPrimasXProductos / selMateriasPrimasXProductos
     - obtenerMateriasPrimasXFormulas / selMateriasPrimasXFormulas
-  * UPDATES-ACTUALIZAR (UPDATES)
+  * UPDATES: EDIT/ACTUALIZAR/UPDATE
     - actualizarMateriaPrima / updMateriaPrima
-  * DELETES-ELIMINAR (DELETES)
+  * DELETES: DROP/ELIMINAR/DELETE
     - eliminarMateriaPrima / delMateriaPrima
-  * SPECIALS-ESPECIALES ()
+  * SPECIALS: PROCESS/ESPECIAL/SPECIAL
     - estatusActivoMateriaPrima / actMateriaPrima
     - listaDesplegableMateriasPrimas / ddlMateriasPrimas
 ================================================== */
@@ -45,11 +45,16 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 /*==================================================
     OBJETOS / CLASES
 ================================================== */
+// Función: objetoMateriaPrima / oMateriaPrima (Individual): Esta Función crea de manera individual un objeto/clase
+
+
+// Función: objetoMateriasPrimas / oMateriasPrimas (Listado): Esta Función crea un listado de objetos/clases, es un array
+
 
 /*==================================================
-    CREATES-CREAR (INSERTS)
+    INSERTS: CREATE / CREAR / INSERT
 ================================================== */
-// Función crearMateriaPrima / insMateriaPrima: función para crear una materia prima
+// Función crearMateriaPrima / insMateriaPrima: Función para insertar
 export async function crearMateriaPrima(formData: FormData) {
   try {
     // Paso 1: Recibir variables
@@ -128,9 +133,9 @@ export async function crearMateriaPrima(formData: FormData) {
 }
 
 /*==================================================
-  READS-OBTENER (SELECTS)
+  SELECTS: READ / OBTENER / SELECT
 ================================================== */
-// Función: obtenerMateriasPrimas / selMateriasPrimas: función para obtener la o las materias primas
+// Función: obtenerMateriasPrimas / selMateriasPrimas: Función para obtener 
 export async function obtenerMateriasPrimas(
   id = -1,
   codigo = "",
@@ -299,9 +304,9 @@ export async function obtenerMateriasPrimasXFormulas(
 }
 
 /*==================================================
-  UPDATES-ACTUALIZAR (UPDATES)
+  UPDATES: EDIT / ACTUALIZAR / UPDATE
 ================================================== */
-// Función: actualizarMateriaPrima / updateMateriaPrima: funcion para actualizar una materia prima
+// Función: actualizarMateriaPrima / updateMateriaPrima: Función para actualizar
 export async function actualizarMateriaPrima(formData: FormData) {
   try {
     // Paso 1: Recibir variables
@@ -395,9 +400,9 @@ export async function actualizarMateriaPrima(formData: FormData) {
 }
 
 /*==================================================
-  * DELETES-ELIMINAR (DELETES)
+  * DELETES: DROP / ELIMINAR / DELETE
 ================================================== */
-// Función: eliminarMateriaPrima / delMateriaPrima: funcion para eliminar una materia prima
+// Función: eliminarMateriaPrima / delMateriaPrima: Función para eliminar
 export async function eliminarMateriaPrima(id: number) {
   try {
     // Paso 1: Validar que id tiene valor
@@ -439,9 +444,9 @@ export async function eliminarMateriaPrima(id: number) {
 }
 
 /*==================================================
-  * SPECIALS-ESPECIALES ()
+  * SPECIALS: PROCESS / ESPECIAL / SPECIAL
 ================================================== */
-// Función: estatusActivoMateriaPrima / actMateriaPrima: funcion para actualizar el estatus activo de una materia prima
+// Función: estatusActivoMateriaPrima / actMateriaPrima: Función especial para cambiar columna activo, el valor debe ser boolean
 export async function estatusActivoMateriaPrima(id: number, activo: boolean): Promise<boolean> {
   try {
     const { error } = await supabase.from("materiasprima").update({ activo: activo }).eq("id", id)
@@ -461,3 +466,5 @@ export async function estatusActivoMateriaPrima(id: number, activo: boolean): Pr
     return false
   }
 }
+
+// Función: listaDesplegableMateriasPrimas / ddlMateriasPrimas: Función que se utiliza para los dropdownlist

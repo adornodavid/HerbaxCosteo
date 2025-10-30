@@ -1,8 +1,14 @@
 "use server"
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+/* ==================================================
+  Imports
+================================================== */
 import { redirect } from "next/navigation"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
+/* ==================================================
+  Interfaces
+================================================== */
 export interface LoginResult {
   success: boolean
   message: string

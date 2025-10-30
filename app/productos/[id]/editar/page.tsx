@@ -60,7 +60,7 @@ export default function EditarProductoPage() {
   const [existingImageUrl, setExistingImageUrl] = useState<string>("")
   const [clientes, setClientes] = useState<Cliente>([])
   const [formulas, setFormulas] = useState<Formula[]>([])
-  const [activeTab, setActiveTab] = useState<"informacion" | "caracteristicas" | "elaboracion">("informacion")
+  const [activeTab, setActiveTab] = useState<"informacion" | "caracteristicas" | "elaboracion" | "cotizacion">("informacion")
   const [productos, setProductos] = useState<oProducto>()
   // Mostrar/Ocultar contenido
   const [isLoading, setIsLoading] = useState(true)
@@ -403,6 +403,18 @@ export default function EditarProductoPage() {
           }`}
         >
           Elaboración
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("cotizacion")}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === "cotizacion"
+              ? "border-b-2 border-primary text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Cotización
         </button>
       </div>
 

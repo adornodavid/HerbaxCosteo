@@ -14,7 +14,7 @@ import { cookies } from "next/headers"
 ================================================== */
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the supabase variable
+const supabase = createClient(supabaseUrl, supabaseServiceKey) 
 
 /* ==================================================
   --------------------
@@ -27,28 +27,32 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   --------------------
   Funciones
   --------------------
-  * CREATES-CREAR (INSERTS)
+  * INSERTS: CREATE/CREAR/INSERT
     - crearCliente / insCliente
-  * READS-OBTENER (SELECTS)
+  * SELECTS: READ/OBTENER/SELECT
     - obtenerClientes / selClientes
-  * UPDATES-ACTUALIZAR (UPDATES)
+  * UPDATES: EDIT/ACTUALIZAR/UPDATE
     - actualizarCliente / updCliente
-  * DELETES-ELIMINAR (DELETES)
+  * DELETES: DROP/ELIMINAR/DELETE
     - eliminarCliente / delCliente
-  * SPECIALS-ESPECIALES ()
+  * SPECIALS: PROCESS/ESPECIAL/SPECIAL
     - estatusActivoCliente / actCliente
     - listaDesplegableClientes / ddlClientes
-    - estadisticasFormulas / statsFormlas
 ================================================== */
 
 /*==================================================
     OBJETOS / CLASES
 ================================================== */
+// Función: objetoCliente / oCliente (Individual): Esta funcion crea un objeto/clase de un cliente de manera individual
+
+
+// Función: objetoClientes / oClientes (Listado): Esta funcion crea un objeto/clase de un listado de clientes, es un array
+
 
 /*==================================================
-    CREATES-CREAR (INSERTS)
+    INSERTS: CREATE / CREAR / INSERT
 ================================================== */
-//Función: crearCliente: funcion para crear un cliente
+// Función: crearCliente / insCliente: Función para insertar
 export async function crearCliente(formData: FormData) {
   try {
     // Paso 1: Recibir variables
@@ -126,9 +130,9 @@ export async function crearCliente(formData: FormData) {
 }
 
 /*==================================================
-  READS-OBTENER (SELECTS)
+  SELECTS: READ / OBTENER / SELECT
 ================================================== */
-//Función: obtenerClientes: funcion para obtener todos los clientes
+// Función: obtenerClientes / selClientes: funcion para obtener 
 export async function obtenerClientes(
   id = -1,
   nombre = "",
@@ -202,9 +206,9 @@ export async function obtenerClientes(
 }
 
 /*==================================================
-  UPDATES-ACTUALIZAR (UPDATES)
+  UPDATES: EDIT / ACTUALIZAR / UPDATE
 ================================================== */
-//Función: actualizarCliente / updCliente: funcion para actualizar un cliente
+// Función: actualizarCliente / updCliente: funcion para actualizar
 export async function actualizarCliente(formData: FormData) {
   try {
     const idString = formData.get("id") as string
@@ -296,9 +300,9 @@ export async function actualizarCliente(formData: FormData) {
 }
 
 /*==================================================
-  * DELETES-ELIMINAR (DELETES)
+  * DELETES: DROP / ELIMINAR / DELETE
 ================================================== */
-//Función: eliminarCliente / delCliente: funcion para eliminar un cliente
+// Función: eliminarCliente / delCliente: funcion para eliminar
 export async function eliminarCliente(id: number) {
   try {
     // Paso 1: Validar que id tiene valor
@@ -340,9 +344,9 @@ export async function eliminarCliente(id: number) {
 }
 
 /*==================================================
-  * SPECIALS-ESPECIALES ()
+  * SPECIALS: PROCESS / ESPECIAL / SPECIAL
 ================================================== */
-// Función: estatusActivoCliente / actCliente: Funcion que cambia la columna activo a true(activo) o false(inactivo)
+// Función: estatusActivoCliente / actCliente: Función especial para cambiar columna activo, debe ser boolean el valor
 export async function estatusActivoCliente(id: number, activo: boolean): Promise<boolean> {
   try {
     const { error } = await supabase.from("clientes").update({ activo: activo }).eq("id", id)
@@ -363,7 +367,7 @@ export async function estatusActivoCliente(id: number, activo: boolean): Promise
   }
 }
 
-// Función: listaDesplegableClientes: función que se utiliza para los dropdownlist y puede contener id y / o nombre
+// Función: listaDesplegableClientes / ddlCliente: Función que se utiliza para los dropdownlist
 export async function listaDesplegableClientes(id = -1, nombre = "", activo = "Todos") {
   try {
     // Query principal

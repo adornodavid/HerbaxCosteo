@@ -47,66 +47,66 @@ function createSupabaseServerClient() {
 //Función: obtenerResumenesDashboard
 export async function obtenerResumenesDashboard() {
   try {
-    const supabase = createSupabaseServerClient()
+    // const supabase = createSupabaseServerClient()
 
-    // Obtener conteo de hoteles activos
-    const { count: hotelesCount, error: hotelesError } = await supabase
-      .from("hoteles")
-      .select("*", { count: "exact", head: true })
-      .eq("activo", true)
+    // // Obtener conteo de hoteles activos
+    // const { count: hotelesCount, error: hotelesError } = await supabase
+    //   .from("hoteles")
+    //   .select("*", { count: "exact", head: true })
+    //   .eq("activo", true)
 
-    if (hotelesError) {
-      console.error("Error obteniendo hoteles:", hotelesError)
-    }
+    // if (hotelesError) {
+    //   console.error("Error obteniendo hoteles:", hotelesError)
+    // }
 
-    // Obtener conteo de restaurantes activos
-    const { count: restaurantesCount, error: restaurantesError } = await supabase
-      .from("restaurantes")
-      .select("*", { count: "exact", head: true })
-      .eq("activo", true)
+    // // Obtener conteo de restaurantes activos
+    // const { count: restaurantesCount, error: restaurantesError } = await supabase
+    //   .from("restaurantes")
+    //   .select("*", { count: "exact", head: true })
+    //   .eq("activo", true)
 
-    if (restaurantesError) {
-      console.error("Error obteniendo restaurantes:", restaurantesError)
-    }
+    // if (restaurantesError) {
+    //   console.error("Error obteniendo restaurantes:", restaurantesError)
+    // }
 
-    // Obtener conteo de menús activos
-    const { count: menusCount, error: menusError } = await supabase
-      .from("menus_restaurantes")
-      .select("*", { count: "exact", head: true })
-      .eq("activo", true)
+    // // Obtener conteo de menús activos
+    // const { count: menusCount, error: menusError } = await supabase
+    //   .from("menus_restaurantes")
+    //   .select("*", { count: "exact", head: true })
+    //   .eq("activo", true)
 
-    if (menusError) {
-      console.error("Error obteniendo menús:", menusError)
-    }
+    // if (menusError) {
+    //   console.error("Error obteniendo menús:", menusError)
+    // }
 
-    // Obtener conteo de platillos activos
-    const { count: platillosCount, error: platillosError } = await supabase
-      .from("platillos")
-      .select("*", { count: "exact", head: true })
-      .eq("activo", true)
+    // // Obtener conteo de platillos activos
+    // const { count: platillosCount, error: platillosError } = await supabase
+    //   .from("platillos")
+    //   .select("*", { count: "exact", head: true })
+    //   .eq("activo", true)
 
-    if (platillosError) {
-      console.error("Error obteniendo platillos:", platillosError)
-    }
+    // if (platillosError) {
+    //   console.error("Error obteniendo platillos:", platillosError)
+    // }
 
-    // Obtener conteo de ingredientes activos
-    const { count: ingredientesCount, error: ingredientesError } = await supabase
-      .from("ingredientes")
-      .select("*", { count: "exact", head: true })
-      .eq("activo", true)
+    // // Obtener conteo de ingredientes activos
+    // const { count: ingredientesCount, error: ingredientesError } = await supabase
+    //   .from("ingredientes")
+    //   .select("*", { count: "exact", head: true })
+    //   .eq("activo", true)
 
-    if (ingredientesError) {
-      console.error("Error obteniendo ingredientes:", ingredientesError)
-    }
+    // if (ingredientesError) {
+    //   console.error("Error obteniendo ingredientes:", ingredientesError)
+    // }
 
     return {
       success: true,
       data: {
-        hoteles: hotelesCount || 0,
-        restaurantes: restaurantesCount || 0,
-        menus: menusCount || 0,
-        platillos: platillosCount || 0,
-        ingredientes: ingredientesCount || 0,
+        hoteles: 0,
+        restaurantes: 0,
+        menus: 0,
+        platillos: 0,
+        ingredientes: 0,
       },
     }
   } catch (error) {
@@ -134,30 +134,29 @@ export async function obtenerEstadisticasEmpresariales() {
       .from("productos")
       .select(`
         clienteid,
-        clientes!inner(nombre),
         activo
       `)
       .eq("activo", true)
 
-    // Obtener estadísticas de fórmulas por cliente
-    const { data: formulasPorCliente, error: formulasError } = await supabase
-      .from("formulas")
-      .select(`
-        clienteid,
-        clientes!inner(nombre),
-        activo
-      `)
-      .eq("activo", true)
+    // // Obtener estadísticas de fórmulas por cliente
+    // const { data: formulasPorCliente, error: formulasError } = await supabase
+    //   .from("formulas")
+    //   .select(`
+    //     clienteid,
+    //     clientes!inner(nombre),
+    //     activo
+    //   `)
+    //   .eq("activo", true)
 
-    // Obtener estadísticas de ingredientes por categoría
-    const { data: ingredientesPorCategoria, error: ingredientesError } = await supabase
-      .from("ingredientes")
-      .select(`
-        categoriaid,
-        categoriasingredientes!inner(descripcion),
-        activo
-      `)
-      .eq("activo", true)
+    // // Obtener estadísticas de ingredientes por categoría
+    // const { data: ingredientesPorCategoria, error: ingredientesError } = await supabase
+    //   .from("ingredientes")
+    //   .select(`
+    //     categoriaid,
+    //     categoriasingredientes!inner(descripcion),
+    //     activo
+    //   `)
+    //   .eq("activo", true)
 
     // Obtener costos promedio por tipo
     const { data: costosProductos, error: costosError } = await supabase
@@ -170,32 +169,32 @@ export async function obtenerEstadisticasEmpresariales() {
       .select("costo")
       .eq("activo", true)
 
-    const { data: costosIngredientes, error: costosIngredientesError } = await supabase
-      .from("ingredientes")
-      .select("costo")
-      .eq("activo", true)
+    // const { data: costosIngredientes, error: costosIngredientesError } = await supabase
+    //   .from("ingredientes")
+    //   .select("costo")
+    //   .eq("activo", true)
 
     // Procesar datos para gráficos
     const productosAgrupados =
       productosPorCliente?.reduce((acc: any, item: any) => {
-        const clienteNombre = item.clientes?.nombre || "Sin cliente"
-        acc[clienteNombre] = (acc[clienteNombre] || 0) + 1
+        const clienteId = item.clienteid || 0
+        acc[clienteId] = (acc[clienteId] || 0) + 1
         return acc
       }, {}) || {}
 
-    const formulasAgrupadas =
-      formulasPorCliente?.reduce((acc: any, item: any) => {
-        const clienteNombre = item.clientes?.nombre || "Sin cliente"
-        acc[clienteNombre] = (acc[clienteNombre] || 0) + 1
-        return acc
-      }, {}) || {}
+    // const formulasAgrupadas =
+    //   formulasPorCliente?.reduce((acc: any, item: any) => {
+    //     const clienteNombre = item.clientes?.nombre || "Sin cliente"
+    //     acc[clienteNombre] = (acc[clienteNombre] || 0) + 1
+    //     return acc
+    //   }, {}) || {}
 
-    const ingredientesAgrupados =
-      ingredientesPorCategoria?.reduce((acc: any, item: any) => {
-        const categoriaNombre = item.categoriasingredientes?.descripcion || "Sin categoría"
-        acc[categoriaNombre] = (acc[categoriaNombre] || 0) + 1
-        return acc
-      }, {}) || {}
+    // const ingredientesAgrupados =
+    //   ingredientesPorCategoria?.reduce((acc: any, item: any) => {
+    //     const categoriaNombre = item.categoriasingredientes?.descripcion || "Sin categoría"
+    //     acc[categoriaNombre] = (acc[categoriaNombre] || 0) + 1
+    //     return acc
+    //   }, {}) || {}
 
     // Calcular promedios de costos
     const promedioCostoProductos = costosProductos?.length
@@ -206,25 +205,17 @@ export async function obtenerEstadisticasEmpresariales() {
       ? costosFormulas.reduce((sum, item) => sum + (item.costo || 0), 0) / costosFormulas.length
       : 0
 
-    const promedioCostoIngredientes = costosIngredientes?.length
-      ? costosIngredientes.reduce((sum, item) => sum + (item.costo || 0), 0) / costosIngredientes.length
-      : 0
+    const promedioCostoIngredientes = 0
 
     return {
       success: true,
       data: {
-        productosPorCliente: Object.entries(productosAgrupados).map(([nombre, cantidad]) => ({
-          cliente: nombre,
+        productosPorCliente: Object.entries(productosAgrupados).map(([clienteId, cantidad]) => ({
+          cliente: `Cliente ${clienteId}`,
           cantidad: cantidad as number,
         })),
-        formulasPorCliente: Object.entries(formulasAgrupadas).map(([nombre, cantidad]) => ({
-          cliente: nombre,
-          cantidad: cantidad as number,
-        })),
-        ingredientesPorCategoria: Object.entries(ingredientesAgrupados).map(([categoria, cantidad]) => ({
-          categoria: categoria,
-          cantidad: cantidad as number,
-        })),
+        formulasPorCliente: [],
+        ingredientesPorCategoria: [],
         promediosCostos: {
           productos: promedioCostoProductos,
           formulas: promedioCostoFormulas,
@@ -275,22 +266,22 @@ export async function obtenerKPIsDashboard() {
       .select("*", { count: "exact", head: true })
       .eq("activo", true)
 
-    // Total de ingredientes activos
-    const { count: ingredientesActivos } = await supabase
-      .from("ingredientes")
-      .select("*", { count: "exact", head: true })
-      .eq("activo", true)
+    // // Total de ingredientes activos
+    // const { count: ingredientesActivos } = await supabase
+    //   .from("ingredientes")
+    //   .select("*", { count: "exact", head: true })
+    //   .eq("activo", true)
 
     // Costo total del inventario
     const { data: costosProductos } = await supabase.from("productos").select("costo").eq("activo", true)
 
     const { data: costosFormulas } = await supabase.from("formulas").select("costo").eq("activo", true)
 
-    const { data: costosIngredientes } = await supabase.from("ingredientes").select("costo").eq("activo", true)
+    // const { data: costosIngredientes } = await supabase.from("ingredientes").select("costo").eq("activo", true)
 
     const costoTotalProductos = costosProductos?.reduce((sum, item) => sum + (item.costo || 0), 0) || 0
     const costoTotalFormulas = costosFormulas?.reduce((sum, item) => sum + (item.costo || 0), 0) || 0
-    const costoTotalIngredientes = costosIngredientes?.reduce((sum, item) => sum + (item.costo || 0), 0) || 0
+    const costoTotalIngredientes = 0
 
     return {
       success: true,
@@ -299,7 +290,7 @@ export async function obtenerKPIsDashboard() {
         catalogosActivos: catalogosActivos || 0,
         productosActivos: productosActivos || 0,
         formulasActivas: formulasActivas || 0,
-        ingredientesActivos: ingredientesActivos || 0,
+        ingredientesActivos: 0,
         valorTotalInventario: costoTotalProductos + costoTotalFormulas + costoTotalIngredientes,
         costoTotalProductos,
         costoTotalFormulas,

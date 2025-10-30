@@ -188,7 +188,19 @@ export default function ProductosPage() {
           unidadesmedida: {
             descripcion: p.unidadesmedida?.descripcion || null,
           },
+          mp: p.mp,
+          me: p.me,
+          ms: p.ms,
           costo: p.costo,
+          mp_porcentaje: p.mp_porcentaje,
+          me_porcentaje: p.me_porcentaje,
+          ms_porcentaje: p.ms_porcentaje,
+          mp_costeado: p.mp_costeado,
+          me_costeado: p.me_costeado,
+          ms_costeado: p.ms_costeado,
+          preciohl: p.preciohl,
+          utilidadhl: p.utilidadhl,
+          forecasthl: p.forecasthl,
           activo: p.activo,
           productoscaracteristicas: {
             descripcion: p.productoscaracteristicas?.descripcion || null,
@@ -240,6 +252,21 @@ export default function ProductosPage() {
                           descripcion: mxf.unidadesmedida?.descripcion || null,
                         },
                         costo: mxf.materiasprima?.codigo || null,
+                      },
+                    })) || [],
+                  formulasxformula:
+                    fxp.formulasxformula?.map((fxf) => ({
+                      secundariaid: fxf.secundariaid || null,
+                      cantidad: fxf.cantidad || null,
+                      costoparcial: fxf.costoparcial || null,
+                      formulas: {
+                        codigo: fxf.formulas?.codigo || null,
+                        nombre: fxf.formulas?.nombre || null,
+                        unidadmedidaid: fxf.formulas?.codigo || null,
+                        unidadesmedida: {
+                          descripcion: fxf.unidadesmedida?.descripcion || null,
+                        },
+                        costo: fxf.formulas?.codigo || null,
                       },
                     })) || [],
                 } || null,
@@ -617,6 +644,7 @@ export default function ProductosPage() {
                 </SelectContent>
               </Select>
             </div>
+            {/*
             <div className="lg:col-span-2">
               <label htmlFor="ddlCatalogo" className="text-sm font-medium">
                 Catálogo
@@ -634,6 +662,7 @@ export default function ProductosPage() {
                 </SelectContent>
               </Select>
             </div>
+            */}
             <div className="lg:col-span-2">
               <label htmlFor="ddlEstatus" className="text-sm font-medium">
                 Estatus
@@ -850,56 +879,129 @@ export default function ProductosPage() {
           {elementoDetalles && (
             <Card className="overflow-hidden border-0 shadow-none">
               <CardContent className="p-0">
-                <div className="flex flex-col md:flex-row">
-                  <div className="md:w-1/3 h-64 md:h-auto flex items-center justify-center bg-gray-300">
+                <div className="flex flex-row">
+                  <div className="w-[200px] h-[200px] flex items-center justify-center bg-gray-200 flex-shrink-0">
                     <img
                       src={
                         elementoDetalles.imgurl && elementoDetalles.imgurl !== "Sin imagen"
                           ? elementoDetalles.imgurl
-                          : "/placeholder.svg?height=400&width=400&text=Producto"
+                          : "/placeholder.svg?height=200&width=200&text=Producto"
                       }
                       alt={elementoDetalles.nombre}
-                      className="w-full h-auto object-cover"
+                      className="h-[200px] w-auto"
                     />
                   </div>
 
-                  <div className="md:w-2/3 p-6 space-y-4">
-                    <h2 className="text-2xl font-bold mb-4">Información del Producto</h2>
-
-                    <div className="space-y-3">
-                      <div>
-                        <span className="font-semibold text-gray-700">ID:</span>
-                        <span className="ml-2 text-gray-900">{elementoDetalles.id}</span>
+                  <div className="flex-1 p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div className="space-y-2">
+                      <h3 className="font-bold text-lg text-sky-700 border-b pb-1">Información Básica</h3>
+                      <div className="space-y-1 text-sm">
+                        <div>
+                          <span className="font-semibold text-sky-700">ID:</span>
+                          <span className="ml-2 text-gray-900">{elementoDetalles.id}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-sky-700">Código:</span>
+                          <span className="ml-2 text-gray-900">{elementoDetalles.codigo || "Sin código"}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-sky-700">Nombre:</span>
+                          <span className="ml-2 text-gray-900">{elementoDetalles.nombre || "Sin nombre"}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-sky-700">Cliente:</span>
+                          <span className="ml-2 text-gray-900">
+                            {elementoDetalles.clientes?.nombre || "Sin cliente"}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-sky-700">Zona:</span>
+                          <span className="ml-2 text-gray-900">{elementoDetalles.zonas?.nombre || "Sin zona"}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-sky-700">Unidad de Medida:</span>
+                          <span className="ml-2 text-gray-900">
+                            {elementoDetalles.unidadesmedida?.descripcion || "Sin unidad"}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-sky-700">Estatus:</span>
+                          <span
+                            className={`ml-2 px-2 py-1 rounded text-xs font-semibold ${
+                              elementoDetalles.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                            }`}
+                          >
+                            {elementoDetalles.activo ? "Activo" : "Inactivo"}
+                          </span>
+                        </div>
                       </div>
+                    </div>
 
-                      <div>
-                        <span className="font-semibold text-gray-700">Nombre:</span>
-                        <span className="ml-2 text-gray-900">{elementoDetalles.nombre}</span>
+                    <div className="space-y-2">
+                      <h3 className="font-bold text-lg text-green-700 border-b pb-1">Composición y Costo</h3>
+                      <div className="space-y-1 text-sm">
+                        <div>
+                          <span className="font-semibold text-green-700">MP:</span>
+                          <span className="ml-2 text-gray-900">{elementoDetalles.mp || "0"}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-green-700">ME:</span>
+                          <span className="ml-2 text-gray-900">{elementoDetalles.me || "0"}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-green-700">MS:</span>
+                          <span className="ml-2 text-gray-900">{elementoDetalles.ms || "0"}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-green-700">Costo de elaboración:</span>
+                          <span className="ml-2 text-gray-900">${elementoDetalles.costo?.toFixed(2) || "0.00"}</span>
+                        </div>
                       </div>
+                    </div>
 
-                      <div>
-                        <span className="font-semibold text-gray-700">Código:</span>
-                        <span className="ml-2 text-gray-900">{elementoDetalles.codigo}</span>
+                    <div className="space-y-2">
+                      <h3 className="font-bold text-lg text-purple-700 border-b pb-1">Porcentajes</h3>
+                      <div className="space-y-1 text-sm">
+                        <div>
+                          <span className="font-semibold text-purple-700">MP %:</span>
+                          <span className="ml-2 text-gray-900">
+                            {((elementoDetalles.mp_porcentaje || 0) * 100).toFixed(2)}%
+                          </span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-purple-700">ME %:</span>
+                          <span className="ml-2 text-gray-900">
+                            {((elementoDetalles.me_porcentaje || 0) * 100).toFixed(2)}%
+                          </span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-purple-700">MS %:</span>
+                          <span className="ml-2 text-gray-900">
+                            {((elementoDetalles.ms_porcentaje || 0) * 100).toFixed(2)}%
+                          </span>
+                        </div>
                       </div>
+                    </div>
 
-                      <div>
-                        <span className="font-semibold text-gray-700">Estatus:</span>
-                        <span
-                          className={`ml-2 px-2 py-1 rounded text-sm font-semibold ${
-                            elementoDetalles.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                          }`}
-                        >
-                          {elementoDetalles.activo ? "Activo" : "Inactivo"}
-                        </span>
-                      </div>
-
-                      <div>
-                        <span className="font-semibold text-gray-700">Fecha de Creación:</span>
-                        <span className="ml-2 text-gray-900">
-                          {elementoDetalles.ProductoFechaCreacion
-                            ? new Date(elementoDetalles.ProductoFechaCreacion).toLocaleDateString()
-                            : "N/A"}
-                        </span>
+                    <div className="space-y-2">
+                      <h3 className="font-bold text-lg text-amber-700 border-b pb-1">Costos en Moneda</h3>
+                      <div className="space-y-1 text-sm">
+                        <div>
+                          <span className="font-semibold text-amber-700">MP $:</span>
+                          <span className="ml-2 text-gray-900">${(elementoDetalles.mp_costeado || 0).toFixed(2)}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-amber-700">ME $:</span>
+                          <span className="ml-2 text-gray-900">${(elementoDetalles.me_costeado || 0).toFixed(2)}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-amber-700">MS $:</span>
+                          <span className="ml-2 text-gray-900">${(elementoDetalles.ms_costeado || 0).toFixed(2)}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-amber-700">Precio Healthy Lab:</span>
+                          <span className="ml-2 text-gray-900">${(elementoDetalles.preciohl || 0).toFixed(2)}</span>
+                        </div>
                       </div>
                     </div>
                   </div>

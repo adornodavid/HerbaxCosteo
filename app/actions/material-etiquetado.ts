@@ -3,8 +3,8 @@
 /* ==================================================
   Imports
 ================================================== */
-import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
+import { createClient } from "@/lib/supabase"
 import { imagenSubir } from "@/app/actions/utilerias"
 
 /* ==================================================
@@ -25,16 +25,16 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   --------------------
   Funciones
   --------------------
-  * CREATES-CREAR (INSERTS)
+  * INSERTS: CREATE/CREAR/INSERT
     - crearMaterialEtiquetado / insMaterialEtiquetado
-  * READS-OBTENER (SELECTS)
+  * SELECTS: READ/OBTENER/SELECT
     - obtenerMaterialesEtiquetados / selMaterialesEtiquetados
     - obtenerMaterialesEtiquetadosXProductos / selMaterialesEtiquetadosXProductos
-  * UPDATES-ACTUALIZAR (UPDATES)
+  * UPDATES: EDIT/ACTUALIZAR/UPDATE
     - actualizarMaterialEtiquetado / updMaterialEtiquetado
-  * DELETES-ELIMINAR (DELETES)
+  * DELETES: DROP/ELIMINAR/DELETE
     - eliminarMaterialEtiquetado / delMaterialEtiquetado
-  * SPECIALS-ESPECIALES ()
+  * SPECIALS: PROCESS/ESPECIAL/SPECIAL
     - estatusActivoMaterialEtiquetado / actMaterialEtiquetado
     - listaDesplegableMaterialesEtiquetados / ddlMaterialesEtiquetados
 ================================================== */
@@ -42,11 +42,16 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 /*==================================================
     OBJETOS / CLASES
 ================================================== */
+// Función: objetoMaterialEtiquetado / oMaterialEtiquetado (Individual): Esta Función crea de manera individual un objeto/clase
+
+
+// Función: objetoMaterialesEtiquetados / oMaterialesEtiquetados (Listado): Esta Función crea un listado de objetos/clases, es un array
+
 
 /*==================================================
-    CREATES-CREAR (INSERTS)
+    INSERTS: CREATE / CREAR / INSERT
 ================================================== */
-// Función crearMaterialEtiquetado / insMaterialEtiquetado: función para crear un material de etiquetado
+// Función crearMaterialEtiquetado / insMaterialEtiquetado: Función para insertar
 export async function crearMaterialEtiquetado(formData: FormData) {
   try {
     // Paso 1: Recibir variables
@@ -135,9 +140,9 @@ export async function crearMaterialEtiquetado(formData: FormData) {
 }
 
 /*==================================================
-  READS-OBTENER (SELECTS)
+  SELECTS: READ / OBTENER / SELECT
 ================================================== */
-// Función: obtenerMaterialesEtiquetados / selMaterialesEtiquetados: Función para obtener el o los materiales de etiquetado
+// Función: obtenerMaterialesEtiquetados / selMaterialesEtiquetados: Función para obtener 
 export async function obtenerMaterialesEtiquetados(
   id = -1,
   codigo = "",
@@ -267,9 +272,9 @@ export async function obtenerMaterialesEtiquetadosXProductos(
 }
 
 /*==================================================
-  UPDATES-ACTUALIZAR (UPDATES)
+  UPDATES: EDIT / ACTUALIZAR / UPDATE
 ================================================== */
-// Función: actualizarMaterialEtiquetado / updateMaterialEtiquetado: funcion para actualizar un material de etiquetado
+// Función: actualizarMaterialEtiquetado / updateMaterialEtiquetado: Función para actualizar
 export async function actualizarMaterialEtiquetado(formData: FormData) {
   try {
     // Paso 1: Recibir variables
@@ -363,9 +368,9 @@ export async function actualizarMaterialEtiquetado(formData: FormData) {
 }
 
 /*==================================================
-  * DELETES-ELIMINAR (DELETES)
+  * DELETES: DROP / ELIMINAR / DELETE
 ================================================== */
-// Función: eliminarMaterialEtiquetado / delMaterialEtiquetado: funcion para eliminar un material de etiquetado
+// Función: eliminarMaterialEtiquetado / delMaterialEtiquetado: Función para eliminar
 export async function eliminarMaterialEtiquetado(id: number) {
   try {
     // Paso 1: Validar que id tiene valor
@@ -416,8 +421,9 @@ export async function eliminarMaterialEtiquetado(id: number) {
 }
 
 /*==================================================
-  * SPECIALS-ESPECIALES ()
+  * SPECIALS: PROCESS / ESPECIAL / SPECIAL
 ================================================== */
+// Función: estatusActivoMaterialEtiquetado / actMaterialEtiquetado: Función especial para cambiar columna activo, el valor debe ser boolean
 export async function estatusActivoMaterialEtiquetado(id: number, activo: boolean): Promise<boolean> {
   try {
     const { error } = await supabase.from("materialesetiquetado").update({ activo: activo }).eq("id", id)
@@ -437,3 +443,5 @@ export async function estatusActivoMaterialEtiquetado(id: number, activo: boolea
     return false
   }
 }
+
+// Función: listaDesplegableMaterialesEtiquetados / ddlMaterialesEtiquetados: Función que se utiliza para los dropdownlist

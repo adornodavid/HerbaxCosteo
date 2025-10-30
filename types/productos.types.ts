@@ -1,6 +1,7 @@
 /* ==================================================
-  * Objetos / Clases
+  * Objetos
     - oProducto
+    - oProductoXCliente
   * CRUD:
     - Producto
     - ProductoCrear
@@ -8,16 +9,19 @@
     - ProductoCaracteristicas
     - ProductoCaracteristicasCrear
     - ProductoCaracteristicasActualizar
-    - ProductoXCatalogo
-    - ProductoXCatalogoCrear
-    - ProductoXCatalogoActualizar
+    - ProductoXCliente
+    - ProductoXClienteCrear
+    - ProductoXClienteActualizar
+    - ProductoXClientePronostico
+    - ProductoXClientePronosticoCrear
+    - ProductoXClientePronosticoActualizar
   * Especiales:
     - ProductosListado
     - ProductoXCatalogo
     - ProductosEstadisticas
 ================================================== */
 
-// Objetos / Clases
+// Objetos
 export interface oProducto {
   id: number
   codigo: string | null
@@ -35,7 +39,19 @@ export interface oProducto {
   unidadesmedida: {
     descripcion: string | null
   }
+  mp: number | null
+  me: number | null
+  ms: number | null
   costo: number | null
+  mp_porcentaje: number | null
+  me_porcentaje: number | null
+  ms_porcentaje: number | null
+  mp_costeado: number | null
+  me_costeado: number | null
+  ms_costeado: number | null
+  preciohl: number | null
+  utilidadhl: number | null
+  forecasthl:number | null
   activo: boolean | null
   productoscaracteristicas: {
     descripcion: string | null
@@ -51,15 +67,6 @@ export interface oProducto {
     advertencia: string | null
     condicionesalmacenamiento: string | null
   }
-  productosxcatalogo: Array<{
-    catalogoid: number | null
-    precioventa: number | null
-    margenutilidad: number | null
-    catalogos: {
-      nombre: string | null
-      descripcion: string | null
-    } | null
-  }> | null
   materialesetiquetadoxproducto: Array<{
     materialetiquetadodid: numbre | null
     materialesetiquetado:{
@@ -99,9 +106,145 @@ export interface oProducto {
           costo: number | null
         }
       }> | null
+      formulasxformula: Array<{
+        secundariaid: number | null
+        cantidad: number | null
+        costoparcial: number | null
+        formulas:{
+          codigo: string | null
+          nombre: string | null
+          unidadmedidaid: number | null
+          unidadesmedida: {
+            descripcion: string | null
+          }
+          costo: number | null
+        }
+      }> | null
     }
   }> | null
+  /*
+  productosxcatalogo: Array<{
+    catalogoid: number | null
+    precioventa: number | null
+    margenutilidad: number | null
+    catalogos: {
+      nombre: string | null
+      descripcion: string | null
+    } | null
+  }> | null
+  */
 }
+
+export interface ProductoXCliente{
+    idrec: number | null
+    clienteid: number | null
+    clientes: {
+        nombre: string | null
+    }
+    productoid: number | null
+    productos:{
+        codigo: string | null
+        nombre: string | null
+        mp: number | null
+        me: number | null
+        ms: number | null
+        costo: number | null
+        mp_porcentaje: number | null
+        me_porcentaje: number | null
+        ms_porcentaje: number | null
+        mp_costeado: number | null
+        me_costeado: number | null
+        ms_costeado: number | null
+        preciohl: number | null
+        utilidadhl: number | null
+    }
+    categoria: string | null
+    precioventasiniva: number | null
+    precioventaconiva: number | null
+    preciohl: number | null
+    
+    plangeneracional: number | null
+    plannivel: number | null
+    planinfinito: number | null
+    ivapagado: number | null
+    cda: number | null
+    bonoiniciorapido: number | null
+    constructoriniciorapido: number | null
+    rutaexito: number | null
+    reembolsos: number | null
+    tarjetacredito: number | null
+    envio: number | null
+    porcentajecosto: number | null
+    totalcostos: number | null
+    utilidadmarginal: number | null
+    precioactualporcentajeutilidad: number | null
+}
+
+export interface ProductoXClienteN{
+    plangeneracional: number | null
+    plannivel: number | null
+    planinfinito: number | null
+    ivapagado: number | null
+    cda: number | null
+    bonoiniciorapido: number | null
+    constructoriniciorapido: number | null
+    rutaexito: number | null
+    reembolsos: number | null
+    tarjetacredito: number | null
+    envio: number | null
+    porcentajecosto: number | null
+    totalcostos: number | null
+    utilidadmarginal: number | null
+    precioactualporcentajeutilidad: number | null
+}
+
+export interface ProductoXClienteOptimoN{
+    utilidadoptima: number | null
+    comisiones_porcentaje: number | null
+    costo_porcentaje: number | null
+    comisionesmascosto: number | null
+    preciometa: number | null
+    preciometaconiva: number | null
+    diferenciautilidadesperada: number | null
+}
+
+export interface ProductoXClienteOptimo{
+    idrec: number | null
+    clienteid: number | null
+    clientes: {
+        nombre: string | null
+    }
+    productoid: number | null
+    productos:{
+        codigo: string | null
+        nombre: string | null
+        mp: number | null
+        me: number | null
+        ms: number | null
+        costo: number | null
+        mp_porcentaje: number | null
+        me_porcentaje: number | null
+        ms_porcentaje: number | null
+        mp_costeado: number | null
+        me_costeado: number | null
+        ms_costeado: number | null
+        preciohl: number | null
+        utilidadhl: number | null
+    }
+    categoria: string | null
+    precioventasiniva: number | null
+    precioventaconiva: number | null
+    preciohl: number | null
+    utilidadoptima: number | null
+    comisiones_porcentaje: number | null
+    costo_porcentaje: number | null
+    comisionesmascosto: number | null
+    preciometa: number | null
+    preciometaconiva: number | null
+    diferenciautilidadesperada: number | null
+}
+
+export type ProductoXClienteOptimos = ProductoXClienteOptimo[]
 
 // CRUD
 export interface Producto{
@@ -190,7 +333,7 @@ export interface ProductoCaracteristicasActualizar{
   activo: boolean | null
 }
 
-export interface ProductoXCatalogo {
+export interface ProductoXCliente {
   idrec: number | null
   catalogoid: number | null
   productoid: number | null
@@ -200,7 +343,7 @@ export interface ProductoXCatalogo {
   fechacreacion: Date | null
   activo: boolean | null
 }
-export interface ProductoXCatalogoCrear {
+export interface ProductoXClienteCrear {
   catalogoid: number | null
   productoid: number | null
   cantidad: number | null
@@ -208,7 +351,7 @@ export interface ProductoXCatalogoCrear {
   margenutilidad: number | null
   fechacreacion: Date | null
 }
-export interface ProductoXCatalogoActualizar {
+export interface ProductoXClienteActualizar {
   catalogoid: number | null
   productoid: number | null
   cantidad: number | null

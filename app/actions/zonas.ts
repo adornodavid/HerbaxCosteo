@@ -3,9 +3,9 @@
 /* ==================================================
   Imports
 ================================================== */
+import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase"
 import { arrActivoTrue, arrActivoFalse } from "@/lib/config"
-import { revalidatePath } from "next/cache"
 import { imagenSubir } from "@/app/actions/utilerias"
 
 /* ==================================================
@@ -26,15 +26,19 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   --------------------
   Funciones
   --------------------
-  * CREATES-CREAR (INSERTS)
+  * INSERTS: CREATE/CREAR/INSERT
     - crearZona / insZona
-  * READS-OBTENER (SELECTS)
+
+  * SELECTS: READ/OBTENER/SELECT
     - obtenerZonas / selZonas
-  * UPDATES-ACTUALIZAR (UPDATES)
+
+  * UPDATES: EDIT/ACTUALIZAR/UPDATE
     - actualizarZona / updZona
-  * DELETES-ELIMINAR (DELETES)
+
+  * DELETES: DROP/ELIMINAR/DELETE
     - eliminarZona / delZona
-  * SPECIALS-ESPECIALES ()
+
+  * SPECIALS: PROCESS/ESPECIAL/SPECIAL
     - estatusActivoZona / actZona
     - listaDesplegableZonas / ddlZonas
 ================================================== */
@@ -42,11 +46,16 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 /*==================================================
     OBJETOS / CLASES
 ================================================== */
+// Función: objetoZona / oZona (Individual): Esta Función crea de manera individual un objeto/clase
+
+
+// Función: objetoZonas / oZonas (Listado): Esta Función crea un listado de objetos/clases, es un array
+
 
 /*==================================================
-    CREATES-CREAR (INSERTS)
+    INSERTS: CREATE / CREAR / INSERT
 ================================================== */
-// Función: crearZona / insZona: Función para insertar una Zona
+// Función: crearZona / insZona: Función para insertar
 export async function crearZona(formData: FormData) {
   try {
     // Paso 1: Recibir variables
@@ -115,9 +124,9 @@ export async function crearZona(formData: FormData) {
 }
 
 /*==================================================
-  READS-OBTENER (SELECTS)
+  SELECTS: READ / OBTENER / SELECT
 ================================================== */
-//Función: obtenerZonas: funcion para obtener todas las zonas
+//Función: obtenerZonas: funcion para obtener
 export async function obtenerZonas(id = -1, nombre = "", clave = "", activo = "Todos") {
   try {
     // Paso 1: Preparar Query
@@ -171,9 +180,9 @@ export async function obtenerZonas(id = -1, nombre = "", clave = "", activo = "T
 }
 
 /*==================================================
-  UPDATES-ACTUALIZAR (UPDATES)
+  UPDATES: EDIT / ACTUALIZAR / UPDATE
 ================================================== */
-//Función: actualizarZona / updZona: funcion para actualizar una Zona
+//Función: actualizarZona / updZona: funcion para actualizar
 export async function actualizarZona(formData: FormData) {
   try {
     // Paso 1: Recibir variables
@@ -259,9 +268,9 @@ export async function actualizarZona(formData: FormData) {
 }
 
 /*==================================================
-  * DELETES-ELIMINAR (DELETES)
+  * DELETES: DROP / ELIMINAR / DELETE
 ================================================== */
-//Función: eliminarZona / delZona: funcion para eliminar una zona
+//Función: eliminarZona / delZona: funcion para
 export async function eliminarZona(id: number) {
   try {
     // Paso 1: Validar que id tiene valor
@@ -302,8 +311,9 @@ export async function eliminarZona(id: number) {
 }
 
 /*==================================================
-  * SPECIALS-ESPECIALES ()
+  * SPECIALS: PROCESS / ESPECIAL / SPECIAL
 ================================================== */
+// Función: estatusActivoZona / actZona: Función especial para cambiar columna activo, el valor debe ser boolean
 export async function estatusActivoZona(id: number, activo: boolean): Promise<boolean> {
   try {
     const { error } = await supabase.from("zonas").update({ activo: activo }).eq("id", id)
@@ -323,3 +333,5 @@ export async function estatusActivoZona(id: number, activo: boolean): Promise<bo
     return false
   }
 }
+
+// Función: listaDesplegableZonas / ddlZonas: Función que se utiliza para los dropdownlist

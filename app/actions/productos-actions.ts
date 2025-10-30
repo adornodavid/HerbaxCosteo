@@ -180,7 +180,7 @@ export async function actualizarProducto(
 }
 
 //Función: obtenerProductos: función para obtener el listado de productos
-export async function obtenerProductos(clienteid = -1) {
+export async function obtenerProductos(clienteid: number) {
   try {
     let query = supabaseAdmin.from("productos").select(`
       id, nombre, descripcion, propositoprincipal, costo, activo, imgurl,

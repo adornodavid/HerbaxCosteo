@@ -4,35 +4,37 @@
   Imports
 ================================================== */
 import { supabase } from "@/lib/supabase"
+import type { Session } from "@/types/usuarios" // Declare the LoginResult variable
+import { establecerSesionCookies, eliminarSesionCookies, limpiarSessionCookies } from "./session"
+import { HashData, Encrypt, CompareHash } from "./utilerias"
+
 import { setSessionCookies } from "./session-actions"
 import { cerrarSesion } from "./session-actions-with-expiration" // Importar cerrarSesion
-import { HashData, Encrypt, CompareHash } from "./utilerias"
-import { establecerSesionCookies, eliminarSesionCookies, limpiarSessionCookies } from "./session"
-import type { Session } from "@/types/usuarios" // Declare the LoginResult variable
 
 /* ==================================================
-	  Funciones
-	  --------------------
-		* Inicio
-      - procesarInicioSesion
-    * Cerrar
-      - procesarCerrarSesion
-      
+	--------------------
+	Funciones
+	--------------------
+	* Inicio
+	- procesarInicioSesion
+	* Cerrar
+	- procesarCerrarSesion
 
 
 
 
-    * SESSION
-      - obtenerSesion / getSession
-      - establecerSesionCookies / setSessionCookies
-      - limpiarSesion / clearSession
-      - crearSesionConExpiracion
-      - obtenerVariablesSesion
-      - cerrarSesion
-      - obtenerTiempoRestanteSesion
-      - renovarSesion
+
+	* XXXXX BORRAR XXXXXXXX    SESSION
+	- obtenerSesion / getSession
+	- establecerSesionCookies / setSessionCookies
+	- limpiarSesion / clearSession
+	- crearSesionConExpiracion
+	- obtenerVariablesSesion
+	- cerrarSesion
+	- obtenerTiempoRestanteSesion
+	- renovarSesion
       - 
-	================================================== */
+================================================== */
 
 // procesarInicioSesion: funcion para iniciar sesion en el sistema
 export async function procesarInicioSesion(email: string, password: string): Promise<LoginResult> {
