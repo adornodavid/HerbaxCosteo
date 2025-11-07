@@ -236,65 +236,121 @@ export default function VerProductoPage() {
         <>
           <Card className="overflow-hidden mb-6">
             <CardContent className="p-0">
-              <div className="flex flex-row h-[200px]">
-                {/* Image on left with gray background */}
-                <div className="w-[200px] h-[200px] flex items-center justify-center bg-gray-200">
+              <div className="flex flex-row">
+                <div className="w-[200px] h-[200px] flex items-center justify-center bg-gray-200 flex-shrink-0">
                   <img
-                    src={producto.imgurl || "/placeholder.svg?height=300&width=300&text=Producto"}
+                    src={producto.imgurl || "/placeholder.svg?height=200&width=200&text=Producto"}
                     alt={producto.nombre}
                     className="h-[200px] w-auto"
                   />
                 </div>
 
-                {/* Product info on right - compact layout */}
-                <div className="flex-1 p-6 flex flex-col justify-center space-y-3">
-                  {/* Line 1: ID, Código, Nombre */}
-                  <div className="flex gap-6 items-center">
-                    <div>
-                      <span className="font-semibold text-sky-700">ID:</span>
-                      <span className="ml-2 text-gray-900">{producto.id}</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-sky-700">Código:</span>
-                      <span className="ml-2 text-gray-900">{producto.codigo || "Sin código"}</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-sky-700">Nombre:</span>
-                      <span className="ml-2 text-gray-900">{producto.nombre || "Sin nombre"}</span>
+                <div className="flex-1 p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-lg text-sky-700 border-b pb-1">Información Básica</h3>
+                    <div className="space-y-1 text-sm">
+                      <div>
+                        <span className="font-semibold text-sky-700">ID:</span>
+                        <span className="ml-2 text-gray-900">{producto.id}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-sky-700">Código:</span>
+                        <span className="ml-2 text-gray-900">{producto.codigo || "Sin código"}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-sky-700">Nombre:</span>
+                        <span className="ml-2 text-gray-900">{producto.nombre || "Sin nombre"}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-sky-700">Cliente:</span>
+                        <span className="ml-2 text-gray-900">{producto.clientes?.nombre || "Sin cliente"}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-sky-700">Zona:</span>
+                        <span className="ml-2 text-gray-900">{producto.zonas?.nombre || "Sin zona"}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-sky-700">Unidad de Medida:</span>
+                        <span className="ml-2 text-gray-900">
+                          {producto.unidadesmedida?.descripcion || "Sin unidad"}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-sky-700">Estatus:</span>
+                        <span
+                          className={`ml-2 px-2 py-1 rounded text-xs font-semibold ${
+                            producto.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                          }`}
+                        >
+                          {producto.activo ? "Activo" : "Inactivo"}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Line 2: Cliente, Zona */}
-                  <div className="flex gap-6 items-center">
-                    <div>
-                      <span className="font-semibold text-sky-700">Cliente:</span>
-                      <span className="ml-2 text-gray-900">{producto.clientes?.nombre || "Sin cliente"}</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-sky-700">Zona:</span>
-                      <span className="ml-2 text-gray-900">{producto.zonas?.nombre || "Sin zona"}</span>
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-lg text-green-700 border-b pb-1">Composición y Costo</h3>
+                    <div className="space-y-1 text-sm">
+                      <div>
+                        <span className="font-semibold text-green-700">MP:</span>
+                        <span className="ml-2 text-gray-900">${(producto.mp || 0).toFixed(6)}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-green-700">ME:</span>
+                        <span className="ml-2 text-gray-900">${(producto.me || 0).toFixed(6)}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-green-700">MS:</span>
+                        <span className="ml-2 text-gray-900">${(producto.ms || 0).toFixed(6)}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-green-700">Costo:</span>
+                        <span className="ml-2 text-gray-900">${producto.costo?.toFixed(6) || "0.000000"}</span>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Line 3: Unidad de medida, Costo de elaboración, Estatus */}
-                  <div className="flex gap-6 items-center">
-                    <div>
-                      <span className="font-semibold text-sky-700">Unidad de Medida:</span>
-                      <span className="ml-2 text-gray-900">{producto.unidadesmedida?.descripcion || "Sin unidad"}</span>
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-lg text-purple-700 border-b pb-1">Porcentajes</h3>
+                    <div className="space-y-1 text-sm">
+                      <div>
+                        <span className="font-semibold text-purple-700">MP %:</span>
+                        <span className="ml-2 text-gray-900">{((producto.mp_porcentaje || 0) * 100).toFixed(2)}%</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-purple-700">ME %:</span>
+                        <span className="ml-2 text-gray-900">{((producto.me_porcentaje || 0) * 100).toFixed(2)}%</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-purple-700">MS %:</span>
+                        <span className="ml-2 text-gray-900">{((producto.ms_porcentaje || 0) * 100).toFixed(2)}%</span>
+                      </div>
                     </div>
-                    <div>
-                      <span className="font-semibold text-sky-700">Costo de elaboración:</span>
-                      <span className="ml-2 text-gray-900">${producto.costo?.toFixed(2) || "0.00"}</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-sky-700">Estatus:</span>
-                      <span
-                        className={`ml-2 px-2 py-1 rounded text-sm font-semibold ${
-                          producto.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                        }`}
-                      >
-                        {producto.activo ? "Activo" : "Inactivo"}
-                      </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-lg text-amber-700 border-b pb-1">Costos en Moneda</h3>
+                    <div className="space-y-1 text-sm">
+                      <div>
+                        <span className="font-semibold text-amber-700">MP $:</span>
+                        <span className="ml-2 text-gray-900">${(producto.mp_costeado || 0).toFixed(6)}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-amber-700">ME $:</span>
+                        <span className="ml-2 text-gray-900">${(producto.me_costeado || 0).toFixed(6)}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-amber-700">MS $:</span>
+                        <span className="ml-2 text-gray-900">${(producto.ms_costeado || 0).toFixed(6)}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-amber-700">Precio Healthy Lab:</span>
+                        <span className="ml-2 text-gray-900">${(producto.preciohl || 0).toFixed(6)}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-amber-700">Utilidad:</span>
+                        <span className="ml-2 text-gray-900">${(producto.utilidadhl || 0).toFixed(6)}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -622,7 +678,7 @@ export default function VerProductoPage() {
                             <td className="p-3">
                               <Package className="h-5 w-5 text-orange-600" />
                             </td>
-                            <td className="p-3">Material de etiquetado</td>
+                            <td className="p-3">Material de empaque</td>
                             <td className="p-3">{materialRel.materialesetiquetado?.codigo || "N/A"}</td>
                             <td className="p-3">{materialRel.materialesetiquetado?.nombre || "N/A"}</td>
                             <td className="p-3">
@@ -642,28 +698,62 @@ export default function VerProductoPage() {
                       </tbody>
                     </table>
 
-                    <div className="border-t-2 border-blue-500 mt-4 pt-4">
-                      <div className="flex justify-end">
-                        <div className="w-2/5">
+                    <div className="border-t-2 border-blue-500 mt-4 pt-4 flex justify-end">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl">
+                        <div className="space-y-2">
                           <div className="flex justify-between py-2 border-b border-gray-200">
-                            <span className="font-bold">Costo de elaboración:</span>
-                            <span>${producto.costo?.toFixed(2) || "0.00"}</span>
+                            <span className="font-semibold">MP:</span>
+                            <span>${(producto.mp || 0).toFixed(6)}</span>
                           </div>
                           <div className="flex justify-between py-2 border-b border-gray-200">
-                            <span>Variación de precios:</span>
-                            <span>5%</span>
+                            <span className="font-semibold">ME:</span>
+                            <span>${(producto.me || 0).toFixed(6)}</span>
                           </div>
                           <div className="flex justify-between py-2 border-b border-gray-200">
-                            <span className="font-bold">Costo total:</span>
-                            <span className="font-bold">
-                              ${((producto.costo || 0) + (producto.costo || 0) * 0.05).toFixed(2)}
-                            </span>
+                            <span className="font-semibold">MS:</span>
+                            <span>${(producto.ms || 0).toFixed(6)}</span>
                           </div>
-                          <div className="flex justify-between py-2">
-                            <span className="font-bold">Precio Mínimo sugerido:</span>
-                            <span className="font-bold text-green-600">
-                              ${(((producto.costo || 0) + (producto.costo || 0) * 0.05) * 1.3).toFixed(2)}
-                            </span>
+                          <div className="flex justify-between py-2 border-b border-gray-200">
+                            <span className="font-bold">Costo:</span>
+                            <span className="text-green-600">${(producto.costo || 0).toFixed(6)}</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between py-2 border-b border-gray-200">
+                            <span className="font-semibold">MP %:</span>
+                            <span>{((producto.mp_porcentaje || 0) * 100).toFixed(2)}%</span>
+                          </div>
+                          <div className="flex justify-between py-2 border-b border-gray-200">
+                            <span className="font-semibold">ME %:</span>
+                            <span>{((producto.me_porcentaje || 0) * 100).toFixed(2)}%</span>
+                          </div>
+                          <div className="flex justify-between py-2 border-b border-gray-200">
+                            <span className="font-semibold">MS %:</span>
+                            <span>{((producto.ms_porcentaje || 0) * 100).toFixed(2)}%</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between py-2 border-b border-gray-200">
+                            <span className="font-semibold">MP Costo:</span>
+                            <span>${(producto.mp_costeado || 0).toFixed(6)}</span>
+                          </div>
+                          <div className="flex justify-between py-2 border-b border-gray-200">
+                            <span className="font-semibold">ME Costo:</span>
+                            <span>${(producto.me_costeado || 0).toFixed(6)}</span>
+                          </div>
+                          <div className="flex justify-between py-2 border-b border-gray-200">
+                            <span className="font-semibold">MS Costo:</span>
+                            <span>${(producto.ms_costeado || 0).toFixed(6)}</span>
+                          </div>
+                          <div className="flex justify-between py-2 border-b border-gray-200">
+                            <span className="font-bold">Precio Healthy Lab:</span>
+                            <span className="text-green-600">${(producto.preciohl || 0).toFixed(6)}</span>
+                          </div>
+                          <div className="flex justify-between py-2 border-b border-gray-200">
+                            <span className="font-bold">Utilidad:</span>
+                            <span className="text-green-600">${(producto.utilidadhl || 0).toFixed(6)}</span>
                           </div>
                         </div>
                       </div>

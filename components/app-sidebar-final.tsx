@@ -1,33 +1,32 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { getSession } from "@/app/actions/session-actions"
+import { obtenerSesion } from "@/app/actions/session"
 import { Icons } from "@/components/icons"
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { useNavigationGuard } from "@/contexts/navigation-guard-context"
-
-interface SessionData {
-  UsuarioId: number
-  Email: string
-  NombreCompleto: string
-  HotelId: number
-  RolId: number
-  Permisos: string
-  SesionActiva: boolean
-}
+import type { Session } from "@/types/usuarios"
 
 export function AppSidebar() {
+  console.log("[v0] AppSidebar component is rendering")
+
   const pathname = usePathname()
   const router = useRouter()
-  const [sessionData, setSessionData] = useState<SessionData | null>(null)
+  const [sessionData, setSessionData] = useState<Session | null>(null)
   const [openMenus, setOpenMenus] = useState<string[]>([])
   const { attemptNavigation } = useNavigationGuard()
 
+  console.log("[v0] Before useEffect, sessionData:", sessionData)
+
   useEffect(() => {
+    console.log("[v0] Inside useEffect - starting to load session")
     const loadSession = async () => {
-      const session = await getSession()
+      console.log("[v0] Inside loadSession function")
+      const session = await obtenerSesion()
+      console.log("[v0] Session loaded:", session)
+      console.log("[v0] RolId from session:", session?.RolId)
       setSessionData(session)
     }
     loadSession()
@@ -49,77 +48,64 @@ export function AppSidebar() {
     [attemptNavigation, router],
   )
 
-  const getHealthyLabSubmenu = () => {
-    const allSubmenus = [
-      { name: "Productos", href: "/productos", icon: Icons.PillBottle },
-      { name: "Fórmulas", href: "/formulas", icon: Icons.FlaskRound },
-      { name: "Empaque", href: "/materialetiquetado", icon: Icons.Package },
-      { name: "Materia Prima", href: "/materiaprima", icon: Icons.Pill },
-      { name: "Clientes", href: "/clientes", icon: Icons.Hotel },
-      { name: "Zonas", href: "/zonas", icon: Icons.Building },
-    ]
+  const menuItems = useMemo(() => {
+    const getHealthyLabSubmenu = () => {
+      const allSubmenus = [
+        { name: "Productos", href: "/productos", icon: Icons.PillBottle },
+        { name: "Fórmulas", href: "/formulas", icon: Icons.FlaskRound },
+        { name: "Empaque", href: "/materialetiquetado", icon: Icons.Package },
+        { name: "Materia Prima", href: "/materiaprima", icon: Icons.Pill },
+        { name: "Clientes", href: "/clientes", icon: Icons.Hotel },
+        { name: "Zonas", href: "/zonas", icon: Icons.Building },
+      ]
 
-    // If rolid is 1, 2, or 3, show all submenus
-    if (sessionData?.RolId === 1 || sessionData?.RolId === 2 || sessionData?.RolId === 3) {
-      return allSubmenus
+      const rolId = sessionData?.RolId
+
+      if (rolId === 1 || rolId === 2 || rolId === 3) {
+        return allSubmenus
+      }
+
+      return allSubmenus.filter((item) => item.name === "Productos" || item.name === "Zonas")
     }
 
-    // Otherwise, only show Productos and Zonas
-    return allSubmenus.filter((item) => item.name === "Productos" || item.name === "Zonas")
-  }
-
-  const menuItems = [
-    {
-      name: "Dashboard",
-      href: "/dashboard",
-      icon: Icons.LayoutDashboard,
-      hasSubmenu: false,
-    },
-    {
-      name: "Perfil",
-      icon: Icons.User,
-      hasSubmenu: true,
-      submenu: [
-        { name: "Perfil", href: "/perfil", icon: Icons.User },
-        { name: "Cerrar Sesión", href: "/logout", icon: Icons.LogOut },
-      ],
-    },
-    {
-      name: "Healthy Lab",
-      icon: Icons.FlaskRound,
-      hasSubmenu: true,
-      submenu: getHealthyLabSubmenu(),
-    },
-    // {
-    //   name: "Gestión",
-    //   icon: Icons.Settings,
-    //   hasSubmenu: true,
-    //   submenu: [{ name: "Mis Productos", href: "/mis-productos", icon: Icons.PillBottle }],
-    // },
-    {
-      name: "Costeos",
-      icon: Icons.NotebookPen,
-      hasSubmenu: true,
-      submenu: [{ name: "Costear", href: "/costear", icon: Icons.NotebookPen }],
-    },
-    {
-      name: "Reportes",
-      icon: Icons.BarChart,
-      hasSubmenu: true,
-      submenu: [
-        { name: "Reporte Costeo", href: "/reportecosteo", icon: Icons.FileBarChart },
-        { name: "Análisis de Costos", href: "/analisiscostos", icon: Icons.TrendingUp },
-        { name: "Márgenes de Utilidad", href: "/margenesutilidad", icon: Icons.PieChart },
-      ],
-    },
-  ]
+    return [
+      {
+        name: "Inicio",
+        href: "/inicio",
+        icon: Icons.LayoutDashboard,
+      },
+      {
+        name: "Healthy Lab",
+        icon: Icons.FlaskRound,
+        submenus: getHealthyLabSubmenu(),
+      },
+      {
+        name: "Costeo",
+        icon: Icons.DollarSign,
+        submenus: [{ name: "Costear", href: "/costear", icon: Icons.DollarSign }],
+      },
+      {
+        name: "Reportes",
+        icon: Icons.FileText,
+        submenus: [{ name: "Reportes de Costeo", href: "/reportecosteo", icon: Icons.BarChart }],
+      },
+      {
+        name: "Perfil",
+        icon: Icons.User,
+        submenus: [
+          { name: "Mi Perfil", href: "/perfil", icon: Icons.User },
+          { name: "Cerrar Sesión", href: "/logout", icon: Icons.LogOut },
+        ],
+      },
+    ]
+  }, [sessionData])
 
   return (
     <div
       id="SideBar"
       className="fixed left-0 top-0 w-64 h-screen bg-[#F3F6F9] backdrop-blur-2xl border-r border-white/20 text-slate-800 flex flex-col shadow-2xl shadow-black/10 z-50"
       style={{
-        background: "linear-gradient(135deg",
+        background: "linear-gradient(135deg, #F3F6F9, #F3F6F9)",
         boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2), 0 20px 40px rgba(0,0,0,0.1)",
       }}
     >
@@ -166,7 +152,7 @@ export function AppSidebar() {
         <div className="p-4 space-y-3">
           {menuItems.map((item) => (
             <div key={item.name}>
-              {!item.hasSubmenu ? (
+              {!item.submenus ? (
                 <button
                   onClick={() => handleNavigationClick(item.href!)}
                   className={`group flex items-center space-x-3 px-4 py-3 rounded-xs text-sm font-medium transition-all duration-300 w-full relative ${
@@ -202,27 +188,29 @@ export function AppSidebar() {
                     </Button>
                   </CollapsibleTrigger>
                   <CollapsibleContent className="ml-4 mt-2 space-y-1">
-                    {item.submenu?.map((subItem) => (
-                      <button
-                        key={subItem.name}
-                        onClick={() => handleNavigationClick(subItem.href)}
-                        className={`group flex items-center space-x-3 px-4 py-2.5 rounded-xs text-sm transition-all duration-300 w-full ${
-                          isActive(subItem.href)
-                            ? "bg-[#e1eef7] text-slate-800 border border-[#e1eef7] shadow-md"
-                            : "text-slate-500 hover:bg-[#bcdef7] hover:text-slate-700 border border-transparent hover:border-white/15"
-                        }`}
-                        style={
-                          isActive(subItem.href)
-                            ? {
-                                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.08)",
-                              }
-                            : {}
-                        }
-                      >
-                        <subItem.icon className="w-4 h-4 transition-colors duration-300" />
-                        <span>{subItem.name}</span>
-                      </button>
-                    ))}
+                    {item.submenus &&
+                      item.submenus.length > 0 &&
+                      item.submenus.map((subItem) => (
+                        <button
+                          key={subItem.name}
+                          onClick={() => handleNavigationClick(subItem.href)}
+                          className={`group flex items-center space-x-3 px-4 py-2.5 rounded-xs text-sm transition-all duration-300 w-full ${
+                            isActive(subItem.href)
+                              ? "bg-[#e1eef7] text-slate-800 border border-[#e1eef7] shadow-md"
+                              : "text-slate-500 hover:bg-[#bcdef7] hover:text-slate-700 border border-transparent hover:border-white/15"
+                          }`}
+                          style={
+                            isActive(subItem.href)
+                              ? {
+                                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.08)",
+                                }
+                              : {}
+                          }
+                        >
+                          <subItem.icon className="w-4 h-4 transition-colors duration-300" />
+                          <span>{subItem.name}</span>
+                        </button>
+                      ))}
                   </CollapsibleContent>
                 </Collapsible>
               )}

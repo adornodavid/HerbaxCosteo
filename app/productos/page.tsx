@@ -751,7 +751,14 @@ export default function ProductosPage() {
                     <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{p.nombre}</h3>
                     {/* Código */}
                     <p className="text-sm text-gray-600 mb-2">Código: {p.codigo || "Sin código."}</p>
-                    <p className="text-lg font-bold text-green-600">{formatCurrency(p.costo)}</p>
+                    <div className="text-sm">
+                      <p>
+                        <span className="font-bold text-black">Costo:</span> {formatCurrency(p.costo)}
+                      </p>
+                      <p>
+                        <span className="font-bold text-black">Precio HL:</span> {formatCurrency(p.preciohl)}
+                      </p>
+                    </div>
 
                     <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
                       <div className="flex gap-3 justify-center mt-auto">

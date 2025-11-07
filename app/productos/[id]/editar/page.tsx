@@ -52,8 +52,6 @@ import {
 } from "@/app/actions/material-etiquetado"
 import { listaDesplegableUnidadesMedida } from "@/app/actions/catalogos"
 import { listDesplegableZonas } from "@/app/actions/zonas"
-// -- Backend --
-import { createClient } from "@/lib/supabase/client"
 
 /* ==================================================
 	Componente Principal (Pagina)
@@ -128,6 +126,9 @@ export default function EditarProductoPage() {
   const [showModalTutorial, setShowModalTutorial] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showProcessing, setShowProcessing] = useState(false)
+
+  const [showCosteoRedirectModal, setShowCosteoRedirectModal] = useState(false)
+  // </CHANGE>
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -541,7 +542,7 @@ export default function EditarProductoPage() {
         await cargarDatosIniciales()
       } else {
         setModalError({
-          Titulo: "Error al agregar material de etiquetado",
+          Titulo: "Error al agregar material de empaque",
           Mensaje: result.error || "Error desconocido",
         })
         setShowModalError(true)
@@ -577,7 +578,7 @@ export default function EditarProductoPage() {
       if (result.success) {
         setModalAlert({
           Titulo: "Éxito",
-          Mensaje: "Material de etiquetado eliminado exitosamente",
+          Mensaje: "Material de empaque eliminado exitosamente",
         })
         setShowModalAlert(true)
 
@@ -585,7 +586,7 @@ export default function EditarProductoPage() {
         await cargarDatosIniciales()
       } else {
         setModalError({
-          Titulo: "Error al eliminar material de etiquetado",
+          Titulo: "Error al eliminar material de empaque",
           Mensaje: result.error || "Error desconocido",
         })
         setShowModalError(true)
@@ -717,6 +718,22 @@ export default function EditarProductoPage() {
     }))
   }
 
+  const handleCosteoTabClick = () => {
+    setShowCosteoRedirectModal(true)
+  }
+
+  const handleCosteoRedirect = () => {
+    if (producto) {
+      const params = new URLSearchParams({
+        productoid: producto.id.toString(),
+        clienteid: producto.clienteid?.toString() || "",
+        zonaid: producto.zonaid?.toString() || "",
+      })
+      router.push(`/costear?${params.toString()}`)
+    }
+  }
+  // </CHANGE>
+
   // --- Renders ---
   // Contenidos auxiliares
   if (showPageLoading) {
@@ -767,6 +784,33 @@ export default function EditarProductoPage() {
         />
       )}
 
+      {showCosteoRedirectModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4">Redirección a Página de Costeo</h3>
+            <p className="mb-6">
+              La actualización del costeo del producto se realiza por medio de la página de costeo.
+              <br />
+              <br />
+              <strong>Advertencia:</strong> Si acepta, saldrá del módulo de actualización de producto y será
+              redireccionado a la página de costear. Los cambios realizados no guardados se perderán.
+              <br />
+              <br />
+              ¿Desea continuar?
+            </p>
+            <div className="flex gap-4 justify-end">
+              <Button variant="outline" onClick={() => setShowCosteoRedirectModal(false)}>
+                Cancelar
+              </Button>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={handleCosteoRedirect}>
+                Aceptar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* </CHANGE> */}
+
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
@@ -811,7 +855,7 @@ export default function EditarProductoPage() {
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold mb-4">Confirmar Eliminación</h3>
             <p className="mb-6">
-              ¿Está seguro que desea eliminar el material de etiquetado{" "}
+              ¿Está seguro que desea eliminar el material de empaque{" "}
               <strong>{materialEtiquetadoToDelete?.nombre}</strong> del producto?
             </p>
             <div className="flex gap-4 justify-end">
@@ -829,9 +873,9 @@ export default function EditarProductoPage() {
       {showAddMaterialEtiquetadoModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Confirmar Agregar Material Etiquetado</h3>
+            <h3 className="text-lg font-semibold mb-4">Confirmar Agregar Material Empaque</h3>
             <p className="mb-6">
-              ¿Está seguro que desea agregar el material de etiquetado{" "}
+              ¿Está seguro que desea agregar el material de empaque{" "}
               <strong>{materialEtiquetadoSeleccionado?.nombre}</strong> con cantidad{" "}
               <strong>{materialEtiquetadoCantidad}</strong> al producto?
             </p>
@@ -898,7 +942,7 @@ export default function EditarProductoPage() {
 
         <button
           type="button"
-          onClick={() => setActiveTab("cotizacion")}
+          onClick={handleCosteoTabClick}
           className={`px-4 py-2 font-medium transition-colors ${
             activeTab === "cotizacion"
               ? "border-b-2 border-primary text-primary"
@@ -907,6 +951,7 @@ export default function EditarProductoPage() {
         >
           Costeo
         </button>
+        {/* </CHANGE> */}
       </div>
 
       {activeTab === "informacion" && (
@@ -1008,7 +1053,7 @@ export default function EditarProductoPage() {
                       <img
                         src={imagePreview || "/placeholder.svg"}
                         alt="Preview"
-                        className="w-full h-auto object-cover"
+                        className="h-full w-auto object-contain"
                       />
                     ) : (
                       <span className="text-muted-foreground text-sm">Sin imagen seleccionada</span>
@@ -1019,125 +1064,115 @@ export default function EditarProductoPage() {
 
               {producto && (
                 <>
-                  <Card className="rounded-xs border bg-card text-card-foreground shadow mt-6">
-                    <CardContent className="p-0">
-                      <div className="flex flex-row">
-                        <div className="w-[200px] h-[200px] flex items-center justify-center bg-gray-200 flex-shrink-0">
-                          <img
-                            src={producto.imgurl || "/placeholder.svg?height=200&width=200&text=Producto"}
-                            alt={producto.nombre || "Producto"}
-                            className="h-[200px] w-auto"
-                          />
+                  <Card className="rounded-xs border bg-card text-foreground shadow mt-6">
+                    <CardContent className="p-6">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div className="space-y-2">
+                          <h3 className="font-bold text-lg text-sky-700 border-b pb-1">Información Básica</h3>
+                          <div className="space-y-1 text-sm">
+                            <div>
+                              <span className="font-semibold text-sky-700">ID:</span>
+                              <span className="ml-2 text-gray-900">{producto.id}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Código:</span>
+                              <span className="ml-2 text-gray-900">{producto.codigo || "Sin código"}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Nombre:</span>
+                              <span className="ml-2 text-gray-900">{producto.nombre || "Sin nombre"}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Cliente:</span>
+                              <span className="ml-2 text-gray-900">{producto.clientes?.nombre || "Sin cliente"}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Zona:</span>
+                              <span className="ml-2 text-gray-900">{producto.zonas?.nombre || "Sin zona"}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Unidad de Medida:</span>
+                              <span className="ml-2 text-gray-900">
+                                {producto.unidadesmedida?.descripcion || "Sin unidad"}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Estatus:</span>
+                              <span
+                                className={`ml-2 px-2 py-1 rounded text-xs font-semibold ${
+                                  producto.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                                }`}
+                              >
+                                {producto.activo ? "Activo" : "Inactivo"}
+                              </span>
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="flex-1 p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
-                          <div className="space-y-2">
-                            <h3 className="font-bold text-lg text-sky-700 border-b pb-1">Información Básica</h3>
-                            <div className="space-y-1 text-sm">
-                              <div>
-                                <span className="font-semibold text-sky-700">ID:</span>
-                                <span className="ml-2 text-gray-900">{producto.id}</span>
-                              </div>
-                              <div>
-                                <span className="font-semibold text-sky-700">Código:</span>
-                                <span className="ml-2 text-gray-900">{producto.codigo || "Sin código"}</span>
-                              </div>
-                              <div>
-                                <span className="font-semibold text-sky-700">Nombre:</span>
-                                <span className="ml-2 text-gray-900">{producto.nombre || "Sin nombre"}</span>
-                              </div>
-                              <div>
-                                <span className="font-semibold text-sky-700">Cliente:</span>
-                                <span className="ml-2 text-gray-900">{producto.clientes?.nombre || "Sin cliente"}</span>
-                              </div>
-                              <div>
-                                <span className="font-semibold text-sky-700">Zona:</span>
-                                <span className="ml-2 text-gray-900">{producto.zonas?.nombre || "Sin zona"}</span>
-                              </div>
-                              <div>
-                                <span className="font-semibold text-sky-700">Unidad de Medida:</span>
-                                <span className="ml-2 text-gray-900">
-                                  {producto.unidadesmedida?.descripcion || "Sin unidad"}
-                                </span>
-                              </div>
-                              <div>
-                                <span className="font-semibold text-sky-700">Estatus:</span>
-                                <span
-                                  className={`ml-2 px-2 py-1 rounded text-xs font-semibold ${
-                                    producto.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                                  }`}
-                                >
-                                  {producto.activo ? "Activo" : "Inactivo"}
-                                </span>
-                              </div>
+                        <div className="space-y-2">
+                          <h3 className="font-bold text-lg text-green-700 border-b pb-1">Composición y Costo</h3>
+                          <div className="space-y-1 text-sm">
+                            <div>
+                              <span className="font-semibold text-green-700">MP:</span>
+                              <span className="ml-2 text-gray-900">{producto.mp || "0"}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-green-700">ME:</span>
+                              <span className="ml-2 text-gray-900">{producto.me || "0"}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-green-700">MS:</span>
+                              <span className="ml-2 text-gray-900">{producto.ms || "0"}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-green-700">Costo de elaboración:</span>
+                              <span className="ml-2 text-gray-900">${producto.costo?.toFixed(2) || "0.00"}</span>
                             </div>
                           </div>
+                        </div>
 
-                          <div className="space-y-2">
-                            <h3 className="font-bold text-lg text-green-700 border-b pb-1">Composición y Costo</h3>
-                            <div className="space-y-1 text-sm">
-                              <div>
-                                <span className="font-semibold text-green-700">MP:</span>
-                                <span className="ml-2 text-gray-900">{producto.mp || "0"}</span>
-                              </div>
-                              <div>
-                                <span className="font-semibold text-green-700">ME:</span>
-                                <span className="ml-2 text-gray-900">{producto.me || "0"}</span>
-                              </div>
-                              <div>
-                                <span className="font-semibold text-green-700">MS:</span>
-                                <span className="ml-2 text-gray-900">{producto.ms || "0"}</span>
-                              </div>
-                              <div>
-                                <span className="font-semibold text-green-700">Costo de elaboración:</span>
-                                <span className="ml-2 text-gray-900">${producto.costo?.toFixed(2) || "0.00"}</span>
-                              </div>
+                        <div className="space-y-2">
+                          <h3 className="font-bold text-lg text-purple-700 border-b pb-1">Porcentajes</h3>
+                          <div className="space-y-1 text-sm">
+                            <div>
+                              <span className="font-semibold text-purple-700">MP %:</span>
+                              <span className="ml-2 text-gray-900">
+                                {((producto.mp_porcentaje || 0) * 100).toFixed(2)}%
+                              </span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-purple-700">ME %:</span>
+                              <span className="ml-2 text-gray-900">
+                                {((producto.me_porcentaje || 0) * 100).toFixed(2)}%
+                              </span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-purple-700">MS %:</span>
+                              <span className="ml-2 text-gray-900">
+                                {((producto.ms_porcentaje || 0) * 100).toFixed(2)}%
+                              </span>
                             </div>
                           </div>
+                        </div>
 
-                          <div className="space-y-2">
-                            <h3 className="font-bold text-lg text-purple-700 border-b pb-1">Porcentajes</h3>
-                            <div className="space-y-1 text-sm">
-                              <div>
-                                <span className="font-semibold text-purple-700">MP %:</span>
-                                <span className="ml-2 text-gray-900">
-                                  {((producto.mp_porcentaje || 0) * 100).toFixed(2)}%
-                                </span>
-                              </div>
-                              <div>
-                                <span className="font-semibold text-purple-700">ME %:</span>
-                                <span className="ml-2 text-gray-900">
-                                  {((producto.me_porcentaje || 0) * 100).toFixed(2)}%
-                                </span>
-                              </div>
-                              <div>
-                                <span className="font-semibold text-purple-700">MS %:</span>
-                                <span className="ml-2 text-gray-900">
-                                  {((producto.ms_porcentaje || 0) * 100).toFixed(2)}%
-                                </span>
-                              </div>
+                        <div className="space-y-2">
+                          <h3 className="font-bold text-lg text-amber-700 border-b pb-1">Costos en Moneda</h3>
+                          <div className="space-y-1 text-sm">
+                            <div>
+                              <span className="font-semibold text-amber-700">MP $:</span>
+                              <span className="ml-2 text-gray-900">${(producto.mp_costeado || 0).toFixed(2)}</span>
                             </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <h3 className="font-bold text-lg text-amber-700 border-b pb-1">Costos en Moneda</h3>
-                            <div className="space-y-1 text-sm">
-                              <div>
-                                <span className="font-semibold text-amber-700">MP $:</span>
-                                <span className="ml-2 text-gray-900">${(producto.mp_costeado || 0).toFixed(2)}</span>
-                              </div>
-                              <div>
-                                <span className="font-semibold text-amber-700">ME $:</span>
-                                <span className="ml-2 text-gray-900">${(producto.me_costeado || 0).toFixed(2)}</span>
-                              </div>
-                              <div>
-                                <span className="font-semibold text-amber-700">MS $:</span>
-                                <span className="ml-2 text-gray-900">${(producto.ms_costeado || 0).toFixed(2)}</span>
-                              </div>
-                              <div>
-                                <span className="font-semibold text-amber-700">Precio Healthy Lab:</span>
-                                <span className="ml-2 text-gray-900">${(producto.preciohl || 0).toFixed(2)}</span>
-                              </div>
+                            <div>
+                              <span className="font-semibold text-amber-700">ME $:</span>
+                              <span className="ml-2 text-gray-900">${(producto.me_costeado || 0).toFixed(2)}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-amber-700">MS $:</span>
+                              <span className="ml-2 text-gray-900">${(producto.ms_costeado || 0).toFixed(2)}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-amber-700">Precio Healthy Lab:</span>
+                              <span className="ml-2 text-gray-900">${(producto.preciohl || 0).toFixed(2)}</span>
                             </div>
                           </div>
                         </div>
