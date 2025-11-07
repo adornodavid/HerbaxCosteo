@@ -27,13 +27,19 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   --------------------
   * INSERTS: CREATE/CREAR/INSERT
     - crearMaterialEtiquetado / insMaterialEtiquetado
+    - crearMaterialEtiquetadoXProducto / insMaterialEtiquetadoXProducto
+
   * SELECTS: READ/OBTENER/SELECT
     - obtenerMaterialesEtiquetados / selMaterialesEtiquetados
     - obtenerMaterialesEtiquetadosXProductos / selMaterialesEtiquetadosXProductos
+
   * UPDATES: EDIT/ACTUALIZAR/UPDATE
     - actualizarMaterialEtiquetado / updMaterialEtiquetado
+
   * DELETES: DROP/ELIMINAR/DELETE
     - eliminarMaterialEtiquetado / delMaterialEtiquetado
+    - eliminarMaterialEtiquetadoXProducto / delMaterialEtiquetadoXProducto
+    
   * SPECIALS: PROCESS/ESPECIAL/SPECIAL
     - estatusActivoMaterialEtiquetado / actMaterialEtiquetado
     - listaDesplegableMaterialesEtiquetados / ddlMaterialesEtiquetados
@@ -44,9 +50,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 ================================================== */
 // Función: objetoMaterialEtiquetado / oMaterialEtiquetado (Individual): Esta Función crea de manera individual un objeto/clase
 
-
 // Función: objetoMaterialesEtiquetados / oMaterialesEtiquetados (Listado): Esta Función crea un listado de objetos/clases, es un array
-
 
 /*==================================================
     INSERTS: CREATE / CREAR / INSERT
@@ -139,10 +143,88 @@ export async function crearMaterialEtiquetado(formData: FormData) {
   }
 }
 
+// Función crearMaterialEtiquetadoXProducto: Función para crear relación entre material de etiquetado y producto
+export async function crearMaterialEtiquetadoXProducto(
+  materialetiquetadoid: number,
+  productoid: number,
+  cantidad: number,
+) {
+  try {
+    // Paso 1: Validar parámetros
+    if (
+      !materialetiquetadoid ||
+      materialetiquetadoid <= 0 ||
+      !productoid ||
+      productoid <= 0 ||
+      !cantidad ||
+      cantidad <= 0
+    ) {
+      return {
+        success: false,
+        error:
+          "No se recibieron los parametros necesario para poder proceder en ejecutar la funcion crearMaterialEtiquetadoXProducto en app/actions/material-etiquetado",
+      }
+    }
+
+    // Paso 2: Obtener costo unitario del material de etiquetado
+    const { data: materialData, error: materialError } = await supabase
+      .from("materialesetiquetado")
+      .select("costo")
+      .eq("id", materialetiquetadoid)
+      .single()
+
+    if (materialError || !materialData) {
+      console.error(
+        "Error obteniendo costo del material de etiquetado en crearMaterialEtiquetadoXProducto:",
+        materialError,
+      )
+      return { success: false, error: "Error obteniendo costo de material de etiquetado: " + materialError?.message }
+    }
+
+    const costounitario = materialData.costo || 0
+
+    // Paso 3: Calcular costo parcial
+    const costoparcial = cantidad * costounitario
+
+    // Paso 4: Insertar en materialesetiquetadoxproducto
+    const fechaActual = new Date().toISOString().split("T")[0]
+
+    const { error: insertError } = await supabase.from("materialesetiquetadoxproducto").insert({
+      productoid: productoid,
+      materialetiquetadoid: materialetiquetadoid,
+      cantidad: cantidad,
+      costoparcial: costoparcial,
+      fechacreacion: fechaActual,
+      activo: true,
+    })
+
+    if (insertError) {
+      console.error(
+        "Error insertando en materialesetiquetadoxproducto en crearMaterialEtiquetadoXProducto:",
+        insertError,
+      )
+      return { success: false, error: "Error insertando relación: " + insertError.message }
+    }
+
+    revalidatePath("/productos")
+
+    // Paso 5: Return resultados
+    return { success: true }
+  } catch (error) {
+    console.error("Error en crearMaterialEtiquetadoXProducto de actions/material-etiquetado: " + error)
+    return {
+      success: false,
+      error:
+        "Error interno del servidor, al ejecutar funcion crearMaterialEtiquetadoXProducto de actions/material-etiquetado: " +
+        error,
+    }
+  }
+}
+
 /*==================================================
   SELECTS: READ / OBTENER / SELECT
 ================================================== */
-// Función: obtenerMaterialesEtiquetados / selMaterialesEtiquetados: Función para obtener 
+// Función: obtenerMaterialesEtiquetados / selMaterialesEtiquetados: Función para obtener
 export async function obtenerMaterialesEtiquetados(
   id = -1,
   codigo = "",
@@ -420,6 +502,49 @@ export async function eliminarMaterialEtiquetado(id: number) {
   }
 }
 
+// Función: eliminarMaterialEtiquetadoXProducto: Función para eliminar la relación entre material de etiquetado y producto
+export async function eliminarMaterialEtiquetadoXProducto(materialetiquetadoid: number, productoid: number) {
+  try {
+    // Paso 1: Validar parámetros
+    if (!materialetiquetadoid || materialetiquetadoid <= 0 || !productoid || productoid <= 0) {
+      return {
+        success: false,
+        error:
+          "No se recibieron los parametros necesarios para ejecutar la funcion, en eliminarMaterialEtiquetadoXProducto de app/actions/material-etiquetado",
+      }
+    }
+
+    // Paso 2: Ejecutar Query DELETE
+    const { error } = await supabase
+      .from("materialesetiquetadoxproducto")
+      .delete()
+      .eq("materialetiquetadoid", materialetiquetadoid)
+      .eq("productoid", productoid)
+
+    // Return si hay error en query
+    if (error) {
+      console.error(
+        "Error eliminando relación material de etiquetado x producto en eliminarMaterialEtiquetadoXProducto de actions/material-etiquetado:",
+        error,
+      )
+      return { success: false, error: "Error en query: " + error.message }
+    }
+
+    revalidatePath("/productos")
+
+    // Paso 3: Return resultados
+    return { success: true }
+  } catch (error) {
+    console.error("Error en eliminarMaterialEtiquetadoXProducto de actions/material-etiquetado: " + error)
+    return {
+      success: false,
+      error:
+        "Error interno del servidor, al ejecutar funcion eliminarMaterialEtiquetadoXProducto de actions/material-etiquetado: " +
+        error,
+    }
+  }
+}
+
 /*==================================================
   * SPECIALS: PROCESS / ESPECIAL / SPECIAL
 ================================================== */
@@ -441,6 +566,36 @@ export async function estatusActivoMaterialEtiquetado(id: number, activo: boolea
   } catch (error) {
     console.error("Error en estatusActivoMaterialEtiquetado de app/actions/material-etiquetado: ", error)
     return false
+  }
+}
+
+// Función: listaDesplegableMaterialesEtiquetadosBuscar: Función para buscar materiales de etiquetado en un dropdown
+export async function listaDesplegableMaterialesEtiquetadosBuscar(buscar: string): Promise<any[]> {
+  try {
+    let query = supabase
+      .from("materialesetiquetado")
+      .select("id, codigo, nombre, costo, unidadmedidaid, unidadesmedida!unidadmedidaid(descripcion)")
+      .eq("activo", true)
+
+    // Apply filter: search in nombre OR codigo
+    if (buscar && buscar.trim() !== "") {
+      query = query.or(`nombre.ilike.%${buscar}%,codigo.ilike.%${buscar}%`)
+    }
+
+    // Order by nombre
+    query = query.order("nombre", { ascending: true })
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error("Error obteniendo lista desplegable de materiales de etiquetado:", error)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error("Error en app/actions/material-etiquetado en listaDesplegableMaterialesEtiquetadosBuscar:", error)
+    return []
   }
 }
 

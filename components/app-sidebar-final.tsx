@@ -49,6 +49,25 @@ export function AppSidebar() {
     [attemptNavigation, router],
   )
 
+  const getHealthyLabSubmenu = () => {
+    const allSubmenus = [
+      { name: "Productos", href: "/productos", icon: Icons.PillBottle },
+      { name: "Fórmulas", href: "/formulas", icon: Icons.FlaskRound },
+      { name: "Empaque", href: "/materialetiquetado", icon: Icons.Package },
+      { name: "Materia Prima", href: "/materiaprima", icon: Icons.Pill },
+      { name: "Clientes", href: "/clientes", icon: Icons.Hotel },
+      { name: "Zonas", href: "/zonas", icon: Icons.Building },
+    ]
+
+    // If rolid is 1, 2, or 3, show all submenus
+    if (sessionData?.RolId === 1 || sessionData?.RolId === 2 || sessionData?.RolId === 3) {
+      return allSubmenus
+    }
+
+    // Otherwise, only show Productos and Zonas
+    return allSubmenus.filter((item) => item.name === "Productos" || item.name === "Zonas")
+  }
+
   const menuItems = [
     {
       name: "Dashboard",
@@ -69,21 +88,14 @@ export function AppSidebar() {
       name: "Healthy Lab",
       icon: Icons.FlaskRound,
       hasSubmenu: true,
-      submenu: [
-        { name: "Productos", href: "/productos", icon: Icons.PillBottle },
-        { name: "Fórmulas", href: "/formulas", icon: Icons.FlaskRound },
-        { name: "Empaque", href: "/materialetiquetado", icon: Icons.Package },
-        { name: "Materia Prima", href: "/materiaprima", icon: Icons.Pill },
-        { name: "Clientes", href: "/clientes", icon: Icons.Hotel },
-        { name: "Zonas", href: "/zonas", icon: Icons.Building },
-      ],
+      submenu: getHealthyLabSubmenu(),
     },
-    {
-      name: "Gestión",
-      icon: Icons.Settings,
-      hasSubmenu: true,
-      submenu: [{ name: "Mis Productos", href: "/mis-productos", icon: Icons.PillBottle }],
-    },
+    // {
+    //   name: "Gestión",
+    //   icon: Icons.Settings,
+    //   hasSubmenu: true,
+    //   submenu: [{ name: "Mis Productos", href: "/mis-productos", icon: Icons.PillBottle }],
+    // },
     {
       name: "Costeos",
       icon: Icons.NotebookPen,

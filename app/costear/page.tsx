@@ -3,13 +3,13 @@
 /* ==================================================
 	Imports
 ================================================== */
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect, useRef } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, Loader2 } from "lucide-react"
+import { Search, RotateCcw, Loader2, Edit, X, HelpCircle } from "lucide-react" // Added Edit, X, HelpCircle
 import type {
   ProductoXCliente,
   ProductoXClienteOptimo,
@@ -44,6 +44,7 @@ import {
 import { useAuth } from "@/contexts/auth-context"
 import { useUserSession } from "@/hooks/use-user-session"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
+import { listDesplegableZonas } from "@/app/actions/zonas"
 import {
   listaDesplegableProductosBuscar,
   objetoProducto,
@@ -63,10 +64,11 @@ import type { oProducto } from "@/types/productos.types"
 ================================================== */
 export default function CostearPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { user, isLoading: authLoading } = useAuth()
   const { user: sessionUser, loading: sessionLoading } = useUserSession()
 
-  // --- Estados ---
+  // -- Estados --
   const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
   const [showPageLoading, setShowPageLoading] = useState(true)
   const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
@@ -91,9 +93,11 @@ export default function CostearPage() {
 
   // Estados de filtros
   const [filtroClienteId, setFiltroClienteId] = useState("")
+  const [filtroZonaId, setFiltroZonaId] = useState("")
   const [filtroProductoTexto, setFiltroProductoTexto] = useState("")
   const [filtroProductoId, setFiltroProductoId] = useState("")
   const [clientesOptions, setClientesOptions] = useState<ddlItem[]>([])
+  const [zonasOptions, setZonasOptions] = useState<ddlItem[]>([])
   const [productosOptions, setProductosOptions] = useState<ddlItem[]>([])
   const [showProductosDropdown, setShowProductosDropdown] = useState(false)
   const [productosCliente, setProductosCliente] = useState<oProducto[]>([])
@@ -109,9 +113,25 @@ export default function CostearPage() {
   const [precioVentaConIVA, setPrecioVentaConIVA] = useState("")
   const [forecast, setForecast] = useState("")
 
+  const [porcentajeGeneracional, setPorcentajeGeneracional] = useState("")
+  const [porcentajeNivel, setPorcentajeNivel] = useState("")
+  const [porcentajeInfinito, setPorcentajeInfinito] = useState("")
+  const [porcentajeIva, setPorcentajeIva] = useState("")
+  const [porcentajeBonoRapido, setPorcentajeBonoRapido] = useState("")
+  const [porcentajeCDA, setPorcentajeCDA] = useState("")
+  const [porcentajeConstructor, setPorcentajeConstructor] = useState("")
+  const [porcentajeRuta, setPorcentajeRuta] = useState("")
+  const [porcentajeReembolsos, setPorcentajeReembolsos] = useState("")
+  const [porcentajeTarjeta, setPorcentajeTarjeta] = useState("")
+  const [porcentajeEnvio, setPorcentajeEnvio] = useState("")
+
   // Estados de búsqueda
   const [isSearching, setIsSearching] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
+
+  const hasAutoSearched = useRef(false)
+
+  const [porcentajesEditables, setPorcentajesEditables] = useState(false)
 
   // -- Funciones --
 
@@ -121,10 +141,27 @@ export default function CostearPage() {
     }
   }, [sessionLoading, sessionUser])
 
+  // useEffect to load zonas when filtroClienteId changes
+  useEffect(() => {
+    const cargarZonas = async () => {
+      if (filtroClienteId) {
+        const result = await listDesplegableZonas(-1, "", Number(filtroClienteId))
+        if (result.success && result.data) {
+          setZonasOptions(result.data)
+          // Reset zona selection to "Todos" when cliente changes
+          setFiltroZonaId("")
+        }
+      } else {
+        setFiltroZonaId("")
+      }
+    }
+    cargarZonas()
+  }, [filtroClienteId])
+
   useEffect(() => {
     const cargarProductosCliente = async () => {
       if (filtroClienteId) {
-        const result = await listaDesplegableProductosXClientes(Number(filtroClienteId))
+        const result = await listaDesplegableProductosXClientes(Number(filtroClienteId), Number(filtroZonaId))
         if (result.success && result.data) {
           setProductosCliente(result.data)
         }
@@ -133,7 +170,7 @@ export default function CostearPage() {
       }
     }
     cargarProductosCliente()
-  }, [filtroClienteId])
+  }, [filtroClienteId, filtroZonaId])
 
   useEffect(() => {
     const cargarClientes = async () => {
@@ -174,6 +211,45 @@ export default function CostearPage() {
     }
   }, [precioVentaSinIVA])
 
+  useEffect(() => {
+    console.log("Inicia asignacion a filtros por parametros")
+    const loadFromURLParams = async () => {
+      const productoid = searchParams.get("productoid")
+      const clienteid = searchParams.get("clienteid")
+      const zonaid = searchParams.get("zonaid")
+
+      // Only proceed if we have URL parameters and haven't auto-searched yet
+      if (productoid && clienteid && !hasAutoSearched.current) {
+        hasAutoSearched.current = true
+
+        // Step 1: Set Cliente first
+        setFiltroClienteId(clienteid)
+
+        // Step 2: Wait for zonas to load based on the cliente
+        await new Promise((resolve) => setTimeout(resolve, 800))
+
+        // Step 3: Set Zona if provided
+        const zonaValue = zonaid && zonaid !== "-1" ? zonaid : "-1"
+        setFiltroZonaId(zonaValue)
+
+        // Step 4: Wait a bit more for zona to be set
+        await new Promise((resolve) => setTimeout(resolve, 300))
+
+        // Step 5: Set Producto
+        setFiltroProductoId(productoid)
+
+        // Step 6: Wait for all states to update, then trigger search once
+        await new Promise((resolve) => setTimeout(resolve, 500))
+
+        ejecutarBusqueda(clienteid, productoid, zonaValue)
+      }
+    }
+
+    if (!authLoading && !sessionLoading) {
+      loadFromURLParams()
+    }
+  }, [searchParams, authLoading, sessionLoading])
+
   const handleActualizar = () => {
     if (!filtroClienteId || !filtroProductoId || !precioVentaSinIVA || !forecast) {
       setModalAlert({
@@ -201,6 +277,17 @@ export default function CostearPage() {
         Number(filtroClienteId),
         Number(precioVentaSinIVA),
         Number(forecast),
+        Number(porcentajeGeneracional),
+        Number(porcentajeNivel),
+        Number(porcentajeInfinito),
+        Number(porcentajeIva),
+        Number(porcentajeBonoRapido),
+        Number(porcentajeCDA),
+        Number(porcentajeConstructor),
+        Number(porcentajeRuta),
+        Number(porcentajeReembolsos),
+        Number(porcentajeTarjeta),
+        Number(porcentajeEnvio),
       )
 
       const elapsedTime = Date.now() - startTime
@@ -243,8 +330,12 @@ export default function CostearPage() {
     }
   }
 
-  const ejecutarBusqueda = async () => {
-    if (!filtroClienteId || !filtroProductoId) {
+  const ejecutarBusqueda = async (clienteIdParam?: number, productoIdParam?: string, zonaIdParam?: string) => {
+    const clienteId = filtroClienteId || clienteIdParam
+    const productoId = productoIdParam || filtroProductoId
+    const zonaId = zonaIdParam || filtroZonaId
+
+    if (!clienteId || !productoId) {
       setModalAlert({
         Titulo: "Campos requeridos",
         Mensaje: "Por favor seleccione un cliente y un producto para buscar.",
@@ -260,9 +351,9 @@ export default function CostearPage() {
     try {
       let transformedData: ProductoXCliente
 
-      setProducto(false)
+      setProducto(null) // Corrected to set null
 
-      const productoResult = await objetoProducto(Number(filtroProductoId), "", Number(filtroClienteId))
+      const productoResult = await objetoProducto(Number(productoId), "", Number(clienteId))
       if (productoResult.success && productoResult.data) {
         setProducto(productoResult.data)
         console.log(productoResult.data)
@@ -271,9 +362,9 @@ export default function CostearPage() {
       }
 
       const [resultOptima25, resultCotizacion, resultOptima30] = await Promise.all([
-        cotizacionOptima25(Number(filtroProductoId), Number(filtroClienteId)),
-        cotizacionProducto(Number(filtroProductoId), Number(filtroClienteId)),
-        cotizacionOptima30(Number(filtroProductoId), Number(filtroClienteId)),
+        cotizacionOptima25(Number(productoId), Number(clienteId)),
+        cotizacionProducto(Number(productoId), Number(clienteId), Number(zonaId)),
+        cotizacionOptima30(Number(productoId), Number(clienteId)),
       ])
 
       if (resultCotizacion.success && resultCotizacion.data) {
@@ -286,6 +377,42 @@ export default function CostearPage() {
 
         if (resultCotizacion.data[0]?.sforecast) {
           setForecast(resultCotizacion.data[0].sforecast.toString())
+        }
+
+        if (resultCotizacion.data[0]?.sporcentajegeneracional !== undefined) {
+          setPorcentajeGeneracional(resultCotizacion.data[0].sporcentajegeneracional.toString())
+        }
+        if (resultCotizacion.data[0]?.sporcentajenivel !== undefined) {
+          setPorcentajeNivel(resultCotizacion.data[0].sporcentajenivel.toString())
+        }
+        if (resultCotizacion.data[0]?.sporcentajeinfinito !== undefined) {
+          setPorcentajeInfinito(resultCotizacion.data[0].sporcentajeinfinito.toString())
+        }
+        if (resultCotizacion.data[0]?.sporcentajeiva !== undefined) {
+          setPorcentajeIva(resultCotizacion.data[0].sporcentajeiva.toString())
+        }
+        if (resultCotizacion.data[0]?.sporcentajebonorapido !== undefined) {
+          setPorcentajeBonoRapido(resultCotizacion.data[0].sporcentajebonorapido.toString())
+        }
+        if (resultCotizacion.data[0]?.scda !== undefined) {
+          setPorcentajeCDA(resultCotizacion.data[0].scda.toString())
+        }
+        console.log("result", resultCotizacion.data[0])
+
+        if (resultCotizacion.data[0]?.sporcentajeconstructor !== undefined) {
+          setPorcentajeConstructor(resultCotizacion.data[0].sporcentajeconstructor.toString())
+        }
+        if (resultCotizacion.data[0]?.porcentajeruta !== undefined) {
+          setPorcentajeRuta(resultCotizacion.data[0].porcentajeruta.toString())
+        }
+        if (resultCotizacion.data[0]?.sporcentajereembolsos !== undefined) {
+          setPorcentajeReembolsos(resultCotizacion.data[0].sporcentajereembolsos.toString())
+        }
+        if (resultCotizacion.data[0]?.sporcentajetarjeta !== undefined) {
+          setPorcentajeTarjeta(resultCotizacion.data[0].sporcentajetarjeta.toString())
+        }
+        if (resultCotizacion.data[0]?.sporcentajeenvio !== undefined) {
+          setPorcentajeEnvio(resultCotizacion.data[0].sporcentajeenvio.toString())
         }
       }
 
@@ -341,6 +468,17 @@ export default function CostearPage() {
         Number(filtroClienteId),
         Number(precioVentaSinIVA),
         Number(forecast),
+        Number(porcentajeGeneracional),
+        Number(porcentajeNivel),
+        Number(porcentajeInfinito),
+        Number(porcentajeIva),
+        Number(porcentajeBonoRapido),
+        Number(porcentajeCDA),
+        Number(porcentajeConstructor),
+        Number(porcentajeRuta),
+        Number(porcentajeReembolsos),
+        Number(porcentajeTarjeta),
+        Number(porcentajeEnvio),
       )
 
       const elapsedTime = Date.now() - startTime
@@ -391,6 +529,19 @@ export default function CostearPage() {
     if (sessionUser?.ClienteId) {
       setFiltroClienteId(sessionUser.ClienteId.toString())
     }
+    setFiltroZonaId("")
+    setPorcentajeGeneracional("")
+    setPorcentajeNivel("")
+    setPorcentajeInfinito("")
+    setPorcentajeIva("")
+    setPorcentajeBonoRapido("")
+    setPorcentajeCDA("")
+    setPorcentajeConstructor("")
+    setPorcentajeRuta("")
+    setPorcentajeReembolsos("")
+    setPorcentajeTarjeta("")
+    setPorcentajeEnvio("")
+    setPorcentajesEditables(false)
   }
 
   const handleSelectProducto = (producto: ddlItem) => {
@@ -400,6 +551,7 @@ export default function CostearPage() {
   }
 
   useEffect(() => {
+    console.log("Inicia carga de pagina")
     if (!authLoading) {
       if (!user || user.RolId === 0) {
         router.push("/login")
@@ -554,38 +706,23 @@ export default function CostearPage() {
               </Select>
             </div>
 
-            {/*
-            <div className="relative">
-              <label htmlFor="txtProducto" className="text-sm font-medium">
-                Producto
+            <div>
+              <label htmlFor="ddlZona" className="text-sm font-medium">
+                Zona
               </label>
-              <Input
-                id="txtProducto"
-                type="text"
-                placeholder="Buscar producto..."
-                value={filtroProductoTexto}
-                onChange={(e) => setFiltroProductoTexto(e.target.value)}
-                onFocus={() => {
-                  if (productosOptions.length > 0) setShowProductosDropdown(true)
-                }}
-              />
-              <input type="hidden" value={filtroProductoId} />
-
-              {showProductosDropdown && productosOptions.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-                  {productosOptions.map((producto) => (
-                    <div
-                      key={producto.value}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleSelectProducto(producto)}
-                    >
-                      {producto.text}
-                    </div>
+              <Select value={filtroZonaId} onValueChange={setFiltroZonaId}>
+                <SelectTrigger id="ddlZona">
+                  <SelectValue placeholder="Seleccione una zona" />
+                </SelectTrigger>
+                <SelectContent>
+                  {zonasOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.text}
+                    </SelectItem>
                   ))}
-                </div>
-              )}
+                </SelectContent>
+              </Select>
             </div>
-            */}
 
             <div className="md:col-span-2">
               <label htmlFor="ddlProducto" className="text-sm font-medium">
@@ -835,8 +972,181 @@ export default function CostearPage() {
                   <label htmlFor="txtfechamodificacion" className="justify-Right text-sm font-medium text-righ mb-2">
                     Fecha Ultima Modificacion: {productoXCliente.sfechaultimamodificacion}
                   </label>
+
+                  <div className="mb-6 mt-4">
+                    <div className="flex justify-end gap-2 mb-2">
+                      {!porcentajesEditables ? (
+                        <div className="relative group">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="bg-blue-500 text-white hover:bg-blue-600"
+                            onClick={() => setPorcentajesEditables(true)}
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Modificar
+                          </Button>
+                          <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-gray-800 text-white text-xs rounded p-2 w-48 z-10">
+                            <HelpCircle className="h-3 w-3 inline mr-1" />
+                            Habilita los inputs de porcentaje para que puedan ser modificados
+                          </div>
+                        </div>
+                      ) : (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          className="bg-red-500 text-white hover:bg-red-600"
+                          onClick={() => setPorcentajesEditables(false)}
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          Cancelar
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
                   <table className="w-full border-collapse">
                     <thead>
+                      <tr className="bg-gray-100 text-xs">
+                        <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[130px]">
+                          % Generacional
+                        </th>
+                        <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[90px]">% Nivel</th>
+                        <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[100px]">
+                          % Infinito
+                        </th>
+                        <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[100px]">% IVA</th>
+                        <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[100px]">CDA</th>
+                        <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[100px]">
+                          % Bono Rápido
+                        </th>
+                        <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[120px]">
+                          % Constructor
+                        </th>
+                        <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[100px]">% Ruta</th>
+                        <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[120px]">
+                          % Reembolsos
+                        </th>
+                        <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[100px]">
+                          % Tarjeta
+                        </th>
+                        <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[100px]">Envio</th>
+                      </tr>
+                      <tr>
+                        <td className="border p-1">
+                          <Input
+                            type="text"
+                            step="0.01"
+                            value={porcentajeGeneracional}
+                            onChange={(e) => setPorcentajeGeneracional(e.target.value)}
+                            className="h-8 text-xs"
+                            disabled={!porcentajesEditables}
+                          />
+                        </td>
+                        <td className="border p-1">
+                          <Input
+                            type="text"
+                            step="0.01"
+                            value={porcentajeNivel}
+                            onChange={(e) => setPorcentajeNivel(e.target.value)}
+                            className="h-8 text-xs"
+                            disabled={!porcentajesEditables}
+                          />
+                        </td>
+                        <td className="border p-1">
+                          <Input
+                            type="text"
+                            step="0.01"
+                            value={porcentajeInfinito}
+                            onChange={(e) => setPorcentajeInfinito(e.target.value)}
+                            className="h-8 text-xs"
+                            disabled={!porcentajesEditables}
+                          />
+                        </td>
+                        <td className="border p-1">
+                          <Input
+                            type="text"
+                            step="0.01"
+                            value={porcentajeIva}
+                            onChange={(e) => setPorcentajeIva(e.target.value)}
+                            className="h-8 text-xs"
+                            disabled={!porcentajesEditables}
+                          />
+                        </td>
+
+                        <td className="border p-1">
+                          <Input
+                            type="text"
+                            step="0.01"
+                            value={porcentajeCDA}
+                            onChange={(e) => setPorcentajeCDA(e.target.value)}
+                            className="h-8 text-xs"
+                            disabled={!porcentajesEditables}
+                          />
+                        </td>
+                        <td className="border p-1">
+                          <Input
+                            type="text"
+                            step="0.01"
+                            value={porcentajeBonoRapido}
+                            onChange={(e) => setPorcentajeBonoRapido(e.target.value)}
+                            className="h-8 text-xs"
+                            disabled={!porcentajesEditables}
+                          />
+                        </td>
+                        <td className="border p-1">
+                          <Input
+                            type="text"
+                            step="0.01"
+                            value={porcentajeConstructor}
+                            onChange={(e) => setPorcentajeConstructor(e.target.value)}
+                            className="h-8 text-xs"
+                            disabled={!porcentajesEditables}
+                          />
+                        </td>
+                        <td className="border p-1">
+                          <Input
+                            type="text"
+                            step="0.01"
+                            value={porcentajeRuta}
+                            onChange={(e) => setPorcentajeRuta(e.target.value)}
+                            className="h-8 text-xs"
+                            disabled={!porcentajesEditables}
+                          />
+                        </td>
+                        <td className="border p-1">
+                          <Input
+                            type="text"
+                            step="0.01"
+                            value={porcentajeReembolsos}
+                            onChange={(e) => setPorcentajeReembolsos(e.target.value)}
+                            className="h-8 text-xs"
+                            disabled={!porcentajesEditables}
+                          />
+                        </td>
+                        <td className="border p-1">
+                          <Input
+                            type="text"
+                            step="0.01"
+                            value={porcentajeTarjeta}
+                            onChange={(e) => setPorcentajeTarjeta(e.target.value)}
+                            className="h-8 text-xs"
+                            disabled={!porcentajesEditables}
+                          />
+                        </td>
+                        <td className="border p-1">
+                          <Input
+                            type="text"
+                            step="0.01"
+                            value={porcentajeEnvio}
+                            onChange={(e) => setPorcentajeEnvio(e.target.value)}
+                            className="h-8 text-xs"
+                            disabled={!porcentajesEditables}
+                          />
+                        </td>
+                      </tr>
                       <tr className="bg-gray-100">
                         <th className="border p-2 text-left text-sm font-semibold bg-red-500 text-white">
                           Plan Generacional

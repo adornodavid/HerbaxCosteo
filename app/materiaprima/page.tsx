@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight, EyeOff, Trash2 } from "lucide-react"
+import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight, Trash2, AppWindow } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { MateriaPrima } from "@/types/materia-prima"
@@ -461,6 +461,8 @@ export default function MateriaPrimaPage() {
                           {new Intl.NumberFormat("es-MX", {
                             style: "currency",
                             currency: "MXN",
+                            minimumFractionDigits: 6,
+                            maximumFractionDigits: 6,
                           }).format(elementoDetalles.MateriaPrimaCosto)}
                         </span>
                       </div>
@@ -544,6 +546,8 @@ export default function MateriaPrimaPage() {
                         {new Intl.NumberFormat("es-MX", {
                           style: "currency",
                           currency: "MXN",
+                          minimumFractionDigits: 6,
+                          maximumFractionDigits: 6,
                         }).format(elemento.MateriaPrimaCosto)}
                       </td>
                       <td className="py-3 px-4">
@@ -563,7 +567,7 @@ export default function MateriaPrimaPage() {
                             title="Detalles"
                             onClick={() => handleVerDetalles(elemento)}
                           >
-                            <EyeOff className="h-4 w-4" />
+                            <AppWindow className="h-4 w-4" />
                           </Button>
 
                           <Button

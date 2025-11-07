@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase"
 import { arrActivoTrue, arrActivoFalse } from "@/lib/config"
 import { obtenerProductosXClientes } from "@/app/actions/productos"
 import { imagenSubir } from "@/app/actions/utilerias"
+import type { oFormula, oMateriasPrimasXFormula, oFormulasXFormula, ddlItem } from "@/types/formulas.types"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -29,27 +30,93 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
   --------------------
   * INSERTS: CREATE/CREAR/INSERT
     - crearFormula / insFormula
+    - crearFormulaXProducto
+    - crearFormulaXFormula
+  
   * SELECTS: READ/OBTENER/SELECT
     - obtenerFormulas / selFormulas
     - obtenerFormulasXClientes / selFormulasXClientes
     - obtenerFormulasXProductos / selFormulasXProductos
+    - obtenerMateriasPrimasXFormula: Función para obtener materias primas relacionadas a una formula
+    - obtenerFormulasXFormula: Función para obtener formulas relacionadas a una formula
+    - listaDesplegableFormulasBuscar
+  
   * UPDATES: EDIT/ACTUALIZAR/UPDATE
     - actualizarFormula / updFormula    
+  
   * DELETES: DROP/ELIMINAR/DELETE
     - eliminarFormula / delFormula
+    - eliminarFormulaXFormula
+    - eliminarFormulaXProducto
+  
   * SPECIALS: PROCESS/ESPECIAL/SPECIAL
     - listaDesplegableFormulas / ddlFormulas
     - estadisticasFormulas / statsFormulas
+    - recalcularFormula / recalcularFormula
 ================================================== */
 
 /*==================================================
     OBJETOS / CLASES
 ================================================== */
 // Función: objetoFormula / oFormula (Individual): Esta Función crea de manera individual un objeto/clase
+export async function objetoFormula(
+  formulaid = -1,
+  codigo = "",
+  nombre = "",
+  activo = "Todos",
+  clienteid = -1,
+  productoid = -1,
+): Promise<{ success: boolean; data?: oFormula; error?: string }> {
+  try {
+    const resultado = await obtenerFormulas(formulaid, codigo, nombre, activo, clienteid, productoid)
 
+    if (!resultado.success || !resultado.data) {
+      return { success: false, error: resultado.error || "No se encontraron datos" }
+    }
 
-// Función: objetoFormulaS / oFormulaS (Listado): Esta Función crea un listado de objetos/clases, es un array
+    if (resultado.data.length === 0) {
+      return { success: false, error: "Formula no encontrada" }
+    }
 
+    const formula: oFormula = resultado.data[0] as oFormula
+
+    return { success: true, data: formula }
+  } catch (error) {
+    console.error("Error en app/actions/formulas en objetoFormula (Individual):", error)
+    return {
+      success: false,
+      error: "Error interno del servidor al ejecutar objetoFormula de app/actions/formula, " + error,
+    }
+  }
+}
+
+// Función: objetoFormulas / oFormulas (Listado): Esta Función crea un listado de objetos/clases, es un array
+export async function objetoFormulas(
+  formulaid = -1,
+  codigo = "",
+  nombre = "",
+  activo = "Todos",
+  clienteid = -1,
+  productoid = -1,
+): Promise<{ success: boolean; data?: oFormula[]; error?: string }> {
+  try {
+    const resultado = await obtenerFormulas(formulaid, codigo, nombre, activo, clienteid, productoid)
+
+    if (!resultado.success || !resultado.data) {
+      return { success: false, error: resultado.error || "No se encontraron datos" }
+    }
+
+    const formulas: oFormula[] = resultado.data as oFormula[]
+
+    return { success: true, data: formulas }
+  } catch (error) {
+    console.error("Error en app/actions/formulas en objetoFormulas (Listado/Array):", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al momento de ejecutar objetoFormulas de app/Actions/formulas, " + error,
+    }
+  }
+}
 
 /*==================================================
     INSERTS: CREATE / CREAR / INSERT
@@ -129,10 +196,128 @@ export async function crearFormula(formData: FormData) {
   }
 }
 
+// Función crearFormulaXProducto: Función para crear relación entre formula y producto
+export async function crearFormulaXProducto(formulaid: number, productoid: number, cantidad: number) {
+  try {
+    // Paso 1: Validar parámetros
+    if (!formulaid || formulaid <= 0 || !productoid || productoid <= 0 || !cantidad || cantidad <= 0) {
+      return {
+        success: false,
+        error:
+          "No se recibieron los parametros necesario para poder proceder en ejecutar la funcion crearFormulaXProducto en app/actions/formulas",
+      }
+    }
+
+    // Paso 2: Obtener costo unitario de la formula
+    const { data: formulaData, error: formulaError } = await supabase
+      .from("formulas")
+      .select("costo")
+      .eq("id", formulaid)
+      .single()
+
+    if (formulaError || !formulaData) {
+      console.error("Error obteniendo costo de formula en crearFormulaXProducto:", formulaError)
+      return { success: false, error: "Error obteniendo costo de formula: " + formulaError?.message }
+    }
+
+    const costounitario = formulaData.costo || 0
+
+    // Paso 3: Calcular costo parcial
+    const costoparcial = cantidad * costounitario
+
+    // Paso 4: Insertar en formulasxproducto
+    const fechaActual = new Date().toISOString().split("T")[0]
+
+    const { error: insertError } = await supabase.from("formulasxproducto").insert({
+      productoid: productoid,
+      formulaid: formulaid,
+      cantidad: cantidad,
+      costoparcial: costoparcial,
+      fechacreacion: fechaActual,
+      activo: true,
+    })
+
+    if (insertError) {
+      console.error("Error insertando en formulasxproducto en crearFormulaXProducto:", insertError)
+      return { success: false, error: "Error insertando relación: " + insertError.message }
+    }
+
+    revalidatePath("/productos")
+
+    // Paso 5: Return resultados
+    return { success: true }
+  } catch (error) {
+    console.error("Error en crearFormulaXProducto de actions/formulas: " + error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion crearFormulaXProducto de actions/formulas: " + error,
+    }
+  }
+}
+
+// Función crearFormulaXFormula: Función para crear relación entre formula secundaria y formula principal
+export async function crearFormulaXFormula(secundariaid: number, formulaid: number, cantidad: number) {
+  try {
+    // Paso 1: Validar parámetros
+    if (!secundariaid || secundariaid <= 0 || !formulaid || formulaid <= 0 || !cantidad || cantidad <= 0) {
+      return {
+        success: false,
+        error:
+          "No se recibieron los parametros necesario para poder proceder en ejecutar la funcion crearFormulaXFormula en app/actions/formulas",
+      }
+    }
+
+    // Paso 2: Obtener costo unitario de la formula secundaria
+    const { data: formulaData, error: formulaError } = await supabase
+      .from("formulas")
+      .select("costo")
+      .eq("id", secundariaid)
+      .single()
+
+    if (formulaError || !formulaData) {
+      console.error("Error obteniendo costo de formula en crearFormulaXFormula:", formulaError)
+      return { success: false, error: "Error obteniendo costo de formula: " + formulaError?.message }
+    }
+
+    const costounitario = formulaData.costo || 0
+
+    // Paso 3: Calcular costo parcial
+    const costoparcial = cantidad * costounitario
+
+    // Paso 4: Insertar en formulasxformula
+    const fechaActual = new Date().toISOString().split("T")[0]
+
+    const { error: insertError } = await supabase.from("formulasxformula").insert({
+      formulaid: formulaid,
+      secundariaid: secundariaid,
+      cantidad: cantidad,
+      costoparcial: costoparcial,
+      fechacreacion: fechaActual,
+      activo: true,
+    })
+
+    if (insertError) {
+      console.error("Error insertando en formulasxformula en crearFormulaXFormula:", insertError)
+      return { success: false, error: "Error insertando relación: " + insertError.message }
+    }
+
+    revalidatePath("/formulas")
+
+    // Paso 5: Return resultados
+    return { success: true }
+  } catch (error) {
+    console.error("Error en crearFormulaXFormula de actions/formulas: " + error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion crearFormulaXFormula de actions/formulas: " + error,
+    }
+  }
+}
+
 /*==================================================
   SELECTS: READ / OBTENER / SELECT
 ================================================== */
-//Función: obtenerFormulas / selFormulas: Función para obtener 
+//Función: obtenerFormulas / selFormulas: Función para obtener
 export async function obtenerFormulas(
   id = -1,
   codigo = "",
@@ -166,7 +351,35 @@ export async function obtenerFormulas(
         nombre,
         imgurl,
         unidadmedidaid,
-        unidadesmedida(descripcion),
+        unidadesmedida!unidadmedidaid(descripcion),
+        materiasprimasxformula!formulaid(
+          materiaprimaid,
+          materiasprima!materiaprimaid(
+            codigo,
+            nombre,
+            imgurl,
+            unidadmedidaid,
+            unidadesmedida!unidadmedidaid(descripcion),
+            costo,
+            factorimportacion,
+            costoconfactorimportacion
+          ),
+          cantidad,
+          costoparcial
+        ),
+        formulasxformula!formulaid(
+          secundariaid,
+          formulas!secundariaid(
+            codigo,
+            nombre,
+            imgurl,
+            unidadmedidaid,
+            unidadesmedida!unidadmedidaid(descripcion),
+            costo
+          ),
+          cantidad,
+          costoparcial
+        ),
         costo,
         fechacreacion,
         activo
@@ -287,6 +500,168 @@ export async function obtenerFormulasXProductos(
       success: false,
       error: "Error interno del servidor, al ejecutar obtenerFormulasXProductos de actions/formulas",
     }
+  }
+}
+
+// Función: obtenerMateriasPrimasXFormula: Función para obtener materias primas relacionadas a una formula
+export async function obtenerMateriasPrimasXFormula(
+  formulaid: number,
+): Promise<{ success: boolean; data?: oMateriasPrimasXFormula; error?: string }> {
+  try {
+    // Paso 1: Validar parámetro
+    if (!formulaid || formulaid < 1) {
+      return {
+        success: false,
+        error:
+          "No se recibio el parametro necesario, favor de verificar, al momento de ejecutar la funcion obtenerMaterisPrimasXFormula de app/actions/formulas",
+      }
+    }
+
+    // Paso 2: Preparar y ejecutar Query
+    let query = supabase.from("formulas").select(`
+        id,
+        codigo,
+        nombre,
+        imgurl,
+        unidadmedidaid,
+        unidadesmedida!unidadmedidaid(descripcion),
+        materiasprimasxformula!formulaid(
+          materiaprimaid,
+          materiasprima!materiaprimaid(
+            codigo,
+            nombre,
+            imgurl,
+            unidadmedidaid,
+            unidadesmedida!unidadmedidaid(descripcion),
+            costo,
+            factorimportacion,
+            costoconfactorimportacion
+          ),
+          cantidad,
+          costoparcial
+        )
+      `)
+
+    // Paso 3: Aplicar filtro
+    query = query.eq("id", formulaid)
+
+    // Paso 4: Ejecutar query
+    const { data, error } = await query.single()
+
+    // Error en query
+    if (error) {
+      console.error("Error obteniendo materias primas x formula en obtenerMateriasPrimasXFormula:", error)
+      return { success: false, error: error.message }
+    }
+
+    // Paso 5: Guardar resultado en variable con tipo
+    const result: oMateriasPrimasXFormula = data as oMateriasPrimasXFormula
+
+    // Paso 6: Retorno de data
+    return { success: true, data: result }
+  } catch (error) {
+    console.error("Error en obtenerMateriasPrimasXFormula de actions/formulas:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerMateriasPrimasXFormula de actions/formulas",
+    }
+  }
+}
+
+// Función: obtenerFormulasXFormula: Función para obtener formulas relacionadas a una formula
+export async function obtenerFormulasXFormula(
+  formulaid: number,
+): Promise<{ success: boolean; data?: oFormulasXFormula; error?: string }> {
+  try {
+    // Paso 1: Validar parámetro
+    if (!formulaid || formulaid < 1) {
+      return {
+        success: false,
+        error:
+          "No se recibio el parametro necesario, favor de verificar, al momento de ejecutar la funcion obtenerFormulasXFormula de app/actions/formulas",
+      }
+    }
+
+    // Paso 2: Preparar y ejecutar Query
+    let query = supabase.from("formulas").select(`
+        id,
+        codigo,
+        nombre,
+        imgurl,
+        unidadmedidaid,
+        unidadesmedida!unidadmedidaid(descripcion),
+        formulasxformula!formulaid(
+          secundariaid,
+          formulas!secundariaid(
+            codigo,
+            nombre,
+            imgurl,
+            unidadmedidaid,
+            unidadesmedida!unidadmedidaid(descripcion),
+            costo
+          ),
+          cantidad,
+          costoparcial
+        )
+      `)
+
+    // Paso 3: Aplicar filtro
+    query = query.eq("id", formulaid)
+
+    // Paso 4: Ejecutar query
+    const { data, error } = await query.single()
+
+    // Error en query
+    if (error) {
+      console.error("Error obteniendo formulas x formula en obtenerFormulasXFormula:", error)
+      return { success: false, error: error.message }
+    }
+
+    // Paso 5: Guardar resultado en variable con tipo
+    const result: oFormulasXFormula = data as oFormulasXFormula
+
+    // Paso 6: Retorno de data
+    return { success: true, data: result }
+  } catch (error) {
+    console.error("Error en obtenerFormulasXFormula de actions/formulas:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerFormulasXFormula de actions/formulas",
+    }
+  }
+}
+
+// Función: listaDesplegableFormulasBuscar: Función para buscar formulas en un dropdown
+export async function listaDesplegableFormulasBuscar(buscar: string): Promise<ddlItem[]> {
+  try {
+    let query = supabase.from("formulas").select("id, codigo, nombre").eq("activo", true)
+
+    // Apply filter: search in nombre OR codigo
+    if (buscar && buscar.trim() !== "") {
+      query = query.or(`nombre.ilike.%${buscar}%,codigo.ilike.%${buscar}%`)
+    }
+
+    // Order by nombre
+    query = query.order("nombre", { ascending: true })
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error("Error obteniendo lista desplegable de formulas:", error)
+      return []
+    }
+
+    // Map results to ddlItem format: value = id, text = "codigo - nombre"
+    const items: ddlItem[] =
+      data?.map((formula) => ({
+        value: formula.id.toString(),
+        text: `${formula.codigo} - ${formula.nombre}`,
+      })) || []
+
+    return items
+  } catch (error) {
+    console.error("Error en app/actions/formulas en listaDesplegableFormulasBuscar:", error)
+    return []
   }
 }
 
@@ -427,6 +802,88 @@ export async function eliminarFormula(id: number) {
   }
 }
 
+// Función: eliminarFormulaXFormula: Función para eliminar la relación entre formula secundaria y formula principal
+export async function eliminarFormulaXFormula(SecundariaId: number, formulaid: number) {
+  try {
+    // Paso 1: Validar parámetros
+    if (!SecundariaId || SecundariaId <= 0 || !formulaid || formulaid <= 0) {
+      return {
+        success: false,
+        error:
+          "No se recibieron los parametros necesarios para ejecutar la funcion, en eliminarFormulaXFormula de app/actions/formulas",
+      }
+    }
+
+    // Paso 2: Ejecutar Query DELETE
+    const { error } = await supabase
+      .from("formulasxformula")
+      .delete()
+      .eq("secundariaid", SecundariaId)
+      .eq("formulaid", formulaid)
+
+    // Return si hay error en query
+    if (error) {
+      console.error(
+        "Error eliminando relación formula x formula en eliminarFormulaXFormula de actions/formulas:",
+        error,
+      )
+      return { success: false, error: "Error en query: " + error.message }
+    }
+
+    revalidatePath("/formulas")
+
+    // Paso 3: Return resultados
+    return { success: true }
+  } catch (error) {
+    console.error("Error en eliminarFormulaXFormula de actions/formulas: " + error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion eliminarFormulaXFormula de actions/formulas: " + error,
+    }
+  }
+}
+
+// Función: eliminarFormulaXProducto: Función para eliminar la relación entre formula y producto
+export async function eliminarFormulaXProducto(formulaid: number, productoid: number) {
+  try {
+    // Paso 1: Validar parámetros
+    if (!formulaid || formulaid <= 0 || !productoid || productoid <= 0) {
+      return {
+        success: false,
+        error:
+          "No se recibieron los parametros necesarios para ejecutar la funcion, en eliminarFormulaXProducto de app/actions/formulas",
+      }
+    }
+
+    // Paso 2: Ejecutar Query DELETE
+    const { error } = await supabase
+      .from("formulasxproducto")
+      .delete()
+      .eq("formulaid", formulaid)
+      .eq("productoid", productoid)
+
+    // Return si hay error en query
+    if (error) {
+      console.error(
+        "Error eliminando relación formula x producto en eliminarFormulaXProducto de actions/formulas:",
+        error,
+      )
+      return { success: false, error: "Error en query: " + error.message }
+    }
+
+    revalidatePath("/productos")
+
+    // Paso 3: Return resultados
+    return { success: true }
+  } catch (error) {
+    console.error("Error en eliminarFormulaXProducto de actions/formulas: " + error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion eliminarFormulaXProducto de actions/formulas: " + error,
+    }
+  }
+}
+
 /*==================================================
   * SPECIALS: PROCESS / ESPECIAL / SPECIAL
 ================================================== */
@@ -445,7 +902,7 @@ export async function estatusActivoFormula(id: number, activo: boolean): Promise
 
     revalidatePath("/formulas")
     return true
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error en estatusActivoFormula de app/actions/formulas: ", error)
     return false
   }
@@ -469,5 +926,149 @@ export async function listaDesplegableFormulas() {
   } catch (error: any) {
     console.error("Error en listaDesplegableFormulas:", error)
     return { data: null, error: error.message }
+  }
+}
+
+// Función: recalcularFormula: Función para recalcular el costo total de una formula sumando materias primas y formulas
+export async function recalcularFormula(formulaid: number) {
+  try {
+    // Paso 1: Validar parámetro
+    if (!formulaid || formulaid <= 0) {
+      return {
+        success: false,
+        error:
+          "No se recibieron los parametros necesarios para ejecuta la funcion recalcularFormula de app/actions/formulas",
+      }
+    }
+
+    // Paso 2: Obtener materias primas relacionadas a la formula
+    const { data: materiasPrimas, error: errorMP } = await supabase
+      .from("materiasprimasxformula")
+      .select(
+        `
+        materiaprimaid,
+        cantidad,
+        materiasprima:materiaprimaid (
+          costo,
+          costoconfactorimportacion
+        )
+      `,
+      )
+      .eq("formulaid", formulaid)
+
+    if (errorMP) {
+      console.error("Error obteniendo materias primas en recalcularFormula:", errorMP)
+      return { success: false, error: "Error obteniendo materias primas: " + errorMP.message }
+    }
+
+    // Paso 3: Recorrer materias primas y actualizar costoparcial
+    if (materiasPrimas && materiasPrimas.length > 0) {
+      for (const mp of materiasPrimas) {
+        const cantidad = mp.cantidad || 0
+        const costoconfactorimportacion = (mp.materiasprima as any)?.costoconfactorimportacion || 0
+        const costoparcial = cantidad * costoconfactorimportacion
+
+        // Actualizar costoparcial en materiasprimasxformula
+        const { error: errorUpdateMP } = await supabase
+          .from("materiasprimasxformula")
+          .update({ costoparcial })
+          .eq("formulaid", formulaid)
+          .eq("materiaprimaid", mp.materiaprimaid)
+
+        if (errorUpdateMP) {
+          console.error("Error actualizando costoparcial de materia prima:", errorUpdateMP)
+        }
+      }
+    }
+
+    // Paso 4: Obtener suma de costos parciales de materias primas
+    const { data: dataSumaMP, error: errorSumaMP } = await supabase
+      .from("materiasprimasxformula")
+      .select("costoparcial")
+      .eq("formulaid", formulaid)
+
+    if (errorSumaMP) {
+      console.error("Error obteniendo suma de materias primas:", errorSumaMP)
+      return { success: false, error: "Error obteniendo suma de materias primas: " + errorSumaMP.message }
+    }
+
+    const MPCostoParcial = dataSumaMP?.reduce((sum, item) => sum + (item.costoparcial || 0), 0) || 0
+
+    // Paso 5: Obtener formulas relacionadas
+    const { data: formulas, error: errorF } = await supabase
+      .from("formulasxformula")
+      .select(
+        `
+        secundariaid,
+        cantidad,
+        formulas:secundariaid (
+          costo
+        )
+      `,
+      )
+      .eq("formulaid", formulaid)
+
+    if (errorF) {
+      console.error("Error obteniendo formulas en recalcularFormula:", errorF)
+      return { success: false, error: "Error obteniendo formulas: " + errorF.message }
+    }
+
+    // Paso 6: Recorrer formulas y actualizar costoparcial
+    if (formulas && formulas.length > 0) {
+      for (const formula of formulas) {
+        const cantidad = formula.cantidad || 0
+        const costo = (formula.formulas as any)?.costo || 0
+        const costoparcial = cantidad * costo
+
+        // Actualizar costoparcial en formulasxformula
+        const { error: errorUpdateF } = await supabase
+          .from("formulasxformula")
+          .update({ costoparcial })
+          .eq("formulaid", formulaid)
+          .eq("secundariaid", formula.secundariaid)
+
+        if (errorUpdateF) {
+          console.error("Error actualizando costoparcial de formula:", errorUpdateF)
+        }
+      }
+    }
+
+    // Paso 7: Obtener suma de costos parciales de formulas
+    const { data: dataSumaF, error: errorSumaF } = await supabase
+      .from("formulasxformula")
+      .select("costoparcial")
+      .eq("formulaid", formulaid)
+
+    if (errorSumaF) {
+      console.error("Error obteniendo suma de formulas:", errorSumaF)
+      return { success: false, error: "Error obteniendo suma de formulas: " + errorSumaF.message }
+    }
+
+    const FCostoParcial = dataSumaF?.reduce((sum, item) => sum + (item.costoparcial || 0), 0) || 0
+
+    // Paso 8: Sumar ambos costos parciales
+    const SumaElaboracion = MPCostoParcial + FCostoParcial
+
+    // Paso 9: Actualizar costo en tabla formulas
+    const { error: errorUpdate } = await supabase
+      .from("formulas")
+      .update({ costo: SumaElaboracion })
+      .eq("id", formulaid)
+
+    if (errorUpdate) {
+      console.error("Error actualizando costo de formula en recalcularFormula:", errorUpdate)
+      return { success: false, error: "Error actualizando costo: " + errorUpdate.message }
+    }
+
+    revalidatePath("/formulas")
+
+    // Paso 10: Return resultados
+    return { success: true, error: false }
+  } catch (error) {
+    console.error("Error en recalcularFormula de actions/formulas: " + error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar funcion recalcularFormula de actions/formulas: " + error,
+    }
   }
 }

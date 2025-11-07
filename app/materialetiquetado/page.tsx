@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight, EyeOff, Trash2 } from "lucide-react"
+import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight, Trash2, AppWindow } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { MaterialEtiquetado } from "@/types/materiales-etiquetado"
@@ -461,7 +461,7 @@ export default function MaterialEtiquetadoPage() {
                       <div>
                         <span className="font-semibold text-gray-700">Costo:</span>
                         <span className="ml-2 text-gray-900">
-                          ${elementoDetalles.MaterialEtiquetadoCosto.toFixed(2)}
+                          ${elementoDetalles.MaterialEtiquetadoCosto.toFixed(6)}
                         </span>
                       </div>
 
@@ -542,7 +542,7 @@ export default function MaterialEtiquetadoPage() {
                       <td className="py-3 px-4">{elemento.MaterialEtiquetadoId}</td>
                       <td className="py-3 px-4">{elemento.MaterialEtiquetadoCodigo}</td>
                       <td className="py-3 px-4">{elemento.MaterialEtiquetadoNombre}</td>
-                      <td className="py-3 px-4">${elemento.MaterialEtiquetadoCosto.toFixed(2)}</td>
+                      <td className="py-3 px-4">${elemento.MaterialEtiquetadoCosto.toFixed(6)}</td>
                       <td className="py-3 px-4">
                         <span
                           className={`px-2 py-1 text-xs rounded-xs font-semibold ${
@@ -560,7 +560,7 @@ export default function MaterialEtiquetadoPage() {
                             title="Detalles"
                             onClick={() => handleVerDetalles(elemento)}
                           >
-                            <EyeOff className="h-4 w-4" />
+                            <AppWindow className="h-4 w-4" />
                           </Button>
 
                           <Button

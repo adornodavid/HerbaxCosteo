@@ -8,9 +8,9 @@ import { useState, useEffect, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Edit, Trash2, ArrowLeft } from "lucide-react"
+import { Edit, Trash2, ArrowLeft, Package, Flag as Flask } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
-import type { Formula } from "@/types/formulas"
+import type { oFormula } from "@/types/formulas.types"
 import type {
   propsPageLoadingScreen,
   propsPageModalAlert,
@@ -28,7 +28,7 @@ import { PageModalError } from "@/components/page-modal-error"
 import { PageModalTutorial } from "@/components/page-modal-tutorial"
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
-import { obtenerFormulas } from "@/app/actions/formulas"
+import { objetoFormula } from "@/app/actions/formulas"
 
 /* ==================================================
 	Componente Principal (Pagina)
@@ -44,10 +44,11 @@ export default function VerFormulaPage() {
   // --- Estados ---
   // Cargar contenido en variables
   const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
-  const [formula, setFormula] = useState<Formula | null>(null)
+  const [formula, setFormula] = useState<oFormula | null>(null)
   const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
   const [ModalError, setModalError] = useState<propsPageModalError>()
   const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
+  const [activeTab, setActiveTab] = useState<"materiasprima" | "formulas" | "elaboracion">("elaboracion")
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
   const [showModalAlert, setShowModalAlert] = useState(false)
@@ -67,9 +68,9 @@ export default function VerFormulaPage() {
         try {
           setShowPageLoading(true)
 
-          const result = await obtenerFormulas(formulaId, "", "", "Todos", -1, -1)
-          if (result.success && result.data && result.data.length > 0) {
-            setFormula(result.data[0])
+          const result = await objetoFormula(formulaId, "", "", "Todos", -1, -1)
+          if (result.success && result.data) {
+            setFormula(result.data)
           }
         } catch (error) {
           console.error("Error al cargar información: ", error)
@@ -144,51 +145,58 @@ export default function VerFormulaPage() {
         Ruta={null}
       />
 
-      {/* Card with formula information */}
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden mb-6">
         <CardContent className="p-0">
-          <div className="flex flex-col md:flex-row">
-            <div className="md:w-1/3 h-64 md:h-auto flex items-center justify-center bg-gray-100">
+          <div className="flex flex-row h-[200px]">
+            {/* Image on left with gray background */}
+            <div className="w-[200px] h-[200px] flex items-center justify-center bg-gray-200">
               <img
                 src={
                   formula.imgurl && formula.imgurl !== "Sin imagen"
                     ? formula.imgurl
-                    : "/placeholder.svg?height=400&width=400&text=Formula"
+                    : "/placeholder.svg?height=200&width=200&text=Formula"
                 }
                 alt={formula.nombre}
-                className="w-full h-auto object-cover"
+                className="h-[200px] w-auto"
               />
             </div>
 
-            {/* Formula data on the right */}
-            <div className="md:w-2/3 p-6 space-y-4">
-              <h1 className="text-3xl font-bold mb-6">Información de la Fórmula</h1>
-
-              <div className="space-y-3">
+            {/* Formula info on right - compact layout */}
+            <div className="flex-1 p-6 flex flex-col justify-center space-y-3">
+              {/* Line 1: ID, Código, Nombre */}
+              <div className="flex gap-6 items-center">
                 <div>
-                  <span className="font-semibold text-gray-700">ID:</span>
+                  <span className="font-semibold text-sky-700">ID:</span>
                   <span className="ml-2 text-gray-900">{formula.id}</span>
                 </div>
-
                 <div>
-                  <span className="font-semibold text-gray-700">Código:</span>
+                  <span className="font-semibold text-sky-700">Código:</span>
                   <span className="ml-2 text-gray-900">{formula.codigo || "Sin código"}</span>
                 </div>
-
                 <div>
-                  <span className="font-semibold text-gray-700">Nombre:</span>
+                  <span className="font-semibold text-sky-700">Nombre:</span>
                   <span className="ml-2 text-gray-900">{formula.nombre || "Sin nombre"}</span>
                 </div>
+              </div>
 
+              {/* Line 2: Unidad de medida, Costo */}
+              <div className="flex gap-6 items-center">
                 <div>
-                  <span className="font-semibold text-gray-700">Costo:</span>
+                  <span className="font-semibold text-sky-700">Unidad de Medida:</span>
+                  <span className="ml-2 text-gray-900">{formula.unidadesmedida?.descripcion || "Sin unidad"}</span>
+                </div>
+                <div>
+                  <span className="font-semibold text-sky-700">Costo:</span>
                   <span className="ml-2 text-gray-900">
                     {formula.costo ? `$${Number(formula.costo).toFixed(2)}` : "$0.00"}
                   </span>
                 </div>
+              </div>
 
+              {/* Line 3: Estatus, Fecha de Creación */}
+              <div className="flex gap-6 items-center">
                 <div>
-                  <span className="font-semibold text-gray-700">Estatus:</span>
+                  <span className="font-semibold text-sky-700">Estatus:</span>
                   <span
                     className={`ml-2 px-2 py-1 rounded text-sm font-semibold ${
                       formula.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"
@@ -197,9 +205,8 @@ export default function VerFormulaPage() {
                     {formula.activo ? "Activo" : "Inactivo"}
                   </span>
                 </div>
-
                 <div>
-                  <span className="font-semibold text-gray-700">Fecha de Creación:</span>
+                  <span className="font-semibold text-sky-700">Fecha de Creación:</span>
                   <span className="ml-2 text-gray-900">
                     {formula.fechacreacion ? new Date(formula.fechacreacion).toLocaleDateString() : "N/A"}
                   </span>
@@ -209,6 +216,215 @@ export default function VerFormulaPage() {
           </div>
         </CardContent>
       </Card>
+
+      <div className="flex gap-2 border-b border-gray-200">
+        <button
+          onClick={() => setActiveTab("materiasprima")}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === "materiasprima"
+              ? "border-b-2 border-blue-500 text-blue-600"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          Materias Prima
+        </button>
+
+        <button
+          onClick={() => setActiveTab("formulas")}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === "formulas" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          Fórmulas
+        </button>
+
+        <button
+          onClick={() => setActiveTab("elaboracion")}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === "elaboracion"
+              ? "border-b-2 border-blue-500 text-blue-600"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          Elaboración
+        </button>
+      </div>
+
+      {activeTab === "materiasprima" && (
+        <Card>
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Materias Prima</h2>
+            <div className="space-y-2">
+              {formula.materiasprimasxformula && formula.materiasprimasxformula.length > 0 ? (
+                <div className="space-y-3">
+                  {formula.materiasprimasxformula.map((mpRel, index) => (
+                    <div key={index} className="flex items-center gap-4 border rounded p-3 max-h-20">
+                      {/* Icon on left */}
+                      <div className="flex-shrink-0">
+                        <div className="w-14 h-14 bg-green-100 rounded-lg flex items-center justify-center">
+                          <Package className="h-7 w-7 text-green-600" />
+                        </div>
+                      </div>
+
+                      {/* Info on right */}
+                      <div className="flex-1 min-w-0">
+                        {/* Line 1: ID, Código, Nombre */}
+                        <div className="flex items-center gap-3 mb-1">
+                          <span className="text-xs text-gray-500">ID: {mpRel.materiaprimaid}</span>
+                          <span className="text-sm font-semibold text-gray-700">
+                            {mpRel.materiasprima?.codigo || "N/A"}
+                          </span>
+                          <span className="text-sm text-gray-900 truncate">{mpRel.materiasprima?.nombre || "N/A"}</span>
+                        </div>
+
+                        {/* Line 2: Unidad de medida, Costo */}
+                        <div className="flex items-center gap-3 text-xs text-gray-600">
+                          <span>{mpRel.materiasprima?.unidadesmedida?.descripcion || "N/A"}</span>
+                          <span className="font-semibold text-green-600">
+                            ${mpRel.materiasprima?.costo?.toFixed(6) || "0.000000"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500">No hay materias prima asignadas</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {activeTab === "formulas" && (
+        <Card>
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Fórmulas</h2>
+            <div className="space-y-2">
+              {formula.formulasxformula && formula.formulasxformula.length > 0 ? (
+                <div className="space-y-3">
+                  {formula.formulasxformula.map((formulaRel, index) => (
+                    <div key={index} className="flex items-center gap-4 border rounded p-3 max-h-20">
+                      {/* Icon on left */}
+                      <div className="flex-shrink-0">
+                        <div className="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <Flask className="h-7 w-7 text-blue-600" />
+                        </div>
+                      </div>
+
+                      {/* Info on right */}
+                      <div className="flex-1 min-w-0">
+                        {/* Line 1: ID, Código, Nombre */}
+                        <div className="flex items-center gap-3 mb-1">
+                          <span className="text-xs text-gray-500">ID: {formulaRel.secundarioid}</span>
+                          <span className="text-sm font-semibold text-gray-700">
+                            {formulaRel.formulas?.codigo || "N/A"}
+                          </span>
+                          <span className="text-sm text-gray-900 truncate">{formulaRel.formulas?.nombre || "N/A"}</span>
+                        </div>
+
+                        {/* Line 2: Unidad de medida, Costo */}
+                        <div className="flex items-center gap-3 text-xs text-gray-600">
+                          <span>{formulaRel.formulas?.unidadesmedida?.descripcion || "N/A"}</span>
+                          <span className="font-semibold text-green-600">
+                            ${formulaRel.formulas?.costo?.toFixed(6) || "0.000000"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500">No hay fórmulas asignadas</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {activeTab === "elaboracion" && (
+        <Card>
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Elaboración de la Fórmula</h2>
+
+            {(formula.materiasprimasxformula && formula.materiasprimasxformula.length > 0) ||
+            (formula.formulasxformula && formula.formulasxformula.length > 0) ? (
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b-2 border-gray-300">
+                      <th className="text-left p-3 font-semibold"></th>
+                      <th className="text-left p-3 font-semibold">Tipo</th>
+                      <th className="text-left p-3 font-semibold">Código</th>
+                      <th className="text-left p-3 font-semibold">Nombre</th>
+                      <th className="text-left p-3 font-semibold">Costo</th>
+                      <th className="text-left p-3 font-semibold">Unidad de medida</th>
+                      <th className="text-left p-3 font-semibold">Factor Importación</th>
+                      <th className="text-left p-3 font-semibold">Costo con FI</th>
+                      <th className="text-left p-3 font-semibold border-l-2 border-gray-300 text-green-600">
+                        Cantidad
+                      </th>
+                      <th className="text-left p-3 font-semibold text-green-600">Costo Parcial</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Materias Prima */}
+                    {formula.materiasprimasxformula?.map((mpRel, index) => (
+                      <tr key={`mp-${index}`} className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="p-3">
+                          <Package className="h-5 w-5 text-green-600" />
+                        </td>
+                        <td className="p-3">Materia Prima</td>
+                        <td className="p-3">{mpRel.materiasprima?.codigo || "N/A"}</td>
+                        <td className="p-3">{mpRel.materiasprima?.nombre || "N/A"}</td>
+                        <td className="p-3">${mpRel.materiasprima?.costo?.toFixed(6) || "0.000000"}</td>
+                        <td className="p-3">{mpRel.materiasprima?.unidadesmedida?.descripcion || "N/A"}</td>
+                        <td className="p-3">{mpRel.materiasprima?.factorimportacion?.toFixed(2) || "0.00"}</td>
+                        <td className="p-3">
+                          ${mpRel.materiasprima?.costoconfactorimportacion?.toFixed(6) || "0.000000"}
+                        </td>
+                        <td className="p-3 border-l-2 border-gray-300 text-green-600">{mpRel.cantidad || 0}</td>
+                        <td className="p-3 text-green-600">${mpRel.costoparcial?.toFixed(6) || "0.000000"}</td>
+                      </tr>
+                    ))}
+
+                    {/* Formulas */}
+                    {formula.formulasxformula?.map((formulaRel, index) => (
+                      <tr key={`formula-${index}`} className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="p-3">
+                          <Flask className="h-5 w-5 text-blue-600" />
+                        </td>
+                        <td className="p-3">Fórmula</td>
+                        <td className="p-3">{formulaRel.formulas?.codigo || "N/A"}</td>
+                        <td className="p-3">{formulaRel.formulas?.nombre || "N/A"}</td>
+                        <td className="p-3">${formulaRel.formulas?.costo?.toFixed(6) || "0.000000"}</td>
+                        <td className="p-3">{formulaRel.formulas?.unidadesmedida?.descripcion || "N/A"}</td>
+                        <td className="p-3">No aplica</td>
+                        <td className="p-3">${formulaRel.formulas?.costo?.toFixed(6) || "0.000000"}</td>
+                        <td className="p-3 border-l-2 border-gray-300 text-green-600">{formulaRel.cantidad || 0}</td>
+                        <td className="p-3 text-green-600">${formulaRel.costoparcial?.toFixed(6) || "0.000000"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                <div className="border-t-2 border-blue-500 mt-4 pt-4">
+                  <div className="flex justify-end">
+                    <div className="w-2/5">
+                      <div className="flex justify-between py-2 border-b border-gray-200">
+                        <span className="font-bold">Costo total:</span>
+                        <span className="font-bold">${formula.costo?.toFixed(6) || "0.000000"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-500">No hay materias prima ni fórmulas asociadas a esta fórmula.</p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="flex gap-4 justify-center">
         {esAdminDOs && (

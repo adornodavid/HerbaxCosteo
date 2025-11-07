@@ -2,10 +2,14 @@
   Imports
 ================================================== */
 import { createClient } from "@/lib/supabase"
+import type { ddlItem } from "@/types/common.types"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
 ================================================== */
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the supabase variable
 
 /* ==================================================
   Funciones
@@ -22,7 +26,7 @@ import { createClient } from "@/lib/supabase"
 		- xxxXXXXX
     - listaDesplegableCatalogos / ddlCatalogos
 ================================================== */
-// Función: listaDesplegableClientes: función que se utiliza para los dropdownlist y puede contener id y / o nombre
+// Función: listaDesplegableUnidadesMedida: función que se utiliza para los dropdownlist y puede contener id y / o nombre
 export async function listaDesplegableUnidadesMedida(id = -1, descripcion = "") {
   try {
     // Query principal
@@ -35,17 +39,24 @@ export async function listaDesplegableUnidadesMedida(id = -1, descripcion = "") 
     if (descripcion !== "") {
       query = query.ilike("descripcion", `%${descripcion}%`)
     }
-  
+
     // Ejecutar query
-    query = query.order("nombre", { ascending: true })
+    query = query.order("descripcion", { ascending: true })
 
     // Varaibles y resultados del query
-    const { data, error } = await query
+    const { data: unidades, error } = await query
 
     if (error) {
       console.error("Error obteniendo la lista desplegable de unidades de medida:", error)
       return { success: false, error: error.message }
     }
+
+    const data: ddlItem[] = unidades
+      ? unidades.map((unidad) => ({
+          value: unidad.id.toString(),
+          text: unidad.descripcion,
+        }))
+      : []
 
     return { success: true, data }
   } catch (error) {
@@ -53,7 +64,6 @@ export async function listaDesplegableUnidadesMedida(id = -1, descripcion = "") 
     return { success: false, error: "Error interno del servidor" }
   }
 }
-
 
 //Función: selCatalogosXFiltros / obtenerCatalogosFiltrados: funcio que ejecuta el bloque de busqueda en la pagina de listado
 export async function obtenerCatalogosFiltrados(
@@ -63,8 +73,6 @@ export async function obtenerCatalogosFiltrados(
   page = 1,
   itemsPerPage = 20,
 ) {
-  const supabase = createClient()
-
   try {
     let query = supabase
       .from("catalogos")
@@ -128,8 +136,6 @@ export async function obtenerCatalogosFiltrados(
 
 //Función: selClientesDDL / obtenerClientesParaDropdown: función para obtener el listado para un dropdownlist
 export async function obtenerClientesParaDropdown() {
-  const supabase = createClient()
-
   try {
     const { data, error } = await supabase
       .from("clientes")
@@ -157,8 +163,6 @@ export async function obtenerClientesParaDropdown() {
 
 //Función: selCatalogoXId / obtenerDetalleCatalogo: Función para obtener a detalle un catalogo pot Id
 export async function obtenerDetalleCatalogo(catalogoId: string) {
-  const supabase = createClient()
-
   try {
     const { data, error } = await supabase
       .from("catalogos")
@@ -209,8 +213,6 @@ export async function obtenerDetalleCatalogo(catalogoId: string) {
 
 //Función: listaDesplegableCatalogos: función para obtener el listado de catalogos para dropdownlist con filtros opcionales
 export async function listaDesplegableCatalogos(id = -1, nombre = "", clienteid = -1) {
-  const supabase = createClient()
-
   try {
     let query = supabase.from("catalogos").select("id, nombre").eq("activo", true)
 
@@ -246,8 +248,6 @@ export async function listaDesplegableCatalogos(id = -1, nombre = "", clienteid 
 
 //Función: obtenerProductosCatalogo: función para obtener productos relacionados a un catálogo
 export async function obtenerProductosCatalogo(catalogoId: string) {
-  const supabase = createClient()
-
   try {
     const { data, error } = await supabase
       .from("catalogos")
@@ -300,8 +300,6 @@ export async function obtenerProductosCatalogo(catalogoId: string) {
 
 //Función: obtenerProductosDisponiblesParaCatalogo: función para obtener productos disponibles del cliente para agregar al catálogo
 export async function obtenerProductosDisponiblesParaCatalogo(catalogoId: string) {
-  const supabase = createClient()
-
   try {
     // Primero obtenemos los productos del cliente relacionado al catálogo
     const { data: catalogoData, error: catalogoError } = await supabase
@@ -366,8 +364,6 @@ export async function asociarProductoACatalogo(
   precioVenta: number,
   costoProducto: number,
 ) {
-  const supabase = createClient()
-
   try {
     const margenUtilidad = precioVenta - costoProducto
     const fechaHoy = new Date().toISOString()
@@ -398,8 +394,6 @@ export async function asociarProductoACatalogo(
 
 //Función: crearCatalogo: función para crear un nuevo catálogo con imagen
 export async function crearCatalogo(clienteId: string, nombre: string, descripcion: string, imageFile: File | null) {
-  const supabase = createClient()
-
   try {
     let imgUrl = null
 
@@ -453,8 +447,6 @@ export async function crearCatalogo(clienteId: string, nombre: string, descripci
 
 //Función: eliminarProductoDeCatalogo: función para eliminar un producto de un catálogo
 export async function eliminarProductoDeCatalogo(catalogoId: string, productoId: string) {
-  const supabase = createClient()
-
   try {
     const { error } = await supabase
       .from("productosxcatalogo")
@@ -484,8 +476,6 @@ export async function actualizarPrecioProductoCatalogo(
   nuevoPrecioVenta: number,
   costoProducto: number,
 ) {
-  const supabase = createClient()
-
   try {
     const nuevoMargenUtilidad = nuevoPrecioVenta - costoProducto
 

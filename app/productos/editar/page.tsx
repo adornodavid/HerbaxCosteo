@@ -45,8 +45,21 @@ import {
   obtenerIngredientesAgregados,
   eliminarIngredienteDeProducto,
   obtenerCostoTotalProducto,
-  actualizarCostoProducto, // Added import
+  actualizarCostoProducto,
 } from "@/app/actions/productos-actions"
+
+import {
+  listaDesplegableMaterialesEtiquetadosBuscar,
+  crearMaterialEtiquetadoXProducto,
+  eliminarMaterialEtiquetadoXProducto,
+} from "@/app/actions/material-etiquetado"
+
+// Import supabase client
+import { createClient } from "@supabase/supabase-js"
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Interfaces
 interface FormData {
@@ -189,6 +202,18 @@ function EditarProductoContent() {
   const [deleteFormulaId, setDeleteFormulaId] = useState<number | null>(null)
   const [deleteIngredienteId, setDeleteIngredienteId] = useState<number | null>(null)
 
+  const [materialesEtiquetado, setMaterialesEtiquetado] = useState<any[]>([])
+  const [materialesEtiquetadoAgregados, setMaterialesEtiquetadoAgregados] = useState<any[]>([])
+  const [materialEtiquetadoSearchTerm, setMaterialEtiquetadoSearchTerm] = useState("")
+  const [filteredMaterialesEtiquetado, setFilteredMaterialesEtiquetado] = useState<any[]>([])
+  const [showMaterialEtiquetadoDropdown, setShowMaterialEtiquetadoDropdown] = useState(false)
+  const [selMaterialEtiquetadoId, setSelMaterialEtiquetadoId] = useState("")
+  const [selMaterialEtiquetadoCantidad, setSelMaterialEtiquetadoCantidad] = useState("")
+  const [selMaterialEtiquetadoUnidad, setSelMaterialEtiquetadoUnidad] = useState("")
+  const [selMaterialEtiquetadoCosto, setSelMaterialEtiquetadoCosto] = useState("")
+  const [showDeleteMaterialEtiquetadoModal, setShowDeleteMaterialEtiquetadoModal] = useState(false)
+  const [deleteMaterialEtiquetadoId, setDeleteMaterialEtiquetadoId] = useState<number | null>(null)
+
   const steps = [
     { number: 1, title: "Información Básica", description: "Datos generales del producto" },
     { number: 2, title: "Agregar Elementos", description: "Ingredientes y fórmulas" },
@@ -273,6 +298,11 @@ function EditarProductoContent() {
 
         if (formulasAgregadasResult.success) setFormulasAgregadas(formulasAgregadasResult.data)
         if (ingredientesAgregadosResult.success) setIngredientesAgregados(ingredientesAgregadosResult.data)
+
+        const materialesEtiquetadoResult = await obtenerMaterialesEtiquetadoAgregados(Number.parseInt(productoId))
+        if (materialesEtiquetadoResult.success) {
+          setMaterialesEtiquetadoAgregados(materialesEtiquetadoResult.data)
+        }
       } catch (error) {
         console.error("Error loading producto data:", error)
         toast.error("Error al cargar los datos del producto")
@@ -610,6 +640,132 @@ function EditarProductoContent() {
 
     setShowDeleteIngredienteModal(false)
     setDeleteIngredienteId(null)
+  }
+
+  const handleMaterialEtiquetadoSearch = async (searchTerm: string) => {
+    console.log("[v0] Buscando material etiquetado:", searchTerm)
+    setMaterialEtiquetadoSearchTerm(searchTerm)
+    if (searchTerm.trim() === "") {
+      setFilteredMaterialesEtiquetado([])
+      setShowMaterialEtiquetadoDropdown(false)
+    } else {
+      const filtered = await listaDesplegableMaterialesEtiquetadosBuscar(searchTerm)
+      console.log("[v0] Materiales etiquetado encontrados:", filtered)
+      setFilteredMaterialesEtiquetado(filtered)
+      setShowMaterialEtiquetadoDropdown(true)
+    }
+  }
+
+  const handleMaterialEtiquetadoSelect = (material: any) => {
+    console.log("[v0] Material etiquetado seleccionado:", material)
+    setMaterialEtiquetadoSearchTerm(`${material.codigo} - ${material.nombre}`)
+    setSelMaterialEtiquetadoId(material.id.toString())
+    setSelMaterialEtiquetadoCosto(material.costo.toString())
+    setSelMaterialEtiquetadoUnidad(material.unidadesmedida?.descripcion || "")
+    setShowMaterialEtiquetadoDropdown(false)
+  }
+
+  const handleAgregarMaterialEtiquetado = async () => {
+    if (!selMaterialEtiquetadoId || !selMaterialEtiquetadoCantidad || !productoId) {
+      toast.error("Completa todos los campos del material etiquetado")
+      return
+    }
+
+    try {
+      const cantidad = Number.parseFloat(selMaterialEtiquetadoCantidad)
+      const costo = Number.parseFloat(selMaterialEtiquetadoCosto)
+      const costoParcial = cantidad * costo
+
+      const result = await crearMaterialEtiquetadoXProducto(
+        Number.parseInt(productoId),
+        Number.parseInt(selMaterialEtiquetadoId),
+        cantidad,
+        costoParcial,
+      )
+
+      if (result.success) {
+        const materialesResult = await obtenerMaterialesEtiquetadoAgregados(Number.parseInt(productoId))
+        if (materialesResult.success) {
+          setMaterialesEtiquetadoAgregados(materialesResult.data)
+        }
+        toast.success("Material etiquetado agregado correctamente")
+        setMaterialEtiquetadoSearchTerm("")
+        setSelMaterialEtiquetadoId("")
+        setSelMaterialEtiquetadoCantidad("")
+        setSelMaterialEtiquetadoUnidad("")
+        setSelMaterialEtiquetadoCosto("")
+      } else {
+        toast.error("Error al agregar material etiquetado: " + result.error)
+      }
+    } catch (error) {
+      console.error("Error adding material etiquetado:", error)
+      toast.error("Error al agregar material etiquetado")
+    }
+  }
+
+  const handleEliminarMaterialEtiquetado = async () => {
+    if (!deleteMaterialEtiquetadoId || !productoId) return
+
+    try {
+      const result = await eliminarMaterialEtiquetadoXProducto(deleteMaterialEtiquetadoId)
+      if (result.success) {
+        const materialesResult = await obtenerMaterialesEtiquetadoAgregados(Number.parseInt(productoId))
+        if (materialesResult.success) {
+          setMaterialesEtiquetadoAgregados(materialesResult.data)
+        }
+        toast.success("Material etiquetado eliminado correctamente")
+      } else {
+        toast.error("Error al eliminar material etiquetado")
+      }
+    } catch (error) {
+      console.error("Error deleting material etiquetado:", error)
+      toast.error("Error al eliminar material etiquetado")
+    }
+
+    setShowDeleteMaterialEtiquetadoModal(false)
+    setDeleteMaterialEtiquetadoId(null)
+  }
+
+  // Helper function to get materiales etiquetado agregados
+  const obtenerMaterialesEtiquetadoAgregados = async (productoid: number) => {
+    try {
+      const { data, error } = await supabase
+        .from("materialesetiquetadoxproductos")
+        .select(
+          `
+          id,
+          materialetiquetadoid,
+          materialesetiquetado!materialetiquetadoid(
+            codigo,
+            nombre,
+            costo,
+            unidadmedidaid,
+            unidadesmedida!unidadmedidaid(descripcion)
+          ),
+          cantidad,
+          costoparcial
+        `,
+        )
+        .eq("productoid", productoid)
+
+      if (error) throw error
+
+      const formatted = data?.map((item: any) => ({
+        id: item.id,
+        materialetiquetadoid: item.materialetiquetadoid,
+        codigo: item.materialesetiquetado?.codigo || "",
+        nombre: item.materialesetiquetado?.nombre || "",
+        costo: item.materialesetiquetado?.costo || 0,
+        unidad: item.materialesetiquetado?.unidadesmedida?.descripcion || "",
+        cantidad: item.cantidad,
+        costoparcial: item.costoparcial,
+      }))
+
+      return { success: true, data: formatted || [] }
+    } catch (error) {
+      console.error("Error obteniendo materiales etiquetado agregados:", error)
+      return { success: false, data: [] }
+    }
   }
 
   // Cargar costo total para el resumen
@@ -1095,7 +1251,7 @@ function EditarProductoContent() {
               </div>
             </div>
 
-            {/* Tabla de fórmulas agregadas */}
+            {/*Tabla de fórmulas agregadas */}
             {formulasAgregadas.length > 0 && (
               <div className="mt-6">
                 <h4 className="text-lg font-semibold mb-3 text-slate-700">Fórmulas Agregadas</h4>
@@ -1220,7 +1376,7 @@ function EditarProductoContent() {
               </div>
             </div>
 
-            {/* Tabla de ingredientes agregados */}
+            {/*Tabla de ingredientes agregados */}
             {ingredientesAgregados.length > 0 && (
               <div className="mt-6">
                 <h4 className="text-lg font-semibold mb-3 text-slate-700">Ingredientes Agregados</h4>
@@ -1251,6 +1407,138 @@ function EditarProductoContent() {
                               onClick={() => {
                                 setDeleteIngredienteId(ingrediente.id)
                                 setShowDeleteIngredienteModal(true)
+                              }}
+                              className="hover:bg-red-600"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="text-md font-medium text-slate-700">Material Etiquetado</h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="relative space-y-2">
+                <Label htmlFor="materialetiquetado" className="text-slate-700 font-medium">
+                  Material Etiquetado
+                </Label>
+                <Input
+                  id="materialetiquetado"
+                  value={materialEtiquetadoSearchTerm}
+                  onChange={(e) => handleMaterialEtiquetadoSearch(e.target.value)}
+                  placeholder="Buscar material..."
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                />
+                {showMaterialEtiquetadoDropdown && filteredMaterialesEtiquetado.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white/95 backdrop-blur-sm border border-slate-200/60 rounded-md shadow-lg max-h-60 overflow-auto">
+                    {filteredMaterialesEtiquetado.map((material) => (
+                      <div
+                        key={material.id}
+                        className="px-4 py-2 hover:bg-slate-100/80 cursor-pointer transition-colors"
+                        onClick={() => handleMaterialEtiquetadoSelect(material)}
+                      >
+                        <div className="font-medium text-slate-700">
+                          {material.codigo} - {material.nombre}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="materialetiquetadocantidad" className="text-slate-700 font-medium">
+                  Cantidad
+                </Label>
+                <Input
+                  id="materialetiquetadocantidad"
+                  type="number"
+                  value={selMaterialEtiquetadoCantidad}
+                  onChange={(e) => setSelMaterialEtiquetadoCantidad(e.target.value)}
+                  placeholder="Cantidad"
+                  step="0.01"
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="materialetiquetadounidad" className="text-slate-700 font-medium">
+                  Unidad de Medida
+                </Label>
+                <Input
+                  id="materialetiquetadounidad"
+                  value={selMaterialEtiquetadoUnidad}
+                  readOnly
+                  placeholder="Unidad automática"
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="materialetiquetadocosto" className="text-slate-700 font-medium">
+                  Costo Unitario
+                </Label>
+                <Input
+                  id="materialetiquetadocosto"
+                  value={selMaterialEtiquetadoCosto}
+                  readOnly
+                  placeholder="Costo automático"
+                  className="bg-white/80 backdrop-blur-sm border-slate-200/60"
+                />
+              </div>
+
+              <div className="flex items-end">
+                <Button
+                  onClick={handleAgregarMaterialEtiquetado}
+                  disabled={!selMaterialEtiquetadoId || !selMaterialEtiquetadoCantidad}
+                  className="w-full bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600"
+                >
+                  Agregar
+                </Button>
+              </div>
+            </div>
+
+            {/*Tabla de materiales etiquetado agregados */}
+            {materialesEtiquetadoAgregados.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-lg font-semibold mb-3 text-slate-700">Materiales Etiquetado del Producto</h4>
+                <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-lg overflow-hidden shadow-sm">
+                  <table className="w-full">
+                    <thead className="bg-gradient-to-r from-slate-50 to-slate-100">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Código</th>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Nombre</th>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Unidad</th>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Costo</th>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Cantidad</th>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Costo Parcial</th>
+                        <th className="px-4 py-3 text-left text-slate-700 font-medium">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {materialesEtiquetadoAgregados.map((material) => (
+                        <tr key={material.id} className="border-t border-slate-200/60 hover:bg-slate-50/50">
+                          <td className="px-4 py-3 text-slate-700">{material.codigo}</td>
+                          <td className="px-4 py-3 text-slate-700">{material.nombre}</td>
+                          <td className="px-4 py-3 text-slate-700">{material.unidad}</td>
+                          <td className="px-4 py-3 text-slate-700">${material.costo.toFixed(2)}</td>
+                          <td className="px-4 py-3 text-slate-700">{material.cantidad}</td>
+                          <td className="px-4 py-3 text-slate-700">${material.costoparcial.toFixed(2)}</td>
+                          <td className="px-4 py-3">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => {
+                                setDeleteMaterialEtiquetadoId(material.id)
+                                setShowDeleteMaterialEtiquetadoModal(true)
                               }}
                               className="hover:bg-red-600"
                             >
@@ -1382,6 +1670,42 @@ function EditarProductoContent() {
                         <td className="px-4 py-3 text-gray-900 font-medium">
                           ${ingrediente.ingredientecostoparcial.toFixed(2)}
                         </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Materiales Etiquetado Agregados */}
+          {materialesEtiquetadoAgregados.length > 0 && (
+            <div className="bg-gradient-to-br from-white to-indigo-50 rounded-lg p-6 border border-indigo-100 shadow-sm">
+              <h4 className="text-lg font-semibold text-indigo-800 mb-4 flex items-center gap-2">
+                <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                Materiales Etiquetado
+              </h4>
+              <div className="bg-white rounded-lg border overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-indigo-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-indigo-800 font-medium">Código</th>
+                      <th className="px-4 py-3 text-left text-indigo-800 font-medium">Nombre</th>
+                      <th className="px-4 py-3 text-left text-indigo-800 font-medium">Unidad</th>
+                      <th className="px-4 py-3 text-left text-indigo-800 font-medium">Costo Unitario</th>
+                      <th className="px-4 py-3 text-left text-indigo-800 font-medium">Cantidad</th>
+                      <th className="px-4 py-3 text-left text-indigo-800 font-medium">Costo Parcial</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {materialesEtiquetadoAgregados.map((material) => (
+                      <tr key={material.id} className="border-t border-indigo-100">
+                        <td className="px-4 py-3 text-gray-900">{material.codigo}</td>
+                        <td className="px-4 py-3 text-gray-900">{material.nombre}</td>
+                        <td className="px-4 py-3 text-gray-900">{material.unidad}</td>
+                        <td className="px-4 py-3 text-gray-900">${material.costo.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-gray-900">{material.cantidad}</td>
+                        <td className="px-4 py-3 text-gray-900 font-medium">${material.costoparcial.toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1615,6 +1939,21 @@ function EditarProductoContent() {
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setDeleteIngredienteId(null)}>Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={handleEliminarIngrediente}>Sí, Eliminar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showDeleteMaterialEtiquetadoModal} onOpenChange={setShowDeleteMaterialEtiquetadoModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Eliminación</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que deseas eliminar este material etiquetado del producto?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteMaterialEtiquetadoId(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleEliminarMaterialEtiquetado}>Sí, Eliminar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -46,6 +46,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - actualizarProductoCaracteristicas / updProductoCaracteristicas
     - actualizarProductoXCatalogo / updProductoXCatalogo
     - actualizarCosteoProducto
+    - recalcularProducto
 
     x actualizarProductoEtapa1
     x actualizarCostoProducto
@@ -357,7 +358,9 @@ export async function obtenerProductos(
                 nombre,
                 unidadmedidaid,
                 unidadesmedida!unidadmedidaid(descripcion),
-                costo
+                costo,
+                factorimportacion,
+                costoconfactorimportacion
               )
             ),
             formulasxformula!formulaid(
@@ -739,7 +742,7 @@ export async function actualizarProducto(formData: FormData) {
     if (!productoid || productoid <= 0) {
       return {
         success: false,
-        message: "no se recibio el productoid a actualizar",
+        error: "no se recibio el productoid a actualizar",
       }
     }
 
@@ -754,16 +757,30 @@ export async function actualizarProducto(formData: FormData) {
     if (formData.get("costo")) updateData.costo = Number.parseFloat(formData.get("costo") as string)
     if (formData.get("activo") !== null) updateData.activo = formData.get("activo") === "true"
 
+    if (formData.get("mp_porcentaje")) {
+      const mpValue = formData.get("mp_porcentaje") as string
+      updateData.mp_porcentaje = Number.parseFloat(mpValue) / 100
+    }
+    if (formData.get("me_porcentaje")) {
+      const meValue = formData.get("me_porcentaje") as string
+      updateData.me_porcentaje = Number.parseFloat(meValue) / 100
+    }
+    if (formData.get("ms_porcentaje")) {
+      const msValue = formData.get("ms_porcentaje") as string
+      updateData.ms_porcentaje = Number.parseFloat(msValue) / 100
+    }
+    // </CHANGE>
+
     const imagen = formData.get("imagen") as File
     if (imagen && imagen.size > 0) {
-      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "productos")
+      const resultadoImagen = await imagenSubir(imagen, formData.get("codigo") as string, "productos")
 
       if (resultadoImagen.success && resultadoImagen.url) {
         updateData.imgurl = resultadoImagen.url
       }
     }
 
-    updateData.fechaactualizacion = new Date().toISOString()
+    //updateData.fechaactualizacion = new Date().toISOString()
 
     const { error } = await supabase.from("productos").update(updateData).eq("id", productoid)
 
@@ -771,20 +788,20 @@ export async function actualizarProducto(formData: FormData) {
       console.error("Error actualizando producto en app/actions/productos en actualizarProducto:", error)
       return {
         success: false,
-        message: error.message,
+        error: error.message,
       }
     }
 
     revalidatePath("/productos")
     return {
       success: true,
-      message: "se actualizo correctamente",
+      error: false,
     }
   } catch (error) {
     console.error("Error en app/actions/productos en actualizarProducto:", error)
     return {
       success: false,
-      message: "Error interno del servidor",
+      error: "Error interno del servidor",
     }
   }
 }
@@ -850,6 +867,17 @@ export async function actualizarCosteoProducto(
   clientesid: number,
   preciosiniva: number,
   forecasts: number,
+  PorcentajeGeneracional: number,
+  PorcentajeNivel: number,
+  PorcentajeInfinito: number,
+  PorcentajeIva: number,
+  PorcentajeBonoRapido: number,
+  PorcentajeCDA: number,
+  PorcentajeConstructor: number,
+  PorcentajeRuta: number,
+  PorcentajeReembolsos: number,
+  PorcentajeTarjeta: number,
+  PorcentajeEnvio: number,
 ): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
     const { data, error } = await supabase.rpc("actualizarcotizacion", {
@@ -857,6 +885,17 @@ export async function actualizarCosteoProducto(
       clientesid,
       preciosiniva,
       forecasts,
+      porcentajegeneracional: PorcentajeGeneracional,
+      porcentajenivel: PorcentajeNivel,
+      porcentajeinfinito: PorcentajeInfinito,
+      porcentajeiva: PorcentajeIva,
+      porcentajebonorapido: PorcentajeBonoRapido,
+      porcentajecda: PorcentajeCDA,
+      porcentajeconstructor: PorcentajeConstructor,
+      porcentajeruta: PorcentajeRuta,
+      porcentajereembolsos: PorcentajeReembolsos,
+      porcentajetarjeta: PorcentajeTarjeta,
+      porcentajeenvio: PorcentajeEnvio,
     })
 
     if (error) {
@@ -868,6 +907,182 @@ export async function actualizarCosteoProducto(
     return { success: true, data }
   } catch (error) {
     console.error("Error en app/actions/productos en actualizarCosteoProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: recalcularProducto: Función para recalcular todos los costos de un producto
+export async function recalcularProducto(productoid: number): Promise<{ success: boolean; error: string | false }> {
+  try {
+    if (!productoid || productoid <= 0) {
+      return {
+        success: false,
+        error:
+          "No se recibieron los parametros necesarios para ejecuta la funcion recalcularProducto de app/actions/productos",
+      }
+    }
+
+    const { data: productoData, error: productoError } = await supabase
+      .from("productos")
+      .select("mp_porcentaje, me_porcentaje, ms_porcentaje")
+      .eq("id", productoid)
+      .single()
+
+    if (productoError || !productoData) {
+      console.error("Error obteniendo porcentajes del producto:", productoError)
+      return { success: false, error: productoError?.message || "Producto no encontrado" }
+    }
+
+    const mp_porcentaje = productoData.mp_porcentaje || 0.35
+    const me_porcentaje = productoData.me_porcentaje || 0.35
+    const ms_porcentaje = productoData.ms_porcentaje || 0.35
+
+    const { data: formulasData, error: formulasError } = await supabase
+      .from("formulasxproducto")
+      .select(
+        `
+        formulaid,
+        cantidad,
+        formulas!formulaid(costo)
+      `,
+      )
+      .eq("productoid", productoid)
+
+    if (formulasError) {
+      console.error("Error obteniendo formulas relacionadas:", formulasError)
+      return { success: false, error: formulasError.message }
+    }
+
+    if (formulasData && formulasData.length > 0) {
+      for (const formula of formulasData) {
+        const cantidad = formula.cantidad || 0
+        const costo = (formula.formulas as any)?.costo || 0
+        const costoparcial = cantidad * costo
+
+        const { error: updateError } = await supabase
+          .from("formulasxproducto")
+          .update({ costoparcial })
+          .eq("formulaid", formula.formulaid)
+          .eq("productoid", productoid)
+
+        if (updateError) {
+          console.error("Error actualizando costoparcial de formula:", updateError)
+        }
+      }
+    }
+
+    const { data: mpSumData, error: mpSumError } = await supabase
+      .from("formulasxproducto")
+      .select("costoparcial")
+      .eq("productoid", productoid)
+
+    if (mpSumError) {
+      console.error("Error obteniendo suma de costoparcial de formulas:", mpSumError)
+      return { success: false, error: mpSumError.message }
+    }
+
+    const mp = mpSumData?.reduce((sum, item) => sum + (item.costoparcial || 0), 0) || 0
+
+    const mp_costeado = mp_porcentaje > 0 ? mp / mp_porcentaje : 0
+
+    const { error: updateMpError } = await supabase.from("productos").update({ mp, mp_costeado }).eq("id", productoid)
+
+    if (updateMpError) {
+      console.error("Error actualizando mp y mp_costeado:", updateMpError)
+      return { success: false, error: updateMpError.message }
+    }
+
+    const { data: materialesData, error: materialesError } = await supabase
+      .from("materialesetiquetadoxproducto")
+      .select(
+        `
+        materialetiquetadoid,
+        cantidad,
+        materialesetiquetado!materialetiquetadoid(costo)
+      `,
+      )
+      .eq("productoid", productoid)
+
+    if (materialesError) {
+      console.error("Error obteniendo materiales etiquetado relacionados:", materialesError)
+      return { success: false, error: materialesError.message }
+    }
+
+    if (materialesData && materialesData.length > 0) {
+      for (const material of materialesData) {
+        const cantidad = material.cantidad || 0
+        const costo = (material.materialesetiquetado as any)?.costo || 0
+        const costoparcial = cantidad * costo
+
+        const { error: updateError } = await supabase
+          .from("materialesetiquetadoxproducto")
+          .update({ costoparcial })
+          .eq("materialetiquetadoid", material.materialetiquetadoid)
+          .eq("productoid", productoid)
+
+        if (updateError) {
+          console.error("Error actualizando costoparcial de material etiquetado:", updateError)
+        }
+      }
+    }
+
+    const { data: meSumData, error: meSumError } = await supabase
+      .from("materialesetiquetadoxproducto")
+      .select("costoparcial")
+      .eq("productoid", productoid)
+
+    if (meSumError) {
+      console.error("Error obteniendo suma de costoparcial de materiales etiquetado:", meSumError)
+      return { success: false, error: meSumError.message }
+    }
+
+    const me = meSumData?.reduce((sum, item) => sum + (item.costoparcial || 0), 0) || 0
+
+    const me_costeado = me_porcentaje > 0 ? me / me_porcentaje : 0
+
+    const { error: updateMeError } = await supabase.from("productos").update({ me, me_costeado }).eq("id", productoid)
+
+    if (updateMeError) {
+      console.error("Error actualizando me y me_costeado:", updateMeError)
+      return { success: false, error: updateMeError.message }
+    }
+
+    const ms = (mp + me) * 0.05
+
+    const ms_costeado = ms_porcentaje > 0 ? ms / ms_porcentaje : 0
+
+    const { error: updateMsError } = await supabase.from("productos").update({ ms, ms_costeado }).eq("id", productoid)
+
+    if (updateMsError) {
+      console.error("Error actualizando ms y ms_costeado:", updateMsError)
+      return { success: false, error: updateMsError.message }
+    }
+
+    const costoelaboracion = mp + me + ms
+
+    const preciohl = mp_costeado + me_costeado + ms_costeado
+
+    const utilidadhl = preciohl - costoelaboracion
+
+    const { error: updateFinalError } = await supabase
+      .from("productos")
+      .update({
+        costo: costoelaboracion,
+        preciohl,
+        utilidadhl,
+      })
+      .eq("id", productoid)
+
+    if (updateFinalError) {
+      console.error("Error actualizando costo, preciohl y utilidadhl:", updateFinalError)
+      return { success: false, error: updateFinalError.message }
+    }
+
+    revalidatePath("/productos")
+
+    return { success: true, error: false }
+  } catch (error) {
+    console.error("Error en app/actions/productos en recalcularProducto:", error)
     return { success: false, error: "Error interno del servidor" }
   }
 }
@@ -1175,6 +1390,7 @@ export async function listaDesplegableProductosBuscar(buscar: string): Promise<d
 // Función: listaDesplegableProductosXClientes: Lista de productos filtrados por cliente
 export async function listaDesplegableProductosXClientes(
   clienteid: number,
+  zonaid: number,
 ): Promise<{ success: boolean; data?: oProducto[]; error?: string }> {
   try {
     // Variable productos de tipo oProducto[]
@@ -1185,7 +1401,7 @@ export async function listaDesplegableProductosXClientes(
       -1, // productoid (default)
       "", // productonombre (default)
       clienteid, // clienteid (parámetro recibido)
-      -1, // zonaid (default)
+      zonaid, // zonaid (default)
       -1, // catalogoid (default)
       "True", // activo (default)
     )
@@ -1231,4 +1447,36 @@ export async function listaDesplegableProductosXClientes(
 
 // Función: operacionPrecioHL: Suma de MP_Porcentaje + ME_Porcentaje + MS_Porcentaje
 
-// Función: operacionUtilidadHL:
+// Función: operacionUtilidadHL: Función para calcular la utilidad HL
+export async function operacionUtilidadHL(productoId: number) {
+  try {
+    const { data: productoData, error: productoError } = await supabase
+      .from("productos")
+      .select("preciohl, costo")
+      .eq("id", productoId)
+      .single()
+
+    if (productoError || !productoData) {
+      console.error("Error obteniendo datos del producto:", productoError)
+      return { success: false, error: productoError?.message || "Producto no encontrado" }
+    }
+
+    const preciohl = productoData.preciohl || 0
+    const costo = productoData.costo || 0
+
+    const utilidadhl = preciohl - costo
+
+    const { error: updateError } = await supabase.from("productos").update({ utilidadhl }).eq("id", productoId)
+
+    if (updateError) {
+      console.error("Error actualizando utilidad HL:", updateError)
+      return { success: false, error: updateError.message }
+    }
+
+    revalidatePath("/productos")
+    return { success: true }
+  } catch (error) {
+    console.error("Error en operacionUtilidadHL:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}

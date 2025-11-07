@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase"
 import { arrActivoTrue, arrActivoFalse } from "@/lib/config"
 import { obtenerFormulasXProductos } from "@/app/actions/formulas"
 import { imagenSubir } from "@/app/actions/utilerias"
+import type { ddlItem } from "@/types" // Import ddlItem type
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -29,14 +30,16 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
   --------------------
   * INSERTS: CREATE/CREAR/INSERT
     - crearMateriaPrima / insMateriaPrima
+    - crearMateriaPrimaXFormula
   * SELECTS: READ/OBTENER/SELECT
     - obtenerMateriasPrimas / selMateriasPrimas
-    - obtenerMateriasPrimasXProductos / selMateriasPrimasXProductos
-    - obtenerMateriasPrimasXFormulas / selMateriasPrimasXFormulas
+    - obtenerIdsMateriasPrimasXProductos / selIdsMateriasPrimasXProductos
+    - obtenerIdsMateriasPrimasXFormulas / selIdsMateriasPrimasXFormulas
   * UPDATES: EDIT/ACTUALIZAR/UPDATE
     - actualizarMateriaPrima / updMateriaPrima
   * DELETES: DROP/ELIMINAR/DELETE
     - eliminarMateriaPrima / delMateriaPrima
+    - eliminarMateriaPrimaXFormula
   * SPECIALS: PROCESS/ESPECIAL/SPECIAL
     - estatusActivoMateriaPrima / actMateriaPrima
     - listaDesplegableMateriasPrimas / ddlMateriasPrimas
@@ -47,9 +50,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 ================================================== */
 // Función: objetoMateriaPrima / oMateriaPrima (Individual): Esta Función crea de manera individual un objeto/clase
 
-
 // Función: objetoMateriasPrimas / oMateriasPrimas (Listado): Esta Función crea un listado de objetos/clases, es un array
-
 
 /*==================================================
     INSERTS: CREATE / CREAR / INSERT
@@ -132,10 +133,84 @@ export async function crearMateriaPrima(formData: FormData) {
   }
 }
 
+// Función: crearMateriPrimaXFromula
+export async function crearMateriaPrimaXFormula(materiaprimaid: number, formulaid: number, cantidad: number) {
+  try {
+    // Paso 1: Validar parámetros
+    if (!materiaprimaid || materiaprimaid <= 0 || !formulaid || formulaid <= 0 || !cantidad || cantidad <= 0) {
+      return {
+        success: false,
+        error:
+          "No se recibieron los parametros necesario para poder proceder en ejecutar la funcion crearMateriaPrimaXFormula en app/actions/materia-prima",
+      }
+    }
+
+    // Paso 2: Obtener costo unitario de la materia prima
+    const { data: materiaPrimaData, error: materiaPrimaError } = await supabase
+      .from("materiasprima")
+      .select("costo")
+      .eq("id", materiaprimaid)
+      .single()
+
+    if (materiaPrimaError || !materiaPrimaData) {
+      console.error(
+        "Error obteniendo costo de materia prima en crearMateriaPrimaXFormula de actions/materia-prima:",
+        materiaPrimaError,
+      )
+      return {
+        success: false,
+        error:
+          "Error obteniendo costo de materia prima: " +
+          (materiaPrimaError?.message || "No se encontró la materia prima"),
+      }
+    }
+
+    const costounitario = materiaPrimaData.costo || 0
+
+    // Paso 3: Calcular costo parcial
+    const costoparcial = cantidad * costounitario
+
+    // Paso 4: Insertar en la tabla materiasprimasxformula
+    const fecha = new Date().toISOString().split("T")[0]
+
+    const { error: insertError } = await supabase.from("materiasprimasxformula").insert({
+      formulaid,
+      materiaprimaid,
+      cantidad,
+      costoparcial,
+      fechacreacion: fecha,
+      activo: true,
+    })
+
+    if (insertError) {
+      console.error(
+        "Error insertando materia prima x formula en crearMateriaPrimaXFormula de actions/materia-prima:",
+        insertError,
+      )
+      return {
+        success: false,
+        error: "Error insertando relación materia prima x formula: " + insertError.message,
+      }
+    }
+
+    revalidatePath("/formulas")
+
+    // Paso 5: Return exitoso
+    return { success: true }
+  } catch (error) {
+    console.error("Error en crearMateriaPrimaXFormula de actions/materia-prima:", error)
+    return {
+      success: false,
+      error:
+        "Error interno del servidor, al ejecutar funcion crearMateriaPrimaXFormula de actions/materia-prima: " + error,
+    }
+  }
+}
+
 /*==================================================
   SELECTS: READ / OBTENER / SELECT
 ================================================== */
-// Función: obtenerMateriasPrimas / selMateriasPrimas: Función para obtener 
+// Función: obtenerMateriasPrimas / selMateriasPrimas: Función para obtener
 export async function obtenerMateriasPrimas(
   id = -1,
   codigo = "",
@@ -148,7 +223,7 @@ export async function obtenerMateriasPrimas(
     // Paso 1: Obtener arrays de las materiasprimaid que esten por formula y/o por producto
     let IdsXFormula: number[] = []
     if (formulaid > 0) {
-      const resultado = await obtenerMateriasPrimasXFormulas(formulaid)
+      const resultado = await obtenerIdsMateriasPrimasXFormulas(formulaid)
       if (resultado.success && resultado.data) {
         IdsXFormula = resultado.data
       }
@@ -268,8 +343,8 @@ export async function obtenerMateriasPrimasXProductos(
   }
 }
 
-// Función: obtenerMateriasPrimasXFormulas / selMateriasPrimasXFormulas, funcion para obtener en un array el listado de los ids de materias primas
-export async function obtenerMateriasPrimasXFormulas(
+// Función: obtenerIdsMateriasPrimasXFormulas / selIdsMateriasPrimasXFormulas, funcion para obtener en un array el listado de los ids de materias primas
+export async function obtenerIdsMateriasPrimasXFormulas(
   formulaid = -1,
 ): Promise<{ success: boolean; data?: number[]; error?: string }> {
   try {
@@ -283,7 +358,7 @@ export async function obtenerMateriasPrimasXFormulas(
       .eq("formulaid", formulaid)
 
     if (error) {
-      console.error("Error en query obtenerMateriasPrimasXFormulas de actions/materia-prima:", error)
+      console.error("Error en query obtenerIdsMateriasPrimasXFormulas de actions/materia-prima:", error)
       return { success: false, error: error.message }
     }
 
@@ -295,10 +370,10 @@ export async function obtenerMateriasPrimasXFormulas(
 
     return { success: true, data: DataIds }
   } catch (error) {
-    console.error("Error en obtenerMateriasPrimasXFormulas de actions/materia-prima:", error)
+    console.error("Error en obtenerIdsMateriasPrimasXFormulas de actions/materia-prima:", error)
     return {
       success: false,
-      error: "Error interno del servidor, al ejecutar obtenerMateriasPrimasXFormulas de actions/materia-prima",
+      error: "Error interno del servidor, al ejecutar obtenerIdsMateriasPrimasXFormulas de actions/materia-prima",
     }
   }
 }
@@ -443,6 +518,49 @@ export async function eliminarMateriaPrima(id: number) {
   }
 }
 
+// Función: eliminarMateriaPrimaXFormula: Función para eliminar la relación entre materia prima y formula
+export async function eliminarMateriaPrimaXFormula(materiaPrimaId: number, formulaid: number) {
+  try {
+    // Paso 1: Validar parámetros
+    if (!materiaPrimaId || materiaPrimaId <= 0 || !formulaid || formulaid <= 0) {
+      return {
+        success: false,
+        error:
+          "No se recibieron los parametros necesarios para ejecutar la funcion, en eliminarMateriaPrimaXFormula de app/actions/materia-prima",
+      }
+    }
+
+    // Paso 2: Ejecutar Query DELETE
+    const { error } = await supabase
+      .from("materiasprimasxformula")
+      .delete()
+      .eq("materiaprimaid", materiaPrimaId)
+      .eq("formulaid", formulaid)
+
+    // Return si hay error en query
+    if (error) {
+      console.error(
+        "Error eliminando relación materia prima x formula en eliminarMateriaPrimaXFormula de actions/materia-prima:",
+        error,
+      )
+      return { success: false, error: "Error en query: " + error.message }
+    }
+
+    revalidatePath("/formulas")
+
+    // Paso 3: Return resultados
+    return { success: true }
+  } catch (error) {
+    console.error("Error en eliminarMateriaPrimaXFormula de actions/materia-prima: " + error)
+    return {
+      success: false,
+      error:
+        "Error interno del servidor, al ejecutar funcion eliminarMateriaPrimaXFormula de actions/materia-prima: " +
+        error,
+    }
+  }
+}
+
 /*==================================================
   * SPECIALS: PROCESS / ESPECIAL / SPECIAL
 ================================================== */
@@ -464,6 +582,40 @@ export async function estatusActivoMateriaPrima(id: number, activo: boolean): Pr
   } catch (error) {
     console.error("Error en estatusActivoMateriaPrima de app/actions/materia-prima: ", error)
     return false
+  }
+}
+
+// Función: listaDesplegableMateriasPrimasBuscar: Función que se utiliza para los dropdownlist con búsqueda
+export async function listaDesplegableMateriasPrimasBuscar(buscar: string): Promise<ddlItem[]> {
+  try {
+    let query = supabase.from("materiasprima").select("id, codigo, nombre").eq("activo", true)
+
+    // Apply filter: search in nombre OR codigo
+    if (buscar && buscar.trim() !== "") {
+      query = query.or(`nombre.ilike.%${buscar}%,codigo.ilike.%${buscar}%`)
+    }
+
+    // Order by nombre
+    query = query.order("nombre", { ascending: true })
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error("Error obteniendo lista desplegable de materias primas:", error)
+      return []
+    }
+
+    // Map results to ddlItem format: value = id, text = "codigo - nombre"
+    const items: ddlItem[] =
+      data?.map((materiaPrima) => ({
+        value: materiaPrima.id.toString(),
+        text: `${materiaPrima.codigo} - ${materiaPrima.nombre}`,
+      })) || []
+
+    return items
+  } catch (error) {
+    console.error("Error en app/actions/materia-prima en listaDesplegableMateriasPrimasBuscar:", error)
+    return []
   }
 }
 

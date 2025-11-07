@@ -10,10 +10,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight, EyeOff, Trash2 } from "lucide-react"
+import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight, Trash2, AppWindow } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
-import type { Formula } from "@/types/formulas"
+import type { oFormula } from "@/types/formulas"
 import type {
   propsPageLoadingScreen,
   propsPageTitlePlusNew,
@@ -52,13 +52,13 @@ export default function FormulasPage() {
   // --- Estados ---
   // Cargar contenido en variables
   const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
-  const [Listado, setListado] = useState<Formula[]>([])
+  const [Listado, setListado] = useState<oFormula[]>([])
   const [TotalListado, setTotalListado] = useState(0)
   const [paginaActual, setPaginaActual] = useState(1)
   const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
   const [ModalError, setModalError] = useState<propsPageModalError>()
   const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
-  const [elementoDetalles, setElementoDetalles] = useState<Formula | null>(null)
+  const [elementoDetalles, setElementoDetalles] = useState<oFormula | null>(null)
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
@@ -114,7 +114,7 @@ export default function FormulasPage() {
       const result = await obtenerFormulas(auxId, codigo, nombre, auxEstatus, clienteid, -1)
       console.log("Success: " + result.success + " Data: " + result.data)
       if (result.success && result.data) {
-        const transformedData: Formula[] = result.data.map((x: Formula) => ({
+        const transformedData: oFormula[] = result.data.map((x: oFormula) => ({
           id: x.id,
           codigo: x.codigo,
           nombre: x.nombre,
@@ -125,7 +125,7 @@ export default function FormulasPage() {
           activo: x.activo,
         }))
 
-        const Listado: Formula[] = transformedData.map((x: Formula) => ({
+        const Listado: oFormula[] = transformedData.map((x: oFormula) => ({
           FormulaId: x.id,
           FormulaCodigo: x.codigo || "Sin código",
           FormulaNombre: x.nombre || "Sin nombre",
@@ -163,9 +163,9 @@ export default function FormulasPage() {
   // Inicio (carga inicial y seguridad)
   const cargarDatosIniciales = async () => {
     if (!user) return
-    
+
     let auxClienteId = -1
-    if(!esAdminDDLs){
+    if (!esAdminDDLs) {
       auxClienteId = user.RolId
     }
     try {
@@ -229,7 +229,7 @@ export default function FormulasPage() {
     }
   }
 
-  const handleVerDetalles = (formula: Formula) => {
+  const handleVerDetalles = (formula: oFormula) => {
     setElementoDetalles(formula)
     setShowElementoDetallesModal(true)
   }
@@ -457,9 +457,12 @@ export default function FormulasPage() {
                       <div>
                         <span className="font-semibold text-gray-700">Costo:</span>
                         <span className="ml-2 text-gray-900">
-                          {new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(
-                            elementoDetalles.FormulaCosto,
-                          )}
+                          {new Intl.NumberFormat("es-MX", {
+                            style: "currency",
+                            currency: "MXN",
+                            minimumFractionDigits: 6,
+                            maximumFractionDigits: 6,
+                          }).format(elementoDetalles.FormulaCosto)}
                         </span>
                       </div>
 
@@ -539,9 +542,12 @@ export default function FormulasPage() {
                       <td className="py-3 px-4">{elemento.FormulaCodigo}</td>
                       <td className="py-3 px-4">{elemento.FormulaNombre}</td>
                       <td className="py-3 px-4">
-                        {new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(
-                          elemento.FormulaCosto,
-                        )}
+                        {new Intl.NumberFormat("es-MX", {
+                          style: "currency",
+                          currency: "MXN",
+                          minimumFractionDigits: 6,
+                          maximumFractionDigits: 6,
+                        }).format(elemento.FormulaCosto)}
                       </td>
                       <td className="py-3 px-4">
                         <span
@@ -560,7 +566,7 @@ export default function FormulasPage() {
                             title="Detalles"
                             onClick={() => handleVerDetalles(elemento)}
                           >
-                            <EyeOff className="h-4 w-4" />
+                            <AppWindow className="h-4 w-4" />
                           </Button>
 
                           <Button

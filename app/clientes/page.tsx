@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, Edit, ToggleLeft, ToggleRight, EyeOff, X, Eye } from "lucide-react"
+import { Search, RotateCcw, Edit, ToggleLeft, ToggleRight, X, Eye, AppWindow } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
@@ -34,7 +34,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
 import { obtenerClientes, estatusActivoCliente } from "@/app/actions/clientes"
-
 
 /* ==================================================
 	Componente Principal (Pagina)
@@ -569,7 +568,7 @@ export default function ClientesPage() {
                           title="Ver Detalles"
                           onClick={() => handleVerDetalles(elemento)}
                         >
-                          <EyeOff className="h-4 w-4" />
+                          <AppWindow className="h-4 w-4" />
                         </Button>
                         <span className="text-xs text-muted-foreground mt-1">Detalles</span>
                       </div>

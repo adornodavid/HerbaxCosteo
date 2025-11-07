@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Users,
   Package,
@@ -26,6 +27,10 @@ import {
   obtenerEstadisticasEmpresariales,
   obtenerKPIsDashboard,
 } from "@/app/actions/dashboard-actions"
+import { listaDesplegableClientes } from "@/app/actions/clientes"
+import { listDesplegableZonas } from "@/app/actions/zonas"
+import { obtenerReporteCosteo } from "@/app/actions/reportecosteo"
+import type { ddlItem } from "@/types/common.types"
 import Link from "next/link"
 import Image from "next/image"
 import { useAuth } from "@/contexts/auth-context"
@@ -39,6 +44,10 @@ import {
   ResponsiveContainer,
   PieChart as RechartsPieChart,
   Cell,
+  Line,
+  LineChart,
+  Area,
+  AreaChart,
 } from "recharts"
 
 /* ==================================================
@@ -83,6 +92,12 @@ interface DatosSesion {
   RolId: number
   Permisos: string
   SesionActiva: boolean
+  ClienteId?: number
+}
+
+interface ReporteCosteoItem {
+  snombre: string
+  sporcentajecosto: number
 }
 
 const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4"]
@@ -101,6 +116,15 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
+
+  const [filtroClienteId, setFiltroClienteId] = useState("")
+  const [filtroZonaId, setFiltroZonaId] = useState("-1")
+  const [clientesOptions, setClientesOptions] = useState<ddlItem[]>([])
+  const [zonasOptions, setZonasOptions] = useState<ddlItem[]>([])
+  const [reporteCosteoData, setReporteCosteoData] = useState<ReporteCosteoItem[]>([])
+  const [costoAnualTotal, setCostoAnualTotal] = useState(0)
+  const [utilidadAnual, setUtilidadAnual] = useState(0)
+  const [costoUtilidadAnual, setCostoUtilidadAnual] = useState(0)
 
   /* ================================================== 
     Al cargar la pagina
@@ -125,7 +149,6 @@ export default function DashboardPage() {
           return
         }
 
-        // Obtener datos de sesión
         setSesion({
           UsuarioId: user.UsuarioId,
           Email: user.Email,
@@ -134,7 +157,12 @@ export default function DashboardPage() {
           RolId: user.RolId,
           Permisos: user.Permisos,
           SesionActiva: user.SesionActiva,
+          ClienteId: user.ClienteId,
         })
+
+        if (user.ClienteId) {
+          setFiltroClienteId(user.ClienteId.toString())
+        }
 
         const [resumenesData, estadisticasData, kpisData] = await Promise.all([
           obtenerResumenesDashboard(),
@@ -164,6 +192,68 @@ export default function DashboardPage() {
     validarSeguridadYCargarDatos()
   }, [router, authLoading, user])
 
+  useEffect(() => {
+    const cargarClientes = async () => {
+      const result = await listaDesplegableClientes(-1, "", "True")
+      if (result.success && result.data) {
+        const options: ddlItem[] = result.data.map((c: any) => ({
+          value: c.id.toString(),
+          text: c.nombre,
+        }))
+        setClientesOptions(options)
+      }
+    }
+    cargarClientes()
+  }, [])
+
+  useEffect(() => {
+    const cargarZonas = async () => {
+      if (filtroClienteId) {
+        const result = await listDesplegableZonas(-1, "", Number(filtroClienteId))
+        if (result.success && result.data) {
+          const todosOption: ddlItem = { value: "-1", text: "Todos" }
+          setZonasOptions([todosOption, ...result.data])
+        }
+      } else {
+        setZonasOptions([{ value: "-1", text: "Todos" }])
+      }
+    }
+    cargarZonas()
+  }, [filtroClienteId])
+
+  useEffect(() => {
+    const cargarReporteCosteo = async () => {
+      if (filtroClienteId) {
+        const result = await obtenerReporteCosteo(-1, Number(filtroClienteId), Number(filtroZonaId))
+        if (result.success && result.data) {
+          let filteredData = result.data
+          
+          {/*if (filtroZonaId !== "-1") {
+            filteredData = result.data.filter((item: any) => item.zonaid === Number(filtroZonaId))
+            console.log("dataaa", filteredData)
+          }
+          */}
+
+          const top5 = filteredData.sort((a: any, b: any) => b.sporcentajecosto - a.sporcentajecosto).slice(0, 5)
+
+          setReporteCosteoData(top5)
+
+          const totalCosto = filteredData.reduce((sum: number, item: any) => sum + (item.scostoanual || 0), 0)
+          const totalUtilidad = filteredData.reduce((sum: number, item: any) => sum + (item.sutilidadanual || 0), 0)
+          const totalCostoUtilidad = filteredData.reduce(
+            (sum: number, item: any) => sum + (item.scostoutilidadanual || 0),
+            0,
+          )
+
+          setCostoAnualTotal(totalCosto)
+          setUtilidadAnual(totalUtilidad)
+          setCostoUtilidadAnual(totalCostoUtilidad)
+        }
+      }
+    }
+    cargarReporteCosteo()
+  }, [filtroClienteId, filtroZonaId])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -189,12 +279,12 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-50">
+    <div className="min-h-screen bg-slate-50">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
                 <BarChart3 className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -211,7 +301,7 @@ export default function DashboardPage() {
                 <Settings className="h-4 w-4" />
               </Button>
               <div className="flex items-center space-x-3 bg-slate-100 rounded-full px-4 py-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center">
                   <span className="text-white text-sm font-semibold">
                     {sesion.NombreCompleto.split(" ")
                       .map((n) => n[0])
@@ -230,62 +320,166 @@ export default function DashboardPage() {
       </header>
 
       <div className="container mx-auto p-6 space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+        <Card className="border-slate-200 shadow-sm">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="ddlCliente" className="text-sm font-medium text-slate-700 mb-2 block">
+                  Cliente
+                </label>
+                <Select value={filtroClienteId} onValueChange={setFiltroClienteId}>
+                  <SelectTrigger id="ddlCliente" className="border-slate-300">
+                    <SelectValue placeholder="Seleccione un cliente" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clientesOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.text}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label htmlFor="ddlZona" className="text-sm font-medium text-slate-700 mb-2 block">
+                  Zona
+                </label>
+                <Select value={filtroZonaId} onValueChange={setFiltroZonaId}>
+                  <SelectTrigger id="ddlZona" className="border-slate-300">
+                    <SelectValue placeholder="Seleccione una zona" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {zonasOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.text}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="border-blue-200 shadow-sm hover:shadow-lg transition-all bg-gradient-to-br from-blue-50 to-white">
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-blue-100 text-sm font-medium">Clientes Activos</p>
-                  <p className="text-3xl font-bold">{kpis?.clientesActivos || 0}</p>
-                  <p className="text-blue-100 text-xs mt-1">+12% vs mes anterior</p>
+                  <p className="text-sm text-blue-700 font-medium">Costo Anual Total</p>
+                  <p className="text-3xl font-bold text-blue-900 mt-1">${costoAnualTotal.toFixed(2)}</p>
                 </div>
-                <Users className="h-12 w-12 text-blue-200" />
+                <div className="bg-blue-100 p-3 rounded-xl">
+                  <DollarSign className="h-8 w-8 text-blue-600" />
+                </div>
+              </div>
+              <div className="h-16">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={[{ value: costoAnualTotal * 0.8 }, { value: costoAnualTotal }]}>
+                    <Area type="monotone" dataKey="value" stroke="#3B82F6" fill="#DBEAFE" strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+          <Card className="border-green-200 shadow-sm hover:shadow-lg transition-all bg-gradient-to-br from-green-50 to-white">
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-green-100 text-sm font-medium">Productos Activos</p>
-                  <p className="text-3xl font-bold">{kpis?.productosActivos || 0}</p>
-                  <p className="text-green-100 text-xs mt-1">+8% vs mes anterior</p>
+                  <p className="text-sm text-green-700 font-medium">Utilidad Anual</p>
+                  <p className="text-3xl font-bold text-green-900 mt-1">${utilidadAnual.toFixed(2)}</p>
                 </div>
-                <Package className="h-12 w-12 text-green-200" />
+                <div className="bg-green-100 p-3 rounded-xl">
+                  <TrendingUp className="h-8 w-8 text-green-600" />
+                </div>
+              </div>
+              <div className="h-16">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={[{ value: utilidadAnual * 0.7 }, { value: utilidadAnual * 0.9 }, { value: utilidadAnual }]}
+                  >
+                    <Line type="monotone" dataKey="value" stroke="#10B981" strokeWidth={3} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+          <Card className="border-purple-200 shadow-sm hover:shadow-lg transition-all bg-gradient-to-br from-purple-50 to-white">
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-purple-100 text-sm font-medium">Fórmulas Activas</p>
-                  <p className="text-3xl font-bold">{kpis?.formulasActivas || 0}</p>
-                  <p className="text-purple-100 text-xs mt-1">+15% vs mes anterior</p>
+                  <p className="text-sm text-purple-700 font-medium">Costo/Utilidad Anual</p>
+                  <p className="text-3xl font-bold text-purple-900 mt-1">{(costoUtilidadAnual * 100).toFixed(2)}%</p>
                 </div>
-                <Beaker className="h-12 w-12 text-purple-200" />
+                <div className="bg-purple-100 p-3 rounded-xl">
+                  <Activity className="h-8 w-8 text-purple-600" />
+                </div>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-orange-100 text-sm font-medium">Valor Inventario</p>
-                  <p className="text-3xl font-bold">${(kpis?.valorTotalInventario || 0).toLocaleString()}</p>
-                  <p className="text-orange-100 text-xs mt-1">+5% vs mes anterior</p>
-                </div>
-                <DollarSign className="h-12 w-12 text-orange-200" />
+              <div className="h-16">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={[
+                      { value: costoUtilidadAnual * 80 },
+                      { value: costoUtilidadAnual * 90 },
+                      { value: costoUtilidadAnual * 100 },
+                    ]}
+                  >
+                    <Area type="monotone" dataKey="value" stroke="#8B5CF6" fill="#EDE9FE" strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
         </div>
 
+        <Card className="border-slate-200 shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-slate-900">Análisis de Costos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-2">% Costo</h3>
+                <div className="space-y-3">
+                  {reporteCosteoData.map((item, index) => (
+                    <div key={index} className="space-y-1">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-slate-700 font-medium truncate max-w-[150px]">{item.snombre}</span>
+                        <span className="text-slate-900 font-semibold">
+                          {(item.sporcentajecosto * 100).toFixed(2)}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-100 rounded-full h-2.5">
+                        <div
+                          className="h-2.5 rounded-full transition-all duration-300 bg-gradient-to-r from-blue-500 to-blue-600"
+                          style={{ width: `${Math.min(item.sporcentajecosto * 100, 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  {reporteCosteoData.length === 0 && (
+                    <p className="text-sm text-slate-500 text-center py-4">Seleccione un cliente para ver los datos</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-2">Sección 2</h3>
+                <p className="text-sm text-slate-500">Contenido pendiente</p>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-2">Sección 3</h3>
+                <p className="text-sm text-slate-500">Contenido pendiente</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Productos por Cliente Chart */}
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-slate-800">
@@ -308,7 +502,6 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Ingredientes por Categoría Chart */}
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-slate-800">
@@ -321,11 +514,9 @@ export default function DashboardPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <RechartsPieChart>
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <RechartsPieChart data={estadisticas?.ingredientesPorCategoria || []}>
-                      {(estadisticas?.ingredientesPorCategoria || []).map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </RechartsPieChart>
+                    {estadisticas?.ingredientesPorCategoria.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
                   </RechartsPieChart>
                 </ResponsiveContainer>
               </div>

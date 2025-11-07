@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Eye, Loader2, RotateCcw, EyeOff, Edit, ToggleRight, ToggleLeft, X } from "lucide-react"
+import { Search, Eye, Loader2, RotateCcw, Edit, ToggleRight, ToggleLeft, X, AppWindow } from "lucide-react"
 //import toast from "react-hot-toast" // Import for toast
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
@@ -273,20 +273,7 @@ export default function ProductosPage() {
             })) || [],
         }))
 
-        const productosListado: ProductoListado[] = transformedData.map((p: oProducto) => ({
-          ProductoId: p.id,
-          ProductoCodigo: p.codigo || "Sin codigo",
-          ProductoNombre: p.nombre || "Sin nombre",
-          ProductoDescripcion: p.productoscaracteristicas.descripcion || p.nombre || "Sin descripción",
-          ProductoTiempo: "N/A",
-          ProductoCosto: p.costo || 0,
-          ProductoActivo: p.activo === true,
-          ProductoImagenUrl: p.imgurl,
-          ClienteId: p.clienteid || -1,
-          ClienteNombre: p.clientes?.nombre || "N/A",
-          CatalogoId: p.productosxcatalogo[0]?.catalogoid || -1,
-          CatalogoNombre: p.productosxcatalogo[0]?.catalogos?.nombre || "N/A",
-        }))
+        const productosListado: oProducto[] = transformedData
 
         // Actualizar estados
         setProductos(productosListado)
@@ -735,25 +722,25 @@ export default function ProductosPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {elementosPaginados.map((p, index) => (
                 <Card
-                  key={`${p.ProductoId}-${p.CatalogoId}-${index}`}
+                  key={`${p.id}-${p.CatalogoId}-${index}`}
                   className="border bg-card text-card-foreground relative flex flex-col overflow-hidden rounded-xs shadow-lg hover:shadow-xl transition-shadow duration-300"
                 >
                   {/* Image at top */}
                   <div
                     className="relative w-full h-48 overflow-hidden cursor-pointer bg-gray-100"
-                    onClick={() => handleViewProductoDetails(p.ProductoId)}
+                    onClick={() => handleViewProductoDetails(p.id)}
                     title="Ver detalles del producto"
                   >
                     <img
-                      src={p.ProductoImagenUrl || "/placeholder.svg?height=200&width=200&text=Producto"}
-                      alt={p.ProductoNombre}
+                      src={p.imgurl || "/placeholder.svg?height=200&width=200&text=Producto"}
+                      alt={p.nombre}
                       className="w-full h-full object-contain rounded-t-xs"
                     />
                     <div className="absolute top-2 right-2">
                       <span
-                        className={`px-2 py-1 text-xs rounded-xs font-semibold ${p.ProductoActivo ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
+                        className={`px-2 py-1 text-xs rounded-xs font-semibold ${p.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
                       >
-                        {p.ProductoActivo ? "Activo" : "Inactivo"}
+                        {p.activo ? "Activo" : "Inactivo"}
                       </span>
                     </div>
                   </div>
@@ -761,17 +748,17 @@ export default function ProductosPage() {
                   {/* Card content */}
                   <CardContent className="flex flex-col flex-grow p-4">
                     {/* Nombre */}
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{p.ProductoNombre}</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{p.nombre}</h3>
                     {/* Código */}
-                    <p className="text-sm text-gray-600 mb-2">Código: {p.ProductoCodigo || "Sin código."}</p>
-                    <p className="text-lg font-bold text-green-600">{formatCurrency(p.ProductoCosto)}</p>
+                    <p className="text-sm text-gray-600 mb-2">Código: {p.codigo || "Sin código."}</p>
+                    <p className="text-lg font-bold text-green-600">{formatCurrency(p.costo)}</p>
 
                     <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
                       <div className="flex gap-3 justify-center mt-auto">
                         {/* Detalles - Opens modal */}
                         <div className="flex flex-col items-center">
                           <Button variant="ghost" size="icon" title="Ver Detalles" onClick={() => handleVerDetalles(p)}>
-                            <EyeOff className="h-4 w-4" />
+                            <AppWindow className="h-4 w-4" />
                           </Button>
                           <span className="text-xs text-muted-foreground mt-1">Detalles</span>
                         </div>
@@ -782,7 +769,7 @@ export default function ProductosPage() {
                             variant="ghost"
                             size="icon"
                             title="Ver Cliente"
-                            onClick={() => router.push(`/productos/${p.ProductoId}/ver`)}
+                            onClick={() => router.push(`/productos/${p.id}/ver`)}
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -797,7 +784,7 @@ export default function ProductosPage() {
                                 variant="ghost"
                                 size="icon"
                                 title="Editar"
-                                onClick={() => router.push(`/productos/${p.ProductoId}/editar`)}
+                                onClick={() => router.push(`/productos/${p.id}/editar`)}
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -809,10 +796,10 @@ export default function ProductosPage() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                title={p.ProductoActivo ? "Inactivar" : "Activar"}
-                                onClick={() => handleToggleStatusClickActivo(p.ProductoId, p.ProductoActivo)}
+                                title={p.activo ? "Inactivar" : "Activar"}
+                                onClick={() => handleToggleStatusClickActivo(p.id, p.activo)}
                               >
-                                {p.ProductoActivo ? (
+                                {p.activo ? (
                                   <ToggleRight className="h-4 w-4 text-red-500" />
                                 ) : (
                                   <ToggleLeft className="h-4 w-4 text-green-500" />
@@ -827,7 +814,7 @@ export default function ProductosPage() {
                                 variant="ghost"
                                 size="icon"
                                 title="Eliminar"
-                                onClick={() => router.push(`/productos/${p.ProductoId}/eliminar`)}
+                                onClick={() => router.push(`/productos/${p.id}/eliminar`)}
                               >
                                 <X className="h-4 w-4 text-red-500" />
                               </Button>
@@ -872,7 +859,7 @@ export default function ProductosPage() {
       </Card>
 
       <Dialog open={showElementoDetallesModal} onOpenChange={setShowElementoDetallesModal}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[80%] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Detalles del Producto</DialogTitle>
           </DialogHeader>
@@ -942,19 +929,21 @@ export default function ProductosPage() {
                       <div className="space-y-1 text-sm">
                         <div>
                           <span className="font-semibold text-green-700">MP:</span>
-                          <span className="ml-2 text-gray-900">{elementoDetalles.mp || "0"}</span>
+                          <span className="ml-2 text-gray-900">${(elementoDetalles.mp || 0).toFixed(6)}</span>
                         </div>
                         <div>
                           <span className="font-semibold text-green-700">ME:</span>
-                          <span className="ml-2 text-gray-900">{elementoDetalles.me || "0"}</span>
+                          <span className="ml-2 text-gray-900">${(elementoDetalles.me || 0).toFixed(6)}</span>
                         </div>
                         <div>
                           <span className="font-semibold text-green-700">MS:</span>
-                          <span className="ml-2 text-gray-900">{elementoDetalles.ms || "0"}</span>
+                          <span className="ml-2 text-gray-900">${(elementoDetalles.ms || 0).toFixed(6)}</span>
                         </div>
                         <div>
                           <span className="font-semibold text-green-700">Costo de elaboración:</span>
-                          <span className="ml-2 text-gray-900">${elementoDetalles.costo?.toFixed(2) || "0.00"}</span>
+                          <span className="ml-2 text-gray-900">
+                            ${elementoDetalles.costo?.toFixed(6) || "0.000000"}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -965,19 +954,19 @@ export default function ProductosPage() {
                         <div>
                           <span className="font-semibold text-purple-700">MP %:</span>
                           <span className="ml-2 text-gray-900">
-                            {((elementoDetalles.mp_porcentaje || 0) * 100).toFixed(2)}%
+                            {((elementoDetalles.mp_porcentaje || 0) * 100).toFixed(0)}%
                           </span>
                         </div>
                         <div>
                           <span className="font-semibold text-purple-700">ME %:</span>
                           <span className="ml-2 text-gray-900">
-                            {((elementoDetalles.me_porcentaje || 0) * 100).toFixed(2)}%
+                            {((elementoDetalles.me_porcentaje || 0) * 100).toFixed(0)}%
                           </span>
                         </div>
                         <div>
                           <span className="font-semibold text-purple-700">MS %:</span>
                           <span className="ml-2 text-gray-900">
-                            {((elementoDetalles.ms_porcentaje || 0) * 100).toFixed(2)}%
+                            {((elementoDetalles.ms_porcentaje || 0) * 100).toFixed(0)}%
                           </span>
                         </div>
                       </div>
@@ -988,19 +977,19 @@ export default function ProductosPage() {
                       <div className="space-y-1 text-sm">
                         <div>
                           <span className="font-semibold text-amber-700">MP $:</span>
-                          <span className="ml-2 text-gray-900">${(elementoDetalles.mp_costeado || 0).toFixed(2)}</span>
+                          <span className="ml-2 text-gray-900">${(elementoDetalles.mp_costeado || 0).toFixed(6)}</span>
                         </div>
                         <div>
                           <span className="font-semibold text-amber-700">ME $:</span>
-                          <span className="ml-2 text-gray-900">${(elementoDetalles.me_costeado || 0).toFixed(2)}</span>
+                          <span className="ml-2 text-gray-900">${(elementoDetalles.me_costeado || 0).toFixed(6)}</span>
                         </div>
                         <div>
                           <span className="font-semibold text-amber-700">MS $:</span>
-                          <span className="ml-2 text-gray-900">${(elementoDetalles.ms_costeado || 0).toFixed(2)}</span>
+                          <span className="ml-2 text-gray-900">${(elementoDetalles.ms_costeado || 0).toFixed(6)}</span>
                         </div>
                         <div>
                           <span className="font-semibold text-amber-700">Precio Healthy Lab:</span>
-                          <span className="ml-2 text-gray-900">${(elementoDetalles.preciohl || 0).toFixed(2)}</span>
+                          <span className="ml-2 text-gray-900">${(elementoDetalles.preciohl || 0).toFixed(6)}</span>
                         </div>
                       </div>
                     </div>

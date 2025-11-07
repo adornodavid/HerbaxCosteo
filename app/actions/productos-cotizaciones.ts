@@ -595,6 +595,7 @@ export async function operacionPrecioActualPorcentajeUtilidad(
 export async function cotizacionProducto(
   productoid: number,
   clienteid: number,
+  zonaid: number,
 ): Promise<{
   success: boolean
   error?: string
@@ -605,6 +606,7 @@ export async function cotizacionProducto(
     const { data, error } = await supabase.rpc("cotizacionproducto", {
       productosid: productoid,
       clientesid: clienteid,
+      zonasid: zonaid,
     })
 
     if (error) {
@@ -730,6 +732,17 @@ export async function calcularCotizacion(
   clienteid: number,
   precioventasiniva: number,
   forecast: number,
+  PorcentajeGeneracional: number,
+  PorcentajeNivel: number,
+  PorcentajeInfinito: number,
+  PorcentajeIva: number,
+  PorcentajeBonoRapido: number,
+  PorcentajeCDA: number,
+  PorcentajeConstructor: number,
+  PorcentajeRuta: number,
+  PorcentajeReembolsos: number,
+  PorcentajeTarjeta: number,
+  PorcentajeEnvio: number,
 ): Promise<{
   success: boolean
   error?: string
@@ -742,6 +755,18 @@ export async function calcularCotizacion(
       clientesid: clienteid,
       preciosiniva: precioventasiniva,
       forecasts: forecast,
+      porcentajegeneracional: PorcentajeGeneracional,
+      porcentajenivel: PorcentajeNivel,
+      porcentajeinfinito: PorcentajeInfinito,
+      porcentajeiva: PorcentajeIva,
+      porcentajebonorapido: PorcentajeBonoRapido,
+      porcentajecda: PorcentajeCDA,
+      porcentajeconstructor: PorcentajeConstructor,
+      porcentajeruta: PorcentajeRuta,
+      porcentajereembolsos: PorcentajeReembolsos,
+      porcentajetarjeta: PorcentajeTarjeta,
+      porcentajeenvio: PorcentajeEnvio,
+
     })
 
     if (error) {
@@ -778,6 +803,18 @@ export async function actualizarCotizacion(
   productoid: number,
   clienteid: number,
   precioventasiniva: number,
+  forecast: number,
+  PorcentajeGeneracional: number,
+  PorcentajeNivel: number,
+  PorcentajeInfinito: number,
+  PorcentajeIva: number,
+  PorcentajeBonoRapido: number,
+  PorcentajeCDA: number,
+  PorcentajeConstructor: number,
+  PorcentajeRuta: number,
+  PorcentajeReembolsos: number,
+  PorcentajeTarjeta: number,
+  PorcentajeEnvio: number,
 ): Promise<{
   success: boolean
   error?: string
@@ -789,6 +826,18 @@ export async function actualizarCotizacion(
       productosid: productoid,
       clientesid: clienteid,
       preciosiniva: precioventasiniva,
+      forecasts: forecast,
+      porcentajegeneracional: PorcentajeGeneracional,
+      porcentajenivel: PorcentajeNivel,
+      porcentajeinfinito: PorcentajeInfinito,
+      porcentajeiva: PorcentajeIva,
+      porcentajebonorapido: PorcentajeBonoRapido,
+      porcentajecda: PorcentajeCDA,
+      porcentajeconstructor: PorcentajeConstructor,
+      porcentajeruta: PorcentajeRuta,
+      porcentajereembolsos: PorcentajeReembolsos,
+      porcentajetarjeta: PorcentajeTarjeta,
+      porcentajeenvio: PorcentajeEnvio,
     })
 
     if (error) {

@@ -48,9 +48,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
 ================================================== */
 // Función: objetoZona / oZona (Individual): Esta Función crea de manera individual un objeto/clase
 
-
 // Función: objetoZonas / oZonas (Listado): Esta Función crea un listado de objetos/clases, es un array
-
 
 /*==================================================
     INSERTS: CREATE / CREAR / INSERT
@@ -228,7 +226,7 @@ export async function actualizarZona(formData: FormData) {
       const resultadoImagen = await imagenSubir(imagen, nombre, "zonas")
       if (!resultadoImagen.success) {
         return { success: false, error: resultadoImagen.error }
-      } else{
+      } else {
         imagenurl = resultadoImagen.url || ""
       }
     } else {
@@ -252,7 +250,7 @@ export async function actualizarZona(formData: FormData) {
       console.error("Error actualizando zona en query en actualizarZona de actions/zonas:", error)
       return { success: false, error: error.message }
     }
- 
+
     revalidatePath("/zonas")
 
     // Retorno de datos
@@ -319,10 +317,7 @@ export async function estatusActivoZona(id: number, activo: boolean): Promise<bo
     const { error } = await supabase.from("zonas").update({ activo: activo }).eq("id", id)
 
     if (error) {
-      console.error(
-        "Error actualizando estatus activo de la zona en estatusActivoZona de app/actions/zonas:",
-        error,
-      )
+      console.error("Error actualizando estatus activo de la zona en estatusActivoZona de app/actions/zonas:", error)
       return false
     }
 
@@ -335,3 +330,56 @@ export async function estatusActivoZona(id: number, activo: boolean): Promise<bo
 }
 
 // Función: listaDesplegableZonas / ddlZonas: Función que se utiliza para los dropdownlist
+export async function listDesplegableZonas(zonaid = -1, zonanombre = "", clienteid = -1) {
+  try {
+    // Paso 1: Preparar Query
+    let query = supabase.from("zonasxcliente").select(`
+        idrec,
+        clienteid,
+        zonaid,
+        zonas!zonaid(
+        id,
+        nombre)
+      `)
+
+    // Paso 2: Filtros en query, dependiendo parametros
+    if (zonaid !== -1) {
+      query = query.eq("id", zonaid)
+    }
+    if (zonanombre !== "") {
+      query = query.ilike("zonas.nombre", `%${zonanombre}%`)
+    }
+    if (clienteid !== -1) {
+      query = query.eq("clienteid", clienteid)
+    }
+
+    // Paso 3: Ejecutar query
+    query = query.order("idrec", { ascending: true })
+
+    // Paso 4: Variables y resultados del query
+    const { data: zonas, error } = await query
+
+    // Error en query
+    if (error) {
+      console.error("Error obteniendo zonas de query en listDesplegableZonas de actions/zonas: ", error)
+      return { success: false, error: error.message }
+    }
+
+    // Paso 5: Transformar datos al formato ddlItem
+    const data: { value: string; text: string }[] = zonas
+      ? zonas.map((zona: any) => ({
+          value: zona.zonas.id.toString(),
+          text: zona.zonas.nombre,
+        }))
+      : []
+
+    // Paso 6: Retorno de data
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en listDesplegableZonas de actions/zonas: " + error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar listDesplegableZonas de actions/zonas: " + error,
+    }
+  }
+}

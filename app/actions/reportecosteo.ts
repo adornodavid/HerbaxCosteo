@@ -17,12 +17,13 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 ================================================== */
 
 // Función: obtenerReporteCosteo: Ejecuta la función RPC de Supabase para obtener el reporte de costeo
-export async function obtenerReporteCosteo(productosid: number, clientesid: number) {
+export async function obtenerReporteCosteo(productosid: number, clientesid: number, zonasid: number) {
   try {
     // Ejecutar la función RPC de Supabase
     const { data, error } = await supabase.rpc("reportecosteo", {
       productosid,
       clientesid,
+      zonasid,
     })
 
     if (error) {
