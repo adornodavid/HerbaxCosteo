@@ -359,7 +359,7 @@ export default function VerProductoPage() {
           </Card>
 
           <div className="flex gap-2 border-b border-gray-200">
-            <button
+            {/*<button
               onClick={() => setActiveTab("caracteristicas")}
               className={`px-6 py-3 font-semibold transition-colors ${
                 activeTab === "caracteristicas"
@@ -368,7 +368,7 @@ export default function VerProductoPage() {
               }`}
             >
               Características
-            </button>
+            </button>*/}
 
             <button
               onClick={() => setActiveTab("formulas")}
@@ -437,7 +437,7 @@ export default function VerProductoPage() {
             </button> */}
           </div>
 
-          {activeTab === "caracteristicas" && (
+          {/*{activeTab === "caracteristicas" && (
             <Card>
               <CardContent className="p-6">
                 <h2 className="text-2xl font-bold mb-4">Características del Producto</h2>
@@ -534,7 +534,7 @@ export default function VerProductoPage() {
                 </div>
               </CardContent>
             </Card>
-          )}
+          )}*/}
 
           {activeTab === "formulas" && (
             <Card>
@@ -1272,13 +1272,13 @@ export default function VerProductoPage() {
                   Actualizar
                 </Button>
 
-                <Button
+                {/*<Button
                   className="bg-red-600 hover:bg-red-700 text-white"
                   onClick={() => router.push(`/productos/${productoId}/eliminar`)}
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Eliminar
-                </Button>
+                </Button>*/}
               </>
             )}
 

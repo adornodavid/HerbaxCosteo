@@ -429,7 +429,7 @@ export async function obtenerProductos(
   }
 }
 
-// Funcion: obtenerProductosCaracteristicas / selProductosCaracteristicas: Funcion para obtener las características de un producto
+// Funcion: obtenerProductosCaracteristicas / selProductosCaracteristicas: FUNCION para obtener las características de un producto
 export async function obtenerProductosCaracteristicas(
   idrec = -1,
   productoid = -1,
@@ -522,7 +522,7 @@ export async function obtenerProductosCaracteristicas(
   }
 }
 
-// Función: obtenerProductosXCatalogos / selProductosXCatalogos: Funcion para obtener en un array el listado de los ids de productos
+// Función: obtenerProductosXCatalogos / selProductosXCatalogos: FUNCION para obtener en un array el listado de los ids de productos
 export async function obtenerProductosXCatalogos(
   catalogoid = -1,
 ): Promise<{ success: boolean; data?: number[]; error?: string }> {
@@ -563,7 +563,7 @@ export async function obtenerProductosXClientes(
     //const { data, error } = await supabase.from("productos").select("productoid").eq("clienteid", clienteid)
     const { data, error } = await supabase
       .from("productos")
-      .selectselect(`
+      .select(`
         idrec,
         clienteid,
         clientes!clienteid(nombre),
@@ -637,7 +637,7 @@ export async function obtenerProductosXClientes(
   }
 }
 
-// Funcion: obtenerProductos / selProductos: Funcion para obtener
+// Funcion: obtenerProductos / selProductos: FUNCION para obtener
 export async function obtenerProductosXClientesOptima(productoid = -1, clienteid = -1) {
   try {
     let query = supabase.from("productosxcliente").select(`
@@ -1078,6 +1078,29 @@ export async function recalcularProducto(productoid: number): Promise<{ success:
       return { success: false, error: updateFinalError.message }
     }
 
+    // Get clienteid for the product
+    const { data: productoInfo, error: productoInfoError } = await supabase
+      .from("productos")
+      .select("clienteid")
+      .eq("id", productoid)
+      .single()
+
+    if (!productoInfoError && productoInfo) {
+      const clientesid = productoInfo.clienteid
+
+      // Execute recalcularcosteogeneral function
+      const { data: recalcularData, error: recalcularError } = await supabase.rpc("recalcularcosteogeneral", {
+        productosid: productoid,
+        clientesid: clientesid,
+      })
+
+      if (recalcularError) {
+        console.error("Error ejecutando recalcularcosteogeneral:", recalcularError)
+        // Don't return error, just log it - we want to complete the update even if this fails
+      }
+    }
+    // </CHANGE>
+
     revalidatePath("/productos")
 
     return { success: true, error: false }
@@ -1332,7 +1355,7 @@ export async function actualizarCostoProducto(productoId: number) {
 /*==================================================
   * SPECIALS-ESPECIALES ()
 ================================================== */
-// Función: estatusActivoProducto / actProducto: Funcion que cambia la columna activo a true(activo) o false(inactivo) del producto
+// Función: estatusActivoProducto / actProducto: FUNCION que cambia la columna activo a true(activo) o false(inactivo) del producto
 export async function estatusActivoProducto(productoid: number, activo: boolean): Promise<boolean> {
   try {
     const { error } = await supabase.from("productos").update({ activo: activo }).eq("id", productoid)

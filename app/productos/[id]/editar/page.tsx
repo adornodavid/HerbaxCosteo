@@ -34,7 +34,6 @@ import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageProcessing } from "@/components/page-processing"
 import { PageModalValidation } from "@/components/page-modal-validation"
 import { PageModalError } from "@/components/page-modal-error"
-import { PageModalAlert } from "@/components/page-modal-alert"
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
 import { obtenerProductos, actualizarProducto, recalcularProducto } from "@/app/actions/productos"
@@ -128,6 +127,7 @@ export default function EditarProductoPage() {
   const [showProcessing, setShowProcessing] = useState(false)
 
   const [showCosteoRedirectModal, setShowCosteoRedirectModal] = useState(false)
+  const [showConfirmSaveModal, setShowConfirmSaveModal] = useState(false)
   // </CHANGE>
 
   const [formData, setFormData] = useState({
@@ -287,8 +287,18 @@ export default function EditarProductoPage() {
 
   const ejecutarActualizacion = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setShowConfirmSaveModal(true)
+  }
+
+  const confirmarActualizacion = async () => {
+    setShowConfirmSaveModal(false)
+    // </CHANGE>
+
     // Variables necesarias para el proceso
-    const formDataToSend = new FormData(e.currentTarget)
+    const form = document.getElementById("formInformacion") as HTMLFormElement
+    if (!form) return
+
+    const formDataToSend = new FormData(form)
     const nombre = formDataToSend.get("nombre") as string
     const codigo = formDataToSend.get("codigo") as string
 
@@ -402,19 +412,33 @@ export default function EditarProductoPage() {
       const result = await crearFormulaXProducto(formulaSeleccionada!.id, productoId, Number(formulaCantidad))
 
       if (result.success) {
-        setModalAlert({
-          Titulo: "Éxito",
-          Mensaje: "Fórmula agregada exitosamente",
-        })
-        setShowModalAlert(true)
+        const recalcularResult = await recalcularProducto(productoId)
 
-        // Reset form
-        setFormulaBuscar("")
-        setFormulaSeleccionada(null)
-        setFormulaCantidad("")
+        if (recalcularResult.success) {
+          setModalAlert({
+            Titulo: "Éxito",
+            Mensaje: "Fórmula agregada y producto recalculado exitosamente",
+          })
+          setShowModalAlert(true)
 
-        // Reload product data
-        await cargarDatosIniciales()
+          // Reset form
+          setFormulaBuscar("")
+          setFormulaSeleccionada(null)
+          setFormulaCantidad("")
+
+          // Reload product data
+          await cargarDatosIniciales()
+        } else {
+          setModalError({
+            Titulo: "Error al recalcular producto",
+            Mensaje: recalcularResult.error || "La fórmula se agregó pero hubo un error al recalcular",
+          })
+          setShowModalError(true)
+
+          // Still reload data even if recalculation failed
+          await cargarDatosIniciales()
+        }
+        // </CHANGE>
       } else {
         setModalError({
           Titulo: "Error al agregar fórmula",
@@ -448,14 +472,28 @@ export default function EditarProductoPage() {
       const result = await eliminarFormulaXProducto(formulaToDelete.formulaid, productoId)
 
       if (result.success) {
-        setModalAlert({
-          Titulo: "Éxito",
-          Mensaje: "Fórmula eliminada exitosamente",
-        })
-        setShowModalAlert(true)
+        const recalcularResult = await recalcularProducto(productoId)
 
-        // Reload product data
-        await cargarDatosIniciales()
+        if (recalcularResult.success) {
+          setModalAlert({
+            Titulo: "Éxito",
+            Mensaje: "Fórmula eliminada y producto recalculado exitosamente",
+          })
+          setShowModalAlert(true)
+
+          // Reload product data
+          await cargarDatosIniciales()
+        } else {
+          setModalError({
+            Titulo: "Error al recalcular producto",
+            Mensaje: recalcularResult.error || "La fórmula se eliminó pero hubo un error al recalcular",
+          })
+          setShowModalError(true)
+
+          // Still reload data even if recalculation failed
+          await cargarDatosIniciales()
+        }
+        // </CHANGE>
       } else {
         setModalError({
           Titulo: "Error al eliminar fórmula",
@@ -527,19 +565,36 @@ export default function EditarProductoPage() {
       console.log("result", result.data)
 
       if (result.success) {
-        setModalAlert({
-          Titulo: "Éxito",
-          Mensaje: "Material de etiquetado agregado exitosamente",
-        })
-        setShowModalAlert(true)
+        const recalcularResult = await recalcularProducto(productoId)
 
-        // Reset form
-        setMaterialEtiquetadoBuscar("")
-        setMaterialEtiquetadoSeleccionado(null)
-        setMaterialEtiquetadoCantidad("")
+        if (recalcularResult.success) {
+          setModalAlert({
+            Titulo: "Éxito",
+            Mensaje: "Material de etiquetado agregado y producto recalculado exitosamente",
+          })
+          setShowModalAlert(true)
 
-        // Reload product data
-        await cargarDatosIniciales()
+          // Reset form
+          setMaterialEtiquetadoBuscar("")
+          setMaterialEtiquetadoSeleccionado(null)
+          setMaterialEtiquetadoCantidad("")
+
+          // Reload product data
+          await cargarDatosIniciales()
+        } else {
+          setModalError({
+            Titulo: "Error al recalcular producto",
+            Mensaje: recalcularResult.error || "El material se agregó pero hubo un error al recalcular",
+          })
+          setShowModalError(true)
+
+          // Still reset form and reload data
+          setMaterialEtiquetadoBuscar("")
+          setMaterialEtiquetadoSeleccionado(null)
+          setMaterialEtiquetadoCantidad("")
+          await cargarDatosIniciales()
+        }
+        // </CHANGE>
       } else {
         setModalError({
           Titulo: "Error al agregar material de empaque",
@@ -576,14 +631,28 @@ export default function EditarProductoPage() {
       )
 
       if (result.success) {
-        setModalAlert({
-          Titulo: "Éxito",
-          Mensaje: "Material de empaque eliminado exitosamente",
-        })
-        setShowModalAlert(true)
+        const recalcularResult = await recalcularProducto(productoId)
 
-        // Reload product data
-        await cargarDatosIniciales()
+        if (recalcularResult.success) {
+          setModalAlert({
+            Titulo: "Éxito",
+            Mensaje: "Material de empaque eliminado y producto recalculado exitosamente",
+          })
+          setShowModalAlert(true)
+
+          // Reload product data
+          await cargarDatosIniciales()
+        } else {
+          setModalError({
+            Titulo: "Error al recalcular producto",
+            Mensaje: recalcularResult.error || "El material se eliminó pero hubo un error al recalcular",
+          })
+          setShowModalError(true)
+
+          // Still reload data even if recalculation failed
+          await cargarDatosIniciales()
+        }
+        // </CHANGE>
       } else {
         setModalError({
           Titulo: "Error al eliminar material de empaque",
@@ -776,12 +845,22 @@ export default function EditarProductoPage() {
       )}
 
       {showModalAlert && (
-        <PageModalAlert
-          Titulo={ModalAlert?.Titulo || ""}
-          Mensaje={ModalAlert?.Mensaje || ""}
-          isOpen={true}
-          onClose={() => setShowModalAlert(false)}
-        />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-cyan-100 rounded-full">
+              <svg className="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-center mb-2">{ModalAlert?.Titulo || ""}</h3>
+            <p className="text-center text-gray-600 mb-6">{ModalAlert?.Mensaje || ""}</p>
+            <div className="flex justify-center">
+              <Button className="bg-cyan-500 hover:bg-cyan-600 text-white" onClick={() => setShowModalAlert(false)}>
+                Aceptar
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
 
       {showCosteoRedirectModal && (
@@ -809,6 +888,30 @@ export default function EditarProductoPage() {
           </div>
         </div>
       )}
+      {/* Added modal for confirmation before saving */}
+      {showConfirmSaveModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4">Confirmar Actualización</h3>
+            <p className="mb-6">
+              ¿Está seguro de que desea realizar el cálculo con la información agregada en los campos?
+              <br />
+              <br />
+              <strong>Advertencia:</strong> Al realizar el cambio se creará un recálculo de la información, precios y
+              costos del producto a actualizar. Esta información puede afectar al costeo en caso de que el producto
+              presente dicha información.
+            </p>
+            <div className="flex gap-4 justify-end">
+              <Button variant="outline" onClick={() => setShowConfirmSaveModal(false)}>
+                Cancelar
+              </Button>
+              <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={confirmarActualizacion}>
+                Sí, Continuar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* </CHANGE> */}
 
       {showDeleteModal && (
@@ -817,6 +920,11 @@ export default function EditarProductoPage() {
             <h3 className="text-lg font-semibold mb-4">Confirmar Eliminación</h3>
             <p className="mb-6">
               ¿Está seguro que desea eliminar la fórmula <strong>{formulaToDelete?.nombre}</strong> del producto?
+              <br />
+              <br />
+              <strong>Advertencia:</strong> Al realizar el cambio se creará un recálculo de la información, precios y
+              costos del producto a actualizar. Esta información puede afectar al costeo en caso de que el producto
+              presente dicha información.
             </p>
             <div className="flex gap-4 justify-end">
               <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
@@ -837,6 +945,11 @@ export default function EditarProductoPage() {
             <p className="mb-6">
               ¿Está seguro que desea agregar la fórmula <strong>{formulaSeleccionada?.nombre}</strong> con cantidad{" "}
               <strong>{formulaCantidad}</strong> al producto?
+              <br />
+              <br />
+              <strong>Advertencia:</strong> Al realizar el cambio se creará un recálculo de la información, precios y
+              costos del producto a actualizar. Esta información puede afectar al costeo en caso de que el producto
+              presente dicha información.
             </p>
             <div className="flex gap-4 justify-end">
               <Button variant="outline" onClick={() => setShowAddModal(false)}>
@@ -857,6 +970,11 @@ export default function EditarProductoPage() {
             <p className="mb-6">
               ¿Está seguro que desea eliminar el material de empaque{" "}
               <strong>{materialEtiquetadoToDelete?.nombre}</strong> del producto?
+              <br />
+              <br />
+              <strong>Advertencia:</strong> Al realizar el cambio se creará un recálculo de la información, precios y
+              costos del producto a actualizar. Esta información puede afectar al costeo en caso de que el producto
+              presente dicha información.
             </p>
             <div className="flex gap-4 justify-end">
               <Button variant="outline" onClick={() => setShowDeleteMaterialEtiquetadoModal(false)}>
@@ -878,6 +996,11 @@ export default function EditarProductoPage() {
               ¿Está seguro que desea agregar el material de empaque{" "}
               <strong>{materialEtiquetadoSeleccionado?.nombre}</strong> con cantidad{" "}
               <strong>{materialEtiquetadoCantidad}</strong> al producto?
+              <br />
+              <br />
+              <strong>Advertencia:</strong> Al realizar el cambio se creará un recálculo de la información, precios y
+              costos del producto a actualizar. Esta información puede afectar al costeo en caso de que el producto
+              presente dicha información.
             </p>
             <div className="flex gap-4 justify-end">
               <Button variant="outline" onClick={() => setShowAddMaterialEtiquetadoModal(false)}>
@@ -1202,21 +1325,22 @@ export default function EditarProductoPage() {
                             </td>
                             <td className="border p-3">
                               <Input
-                                type="text"
+                                type="numeric"
+                                step="0.01"
                                 name="mp_porcentaje"
-                                value={
-                                  producto?.mp_porcentaje ? `${(producto.mp_porcentaje * 100).toFixed(2)}` : "0.00"
-                                }
+                                value={(producto.mp_porcentaje * 100).toString()}
                                 onChange={(e) => {
-                                  const value = e.target.value.replace("%", "")
+                                  const value = e.target.value
                                   const numValue = Number.parseFloat(value) / 100
-                                  setProducto((prev) => (prev ? { ...prev, mp_porcentaje: numValue } : null))
+                                  if (!isNaN(numValue)) {
+                                    setProducto((prev) => (prev ? { ...prev, mp_porcentaje: numValue } : null))
+                                  }
                                 }}
                                 className="bg-white"
                               />
                             </td>
                             <td className="border p-3">
-                              <span className="font-medium">${producto?.mp_costeado?.toFixed(2) || "0.00"}</span>
+                              <span className="font-medium">${producto?.mp_costeado?.toFixed(2) || "0"}</span>
                             </td>
                           </tr>
 
@@ -1229,14 +1353,15 @@ export default function EditarProductoPage() {
                             <td className="border p-3">
                               <Input
                                 type="text"
+                                step="0.01"
                                 name="me_porcentaje"
-                                value={
-                                  producto?.me_porcentaje ? `${(producto.me_porcentaje * 100).toFixed(2)}` : "0.00"
-                                }
+                                value={(producto.me_porcentaje * 100).toString()}
                                 onChange={(e) => {
-                                  const value = e.target.value.replace("%", "")
+                                  const value = e.target.value
                                   const numValue = Number.parseFloat(value) / 100
-                                  setProducto((prev) => (prev ? { ...prev, me_porcentaje: numValue } : null))
+                                  if (!isNaN(numValue)) {
+                                    setProducto((prev) => (prev ? { ...prev, me_porcentaje: numValue } : null))
+                                  }
                                 }}
                                 className="bg-white"
                               />
@@ -1256,13 +1381,13 @@ export default function EditarProductoPage() {
                               <Input
                                 type="text"
                                 name="ms_porcentaje"
-                                value={
-                                  producto?.ms_porcentaje ? `${(producto.ms_porcentaje * 100).toFixed(2)}` : "0.00"
-                                }
+                                value={(producto.ms_porcentaje * 100).toString()}
                                 onChange={(e) => {
-                                  const value = e.target.value.replace("%", "")
+                                  const value = e.target.value
                                   const numValue = Number.parseFloat(value) / 100
-                                  setProducto((prev) => (prev ? { ...prev, ms_porcentaje: numValue } : null))
+                                  if (!isNaN(numValue)) {
+                                    setProducto((prev) => (prev ? { ...prev, ms_porcentaje: numValue } : null))
+                                  }
                                 }}
                                 className="bg-white"
                               />
@@ -1435,7 +1560,7 @@ export default function EditarProductoPage() {
               </div>
 
               <div className="space-y-4 mt-8">
-                <h3 className="text-lg font-semibold mt-20">Agregar Material de Empaque</h3>
+                <h3 className="text-lg font-semibold">Agregar Material de Empaque</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                   {/* Material Etiquetado search input with autocomplete */}
@@ -1578,6 +1703,68 @@ export default function EditarProductoPage() {
                   <p className="text-gray-500">No hay materiales de empaque asignados a este producto.</p>
                 )}
               </div>
+
+              <div className="border-t-2 border-blue-500 mt-4 pt-4 flex justify-end">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl">
+                  <div className="space-y-2">
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-semibold">MP:</span>
+                      <span>${(producto?.mp || 0).toFixed(6)}</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-semibold">ME:</span>
+                      <span>${(producto?.me || 0).toFixed(6)}</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-semibold">MS:</span>
+                      <span>${(producto?.ms || 0).toFixed(6)}</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-bold">Costo:</span>
+                      <span className="text-green-600">${(producto?.costo || 0).toFixed(6)}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-semibold">MP %:</span>
+                      <span>{((producto?.mp_porcentaje || 0) * 100).toFixed(2)}%</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-semibold">ME %:</span>
+                      <span>{((producto?.me_porcentaje || 0) * 100).toFixed(2)}%</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-semibold">MS %:</span>
+                      <span>{((producto?.ms_porcentaje || 0) * 100).toFixed(2)}%</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-semibold">MP Costo:</span>
+                      <span>${(producto?.mp_costeado || 0).toFixed(6)}</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-semibold">ME Costo:</span>
+                      <span>${(producto?.me_costeado || 0).toFixed(6)}</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-semibold">MS Costo:</span>
+                      <span>${(producto?.ms_costeado || 0).toFixed(6)}</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-bold">Precio Healthy Lab:</span>
+                      <span className="text-green-600">${(producto?.preciohl || 0).toFixed(6)}</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-bold">Utilidad:</span>
+                      <span className="text-green-600">${(producto?.utilidadhl || 0).toFixed(6)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* </CHANGE> */}
             </div>
           </CardContent>
         </Card>
