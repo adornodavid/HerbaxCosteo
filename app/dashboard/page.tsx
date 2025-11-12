@@ -26,6 +26,7 @@ import {
   obtenerResumenesDashboard,
   obtenerEstadisticasEmpresariales,
   obtenerKPIsDashboard,
+  consultarUtilidadActual,
 } from "@/app/actions/dashboard-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listDesplegableZonas } from "@/app/actions/zonas"
@@ -35,6 +36,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { useAuth } from "@/contexts/auth-context"
 import { ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Info } from "lucide-react"
 import {
   BarChart,
   Bar,
@@ -100,6 +103,16 @@ interface ReporteCosteoItem {
   sporcentajecosto: number
 }
 
+interface UtilidadActualItem {
+  snombre: string
+  scliente: string
+  szona: string
+  stotalcostos: number
+  sprecioventasiniva: number
+  sutilidadmarginal: number
+  sprecioactualporcentajeutilidad: number
+}
+
 const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4"]
 
 /* ==================================================
@@ -125,6 +138,8 @@ export default function DashboardPage() {
   const [costoAnualTotal, setCostoAnualTotal] = useState(0)
   const [utilidadAnual, setUtilidadAnual] = useState(0)
   const [costoUtilidadAnual, setCostoUtilidadAnual] = useState(0)
+
+  const [utilidadActualData, setUtilidadActualData] = useState<UtilidadActualItem[]>([])
 
   /* ================================================== 
     Al cargar la pagina
@@ -226,13 +241,7 @@ export default function DashboardPage() {
       if (filtroClienteId) {
         const result = await obtenerReporteCosteo(-1, Number(filtroClienteId), Number(filtroZonaId))
         if (result.success && result.data) {
-          let filteredData = result.data
-          
-          {/*if (filtroZonaId !== "-1") {
-            filteredData = result.data.filter((item: any) => item.zonaid === Number(filtroZonaId))
-            console.log("dataaa", filteredData)
-          }
-          */}
+          const filteredData = result.data
 
           const top5 = filteredData.sort((a: any, b: any) => b.sporcentajecosto - a.sporcentajecosto).slice(0, 5)
 
@@ -252,6 +261,21 @@ export default function DashboardPage() {
       }
     }
     cargarReporteCosteo()
+  }, [filtroClienteId, filtroZonaId])
+
+  useEffect(() => {
+    const cargarUtilidadActual = async () => {
+      if (filtroClienteId) {
+        const result = await consultarUtilidadActual(Number(filtroClienteId), Number(filtroZonaId))
+        if (result.success && result.data) {
+          const top5 = result.data
+            .sort((a: any, b: any) => b.sprecioactualporcentajeutilidad - a.sprecioactualporcentajeutilidad)
+            .slice(0, 5)
+          setUtilidadActualData(top5)
+        }
+      }
+    }
+    cargarUtilidadActual()
   }, [filtroClienteId, filtroZonaId])
 
   if (loading) {
@@ -437,17 +461,17 @@ export default function DashboardPage() {
 
         <Card className="border-slate-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-slate-900">Análisis de Costos</CardTitle>
+            <CardTitle className="text-slate-900">Estadisticas de Producto</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-2">% Costo</h3>
+                <h3 className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-2">% Costo Producto</h3>
                 <div className="space-y-3">
                   {reporteCosteoData.map((item, index) => (
                     <div key={index} className="space-y-1">
                       <div className="flex justify-between items-center text-sm">
-                        <span className="text-slate-700 font-medium truncate max-w-[150px]">{item.snombre}</span>
+                        <span className="text-slate-700 font-medium truncate max-w-[310px]">{item.snombre}</span>
                         <span className="text-slate-900 font-semibold">
                           {(item.sporcentajecosto * 100).toFixed(2)}%
                         </span>
@@ -467,8 +491,95 @@ export default function DashboardPage() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-2">Sección 2</h3>
-                <p className="text-sm text-slate-500">Contenido pendiente</p>
+                <h3 className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-2">% Utilidad Producto</h3>
+                <div className="space-y-3">
+                  <TooltipProvider>
+                    {utilidadActualData.map((item, index) => (
+                      <Tooltip key={index}>
+                        <TooltipTrigger asChild>
+                          <div className="space-y-1 cursor-help">
+                            <div className="flex justify-between items-center text-sm">
+                              <div className="flex items-center gap-2">
+                                <span className="text-slate-700 font-medium truncate max-w-[310px]">
+                                  {item.snombre}
+                                </span>
+                                <Info className="h-3.5 w-3.5 text-emerald-500" />
+                              </div>
+                              <span className="text-slate-900 font-semibold">
+                                {item.sprecioactualporcentajeutilidad.toFixed(2)}%
+                              </span>
+                            </div>
+                            <div className="w-full bg-slate-100 rounded-full h-2.5">
+                              <div
+                                className="h-2.5 rounded-full transition-all duration-300 bg-gradient-to-r from-emerald-500 to-emerald-600"
+                                style={{
+                                  width: `${Math.min(item.sprecioactualporcentajeutilidad, 100)}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="right"
+                          className="w-80 p-0 border-0 shadow-2xl bg-gradient-to-br from-emerald-50 via-white to-teal-50"
+                        >
+                          <div className="p-5 space-y-4">
+                            <div className="flex items-start gap-3 pb-3 border-b border-emerald-200">
+                              <div className="p-2 bg-emerald-100 rounded-lg">
+                                <TrendingUp className="h-5 w-5 text-emerald-600" />
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="font-bold text-slate-900 text-base mb-1">{item.snombre}</h4>
+                                <p className="text-xs text-slate-600">Análisis de Rentabilidad</p>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                                <p className="text-xs font-medium text-blue-700 mb-1">Cliente</p>
+                                <p className="text-sm font-semibold text-blue-900">{item.scliente}</p>
+                              </div>
+                              <div className="bg-purple-50 rounded-lg p-3 border border-purple-100">
+                                <p className="text-xs font-medium text-purple-700 mb-1">Zona</p>
+                                <p className="text-sm font-semibold text-purple-900">{item.szona}</p>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2.5">
+                              <div className="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg">
+                                <span className="text-xs font-medium text-slate-700">Total Costos</span>
+                                <span className="text-sm font-bold text-slate-900">
+                                  ${item.stotalcostos.toFixed(6)}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center p-2.5 bg-green-50 rounded-lg">
+                                <span className="text-xs font-medium text-green-700">Precio Venta (sin IVA)</span>
+                                <span className="text-sm font-bold text-green-900">
+                                  ${item.sprecioventasiniva.toFixed(6)}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center p-2.5 bg-emerald-50 rounded-lg">
+                                <span className="text-xs font-medium text-emerald-700">Utilidad Marginal</span>
+                                <span className="text-sm font-bold text-emerald-900">
+                                  ${item.sutilidadmarginal.toFixed(6)}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-lg border-2 border-emerald-300">
+                                <span className="text-xs font-bold text-emerald-800">% Utilidad</span>
+                                <span className="text-base font-bold text-emerald-900">
+                                  {(item.sprecioactualporcentajeutilidad * 100).toFixed(2)}%
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  </TooltipProvider>
+                  {utilidadActualData.length === 0 && (
+                    <p className="text-sm text-slate-500 text-center py-4">Seleccione un cliente para ver los datos</p>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-4">

@@ -39,7 +39,6 @@ import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
 import { PageModalTutorial } from "@/components/page-modal-tutorial"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 // -- Frontend --
 
 // -- Backend --
@@ -482,8 +481,7 @@ export default function ProductosPage() {
   }
 
   const handleVerDetalles = (producto: Producto) => {
-    setElementoDetalles(producto)
-    setShowElementoDetallesModal(true)
+    router.push(`/productos/${producto.id}/ver`)
   }
 
   const handleToggleStatusClickProducto = (id: number, activo: boolean) => {
@@ -865,148 +863,7 @@ export default function ProductosPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={showElementoDetallesModal} onOpenChange={setShowElementoDetallesModal}>
-        <DialogContent className="max-w-[80%] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Detalles del Producto</DialogTitle>
-          </DialogHeader>
-          {elementoDetalles && (
-            <Card className="overflow-hidden border-0 shadow-none">
-              <CardContent className="p-0">
-                <div className="flex flex-row">
-                  <div className="w-[200px] h-[200px] flex items-center justify-center bg-gray-200 flex-shrink-0">
-                    <img
-                      src={
-                        elementoDetalles.imgurl && elementoDetalles.imgurl !== "Sin imagen"
-                          ? elementoDetalles.imgurl
-                          : "/placeholder.svg?height=200&width=200&text=Producto"
-                      }
-                      alt={elementoDetalles.nombre}
-                      className="h-[200px] w-auto"
-                    />
-                  </div>
-
-                  <div className="flex-1 p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <div className="space-y-2">
-                      <h3 className="font-bold text-lg text-sky-700 border-b pb-1">Información Básica</h3>
-                      <div className="space-y-1 text-sm">
-                        <div>
-                          <span className="font-semibold text-sky-700">ID:</span>
-                          <span className="ml-2 text-gray-900">{elementoDetalles.id}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-sky-700">Código:</span>
-                          <span className="ml-2 text-gray-900">{elementoDetalles.codigo || "Sin código"}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-sky-700">Nombre:</span>
-                          <span className="ml-2 text-gray-900">{elementoDetalles.nombre || "Sin nombre"}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-sky-700">Cliente:</span>
-                          <span className="ml-2 text-gray-900">
-                            {elementoDetalles.clientes?.nombre || "Sin cliente"}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-sky-700">Zona:</span>
-                          <span className="ml-2 text-gray-900">{elementoDetalles.zonas?.nombre || "Sin zona"}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-sky-700">Unidad de Medida:</span>
-                          <span className="ml-2 text-gray-900">
-                            {elementoDetalles.unidadesmedida?.descripcion || "Sin unidad"}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-sky-700">Estatus:</span>
-                          <span
-                            className={`ml-2 px-2 py-1 rounded text-xs font-semibold ${
-                              elementoDetalles.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                            }`}
-                          >
-                            {elementoDetalles.activo ? "Activo" : "Inactivo"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <h3 className="font-bold text-lg text-green-700 border-b pb-1">Composición y Costo</h3>
-                      <div className="space-y-1 text-sm">
-                        <div>
-                          <span className="font-semibold text-green-700">MP:</span>
-                          <span className="ml-2 text-gray-900">${(elementoDetalles.mp || 0).toFixed(6)}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-green-700">ME:</span>
-                          <span className="ml-2 text-gray-900">${(elementoDetalles.me || 0).toFixed(6)}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-green-700">MS:</span>
-                          <span className="ml-2 text-gray-900">${(elementoDetalles.ms || 0).toFixed(6)}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-green-700">Costo de elaboración:</span>
-                          <span className="ml-2 text-gray-900">
-                            ${elementoDetalles.costo?.toFixed(6) || "0.000000"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <h3 className="font-bold text-lg text-purple-700 border-b pb-1">Porcentajes</h3>
-                      <div className="space-y-1 text-sm">
-                        <div>
-                          <span className="font-semibold text-purple-700">MP %:</span>
-                          <span className="ml-2 text-gray-900">
-                            {((elementoDetalles.mp_porcentaje || 0) * 100).toFixed(0)}%
-                          </span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-purple-700">ME %:</span>
-                          <span className="ml-2 text-gray-900">
-                            {((elementoDetalles.me_porcentaje || 0) * 100).toFixed(0)}%
-                          </span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-purple-700">MS %:</span>
-                          <span className="ml-2 text-gray-900">
-                            {((elementoDetalles.ms_porcentaje || 0) * 100).toFixed(0)}%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <h3 className="font-bold text-lg text-amber-700 border-b pb-1">Costos en Moneda</h3>
-                      <div className="space-y-1 text-sm">
-                        <div>
-                          <span className="font-semibold text-amber-700">MP $:</span>
-                          <span className="ml-2 text-gray-900">${(elementoDetalles.mp_costeado || 0).toFixed(6)}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-amber-700">ME $:</span>
-                          <span className="ml-2 text-gray-900">${(elementoDetalles.me_costeado || 0).toFixed(6)}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-amber-700">MS $:</span>
-                          <span className="ml-2 text-gray-900">${(elementoDetalles.ms_costeado || 0).toFixed(6)}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-amber-700">Precio Healthy Lab:</span>
-                          <span className="ml-2 text-gray-900">${(elementoDetalles.preciohl || 0).toFixed(6)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Removed modal dialog for product details */}
     </div>
   )
 }

@@ -40,13 +40,16 @@ export interface oProducto {
     descripcion: string | null
   }
   mp: number | null
+  mem: number | null
   me: number | null
   ms: number | null
   costo: number | null
   mp_porcentaje: number | null
+  mem_porcentaje: number | null
   me_porcentaje: number | null
   ms_porcentaje: number | null
   mp_costeado: number | null
+  mem_costeado: number | null
   me_costeado: number | null
   ms_costeado: number | null
   preciohl: number | null
@@ -73,6 +76,7 @@ export interface oProducto {
       codigo: string | null
       nombre: string | null
       imgurl: string | null
+      tipomaterialid: number | null
       unidadmedidaid: number | null
       unidadesmedida:{
         descripcion: string | null

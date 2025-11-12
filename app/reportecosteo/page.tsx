@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Download, ChevronLeft, ChevronRight } from "lucide-react"
+import { Search, Download, ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react"
 import * as XLSX from "xlsx"
 import type { ddlItem } from "@/types/common.types"
 import type {
@@ -28,6 +28,7 @@ import { PageModalError } from "@/components/page-modal-error"
 import { useAuth } from "@/contexts/auth-context"
 import { useUserSession } from "@/hooks/use-user-session"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
+import { listDesplegableZonas } from "@/app/actions/zonas"
 import { listaDesplegableProductosXClientes } from "@/app/actions/productos"
 import { obtenerReporteCosteo } from "@/app/actions/reportecosteo"
 import type { oProducto } from "@/types/productos.types"
@@ -66,8 +67,11 @@ export default function ReporteCosteoPage() {
 
   // Estados de filtros
   const [filtroClienteId, setFiltroClienteId] = useState("")
+  const [filtroZonaId, setFiltroZonaId] = useState("")
   const [filtroProductoId, setFiltroProductoId] = useState("-1")
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [clientesOptions, setClientesOptions] = useState<ddlItem[]>([])
+  const [zonasOptions, setZonasOptions] = useState<ddlItem[]>([])
   const [productosCliente, setProductosCliente] = useState<oProducto[]>([])
 
   // Estados de reporte
@@ -90,9 +94,24 @@ export default function ReporteCosteoPage() {
   }, [sessionLoading, sessionUser])
 
   useEffect(() => {
+    const cargarZonas = async () => {
+      if (filtroClienteId) {
+        const result = await listDesplegableZonas(-1, "", Number(filtroClienteId))
+        if (result.success && result.data) {
+          setZonasOptions(result.data)
+        }
+      } else {
+        setZonasOptions([])
+        setFiltroZonaId("")
+      }
+    }
+    cargarZonas()
+  }, [filtroClienteId])
+
+  useEffect(() => {
     const cargarProductosCliente = async () => {
       if (filtroClienteId) {
-        const result = await listaDesplegableProductosXClientes(Number(filtroClienteId))
+        const result = await listaDesplegableProductosXClientes(Number(filtroClienteId), Number(filtroZonaId))
         if (result.success && result.data) {
           setProductosCliente(result.data)
         }
@@ -101,7 +120,7 @@ export default function ReporteCosteoPage() {
       }
     }
     cargarProductosCliente()
-  }, [filtroClienteId])
+  }, [filtroClienteId, filtroZonaId])
 
   useEffect(() => {
     const cargarClientes = async () => {
@@ -118,10 +137,11 @@ export default function ReporteCosteoPage() {
   }, [])
 
   const ejecutarBusqueda = async () => {
-    if (!filtroClienteId || !filtroProductoId) {
+    // Modified to include filtroZonaId in the check
+    if (!filtroClienteId || !filtroZonaId || !filtroProductoId) {
       setModalAlert({
         Titulo: "Campos requeridos",
-        Mensaje: "Por favor seleccione un cliente y un producto para buscar.",
+        Mensaje: "Por favor seleccione un cliente, zona y un producto para buscar.",
         isOpen: true,
         onClose: () => setShowModalAlert(false),
       })
@@ -132,7 +152,7 @@ export default function ReporteCosteoPage() {
     setIsSearching(true)
 
     try {
-      const result = await obtenerReporteCosteo(Number(filtroProductoId), Number(filtroClienteId))
+      const result = await obtenerReporteCosteo(Number(filtroProductoId), Number(filtroClienteId), Number(filtroZonaId))
 
       if (result.success && result.data) {
         setReporteData(result.data)
@@ -190,138 +210,170 @@ export default function ReporteCosteoPage() {
   }
 
   const exportarExcel = () => {
-    if (reporteData.length === 0) {
-      setModalAlert({
-        Titulo: "Sin datos",
-        Mensaje: "No hay datos para exportar. Por favor realice una búsqueda primero.",
-        isOpen: true,
-        onClose: () => setShowModalAlert(false),
-      })
-      setShowModalAlert(true)
-      return
-    }
-
     try {
-      // Crear datos formateados para Excel con los mismos títulos y orden de la tabla
-      const excelData = reporteData.map((row) => ({
-        FOLIO: row.folio || "-",
-        CÓDIGO: row.scodigo || "-",
-        NOMBRE: row.snombre || "-",
-        "PRECIO VENTA SIN IVA":
-          typeof row.sprecioventasiniva === "number"
-            ? row.sprecioventasiniva.toFixed(2)
-            : row.sprecioventasiniva || "-",
-        "PRECIO VENTA CON IVA":
-          typeof row.sprecioventaconiva === "number"
-            ? row.sprecioventaconiva.toFixed(2)
-            : row.sprecioventaconiva || "-",
-        "PLAN GENERACIONAL":
-          typeof row.splangeneracional === "number" ? row.splangeneracional.toFixed(2) : row.splangeneracional || "-",
-        "PLAN NIVEL": typeof row.splannivel === "number" ? row.splannivel.toFixed(2) : row.splannivel || "-",
-        "PLAN INFINITO":
-          typeof row.splaninfinito === "number" ? row.splaninfinito.toFixed(2) : row.splaninfinito || "-",
-        "IVA PAGADO": typeof row.sivapagado === "number" ? row.sivapagado.toFixed(2) : row.sivapagado || "-",
-        CDA: typeof row.scda === "number" ? row.scda.toFixed(2) : row.scda || "-",
-        "BONO INICIO RÁPIDO":
-          typeof row.sbonoiniciorapido === "number" ? row.sbonoiniciorapido.toFixed(2) : row.sbonoiniciorapido || "-",
-        "CONSTRUCTOR INICIO RÁPIDO":
-          typeof row.sconstructoriniciorapido === "number"
-            ? row.sconstructoriniciorapido.toFixed(2)
-            : row.sconstructoriniciorapido || "-",
-        "RUTA ÉXITO": typeof row.srutaexito === "number" ? row.srutaexito.toFixed(2) : row.srutaexito || "-",
-        REEMBOLSOS: typeof row.sreembolsos === "number" ? row.sreembolsos.toFixed(2) : row.sreembolsos || "-",
-        "TARJETA CRÉDITO":
-          typeof row.starjetacredito === "number" ? row.starjetacredito.toFixed(2) : row.starjetacredito || "-",
-        ENVÍO: typeof row.senvio === "number" ? row.senvio.toFixed(2) : row.senvio || "-",
-        "PRECIO HL": typeof row.spreciohl === "number" ? row.spreciohl.toFixed(2) : row.spreciohl || "-",
-        "PORCENTAJE COSTO":
-          typeof row.sporcentajecosto === "number" ? row.sporcentajecosto.toFixed(2) : row.sporcentajecosto || "-",
-        "TOTAL COSTOS": typeof row.stotalcostos === "number" ? row.stotalcostos.toFixed(2) : row.stotalcostos || "-",
-        "UTILIDAD MARGINAL":
-          typeof row.sutilidadmarginal === "number" ? row.sutilidadmarginal.toFixed(2) : row.sutilidadmarginal || "-",
-        "PRECIO ACTUAL % UTILIDAD":
-          typeof row.sprecioactualporcentajeutilidad === "number"
-            ? row.sprecioactualporcentajeutilidad.toFixed(2)
-            : row.sprecioactualporcentajeutilidad || "-",
-        "UTILIDAD ÓPTIMA":
-          typeof row.sutilidadoptima === "number" ? row.sutilidadoptima.toFixed(2) : row.sutilidadoptima || "-",
-        "COMISIONES %":
-          typeof row.scomisiones_porcentaje === "number"
-            ? row.scomisiones_porcentaje.toFixed(2)
-            : row.scomisiones_porcentaje || "-",
-        "COSTO %":
-          typeof row.scosto_porcentaje === "number" ? row.scosto_porcentaje.toFixed(2) : row.scosto_porcentaje || "-",
-        "COMISIONES + COSTO":
-          typeof row.scomisionesmascosto === "number"
-            ? row.scomisionesmascosto.toFixed(2)
-            : row.scomisionesmascosto || "-",
-        "PRECIO SIN IVA":
-          typeof row.spreciosiniva === "number" ? row.spreciosiniva.toFixed(2) : row.spreciosiniva || "-",
-        "PRECIO CON IVA":
-          typeof row.sprecioconiva === "number" ? row.sprecioconiva.toFixed(2) : row.sprecioconiva || "-",
-        "PRECIO META": typeof row.spreciometa === "number" ? row.spreciometa.toFixed(2) : row.spreciometa || "-",
-        "PRECIO META CON IVA":
-          typeof row.spreciometaconiva === "number" ? row.spreciometaconiva.toFixed(2) : row.spreciometaconiva || "-",
-        "DIFERENCIA UTILIDAD ESPERADA":
-          typeof row.sdiferenciautilidadesperada === "number"
-            ? row.sdiferenciautilidadesperada.toFixed(2)
-            : row.sdiferenciautilidadesperada || "-",
-        "UTILIDAD ÓPTIMA 30":
-          typeof row.sutilidadoptima30 === "number" ? row.sutilidadoptima30.toFixed(2) : row.sutilidadoptima30 || "-",
-        "COMISIONES % 30":
-          typeof row.scomisiones_porcentaje30 === "number"
-            ? row.scomisiones_porcentaje30.toFixed(2)
-            : row.scomisiones_porcentaje30 || "-",
-        "COSTO % 30":
-          typeof row.scosto_porcentaje30 === "number"
-            ? row.scosto_porcentaje30.toFixed(2)
-            : row.scosto_porcentaje30 || "-",
-        "COMISIONES + COSTO 30":
-          typeof row.scomisionesmascosto30 === "number"
-            ? row.scomisionesmascosto30.toFixed(2)
-            : row.scomisionesmascosto30 || "-",
-        "PRECIO SIN IVA 30":
-          typeof row.spreciosiniva30 === "number" ? row.spreciosiniva30.toFixed(2) : row.spreciosiniva30 || "-",
-        "PRECIO CON IVA 30":
-          typeof row.sprecioconiva30 === "number" ? row.sprecioconiva30.toFixed(2) : row.sprecioconiva30 || "-",
-        "PRECIO META 30":
-          typeof row.spreciometa30 === "number" ? row.spreciometa30.toFixed(2) : row.spreciometa30 || "-",
-        "PRECIO META CON IVA 30":
-          typeof row.spreciometaconiva30 === "number"
-            ? row.spreciometaconiva30.toFixed(2)
-            : row.spreciometaconiva30 || "-",
-        "DIFERENCIA UTILIDAD ESPERADA 30":
-          typeof row.sdiferenciautilidadesperada30 === "number"
-            ? row.sdiferenciautilidadesperada30.toFixed(2)
-            : row.sdiferenciautilidadesperada30 || "-",
-        "COSTO ANUAL": typeof row.scostoanual === "number" ? row.scostoanual.toFixed(2) : row.scostoanual || "-",
-        "UTILIDAD ANUAL":
-          typeof row.sutilidadanual === "number" ? row.sutilidadanual.toFixed(2) : row.sutilidadanual || "-",
-        "COSTO UTILIDAD ANUAL":
-          typeof row.scostoutilidadanual === "number"
-            ? row.scostoutilidadanual.toFixed(2)
-            : row.scostoutilidadanual || "-",
-        FORECAST: typeof row.sforecast === "number" ? row.sforecast : row.sforecast || "-",
-      }))
-
-      // Crear worksheet desde los datos formateados
-      const ws = XLSX.utils.json_to_sheet(excelData)
+      if (reporteData.length === 0) {
+        setModalAlert({
+          Titulo: "Sin datos",
+          Mensaje: "No hay datos para exportar. Por favor realice una búsqueda primero.",
+          isOpen: true,
+          onClose: () => setShowModalAlert(false),
+        })
+        setShowModalAlert(true)
+        return
+      }
 
       // Crear workbook
       const wb = XLSX.utils.book_new()
+
+      // Convertir datos a formato de hoja
+      const wsData = [
+        // Encabezados
+        [
+          "FOLIO",
+          "CÓDIGO",
+          "NOMBRE",
+          "PRECIO VENTA SIN IVA",
+          "PRECIO VENTA CON IVA",
+          "PLAN GENERACIONAL",
+          "PLAN NIVEL",
+          "PLAN INFINITO",
+          "IVA PAGADO",
+          "CDA",
+          "BONO INICIO RÁPIDO",
+          "CONSTRUCTOR INICIO RÁPIDO",
+          "RUTA ÉXITO",
+          "REEMBOLSOS",
+          "TARJETA CRÉDITO",
+          "ENVÍO",
+          "PRECIO HL",
+          "PORCENTAJE COSTO",
+          "TOTAL COSTOS",
+          "UTILIDAD MARGINAL",
+          "PRECIO ACTUAL % UTILIDAD",
+          "UTILIDAD ÓPTIMA",
+          "COMISIONES %",
+          "COSTO %",
+          "COMISIONES + COSTO",
+          "PRECIO SIN IVA",
+          "PRECIO CON IVA",
+          "PRECIO META",
+          "PRECIO META CON IVA",
+          "DIFERENCIA UTILIDAD ESPERADA",
+          "UTILIDAD ÓPTIMA 30",
+          "COMISIONES % 30",
+          "COSTO % 30",
+          "COMISIONES + COSTO 30",
+          "PRECIO SIN IVA 30",
+          "PRECIO CON IVA 30",
+          "PRECIO META 30",
+          "PRECIO META CON IVA 30",
+          "DIFERENCIA UTILIDAD ESPERADA 30",
+          "COSTO ANUAL",
+          "UTILIDAD ANUAL",
+          "COSTO UTILIDAD ANUAL",
+          "FORECAST",
+        ],
+        // Datos
+        ...reporteData.map((row) => [
+          row.folio || "-",
+          row.scodigo || "-",
+          row.snombre || "-",
+          typeof row.sprecioventasiniva === "number"
+            ? row.sprecioventasiniva.toFixed(2)
+            : row.sprecioventasiniva || "-",
+          typeof row.sprecioventaconiva === "number"
+            ? row.sprecioventaconiva.toFixed(2)
+            : row.sprecioventaconiva || "-",
+          typeof row.splangeneracional === "number" ? row.splangeneracional.toFixed(2) : row.splangeneracional || "-",
+          typeof row.splannivel === "number" ? row.splannivel.toFixed(2) : row.splannivel || "-",
+          typeof row.splaninfinito === "number" ? row.splaninfinito.toFixed(2) : row.splaninfinito || "-",
+          typeof row.sivapagado === "number" ? row.sivapagado.toFixed(2) : row.sivapagado || "-",
+          typeof row.scda === "number" ? row.scda.toFixed(2) : row.scda || "-",
+          typeof row.sbonoiniciorapido === "number" ? row.sbonoiniciorapido.toFixed(2) : row.sbonoiniciorapido || "-",
+          typeof row.sconstructoriniciorapido === "number"
+            ? row.sconstructoriniciorapido.toFixed(2)
+            : row.sconstructoriniciorapido || "-",
+          typeof row.srutaexito === "number" ? row.srutaexito.toFixed(2) : row.srutaexito || "-",
+          typeof row.sreembolsos === "number" ? row.sreembolsos.toFixed(2) : row.sreembolsos || "-",
+          typeof row.starjetacredito === "number" ? row.starjetacredito.toFixed(2) : row.starjetacredito || "-",
+          typeof row.senvio === "number" ? row.senvio.toFixed(2) : row.senvio || "-",
+          typeof row.spreciohl === "number" ? row.spreciohl.toFixed(2) : row.spreciohl || "-",
+          typeof row.sporcentajecosto === "number" ? row.sporcentajecosto.toFixed(2) : row.sporcentajecosto || "-",
+          typeof row.stotalcostos === "number" ? row.stotalcostos.toFixed(2) : row.stotalcostos || "-",
+          typeof row.sutilidadmarginal === "number" ? row.sutilidadmarginal.toFixed(2) : row.sutilidadmarginal || "-",
+          typeof row.sprecioactualporcentajeutilidad === "number"
+            ? row.sprecioactualporcentajeutilidad.toFixed(2)
+            : row.sprecioactualporcentajeutilidad || "-",
+          typeof row.sutilidadoptima === "number" ? row.sutilidadoptima.toFixed(2) : row.sutilidadoptima || "-",
+          typeof row.scomisiones_porcentaje === "number"
+            ? row.scomisiones_porcentaje.toFixed(2)
+            : row.scomisiones_porcentaje || "-",
+          typeof row.scosto_porcentaje === "number" ? row.scosto_porcentaje.toFixed(2) : row.scosto_porcentaje || "-",
+          typeof row.scomisionesmascosto === "number"
+            ? row.scomisionesmascosto.toFixed(2)
+            : row.scomisionesmascosto || "-",
+          typeof row.spreciosiniva === "number" ? row.spreciosiniva.toFixed(2) : row.spreciosiniva || "-",
+          typeof row.sprecioconiva === "number" ? row.sprecioconiva.toFixed(2) : row.sprecioconiva || "-",
+          typeof row.spreciometa === "number" ? row.spreciometa.toFixed(2) : row.spreciometa || "-",
+          typeof row.spreciometaconiva === "number" ? row.spreciometaconiva.toFixed(2) : row.spreciometaconiva || "-",
+          typeof row.sdiferenciautilidadesperada === "number"
+            ? row.sdiferenciautilidadesperada.toFixed(2)
+            : row.sdiferenciautilidadesperada || "-",
+          typeof row.sutilidadoptima30 === "number" ? row.sutilidadoptima30.toFixed(2) : row.sutilidadoptima30 || "-",
+          typeof row.scomisiones_porcentaje30 === "number"
+            ? row.scomisiones_porcentaje30.toFixed(2)
+            : row.scomisiones_porcentaje30 || "-",
+          typeof row.scosto_porcentaje30 === "number"
+            ? row.scosto_porcentaje30.toFixed(2)
+            : row.scosto_porcentaje30 || "-",
+          typeof row.scomisionesmascosto30 === "number"
+            ? row.scomisionesmascosto30.toFixed(2)
+            : row.scomisionesmascosto30 || "-",
+          typeof row.spreciosiniva30 === "number" ? row.spreciosiniva30.toFixed(2) : row.spreciosiniva30 || "-",
+          typeof row.sprecioconiva30 === "number" ? row.sprecioconiva30.toFixed(2) : row.sprecioconiva30 || "-",
+          typeof row.spreciometa30 === "number" ? row.spreciometa30.toFixed(2) : row.spreciometa30 || "-",
+          typeof row.spreciometaconiva30 === "number"
+            ? row.spreciometaconiva30.toFixed(2)
+            : row.spreciometaconiva30 || "-",
+          typeof row.sdiferenciautilidadesperada30 === "number"
+            ? row.sdiferenciautilidadesperada30.toFixed(2)
+            : row.sdiferenciautilidadesperada30 || "-",
+          typeof row.scostoanual === "number" ? row.scostoanual.toFixed(2) : row.scostoanual || "-",
+          typeof row.sutilidadanual === "number" ? row.sutilidadanual.toFixed(2) : row.sutilidadanual || "-",
+          typeof row.scostoutilidadanual === "number"
+            ? row.scostoutilidadanual.toFixed(2)
+            : row.scostoutilidadanual || "-",
+          typeof row.sforecast === "number" ? row.sforecast : row.sforecast || "-",
+        ]),
+      ]
+
+      // Crear hoja
+      const ws = XLSX.utils.aoa_to_sheet(wsData)
+
+      // Agregar hoja al workbook
       XLSX.utils.book_append_sheet(wb, ws, "Reporte Costeo")
 
-      // Generar archivo con timestamp
-      const timestamp = new Date().toISOString().split("T")[0]
-      const filename = `reporte_costeo_${timestamp}.xlsx`
+      // Generate Excel file as array buffer
+      const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" })
 
-      // Escribir archivo (método compatible con navegador)
-      XLSX.writeFile(wb, filename)
+      // Create blob and download
+      const blob = new Blob([wbout], { type: "application/octet-stream" })
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `reporte_costeo_${new Date().toISOString().split("T")[0]}.xlsx`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+      // Mostrar mensaje de éxito
+      setShowSuccessModal(true)
     } catch (error) {
       console.error("Error exportando a Excel:", error)
       setModalError({
         Titulo: "Error al exportar",
-        Mensaje: `Ocurrió un error al exportar: ${error}`,
+        Mensaje: `Ocurrió un error al exportar: ${error instanceof Error ? error.message : String(error)}`,
         isOpen: true,
         onClose: () => setShowModalError(false),
       })
@@ -389,6 +441,29 @@ export default function ReporteCosteoPage() {
         />
       )}
 
+      {/* Added custom success modal with cyan theme */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="bg-cyan-500 rounded-t-lg p-6 flex flex-col items-center">
+              <div className="bg-white rounded-full p-3 mb-4">
+                <CheckCircle2 className="h-12 w-12 text-cyan-500" />
+              </div>
+              <h3 className="text-xl font-semibold text-white text-center">Exportación Exitosa</h3>
+            </div>
+            <div className="p-6">
+              <p className="text-gray-700 text-center mb-6">El archivo Excel se ha descargado correctamente.</p>
+              <Button
+                onClick={() => setShowSuccessModal(false)}
+                className="w-full bg-cyan-500 hover:bg-cyan-600 text-white"
+              >
+                Aceptar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showPageTituloMasNuevo && (
         <PageTitlePlusNew
           Titulo={PageTituloMasNuevo.Titulo}
@@ -415,6 +490,24 @@ export default function ReporteCosteoPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {clientesOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.text}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label htmlFor="ddlZona" className="text-sm font-medium">
+                Zona
+              </label>
+              <Select value={filtroZonaId} onValueChange={setFiltroZonaId}>
+                <SelectTrigger id="ddlZona">
+                  <SelectValue placeholder="Seleccione una zona" />
+                </SelectTrigger>
+                <SelectContent>
+                  {zonasOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.text}
                     </SelectItem>
@@ -517,7 +610,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 4 - Precio Venta Sin IVA */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-700"
                         style={{ minWidth: "150px" }}
                       >
                         PRECIO VENTA SIN IVA
@@ -525,7 +618,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 5 - Precio Venta Con IVA */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-700"
                         style={{ minWidth: "150px" }}
                       >
                         PRECIO VENTA CON IVA
@@ -533,7 +626,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 6 - Plan Generacional */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-purple-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
                         style={{ minWidth: "150px" }}
                       >
                         PLAN GENERACIONAL
@@ -541,7 +634,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 7 - Plan Nivel */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-purple-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
                         style={{ minWidth: "120px" }}
                       >
                         PLAN NIVEL
@@ -549,7 +642,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 8 - Plan Infinito */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-purple-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
                         style={{ minWidth: "120px" }}
                       >
                         PLAN INFINITO
@@ -557,7 +650,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 9 - IVA Pagado */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-orange-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
                         style={{ minWidth: "120px" }}
                       >
                         IVA PAGADO
@@ -565,7 +658,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 10 - CDA */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-orange-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
                         style={{ minWidth: "100px" }}
                       >
                         CDA
@@ -573,7 +666,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 11 - Bono Inicio Rápido */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-orange-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
                         style={{ minWidth: "150px" }}
                       >
                         BONO INICIO RÁPIDO
@@ -581,7 +674,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 12 - Constructor Inicio Rápido */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-orange-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
                         style={{ minWidth: "180px" }}
                       >
                         CONSTRUCTOR INICIO RÁPIDO
@@ -589,7 +682,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 13 - Ruta Éxito */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-orange-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
                         style={{ minWidth: "120px" }}
                       >
                         RUTA ÉXITO
@@ -621,23 +714,23 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 17 - Precio HL */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-indigo-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
                         style={{ minWidth: "120px" }}
                       >
-                        PRECIO HL
+                        COSTO PRODUCTO
                       </th>
 
                       {/* Columna 18 - Porcentaje Costo */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-indigo-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
                         style={{ minWidth: "150px" }}
                       >
-                        PORCENTAJE COSTO
+                        % COSTO
                       </th>
 
                       {/* Columna 19 - Total Costos */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-indigo-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-900"
                         style={{ minWidth: "130px" }}
                       >
                         TOTAL COSTOS
@@ -645,7 +738,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 20 - Utilidad Marginal */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-teal-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
                         style={{ minWidth: "150px" }}
                       >
                         UTILIDAD MARGINAL
@@ -653,7 +746,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 21 - Precio Actual % Utilidad */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-teal-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
                         style={{ minWidth: "180px" }}
                       >
                         PRECIO ACTUAL % UTILIDAD
@@ -661,15 +754,15 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 22 - Utilidad Óptima */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-teal-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
                         style={{ minWidth: "140px" }}
                       >
-                        UTILIDAD ÓPTIMA
+                        UTILIDAD OPTIMA 25
                       </th>
 
                       {/* Columna 23 - Comisiones % */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-pink-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
                         style={{ minWidth: "130px" }}
                       >
                         COMISIONES %
@@ -677,7 +770,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 24 - Costo % */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-pink-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
                         style={{ minWidth: "100px" }}
                       >
                         COSTO %
@@ -685,7 +778,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 25 - Comisiones + Costo */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-pink-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
                         style={{ minWidth: "160px" }}
                       >
                         COMISIONES + COSTO
@@ -693,7 +786,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 26 - Precio Sin IVA */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-cyan-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
                         style={{ minWidth: "140px" }}
                       >
                         PRECIO SIN IVA
@@ -701,7 +794,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 27 - Precio Con IVA */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-cyan-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
                         style={{ minWidth: "140px" }}
                       >
                         PRECIO CON IVA
@@ -709,7 +802,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 28 - Precio Meta */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-cyan-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
                         style={{ minWidth: "120px" }}
                       >
                         PRECIO META
@@ -717,7 +810,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 29 - Precio Meta Con IVA */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-cyan-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
                         style={{ minWidth: "170px" }}
                       >
                         PRECIO META CON IVA
@@ -725,7 +818,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 30 - Diferencia Utilidad Esperada */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-cyan-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
                         style={{ minWidth: "200px" }}
                       >
                         DIFERENCIA UTILIDAD ESPERADA
@@ -733,7 +826,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 31 - Utilidad Óptima 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-amber-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
                         style={{ minWidth: "160px" }}
                       >
                         UTILIDAD ÓPTIMA 30
@@ -741,7 +834,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 32 - Comisiones % 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-amber-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
                         style={{ minWidth: "150px" }}
                       >
                         COMISIONES % 30
@@ -749,7 +842,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 33 - Costo % 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-amber-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
                         style={{ minWidth: "120px" }}
                       >
                         COSTO % 30
@@ -757,7 +850,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 34 - Comisiones + Costo 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-amber-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
                         style={{ minWidth: "180px" }}
                       >
                         COMISIONES + COSTO 30
@@ -765,7 +858,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 35 - Precio Sin IVA 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-lime-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
                         style={{ minWidth: "160px" }}
                       >
                         PRECIO SIN IVA 30
@@ -773,7 +866,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 36 - Precio Con IVA 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-lime-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
                         style={{ minWidth: "160px" }}
                       >
                         PRECIO CON IVA 30
@@ -781,7 +874,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 37 - Precio Meta 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-lime-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
                         style={{ minWidth: "140px" }}
                       >
                         PRECIO META 30
@@ -789,7 +882,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 38 - Precio Meta Con IVA 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-lime-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-600"
                         style={{ minWidth: "190px" }}
                       >
                         PRECIO META CON IVA 30
@@ -797,7 +890,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 39 - Diferencia Utilidad Esperada 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-lime-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-600"
                         style={{ minWidth: "220px" }}
                       >
                         DIFERENCIA UTILIDAD ESPERADA 30
@@ -805,7 +898,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 40 - Costo Anual */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-slate-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-900"
                         style={{ minWidth: "130px" }}
                       >
                         COSTO ANUAL
@@ -813,7 +906,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 41 - Utilidad Anual */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-slate-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
                         style={{ minWidth: "140px" }}
                       >
                         UTILIDAD ANUAL
@@ -821,13 +914,13 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 42 - Costo Utilidad Anual */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-slate-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
                         style={{ minWidth: "180px" }}
                       >
                         COSTO UTILIDAD ANUAL
                       </th>
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-slate-600"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
                         style={{ minWidth: "180px" }}
                       >
                         FORECAST
@@ -1040,7 +1133,7 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 22 - Utilidad Óptima */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right bg-[#56E3A6]/30"
                           style={{ minWidth: "140px" }}
                         >
                           {typeof row.sutilidadoptima === "number"
@@ -1130,7 +1223,7 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 31 - Utilidad Óptima 30 */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right bg-[#56E3A6]/30"
                           style={{ minWidth: "160px" }}
                         >
                           {typeof row.sutilidadoptima30 === "number"

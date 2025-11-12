@@ -831,6 +831,13 @@ export default function CostearPage() {
                         >
                           {producto.activo ? "Activo" : "Inactivo"}
                         </span>
+                        
+                      </div>
+                      <div className ="py-1">
+                          <span className="font-semibold text-sky-700">Categoria:</span>
+                        <span className="ml-2 text-white bg-blue-500 py-1 rounded px-2">
+                          {productoXCliente.scategoria || "Sin categoria"}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -841,6 +848,10 @@ export default function CostearPage() {
                       <div>
                         <span className="font-semibold text-green-700">MP:</span>
                         <span className="ml-2 text-gray-900">{producto.mp || "0"}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-green-700">MEM:</span>
+                        <span className="ml-2 text-gray-900">{producto.mem || "0"}</span>
                       </div>
                       <div>
                         <span className="font-semibold text-green-700">ME:</span>
@@ -865,6 +876,10 @@ export default function CostearPage() {
                         <span className="ml-2 text-gray-900">{((producto.mp_porcentaje || 0) * 100).toFixed(2)}%</span>
                       </div>
                       <div>
+                        <span className="font-semibold text-purple-700">MEM %:</span>
+                        <span className="ml-2 text-gray-900">{((producto.mem_porcentaje || 0) * 100).toFixed(2)}%</span>
+                      </div>
+                      <div>
                         <span className="font-semibold text-purple-700">ME %:</span>
                         <span className="ml-2 text-gray-900">{((producto.me_porcentaje || 0) * 100).toFixed(2)}%</span>
                       </div>
@@ -882,6 +897,10 @@ export default function CostearPage() {
                         <span className="font-semibold text-amber-700">MP $:</span>
                         <span className="ml-2 text-gray-900">${(producto.mp_costeado || 0).toFixed(2)}</span>
                       </div>
+                       <div>
+                        <span className="font-semibold text-amber-700">MEM $:</span>
+                        <span className="ml-2 text-gray-900">${(producto.mem_costeado || 0).toFixed(2)}</span>
+                      </div>
                       <div>
                         <span className="font-semibold text-amber-700">ME $:</span>
                         <span className="ml-2 text-gray-900">${(producto.me_costeado || 0).toFixed(2)}</span>
@@ -893,6 +912,10 @@ export default function CostearPage() {
                       <div>
                         <span className="font-semibold text-amber-700">Precio Healthy Lab:</span>
                         <span className="ml-2 text-gray-900">${(producto.preciohl || 0).toFixed(2)}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-amber-700">Utilidad:</span>
+                        <span className="ml-2 text-gray-900">${(producto.utilidadhl || 0).toFixed(6)}</span>
                       </div>
                     </div>
                   </div>
@@ -975,7 +998,8 @@ export default function CostearPage() {
 
                   <div className="mb-6 mt-4">
                     <div className="flex justify-end gap-2 mb-2">
-                      {!porcentajesEditables ? (
+                      
+                        {!porcentajesEditables ? (
                         <div className="relative group">
                           <Button
                             type="button"
@@ -1004,6 +1028,7 @@ export default function CostearPage() {
                           Cancelar
                         </Button>
                       )}
+
                     </div>
                   </div>
 
@@ -1146,7 +1171,9 @@ export default function CostearPage() {
                             disabled={!porcentajesEditables}
                           />
                         </td>
+
                       </tr>
+                         
                       <tr className="bg-gray-100">
                         <th className="border p-2 text-left text-sm font-semibold bg-red-500 text-white">
                           Plan Generacional

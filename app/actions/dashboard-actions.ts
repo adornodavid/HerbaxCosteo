@@ -316,3 +316,36 @@ export async function obtenerKPIsDashboard() {
     }
   }
 }
+
+//Función: consultarUtilidadActual
+export async function consultarUtilidadActual(clientesid: number, zonasid: number) {
+  try {
+    const supabase = createSupabaseServerClient()
+
+    const { data, error } = await supabase.rpc("consultarutilidadactual", {
+      clientesid: clientesid,
+      zonasid: zonasid,
+    })
+
+    if (error) {
+      console.error("Error consultando utilidad actual:", error)
+      return {
+        success: false,
+        error: error.message,
+        data: [],
+      }
+    }
+
+    return {
+      success: true,
+      data: data || [],
+    }
+  } catch (error) {
+    console.error("Error en consultarUtilidadActual:", error)
+    return {
+      success: false,
+      error: "Error al consultar utilidad actual",
+      data: [],
+    }
+  }
+}

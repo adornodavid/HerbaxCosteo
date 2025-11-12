@@ -574,7 +574,7 @@ export async function listaDesplegableMaterialesEtiquetadosBuscar(buscar: string
   try {
     let query = supabase
       .from("materialesetiquetado")
-      .select("id, codigo, nombre, costo, unidadmedidaid, unidadesmedida!unidadmedidaid(descripcion)")
+      .select("id, codigo, nombre, costo, unidadmedidaid, tipomaterialid, unidadesmedida!unidadmedidaid(descripcion)")
       .eq("activo", true)
 
     // Apply filter: search in nombre OR codigo

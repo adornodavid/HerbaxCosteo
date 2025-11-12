@@ -70,6 +70,8 @@ export default function EditarProductoPage() {
   const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
   const [ModalError, setModalError] = useState<propsPageModalError>()
   const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
+  const [modalSuccess, setModalSuccess] = useState<propsPageModalAlert>()
+  // </CHANGE>
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [existingImageUrl, setExistingImageUrl] = useState<string>("")
   const [clientes, setClientes] = useState<Cliente[]>([])
@@ -105,6 +107,7 @@ export default function EditarProductoPage() {
     nombre: string
     unidadmedida: string
     costo: number
+    tipomaterialid: number // Add tipomaterialid here
   } | null>(null)
   const [materialEtiquetadoCantidad, setMaterialEtiquetadoCantidad] = useState("")
   const [showMaterialesEtiquetadoDropdown, setShowMaterialesEtiquetadoDropdown] = useState(false)
@@ -116,6 +119,29 @@ export default function EditarProductoPage() {
   const [showAddMaterialEtiquetadoModal, setShowAddMaterialEtiquetadoModal] = useState(false)
   const materialEtiquetadoSearchRef = useRef<HTMLDivElement>(null)
 
+  const [materialEnvaseBuscar, setMaterialEnvaseBuscar] = useState("")
+  const [materialesEnvaseResultados, setMaterialesEnvaseResultados] = useState<any[]>([])
+  const [materialEnvaseSeleccionado, setMaterialEnvaseSeleccionado] = useState<{
+    id: number
+    codigo: string
+    nombre: string
+    unidadmedida: string
+    costo: number
+    tipomaterialid: number
+  } | null>(null)
+  const [materialEnvaseCantidad, setMaterialEnvaseCantidad] = useState("")
+  const [materialEnvaseCostoUnitario, setMaterialEnvaseCostoUnitario] = useState("") // Added
+  const [materialEnvaseUnidadMedida, setMaterialEnvaseUnidadMedida] = useState("") // Added
+  const [showMaterialesEnvaseDropdown, setShowMaterialesEnvaseDropdown] = useState(false)
+  const [showDeleteMaterialEnvaseModal, setShowDeleteMaterialEnvaseModal] = useState(false)
+  const [materialEnvaseToDelete, setMaterialEnvaseToDelete] = useState<{
+    materialetiquetadoid: number
+    nombre: string
+  } | null>(null)
+  const [showAddMaterialEnvaseModal, setShowAddMaterialEnvaseModal] = useState(false)
+  const materialEnvaseSearchRef = useRef<HTMLDivElement>(null)
+  // </CHANGE>
+
   // Mostrar/Ocultar contenido
   const [isLoading, setIsLoading] = useState(true)
   const [showPageLoading, setShowPageLoading] = useState(true)
@@ -123,6 +149,7 @@ export default function EditarProductoPage() {
   const [showModalAlert, setShowModalAlert] = useState(false)
   const [showModalError, setShowModalError] = useState(false)
   const [showModalTutorial, setShowModalTutorial] = useState(false)
+  const [showModalSuccess, setShowModalSuccess] = useState(false) // Added state for success modal
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showProcessing, setShowProcessing] = useState(false)
 
@@ -193,8 +220,10 @@ export default function EditarProductoPage() {
     const buscarMaterialesEtiquetado = async () => {
       if (materialEtiquetadoBuscar.trim().length >= 2) {
         const resultados = await listaDesplegableMaterialesEtiquetadosBuscar(materialEtiquetadoBuscar)
-        setMaterialesEtiquetadoResultados(resultados)
-        setShowMaterialesEtiquetadoDropdown(true)
+        const materialesFiltrados = resultados.filter((m) => m.tipomaterialid === 1)
+        setMaterialesEtiquetadoResultados(materialesFiltrados)
+        setShowMaterialesEtiquetadoDropdown(materialesFiltrados.length > 0)
+        // </CHANGE>
       } else {
         setMaterialesEtiquetadoResultados([])
         setShowMaterialesEtiquetadoDropdown(false)
@@ -206,6 +235,24 @@ export default function EditarProductoPage() {
   }, [materialEtiquetadoBuscar])
 
   useEffect(() => {
+    const buscarMaterialesEnvase = async () => {
+      if (materialEnvaseBuscar.trim().length >= 2) {
+        const resultados = await listaDesplegableMaterialesEtiquetadosBuscar(materialEnvaseBuscar)
+        const materialesFiltrados = resultados.filter((m) => m.tipomaterialid === 2)
+        setMaterialesEnvaseResultados(materialesFiltrados)
+        setShowMaterialesEnvaseDropdown(materialesFiltrados.length > 0)
+      } else {
+        setMaterialesEnvaseResultados([])
+        setShowMaterialesEnvaseDropdown(false)
+      }
+    }
+
+    const timeoutId = setTimeout(buscarMaterialesEnvase, 300)
+    return () => clearTimeout(timeoutId)
+  }, [materialEnvaseBuscar])
+  // </CHANGE>
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (formulaSearchRef.current && !formulaSearchRef.current.contains(event.target as Node)) {
         setShowFormulasDropdown(false)
@@ -213,6 +260,10 @@ export default function EditarProductoPage() {
       if (materialEtiquetadoSearchRef.current && !materialEtiquetadoSearchRef.current.contains(event.target as Node)) {
         setShowMaterialesEtiquetadoDropdown(false)
       }
+      if (materialEnvaseSearchRef.current && !materialEnvaseSearchRef.current.contains(event.target as Node)) {
+        setShowMaterialesEnvaseDropdown(false)
+      }
+      // </CHANGE>
     }
 
     document.addEventListener("mousedown", handleClickOutside)
@@ -323,11 +374,11 @@ export default function EditarProductoPage() {
 
         if (recalcularResult.success) {
           setShowProcessing(false)
-          setModalAlert({
+          setModalSuccess({
             Titulo: "Éxito",
             Mensaje: "Producto actualizado y recalculado exitosamente",
           })
-          setShowModalAlert(true)
+          setShowModalSuccess(true) // Show success modal
 
           await cargarDatosIniciales()
           // Force page refresh with new data
@@ -477,7 +528,7 @@ export default function EditarProductoPage() {
         if (recalcularResult.success) {
           setModalAlert({
             Titulo: "Éxito",
-            Mensaje: "Fórmula eliminada y producto recalculado exitosamente",
+            Mensaje: "Fórmula eliminada y producto recalculated exitosamente",
           })
           setShowModalAlert(true)
 
@@ -522,6 +573,7 @@ export default function EditarProductoPage() {
       nombre: material.nombre || "",
       unidadmedida: material.unidadesmedida?.descripcion || "",
       costo: material.costo || 0,
+      tipomaterialid: material.tipomaterialid, // Set tipomaterialid here
     })
   }
 
@@ -550,6 +602,31 @@ export default function EditarProductoPage() {
     setShowAddMaterialEtiquetadoModal(true)
   }
 
+  const handleAgregarMaterialEnvase = () => {
+    console.log("prubeaaa11")
+
+    if (!materialEnvaseSeleccionado) {
+      setModalAlert({
+        Titulo: "Validación",
+        Mensaje: "Debe seleccionar un material de envase para proceder.",
+      })
+      setShowModalAlert(true)
+      return
+    }
+
+    if (!materialEnvaseCantidad || Number(materialEnvaseCantidad) <= 0) {
+      setModalAlert({
+        Titulo: "Validación",
+        Mensaje: "Debe agregar una cantidad válida para proceder.",
+      })
+      setShowModalAlert(true)
+      return
+    }
+    console.log("prubeaaa222")
+    setShowAddMaterialEnvaseModal(true)
+  }
+  // </CHANGE>
+
   const confirmarAgregarMaterialEtiquetado = async () => {
     setShowAddMaterialEtiquetadoModal(false)
     setShowProcessing(true)
@@ -570,7 +647,7 @@ export default function EditarProductoPage() {
         if (recalcularResult.success) {
           setModalAlert({
             Titulo: "Éxito",
-            Mensaje: "Material de etiquetado agregado y producto recalculado exitosamente",
+            Mensaje: "Material de etiquetado agregado y producto recalculated exitosamente",
           })
           setShowModalAlert(true)
 
@@ -613,10 +690,86 @@ export default function EditarProductoPage() {
     }
   }
 
+  const confirmarAgregarMaterialEnvase = async () => {
+    setShowAddMaterialEnvaseModal(false)
+    setShowProcessing(true) // Added this line
+    console.log("prubeaaa331")
+    console.log("prubeaaa332", productoId)
+    console.log("prubeaaa333", materialEnvaseCantidad)
+
+    try {
+      // Directly use the values from state for the action
+      const result = await crearMaterialEtiquetadoXProducto(
+        materialEnvaseSeleccionado!.id,
+        productoId,
+        Number(materialEnvaseCantidad),
+      )
+
+      console.log("prubeaaa")
+
+      if (result.success) {
+        const recalcularResult = await recalcularProducto(productoId)
+
+        if (recalcularResult.success) {
+          setModalAlert({
+            Titulo: "Éxito",
+            Mensaje: "Material de envase agregado y producto recalculado exitosamente",
+          })
+          setShowModalAlert(true)
+
+          setMaterialEnvaseBuscar("")
+          setMaterialEnvaseSeleccionado(null)
+          setMaterialEnvaseCantidad("")
+          setMaterialEnvaseUnidadMedida("") // Reset unit and cost
+          setMaterialEnvaseCostoUnitario("") // Reset unit and cost
+
+          await cargarDatosIniciales()
+        } else {
+          setModalError({
+            Titulo: "Error al recalcular producto",
+            Mensaje: recalcularResult.error || "El material se agregó pero hubo un error al recalcular",
+          })
+          setShowModalError(true)
+
+          setMaterialEnvaseBuscar("")
+          setMaterialEnvaseSeleccionado(null)
+          setMaterialEnvaseCantidad("")
+          setMaterialEnvaseUnidadMedida("") // Reset unit and cost
+          setMaterialEnvaseCostoUnitario("") // Reset unit and cost
+          await cargarDatosIniciales()
+        }
+      } else {
+        setModalError({
+          Titulo: "Error al agregar material de envase",
+          Mensaje: result.error || "Error desconocido",
+        })
+        setShowModalError(true)
+      }
+    } catch (error) {
+      setModalError({
+        Titulo: "Error inesperado",
+        Mensaje: String(error),
+      })
+      setShowModalError(true)
+    } finally {
+      setShowProcessing(false)
+    }
+  }
+  // </CHANGE>
+
+  // The original code had a duplicated `confirmarAgregarMaterialEtiquetado` function.
+  // We will keep only one instance of it.
+
   const handleEliminarMaterialEtiquetado = (materialetiquetadoid: number, nombre: string) => {
     setMaterialEtiquetadoToDelete({ materialetiquetadoid, nombre })
     setShowDeleteMaterialEtiquetadoModal(true)
   }
+
+  const handleEliminarMaterialEnvase = (materialetiquetadoid: number, nombre: string) => {
+    setMaterialEnvaseToDelete({ materialetiquetadoid, nombre })
+    setShowDeleteMaterialEnvaseModal(true)
+  }
+  // </CHANGE>
 
   const confirmarEliminarMaterialEtiquetado = async () => {
     if (!materialEtiquetadoToDelete) return
@@ -636,7 +789,7 @@ export default function EditarProductoPage() {
         if (recalcularResult.success) {
           setModalAlert({
             Titulo: "Éxito",
-            Mensaje: "Material de empaque eliminado y producto recalculado exitosamente",
+            Mensaje: "Material de empaque eliminado y producto recalculated exitosamente",
           })
           setShowModalAlert(true)
 
@@ -671,6 +824,55 @@ export default function EditarProductoPage() {
       setMaterialEtiquetadoToDelete(null)
     }
   }
+
+  const confirmarEliminarMaterialEnvase = async () => {
+    if (!materialEnvaseToDelete) return
+
+    setShowDeleteMaterialEnvaseModal(false)
+    setShowProcessing(true)
+
+    try {
+      const result = await eliminarMaterialEtiquetadoXProducto(materialEnvaseToDelete.materialetiquetadoid, productoId)
+
+      if (result.success) {
+        const recalcularResult = await recalcularProducto(productoId)
+
+        if (recalcularResult.success) {
+          setModalAlert({
+            Titulo: "Éxito",
+            Mensaje: "Material de envase eliminado y producto recalculado exitosamente",
+          })
+          setShowModalAlert(true)
+
+          await cargarDatosIniciales()
+        } else {
+          setModalError({
+            Titulo: "Error al recalcular producto",
+            Mensaje: recalcularResult.error || "El material se eliminó pero hubo un error al recalcular",
+          })
+          setShowModalError(true)
+
+          await cargarDatosIniciales()
+        }
+      } else {
+        setModalError({
+          Titulo: "Error al eliminar material de envase",
+          Mensaje: result.error || "Error desconocido",
+        })
+        setShowModalError(true)
+      }
+    } catch (error) {
+      setModalError({
+        Titulo: "Error inesperado",
+        Mensaje: String(error),
+      })
+      setShowModalError(true)
+    } finally {
+      setShowProcessing(false)
+      setMaterialEnvaseToDelete(null)
+    }
+  }
+  // </CHANGE>
 
   // -- Carga inicial --
   const cargarDatosIniciales = async () => {
@@ -800,6 +1002,21 @@ export default function EditarProductoPage() {
       })
       router.push(`/costear?${params.toString()}`)
     }
+  }
+
+  const handleMaterialEnvaseSelect = (material: any) => {
+    setMaterialEnvaseBuscar(`${material.codigo} - ${material.nombre}`)
+    setShowMaterialesEnvaseDropdown(false)
+    setMaterialEnvaseSeleccionado({
+      id: material.id,
+      codigo: material.codigo || "",
+      nombre: material.nombre || "",
+      unidadmedida: material.unidadesmedida?.descripcion || "",
+      costo: material.costo || 0,
+      tipomaterialid: material.tipomaterialid,
+    })
+    setMaterialEnvaseUnidadMedida(material.unidadesmedida?.descripcion || "") // Set unit
+    setMaterialEnvaseCostoUnitario(material.costo?.toFixed(6) || "0.000000") // Set cost
   }
   // </CHANGE>
 
@@ -1011,6 +1228,81 @@ export default function EditarProductoPage() {
                 onClick={confirmarAgregarMaterialEtiquetado}
               >
                 Sí, Agregar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showModalSuccess && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-xl">
+            <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-100">
+              <svg
+                className="w-8 h-8 text-cyan-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-center mb-2 text-gray-900">¡Actualización Exitosa!</h3>
+            <p className="text-center text-gray-600 mb-6">El producto se ha actualizado correctamente</p>
+            <div className="flex justify-center">
+              <button
+                onClick={() => setShowModalSuccess(false)}
+                className="px-6 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors"
+              >
+                Aceptar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAddMaterialEnvaseModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4">Confirmar Agregar Material de Envase</h3>
+            <p className="mb-6">
+              ¿Está seguro de agregar el material de envase <strong>{materialEnvaseSeleccionado?.nombre}</strong>?
+              <br />
+              <br />
+              Cantidad: <strong>{materialEnvaseCantidad}</strong>
+              <br />
+              Costo Unitario: <strong>${materialEnvaseCostoUnitario}</strong>
+            </p>
+            <div className="flex gap-4 justify-end">
+              <Button variant="outline" onClick={() => setShowAddMaterialEnvaseModal(false)}>
+                Cancelar
+              </Button>
+              <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={confirmarAgregarMaterialEnvase}>
+                Sí, Agregar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteMaterialEnvaseModal && materialEnvaseToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4">Confirmar Eliminación</h3>
+            <p className="mb-6">
+              ¿Está seguro de eliminar el material de envase <strong>{materialEnvaseToDelete.nombre}</strong>?
+              <br />
+              <br />
+              <strong className="text-red-600">Advertencia:</strong> Esta acción no se puede deshacer y se recalcularán
+              los costos del producto.
+            </p>
+            <div className="flex gap-4 justify-end">
+              <Button variant="outline" onClick={() => setShowDeleteMaterialEnvaseModal(false)}>
+                Cancelar
+              </Button>
+              <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={confirmarEliminarMaterialEnvase}>
+                Sí, Eliminar
               </Button>
             </div>
           </div>
@@ -1240,6 +1532,10 @@ export default function EditarProductoPage() {
                               <span className="ml-2 text-gray-900">{producto.mp || "0"}</span>
                             </div>
                             <div>
+                              <span className="font-semibold text-green-700">MEM:</span>
+                              <span className="ml-2 text-gray-900">{producto.mem || "0"}</span>
+                            </div>
+                            <div>
                               <span className="font-semibold text-green-700">ME:</span>
                               <span className="ml-2 text-gray-900">{producto.me || "0"}</span>
                             </div>
@@ -1261,6 +1557,12 @@ export default function EditarProductoPage() {
                               <span className="font-semibold text-purple-700">MP %:</span>
                               <span className="ml-2 text-gray-900">
                                 {((producto.mp_porcentaje || 0) * 100).toFixed(2)}%
+                              </span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-purple-700">MEM %:</span>
+                              <span className="ml-2 text-gray-900">
+                                {((producto.mem_porcentaje || 0) * 100).toFixed(2)}%
                               </span>
                             </div>
                             <div>
@@ -1286,6 +1588,10 @@ export default function EditarProductoPage() {
                               <span className="ml-2 text-gray-900">${(producto.mp_costeado || 0).toFixed(2)}</span>
                             </div>
                             <div>
+                              <span className="font-semibold text-amber-700">MEM $:</span>
+                              <span className="ml-2 text-gray-900">${(producto.mem_costeado || 0).toFixed(2)}</span>
+                            </div>
+                            <div>
                               <span className="font-semibold text-amber-700">ME $:</span>
                               <span className="ml-2 text-gray-900">${(producto.me_costeado || 0).toFixed(2)}</span>
                             </div>
@@ -1296,6 +1602,10 @@ export default function EditarProductoPage() {
                             <div>
                               <span className="font-semibold text-amber-700">Precio Healthy Lab:</span>
                               <span className="ml-2 text-gray-900">${(producto.preciohl || 0).toFixed(2)}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-amber-700">Utilidad:</span>
+                              <span className="ml-2 text-gray-900">${(producto.utilidadhl || 0).toFixed(6)}</span>
                             </div>
                           </div>
                         </div>
@@ -1341,6 +1651,33 @@ export default function EditarProductoPage() {
                             </td>
                             <td className="border p-3">
                               <span className="font-medium">${producto?.mp_costeado?.toFixed(2) || "0"}</span>
+                            </td>
+                          </tr>
+
+                          {/* MEM Row */}
+                          <tr className="hover:bg-gray-50">
+                            <td className="border p-3 font-medium">MEM</td>
+                            <td className="border p-3">
+                              <span className="font-medium">${producto?.mem?.toFixed(2) || "0.00"}</span>
+                            </td>
+                            <td className="border p-3">
+                              <Input
+                                type="text"
+                                step="0.01"
+                                name="mem_porcentaje"
+                                value={(producto.mem_porcentaje * 100).toString()}
+                                onChange={(e) => {
+                                  const value = e.target.value
+                                  const numValue = Number.parseFloat(value) / 100
+                                  if (!isNaN(numValue)) {
+                                    setProducto((prev) => (prev ? { ...prev, mem_porcentaje: numValue } : null))
+                                  }
+                                }}
+                                className="bg-white"
+                              />
+                            </td>
+                            <td className="border p-3">
+                              <span className="font-medium">${producto?.mem_costeado?.toFixed(2) || "0.00"}</span>
                             </td>
                           </tr>
 
@@ -1521,7 +1858,7 @@ export default function EditarProductoPage() {
                           <th className="border p-2 text-left text-sm bg-[#68BAA1] font-semibold border-l-2 border-gray-300 ">
                             Cantidad
                           </th>
-                          <th className="border p-2 text-left text-sm bg-[#68BAA1] ">Costo Parcial</th>
+                          <th className="border p-2 text-left text-sm bg-[#68BAA1]">Costo Parcial</th>
                           <th className="border p-2 text-left text-sm bg-[#68BAA1] font-semibold">Acciones</th>
                         </tr>
                       </thead>
@@ -1551,6 +1888,16 @@ export default function EditarProductoPage() {
                             </td>
                           </tr>
                         ))}
+                        <tr className="bg-gray-100 font-bold">
+                          <td colSpan={6} className="p-2 text-sm text-right">
+                            Total Fórmulas:
+                          </td>
+                          <td className="p-2 text-sm">
+                            ${producto.formulasxproducto.reduce((sum, f) => sum + (f.costoparcial || 0), 0).toFixed(6)}
+                          </td>
+                          <td className="p-2"></td>
+                        </tr>
+                        {/* </CHANGE> */}
                       </tbody>
                     </table>
                   </div>
@@ -1558,18 +1905,19 @@ export default function EditarProductoPage() {
                   <p className="text-gray-500">No hay fórmulas asignadas a este producto.</p>
                 )}
               </div>
+              <div className="border-t-2 border-[#6db8c9] mt-4 pt-4 flex justify-end"></div>
+              {/* </CHANGE> */}
 
-              <div className="space-y-4 mt-8">
-                <h3 className="text-lg font-semibold">Agregar Material de Empaque</h3>
+              <div className="space-y-4">
+                <h3 className="text-lg mt-18 font-semibold">Agregar Material Empaque</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                  {/* Material Etiquetado search input with autocomplete */}
                   <div className="space-y-2 relative" ref={materialEtiquetadoSearchRef}>
-                    <Label htmlFor="txtMaterialEtiquetado">Material de Empaque</Label>
+                    <Label htmlFor="txtMaterialEmpaquetado">Material de Empaque</Label>
                     <Input
-                      id="txtMaterialEtiquetado"
+                      id="txtMaterialEmpaquetado"
                       type="text"
-                      placeholder="Buscar material de empaque..."
+                      placeholder="Buscar material de etiquetado..."
                       value={materialEtiquetadoBuscar}
                       onChange={(e) => setMaterialEtiquetadoBuscar(e.target.value)}
                       onFocus={() =>
@@ -1592,11 +1940,10 @@ export default function EditarProductoPage() {
                     )}
                   </div>
 
-                  {/* Cantidad input */}
                   <div className="space-y-2">
-                    <Label htmlFor="txtMECantidad">Cantidad</Label>
+                    <Label htmlFor="txtME2Cantidad">Cantidad</Label>
                     <Input
-                      id="txtMECantidad"
+                      id="txtME1Cantidad"
                       type="number"
                       step="0.01"
                       placeholder="0.00"
@@ -1605,32 +1952,28 @@ export default function EditarProductoPage() {
                     />
                   </div>
 
-                  {/* Unidad de medida (disabled, auto-populated) */}
                   <div className="space-y-2">
-                    <Label htmlFor="txtMEUnidadMedida">Unidad de Medida</Label>
+                    <Label htmlFor="txtME2UnidadMedida">Unidad de Medida</Label>
                     <Input
-                      id="txtMEUnidadMedida"
+                      id="txtME1UnidadMedida"
                       type="text"
                       value={materialEtiquetadoSeleccionado?.unidadmedida || ""}
                       disabled
                     />
                   </div>
 
-                  {/* Costo (disabled, auto-populated) */}
                   <div className="space-y-2">
-                    <Label htmlFor="txtMECosto">Costo Unitario</Label>
+                    <Label htmlFor="txtME2Costo">Costo Unitario</Label>
                     <Input
-                      id="txtMECosto"
+                      id="txtME1Costo"
                       type="text"
                       value={
-                        // Changed from toFixed(5) to toFixed(6) for 6 decimals
                         materialEtiquetadoSeleccionado ? `$${materialEtiquetadoSeleccionado.costo.toFixed(6)}` : ""
                       }
                       disabled
                     />
                   </div>
 
-                  {/* Agregar button */}
                   <div className="space-y-2 flex items-end">
                     <Button
                       type="button"
@@ -1641,12 +1984,12 @@ export default function EditarProductoPage() {
                     </Button>
                   </div>
                 </div>
-              </div>
 
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Materiales de Empaque del Producto</h3>
+                <h3 className="text-lg  font-semibold">Materiales de Empaque del Producto</h3>
 
-                {producto?.materialesetiquetadoxproducto && producto.materialesetiquetadoxproducto.length > 0 ? (
+                {producto?.materialesetiquetadoxproducto &&
+                producto.materialesetiquetadoxproducto.filter((m) => m.materialesetiquetado?.tipomaterialid === 1)
+                  .length > 0 ? (
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -1663,53 +2006,224 @@ export default function EditarProductoPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {producto.materialesetiquetadoxproducto.map((materialRel, index) => (
-                          <tr key={index} className="hover:bg-gray-50">
-                            <td className="p-2 text-sm">{materialRel.materialesetiquetado?.codigo || "N/A"}</td>
-                            <td className="p-2 text-sm">{materialRel.materialesetiquetado?.nombre || "N/A"}</td>
-                            <td className="p-2 text-sm">
-                              ${materialRel.materialesetiquetado?.costo?.toFixed(6) || "0.000000"}
-                            </td>
-                            <td className="p-2 text-sm">
-                              {materialRel.materialesetiquetado?.unidadesmedida?.descripcion || "N/A"}
-                            </td>
-                            <td className="border-l-2 p-2 text-sm">{materialRel?.cantidad || "0"}</td>
-                            <td className="text-sm">${materialRel?.costoparcial?.toFixed(6) || "0.000000"}</td>
-
-                            <td className="p-2">
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                onClick={() =>
-                                  handleEliminarMaterialEtiquetado(
-                                    materialRel.materialetiquetadoid || 0,
-                                    materialRel.materialesetiquetado?.nombre || "",
-                                  )
-                                }
-                                title="Eliminar"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
+                        {producto.materialesetiquetadoxproducto
+                          .filter((m) => m.materialesetiquetado?.tipomaterialid === 1)
+                          .map((materialRel, index) => (
+                            <tr key={index} className="hover:bg-gray-50">
+                              <td className="p-2 text-sm">{materialRel.materialesetiquetado?.codigo || "N/A"}</td>
+                              <td className="p-2 text-sm">{materialRel.materialesetiquetado?.nombre || "N/A"}</td>
+                              <td className="p-2 text-sm">
+                                ${materialRel.materialesetiquetado?.costo?.toFixed(6) || "0.000000"}
+                              </td>
+                              <td className="p-2 text-sm">
+                                {materialRel.materialesetiquetado?.unidadesmedida?.descripcion || "N/A"}
+                              </td>
+                              <td className="border-l-2 p-2 text-sm">{materialRel?.cantidad || "0"}</td>
+                              <td className="text-sm">${materialRel?.costoparcial?.toFixed(6) || "0.000000"}</td>
+                              <td className="p-2">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  onClick={() =>
+                                    handleEliminarMaterialEtiquetado(
+                                      materialRel.materialetiquetadoid || 0,
+                                      materialRel.materialesetiquetado?.nombre || "",
+                                    )
+                                  }
+                                  title="Eliminar"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        <tr className="bg-gray-100 font-bold">
+                          <td colSpan={6} className="p-2 text-sm text-right">
+                            Total Materiales Empaque:
+                          </td>
+                          <td className="p-2 text-sm">
+                            $
+                            {producto.materialesetiquetadoxproducto
+                              .filter((m) => m.materialesetiquetado?.tipomaterialid === 1)
+                              .reduce((sum, m) => sum + (m.costoparcial || 0), 0)
+                              .toFixed(6)}
+                          </td>
+                          <td className="p-2"></td>
+                        </tr>
+                        {/* </CHANGE> */}
                       </tbody>
                     </table>
                   </div>
                 ) : (
-                  // Renamed from "materiales de etiquetado" to "materiales de empaque"
-                  <p className="text-gray-500">No hay materiales de empaque asignados a este producto.</p>
+                  <p className="text-gray-500">No hay materiales de empaque (Tipo 1) asignados a este producto.</p>
                 )}
               </div>
+              {/* </CHANGE> - Changed location of Material de Envase handler to match Material de Etiquetado behavior */}
 
-              <div className="border-t-2 border-blue-500 mt-4 pt-4 flex justify-end">
+              <div className="border-t-2 border-[#6db8c9] mt-4 pt-4 flex justify-end"></div>
+
+              <div className="space-y-4">
+                <h3 className="text-lg mt-18 font-semibold">Agregar Material de Envase</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                  <div className="space-y-2 relative" ref={materialEnvaseSearchRef}>
+                    <Label htmlFor="txtMaterialEnvase">Material de Envase</Label>
+                    <Input
+                      id="txtMaterialEnvase"
+                      type="text"
+                      placeholder="Buscar material de envase..."
+                      value={materialEnvaseBuscar}
+                      onChange={(e) => setMaterialEnvaseBuscar(e.target.value)}
+                      onFocus={() => materialesEnvaseResultados.length > 0 && setShowMaterialesEnvaseDropdown(true)}
+                    />
+                    {showMaterialesEnvaseDropdown && materialesEnvaseResultados.length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {materialesEnvaseResultados.map((material) => (
+                          <button
+                            key={material.id}
+                            type="button"
+                            className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+                            onClick={() => handleMaterialEnvaseSelect(material)}
+                          >
+                            {material.codigo} - {material.nombre}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="txtMECantidad">Cantidad</Label>
+                    <Input
+                      id="txtMECantidad"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={materialEnvaseCantidad}
+                      onChange={(e) => setMaterialEnvaseCantidad(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="txtMEUnidadMedida">Unidad de Medida</Label>
+                    <Input
+                      id="txtMEUnidadMedida"
+                      type="text"
+                      value={materialEnvaseUnidadMedida} // Use state variable
+                      disabled
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="txtMECosto">Costo Unitario</Label>
+                    <Input
+                      id="txtMECosto"
+                      type="text"
+                      value={materialEnvaseCostoUnitario} // Use state variable
+                      disabled
+                    />
+                  </div>
+
+                  <div className="space-y-2 flex items-end">
+                    <Button
+                      type="button"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white"
+                      onClick={handleAgregarMaterialEnvase}
+                    >
+                      Agregar
+                    </Button>
+                  </div>
+                </div>
+
+                <h3 className="text-lg font-semibold">Materiales de Etiquetado del Producto</h3>
+
+                {producto?.materialesetiquetadoxproducto &&
+                producto.materialesetiquetadoxproducto.filter((m) => m.materialesetiquetado?.tipomaterialid === 2)
+                  .length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="bg-[#6DBAC2] text-white">
+                          <th className="border p-2 text-left text-sm font-semibold">Código</th>
+                          <th className="border p-2 text-left text-sm font-semibold">Nombre</th>
+                          <th className="border p-2 text-left text-sm font-semibold">Costo</th>
+                          <th className="border p-2 text-left text-sm font-semibold">Unidad de Medida</th>
+                          <th className="border p-2 text-left text-sm bg-[#68BAA1] font-semibold border-l-2 border-gray-300">
+                            Cantidad
+                          </th>
+                          <th className="border p-2 text-left text-sm bg-[#68BAA1]">Costo Parcial</th>
+                          <th className="border p-2 text-left text-sm bg-[#68BAA1] font-semibold">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {producto.materialesetiquetadoxproducto
+                          .filter((m) => m.materialesetiquetado?.tipomaterialid === 2)
+                          .map((materialRel, index) => (
+                            <tr key={index} className="hover:bg-gray-50">
+                              <td className="p-2 text-sm">{materialRel.materialesetiquetado?.codigo || "N/A"}</td>
+                              <td className="p-2 text-sm">{materialRel.materialesetiquetado?.nombre || "N/A"}</td>
+                              <td className="p-2 text-sm">
+                                ${materialRel.materialesetiquetado?.costo?.toFixed(6) || "0.000000"}
+                              </td>
+                              <td className="p-2 text-sm">
+                                {materialRel.materialesetiquetado?.unidadesmedida?.descripcion || "N/A"}
+                              </td>
+                              <td className="border-l-2 p-2 text-sm">{materialRel?.cantidad || "0"}</td>
+                              <td className="text-sm">${materialRel?.costoparcial?.toFixed(6) || "0.000000"}</td>
+                              <td className="p-2">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  onClick={() =>
+                                    handleEliminarMaterialEtiquetado(
+                                      materialRel.materialetiquetadoid || 0,
+                                      materialRel.materialesetiquetado?.nombre || "",
+                                    )
+                                  }
+                                  title="Eliminar"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        <tr className="bg-gray-100 font-bold">
+                          <td colSpan={6} className="p-2 text-sm text-right">
+                            Total Materiales Etiquetado:
+                          </td>
+                          <td className="p-2 text-sm">
+                            $
+                            {producto.materialesetiquetadoxproducto
+                              .filter((m) => m.materialesetiquetado?.tipomaterialid === 2)
+                              .reduce((sum, m) => sum + (m.costoparcial || 0), 0)
+                              .toFixed(6)}
+                          </td>
+                          <td className="p-2"></td>
+                        </tr>
+                        {/* </CHANGE> */}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-gray-500">No hay materiales de etiquetado (Tipo 2) asignados a este producto.</p>
+                )}
+              </div>
+              {/* </CHANGE> */}
+
+              <div className="border-t-2 border-black mt-4 pt-4 flex justify-end">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl">
                   <div className="space-y-2">
                     <div className="flex justify-between py-2 border-b border-gray-200">
                       <span className="font-semibold">MP:</span>
                       <span>${(producto?.mp || 0).toFixed(6)}</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-semibold">MEM:</span>
+                      <span>${(producto?.mem || 0).toFixed(6)}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-gray-200">
                       <span className="font-semibold">ME:</span>
@@ -1731,6 +2245,10 @@ export default function EditarProductoPage() {
                       <span>{((producto?.mp_porcentaje || 0) * 100).toFixed(2)}%</span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-semibold">MEM %:</span>
+                      <span>{((producto?.mem_porcentaje || 0) * 100).toFixed(2)}%</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-gray-200">
                       <span className="font-semibold">ME %:</span>
                       <span>{((producto?.me_porcentaje || 0) * 100).toFixed(2)}%</span>
                     </div>
@@ -1744,6 +2262,10 @@ export default function EditarProductoPage() {
                     <div className="flex justify-between py-2 border-b border-gray-200">
                       <span className="font-semibold">MP Costo:</span>
                       <span>${(producto?.mp_costeado || 0).toFixed(6)}</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-semibold">MEM Costo:</span>
+                      <span>${(producto?.mem_costeado || 0).toFixed(6)}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-gray-200">
                       <span className="font-semibold">ME Costo:</span>
@@ -1764,7 +2286,6 @@ export default function EditarProductoPage() {
                   </div>
                 </div>
               </div>
-              {/* </CHANGE> */}
             </div>
           </CardContent>
         </Card>

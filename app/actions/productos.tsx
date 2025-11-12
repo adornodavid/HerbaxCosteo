@@ -301,13 +301,16 @@ export async function obtenerProductos(
         unidadmedidaid,
         unidadesmedida!unidadmedidaid(descripcion),
         mp,
+        mem,
         me,
         ms,
         costo,
         mp_porcentaje,
+        mem_porcentaje,
         me_porcentaje,
         ms_porcentaje,
         mp_costeado,
+        mem_costeado,
         me_costeado,
         ms_costeado,
         preciohl,
@@ -334,6 +337,7 @@ export async function obtenerProductos(
             codigo,
             nombre,
             imgurl,
+            tipomaterialid,
             unidadmedidaid,
             unidadesmedida!unidadmedidaid(descripcion),
             costo
@@ -761,6 +765,10 @@ export async function actualizarProducto(formData: FormData) {
       const mpValue = formData.get("mp_porcentaje") as string
       updateData.mp_porcentaje = Number.parseFloat(mpValue) / 100
     }
+    if (formData.get("mem_porcentaje")) {
+      const memValue = formData.get("mem_porcentaje") as string
+      updateData.mem_porcentaje = Number.parseFloat(memValue) / 100
+    }
     if (formData.get("me_porcentaje")) {
       const meValue = formData.get("me_porcentaje") as string
       updateData.me_porcentaje = Number.parseFloat(meValue) / 100
@@ -924,7 +932,7 @@ export async function recalcularProducto(productoid: number): Promise<{ success:
 
     const { data: productoData, error: productoError } = await supabase
       .from("productos")
-      .select("mp_porcentaje, me_porcentaje, ms_porcentaje")
+      .select("mp_porcentaje, mem_porcentaje, me_porcentaje, ms_porcentaje")
       .eq("id", productoid)
       .single()
 
@@ -934,6 +942,7 @@ export async function recalcularProducto(productoid: number): Promise<{ success:
     }
 
     const mp_porcentaje = productoData.mp_porcentaje || 0.35
+    const mem_porcentaje = productoData.mem_porcentaje || 0.35
     const me_porcentaje = productoData.me_porcentaje || 0.35
     const ms_porcentaje = productoData.ms_porcentaje || 0.35
 
@@ -1026,10 +1035,42 @@ export async function recalcularProducto(productoid: number): Promise<{ success:
       }
     }
 
+    const { data: memSumData, error: memSumError } = await supabase
+      .from("materialesetiquetadoxproducto")
+      .select(`
+              costoparcial, 
+              materialesetiquetado!inner(tipomaterialid)
+              `)
+      .eq("productoid", productoid)
+      .eq("materialesetiquetado.tipomaterialid", 1)
+
+    if (memSumError) {
+      console.error("Error obteniendo suma de costoparcial de materiales etiquetado MEM:", memSumError)
+      return { success: false, error: memSumError.message }
+    }
+
+    const mem = memSumData?.reduce((sum, item) => sum + (item.costoparcial || 0), 0) || 0
+
+    const mem_costeado = mem_porcentaje > 0 ? mem / mem_porcentaje : 0
+
+    const { error: updateMemError } = await supabase
+      .from("productos")
+      .update({ mem, mem_costeado })
+      .eq("id", productoid)
+
+    if (updateMemError) {
+      console.error("Error actualizando mem y mem_costeado:", updateMemError)
+      return { success: false, error: updateMemError.message }
+    }
+
     const { data: meSumData, error: meSumError } = await supabase
       .from("materialesetiquetadoxproducto")
-      .select("costoparcial")
+      .select(`
+              costoparcial, 
+              materialesetiquetado!inner(tipomaterialid)
+              `)
       .eq("productoid", productoid)
+      .eq("materialesetiquetado.tipomaterialid", 2)
 
     if (meSumError) {
       console.error("Error obteniendo suma de costoparcial de materiales etiquetado:", meSumError)
@@ -1047,7 +1088,7 @@ export async function recalcularProducto(productoid: number): Promise<{ success:
       return { success: false, error: updateMeError.message }
     }
 
-    const ms = (mp + me) * 0.05
+    const ms = (mp + mem + me) * 0.05
 
     const ms_costeado = ms_porcentaje > 0 ? ms / ms_porcentaje : 0
 
@@ -1058,18 +1099,21 @@ export async function recalcularProducto(productoid: number): Promise<{ success:
       return { success: false, error: updateMsError.message }
     }
 
-    const costoelaboracion = mp + me + ms
+    const costoelaboracion = mp + mem + me + ms
 
-    const preciohl = mp_costeado + me_costeado + ms_costeado
+    const preciohl = mp_costeado + mem_costeado + me_costeado + ms_costeado
 
     const utilidadhl = preciohl - costoelaboracion
+
+    const preciohlFinal = preciohl <= 50.0 ? 50.0 : preciohl
+    const utilidadhlFinal = preciohlFinal - costoelaboracion
 
     const { error: updateFinalError } = await supabase
       .from("productos")
       .update({
         costo: costoelaboracion,
-        preciohl,
-        utilidadhl,
+        preciohl: preciohlFinal,
+        utilidadhl: utilidadhlFinal,
       })
       .eq("id", productoid)
 

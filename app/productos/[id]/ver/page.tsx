@@ -295,6 +295,10 @@ export default function VerProductoPage() {
                         <span className="font-semibold text-green-700">MP:</span>
                         <span className="ml-2 text-gray-900">${(producto.mp || 0).toFixed(6)}</span>
                       </div>
+                       <div>
+                        <span className="font-semibold text-green-700">MEM:</span>
+                        <span className="ml-2 text-gray-900">${(producto.mem || 0).toFixed(6)}</span>
+                      </div>
                       <div>
                         <span className="font-semibold text-green-700">ME:</span>
                         <span className="ml-2 text-gray-900">${(producto.me || 0).toFixed(6)}</span>
@@ -318,6 +322,10 @@ export default function VerProductoPage() {
                         <span className="ml-2 text-gray-900">{((producto.mp_porcentaje || 0) * 100).toFixed(2)}%</span>
                       </div>
                       <div>
+                        <span className="font-semibold text-purple-700">MEM %:</span>
+                        <span className="ml-2 text-gray-900">{((producto.mem_porcentaje || 0) * 100).toFixed(2)}%</span>
+                      </div>
+                      <div>
                         <span className="font-semibold text-purple-700">ME %:</span>
                         <span className="ml-2 text-gray-900">{((producto.me_porcentaje || 0) * 100).toFixed(2)}%</span>
                       </div>
@@ -334,6 +342,10 @@ export default function VerProductoPage() {
                       <div>
                         <span className="font-semibold text-amber-700">MP $:</span>
                         <span className="ml-2 text-gray-900">${(producto.mp_costeado || 0).toFixed(6)}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-amber-700">MEM $:</span>
+                        <span className="ml-2 text-gray-900">${(producto.mem_costeado || 0).toFixed(6)}</span>
                       </div>
                       <div>
                         <span className="font-semibold text-amber-700">ME $:</span>
