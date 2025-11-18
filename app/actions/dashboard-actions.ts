@@ -129,12 +129,12 @@ export async function obtenerEstadisticasEmpresariales() {
   try {
     const supabase = createSupabaseServerClient()
 
-    // Obtener estadísticas de productos por cliente
     const { data: productosPorCliente, error: productosError } = await supabase
       .from("productos")
       .select(`
         clienteid,
-        activo
+        activo,
+        clientes!inner(nombre)
       `)
       .eq("activo", true)
 
@@ -174,11 +174,10 @@ export async function obtenerEstadisticasEmpresariales() {
     //   .select("costo")
     //   .eq("activo", true)
 
-    // Procesar datos para gráficos
     const productosAgrupados =
       productosPorCliente?.reduce((acc: any, item: any) => {
-        const clienteId = item.clienteid || 0
-        acc[clienteId] = (acc[clienteId] || 0) + 1
+        const clienteNombre = item.clientes?.nombre || "Sin cliente"
+        acc[clienteNombre] = (acc[clienteNombre] || 0) + 1
         return acc
       }, {}) || {}
 
@@ -210,8 +209,8 @@ export async function obtenerEstadisticasEmpresariales() {
     return {
       success: true,
       data: {
-        productosPorCliente: Object.entries(productosAgrupados).map(([clienteId, cantidad]) => ({
-          cliente: `Cliente ${clienteId}`,
+        productosPorCliente: Object.entries(productosAgrupados).map(([clienteNombre, cantidad]) => ({
+          cliente: clienteNombre,
           cantidad: cantidad as number,
         })),
         formulasPorCliente: [],
@@ -345,6 +344,39 @@ export async function consultarUtilidadActual(clientesid: number, zonasid: numbe
     return {
       success: false,
       error: "Error al consultar utilidad actual",
+      data: [],
+    }
+  }
+}
+
+//Función: consultarVariacionPrecios
+export async function consultarVariacionPrecios(clientesid: number, zonasid: number) {
+  try {
+    const supabase = createSupabaseServerClient()
+
+    const { data, error } = await supabase.rpc("consultavariacionprecios", {
+      clientesid: clientesid,
+      zonasid: zonasid,
+    })
+
+    if (error) {
+      console.error("Error consultando variación de precios:", error)
+      return {
+        success: false,
+        error: error.message,
+        data: [],
+      }
+    }
+
+    return {
+      success: true,
+      data: data || [],
+    }
+  } catch (error) {
+    console.error("Error en consultarVariacionPrecios:", error)
+    return {
+      success: false,
+      error: "Error al consultar variación de precios",
       data: [],
     }
   }

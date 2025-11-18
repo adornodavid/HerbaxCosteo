@@ -580,348 +580,364 @@ export default function ReporteCosteoPage() {
               <CardTitle>Reporte de Costeo de Productos</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto relative" style={{ maxHeight: "600px" }}>
+              {/* Start of updates */}
+              <div className="overflow-x-auto relative" style={{ maxHeight: "600px", overflow: "auto" }}>
                 <table className="w-full border-collapse border border-gray-300">
                   <thead>
                     <tr>
-                      {/* Columna 1 - Folio (Sticky) */}
+                      {/* Columna 1 - Folio (Sticky both horizontal and vertical) */}
                       <th
                         className="border border-gray-300 p-3 text-left text-sm font-semibold text-white bg-blue-700 sticky z-20"
-                        style={{ left: "0px", minWidth: "80px", position: "sticky" }}
+                        style={{ left: "0px", top: "0px", minWidth: "80px", position: "sticky" }}
                       >
                         FOLIO
                       </th>
 
-                      {/* Columna 2 - Código (Sticky) */}
+                      {/* Columna 2 - Código (Sticky both horizontal and vertical) */}
                       <th
                         className="border border-gray-300 p-3 text-left text-sm font-semibold text-white bg-blue-700 sticky z-20"
-                        style={{ left: "80px", minWidth: "120px", position: "sticky" }}
+                        style={{ left: "80px", top: "0px", minWidth: "120px", position: "sticky" }}
                       >
                         CÓDIGO
                       </th>
 
-                      {/* Columna 3 - Nombre (Sticky) */}
+                      {/* Columna 3 - Nombre (Sticky both horizontal and vertical) */}
                       <th
                         className="border border-gray-300 p-3 text-left text-sm font-semibold text-white bg-blue-700 sticky z-20"
-                        style={{ left: "200px", minWidth: "250px", position: "sticky" }}
+                        style={{ left: "200px", top: "0px", minWidth: "250px", position: "sticky" }}
                       >
                         NOMBRE
                       </th>
 
+                      <th
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-700 sticky z-10"
+                        style={{ top: "0px", minWidth: "70px" }}
+                      >
+                        CATEGORIA
+                      </th>
+
+                      {/* Columna precio 2025 */}
+                      <th
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-700 sticky z-10"
+                        style={{ top: "0px", minWidth: "150px" }}
+                      >
+                        PRECIO VENTA 2025
+                      </th>
+
                       {/* Columna 4 - Precio Venta Sin IVA */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-700"
-                        style={{ minWidth: "150px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-700 sticky z-10"
+                        style={{ top: "0px", minWidth: "150px" }}
                       >
-                        PRECIO VENTA SIN IVA
+                        PRECIO ACTUAL SIN IVA
                       </th>
 
                       {/* Columna 5 - Precio Venta Con IVA */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-700"
-                        style={{ minWidth: "150px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-700 sticky z-10"
+                        style={{ top: "0px", minWidth: "150px" }}
                       >
-                        PRECIO VENTA CON IVA
+                        PRECIO ACTUAL CON IVA
                       </th>
 
                       {/* Columna 6 - Plan Generacional */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "150px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "150px" }}
                       >
                         PLAN GENERACIONAL
                       </th>
 
                       {/* Columna 7 - Plan Nivel */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "120px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "120px" }}
                       >
                         PLAN NIVEL
                       </th>
 
                       {/* Columna 8 - Plan Infinito */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "120px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "120px" }}
                       >
                         PLAN INFINITO
                       </th>
 
                       {/* Columna 9 - IVA Pagado */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "120px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "120px" }}
                       >
                         IVA PAGADO
                       </th>
 
                       {/* Columna 10 - CDA */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "100px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "100px" }}
                       >
                         CDA
                       </th>
 
                       {/* Columna 11 - Bono Inicio Rápido */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "150px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "150px" }}
                       >
                         BONO INICIO RÁPIDO
                       </th>
 
                       {/* Columna 12 - Constructor Inicio Rápido */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "180px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "180px" }}
                       >
                         CONSTRUCTOR INICIO RÁPIDO
                       </th>
 
                       {/* Columna 13 - Ruta Éxito */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "120px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "120px" }}
                       >
                         RUTA ÉXITO
                       </th>
 
                       {/* Columna 14 - Reembolsos */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "120px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "120px" }}
                       >
                         REEMBOLSOS
                       </th>
 
                       {/* Columna 15 - Tarjeta Crédito */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "140px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "140px" }}
                       >
                         TARJETA CRÉDITO
                       </th>
 
                       {/* Columna 16 - Envío */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "100px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "100px" }}
                       >
                         ENVÍO
                       </th>
 
                       {/* Columna 17 - Precio HL */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "120px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "120px" }}
                       >
                         COSTO PRODUCTO
                       </th>
 
                       {/* Columna 18 - Porcentaje Costo */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "150px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "150px" }}
                       >
                         % COSTO
                       </th>
 
                       {/* Columna 19 - Total Costos */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-900"
-                        style={{ minWidth: "130px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-900 sticky z-10"
+                        style={{ top: "0px", minWidth: "130px" }}
                       >
                         TOTAL COSTOS
                       </th>
 
                       {/* Columna 20 - Utilidad Marginal */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
-                        style={{ minWidth: "150px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "150px" }}
                       >
                         UTILIDAD MARGINAL
                       </th>
 
                       {/* Columna 21 - Precio Actual % Utilidad */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
-                        style={{ minWidth: "180px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "180px" }}
                       >
                         PRECIO ACTUAL % UTILIDAD
                       </th>
 
                       {/* Columna 22 - Utilidad Óptima */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
-                        style={{ minWidth: "140px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900 sticky z-10"
+                        style={{ top: "0px", minWidth: "140px" }}
                       >
                         UTILIDAD OPTIMA 25
                       </th>
 
                       {/* Columna 23 - Comisiones % */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
-                        style={{ minWidth: "130px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "130px" }}
                       >
                         COMISIONES %
                       </th>
 
                       {/* Columna 24 - Costo % */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
-                        style={{ minWidth: "100px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "100px" }}
                       >
                         COSTO %
                       </th>
 
                       {/* Columna 25 - Comisiones + Costo */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
-                        style={{ minWidth: "160px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "160px" }}
                       >
                         COMISIONES + COSTO
                       </th>
 
                       {/* Columna 26 - Precio Sin IVA */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
-                        style={{ minWidth: "140px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900 sticky z-10"
+                        style={{ top: "0px", minWidth: "140px" }}
                       >
                         PRECIO SIN IVA
                       </th>
 
                       {/* Columna 27 - Precio Con IVA */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
-                        style={{ minWidth: "140px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900 sticky z-10"
+                        style={{ top: "0px", minWidth: "140px" }}
                       >
                         PRECIO CON IVA
                       </th>
 
                       {/* Columna 28 - Precio Meta */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
-                        style={{ minWidth: "120px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900 sticky z-10"
+                        style={{ top: "0px", minWidth: "120px" }}
                       >
                         PRECIO META
                       </th>
 
                       {/* Columna 29 - Precio Meta Con IVA */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
-                        style={{ minWidth: "170px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "170px" }}
                       >
                         PRECIO META CON IVA
                       </th>
 
                       {/* Columna 30 - Diferencia Utilidad Esperada */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
-                        style={{ minWidth: "200px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "200px" }}
                       >
                         DIFERENCIA UTILIDAD ESPERADA
                       </th>
 
                       {/* Columna 31 - Utilidad Óptima 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
-                        style={{ minWidth: "160px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900 sticky z-10"
+                        style={{ top: "0px", minWidth: "160px" }}
                       >
                         UTILIDAD ÓPTIMA 30
                       </th>
 
                       {/* Columna 32 - Comisiones % 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "150px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "150px" }}
                       >
                         COMISIONES % 30
                       </th>
 
                       {/* Columna 33 - Costo % 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "120px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "120px" }}
                       >
                         COSTO % 30
                       </th>
 
                       {/* Columna 34 - Comisiones + Costo 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600"
-                        style={{ minWidth: "180px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "180px" }}
                       >
                         COMISIONES + COSTO 30
                       </th>
 
                       {/* Columna 35 - Precio Sin IVA 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
-                        style={{ minWidth: "160px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900 sticky z-10"
+                        style={{ top: "0px", minWidth: "160px" }}
                       >
                         PRECIO SIN IVA 30
                       </th>
 
                       {/* Columna 36 - Precio Con IVA 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
-                        style={{ minWidth: "160px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900 sticky z-10"
+                        style={{ top: "0px", minWidth: "160px" }}
                       >
                         PRECIO CON IVA 30
                       </th>
 
                       {/* Columna 37 - Precio Meta 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900"
-                        style={{ minWidth: "140px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900 sticky z-10"
+                        style={{ top: "0px", minWidth: "140px" }}
                       >
                         PRECIO META 30
                       </th>
 
                       {/* Columna 38 - Precio Meta Con IVA 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-600"
-                        style={{ minWidth: "190px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "190px" }}
                       >
                         PRECIO META CON IVA 30
                       </th>
 
                       {/* Columna 39 - Diferencia Utilidad Esperada 30 */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-600"
-                        style={{ minWidth: "220px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "220px" }}
                       >
                         DIFERENCIA UTILIDAD ESPERADA 30
                       </th>
 
                       {/* Columna 40 - Costo Anual */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-900"
-                        style={{ minWidth: "130px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-red-900 sticky z-10"
+                        style={{ top: "0px", minWidth: "130px" }}
                       >
                         COSTO ANUAL
                       </th>
 
                       {/* Columna 41 - Utilidad Anual */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
-                        style={{ minWidth: "140px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "140px" }}
                       >
                         UTILIDAD ANUAL
                       </th>
 
                       {/* Columna 42 - Costo Utilidad Anual */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
-                        style={{ minWidth: "180px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "180px" }}
                       >
                         COSTO UTILIDAD ANUAL
                       </th>
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600"
-                        style={{ minWidth: "180px" }}
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-600 sticky z-10"
+                        style={{ top: "0px", minWidth: "180px" }}
                       >
                         FORECAST
                       </th>
@@ -938,7 +954,7 @@ export default function ReporteCosteoPage() {
                           className={`border border-gray-300 p-3 text-sm text-gray-700 sticky z-10 ${
                             rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"
                           }`}
-                          style={{ left: "0px", minWidth: "80px", position: "sticky" }}
+                          style={{ left: "0px", top: "0px", minWidth: "80px", position: "sticky" }}
                         >
                           {row.folio || "-"}
                         </td>
@@ -948,7 +964,7 @@ export default function ReporteCosteoPage() {
                           className={`border border-gray-300 p-3 text-sm text-gray-700 sticky z-10 ${
                             rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"
                           }`}
-                          style={{ left: "80px", minWidth: "120px", position: "sticky" }}
+                          style={{ left: "80px", top: "0px", minWidth: "120px", position: "sticky" }}
                         >
                           {row.scodigo || "-"}
                         </td>
@@ -958,15 +974,34 @@ export default function ReporteCosteoPage() {
                           className={`border border-gray-300 p-3 text-sm text-gray-700 sticky z-10 ${
                             rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"
                           }`}
-                          style={{ left: "200px", minWidth: "250px", position: "sticky" }}
+                          style={{ left: "200px", top: "0px", minWidth: "250px", position: "sticky" }}
                         >
                           {row.snombre || "-"}
                         </td>
 
+                        <td
+                          className={`border border-gray-300 p-3 text-sm text-gray-700 sticky ${
+                            rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"
+                          }`}
+                          style={{ top: "0px", minWidth: "70px", position: "sticky" }}
+                        >
+                          {row.scategoria || "-"}
+                        </td>
+
+                        {/* Columna 2025 */}
+                        <td
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "150px", position: "sticky" }}
+                        >
+                          {typeof row.sprecioventaconivaaa === "number"
+                            ? `$${row.sprecioventaconivaaa.toFixed(2)}`
+                            : row.sprecioventaconivaaa || "-"}
+                        </td>
+
                         {/* Columna 4 - Precio Venta Sin IVA */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "150px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "150px", position: "sticky" }}
                         >
                           {typeof row.sprecioventasiniva === "number"
                             ? `$${row.sprecioventasiniva.toFixed(2)}`
@@ -975,8 +1010,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 5 - Precio Venta Con IVA */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "150px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "150px", position: "sticky" }}
                         >
                           {typeof row.sprecioventaconiva === "number"
                             ? `$${row.sprecioventaconiva.toFixed(2)}`
@@ -985,8 +1020,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 6 - Plan Generacional */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "150px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "150px", position: "sticky" }}
                         >
                           {typeof row.splangeneracional === "number"
                             ? `$${row.splangeneracional.toFixed(2)}`
@@ -995,16 +1030,16 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 7 - Plan Nivel */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "120px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "120px", position: "sticky" }}
                         >
                           {typeof row.splannivel === "number" ? `$${row.splannivel.toFixed(2)}` : row.splannivel || "-"}
                         </td>
 
                         {/* Columna 8 - Plan Infinito */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "120px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "120px", position: "sticky" }}
                         >
                           {typeof row.splaninfinito === "number"
                             ? `$${row.splaninfinito.toFixed(2)}`
@@ -1013,24 +1048,24 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 9 - IVA Pagado */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "120px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "120px", position: "sticky" }}
                         >
                           {typeof row.sivapagado === "number" ? `$${row.sivapagado.toFixed(2)}` : row.sivapagado || "-"}
                         </td>
 
                         {/* Columna 10 - CDA */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "100px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "100px", position: "sticky" }}
                         >
                           {typeof row.scda === "number" ? `$${row.scda.toFixed(2)}` : row.scda || "-"}
                         </td>
 
                         {/* Columna 11 - Bono Inicio Rápido */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "150px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "150px", position: "sticky" }}
                         >
                           {typeof row.sbonoiniciorapido === "number"
                             ? `$${row.sbonoiniciorapido.toFixed(2)}`
@@ -1039,8 +1074,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 12 - Constructor Inicio Rápido */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "180px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "180px", position: "sticky" }}
                         >
                           {typeof row.sconstructoriniciorapido === "number"
                             ? `$${row.sconstructoriniciorapido.toFixed(2)}`
@@ -1049,16 +1084,16 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 13 - Ruta Éxito */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "120px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "120px", position: "sticky" }}
                         >
                           {typeof row.srutaexito === "number" ? `$${row.srutaexito.toFixed(2)}` : row.srutaexito || "-"}
                         </td>
 
                         {/* Columna 14 - Reembolsos */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "120px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "120px", position: "sticky" }}
                         >
                           {typeof row.sreembolsos === "number"
                             ? `$${row.sreembolsos.toFixed(2)}`
@@ -1067,8 +1102,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 15 - Tarjeta Crédito */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "140px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "140px", position: "sticky" }}
                         >
                           {typeof row.starjetacredito === "number"
                             ? `$${row.starjetacredito.toFixed(2)}`
@@ -1077,24 +1112,24 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 16 - Envío */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "100px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "100px", position: "sticky" }}
                         >
                           {typeof row.senvio === "number" ? `$${row.senvio.toFixed(2)}` : row.senvio || "-"}
                         </td>
 
                         {/* Columna 17 - Precio HL */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "120px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "120px", position: "sticky" }}
                         >
                           {typeof row.spreciohl === "number" ? `$${row.spreciohl.toFixed(2)}` : row.spreciohl || "-"}
                         </td>
 
                         {/* Columna 18 - Porcentaje Costo */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "150px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "150px", position: "sticky" }}
                         >
                           {typeof row.sporcentajecosto === "number"
                             ? `${row.sporcentajecosto.toFixed(2)}%`
@@ -1103,8 +1138,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 19 - Total Costos */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "130px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "130px", position: "sticky" }}
                         >
                           {typeof row.stotalcostos === "number"
                             ? `$${row.stotalcostos.toFixed(2)}`
@@ -1113,8 +1148,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 20 - Utilidad Marginal */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "150px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "150px", position: "sticky" }}
                         >
                           {typeof row.sutilidadmarginal === "number"
                             ? `$${row.sutilidadmarginal.toFixed(2)}`
@@ -1123,8 +1158,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 21 - Precio Actual % Utilidad */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "180px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "180px", position: "sticky" }}
                         >
                           {typeof row.sprecioactualporcentajeutilidad === "number"
                             ? `${row.sprecioactualporcentajeutilidad.toFixed(2)}%`
@@ -1133,8 +1168,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 22 - Utilidad Óptima */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right bg-[#56E3A6]/30"
-                          style={{ minWidth: "140px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right bg-[#56E3A6]/30 sticky"
+                          style={{ top: "0px", minWidth: "140px", position: "sticky" }}
                         >
                           {typeof row.sutilidadoptima === "number"
                             ? `${row.sutilidadoptima.toFixed(2)}%`
@@ -1143,8 +1178,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 23 - Comisiones % */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "130px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "130px", position: "sticky" }}
                         >
                           {typeof row.scomisiones_porcentaje === "number"
                             ? `${row.scomisiones_porcentaje.toFixed(2)}%`
@@ -1153,8 +1188,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 24 - Costo % */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "100px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "100px", position: "sticky" }}
                         >
                           {typeof row.scosto_porcentaje === "number"
                             ? `${row.scosto_porcentaje.toFixed(2)}%`
@@ -1163,8 +1198,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 25 - Comisiones + Costo */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "160px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "160px", position: "sticky" }}
                         >
                           {typeof row.scomisionesmascosto === "number"
                             ? `${row.scomisionesmascosto.toFixed(2)}%`
@@ -1173,8 +1208,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 26 - Precio Sin IVA */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "140px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "140px", position: "sticky" }}
                         >
                           {typeof row.spreciosiniva === "number"
                             ? `$${row.spreciosiniva.toFixed(2)}`
@@ -1183,8 +1218,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 27 - Precio Con IVA */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "140px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "140px", position: "sticky" }}
                         >
                           {typeof row.sprecioconiva === "number"
                             ? `$${row.sprecioconiva.toFixed(2)}`
@@ -1193,8 +1228,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 28 - Precio Meta */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "120px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "120px", position: "sticky" }}
                         >
                           {typeof row.spreciometa === "number"
                             ? `$${row.spreciometa.toFixed(2)}`
@@ -1203,8 +1238,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 29 - Precio Meta Con IVA */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "170px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "170px", position: "sticky" }}
                         >
                           {typeof row.spreciometaconiva === "number"
                             ? `$${row.spreciometaconiva.toFixed(2)}`
@@ -1213,8 +1248,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 30 - Diferencia Utilidad Esperada */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "200px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "200px", position: "sticky" }}
                         >
                           {typeof row.sdiferenciautilidadesperada === "number"
                             ? `$${row.sdiferenciautilidadesperada.toFixed(2)}`
@@ -1223,8 +1258,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 31 - Utilidad Óptima 30 */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right bg-[#56E3A6]/30"
-                          style={{ minWidth: "160px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right bg-[#56E3A6]/30 sticky"
+                          style={{ top: "0px", minWidth: "160px", position: "sticky" }}
                         >
                           {typeof row.sutilidadoptima30 === "number"
                             ? `${row.sutilidadoptima30.toFixed(2)}%`
@@ -1233,8 +1268,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 32 - Comisiones % 30 */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "150px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "150px", position: "sticky" }}
                         >
                           {typeof row.scomisiones_porcentaje30 === "number"
                             ? `${row.scomisiones_porcentaje30.toFixed(2)}%`
@@ -1243,8 +1278,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 33 - Costo % 30 */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "120px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "120px", position: "sticky" }}
                         >
                           {typeof row.scosto_porcentaje30 === "number"
                             ? `${row.scosto_porcentaje30.toFixed(2)}%`
@@ -1253,8 +1288,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 34 - Comisiones + Costo 30 */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "180px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "180px", position: "sticky" }}
                         >
                           {typeof row.scomisionesmascosto30 === "number"
                             ? `${row.scomisionesmascosto30.toFixed(2)}%`
@@ -1263,8 +1298,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 35 - Precio Sin IVA 30 */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "160px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "160px", position: "sticky" }}
                         >
                           {typeof row.spreciosiniva30 === "number"
                             ? `$${row.spreciosiniva30.toFixed(2)}`
@@ -1273,8 +1308,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 36 - Precio Con IVA 30 */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "160px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "160px", position: "sticky" }}
                         >
                           {typeof row.sprecioconiva30 === "number"
                             ? `$${row.sprecioconiva30.toFixed(2)}`
@@ -1283,8 +1318,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 37 - Precio Meta 30 */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "140px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "140px", position: "sticky" }}
                         >
                           {typeof row.spreciometa30 === "number"
                             ? `$${row.spreciometa30.toFixed(2)}`
@@ -1293,8 +1328,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 38 - Precio Meta Con IVA 30 */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "190px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "190px", position: "sticky" }}
                         >
                           {typeof row.spreciometaconiva30 === "number"
                             ? `$${row.spreciometaconiva30.toFixed(2)}`
@@ -1303,8 +1338,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 39 - Diferencia Utilidad Esperada 30 */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "220px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "220px", position: "sticky" }}
                         >
                           {typeof row.sdiferenciautilidadesperada30 === "number"
                             ? `$${row.sdiferenciautilidadesperada30.toFixed(2)}`
@@ -1313,8 +1348,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 40 - Costo Anual */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "130px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "130px", position: "sticky" }}
                         >
                           {typeof row.scostoanual === "number"
                             ? `$${row.scostoanual.toFixed(2)}`
@@ -1323,8 +1358,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 41 - Utilidad Anual */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "140px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "140px", position: "sticky" }}
                         >
                           {typeof row.sutilidadanual === "number"
                             ? `$${row.sutilidadanual.toFixed(2)}`
@@ -1333,8 +1368,8 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 42 - Costo Utilidad Anual */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "180px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "180px", position: "sticky" }}
                         >
                           {typeof row.scostoutilidadanual === "number"
                             ? `$${row.scostoutilidadanual.toFixed(2)}`
@@ -1342,8 +1377,8 @@ export default function ReporteCosteoPage() {
                         </td>
 
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right"
-                          style={{ minWidth: "180px" }}
+                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          style={{ top: "0px", minWidth: "180px", position: "sticky" }}
                         >
                           {typeof row.sforecast === "number" ? `${row.sforecast}` : row.sforecast || "-"}
                         </td>
@@ -1352,6 +1387,7 @@ export default function ReporteCosteoPage() {
                   </tbody>
                 </table>
               </div>
+              {/* End of updates */}
 
               <div className="flex justify-between items-center mt-4 pt-4 border-t">
                 <Button

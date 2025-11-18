@@ -4,29 +4,18 @@
   Imports
 ================================================== */
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-  Users,
-  Package,
-  Beaker,
-  ShoppingCart,
-  TrendingUp,
-  Activity,
-  DollarSign,
-  BarChart3,
-  PieChart,
-  Bell,
-  Settings,
-} from "lucide-react"
+import { Users, Package, Beaker, ShoppingCart, TrendingUp, Activity, DollarSign, BarChart3, PieChart, Bell, Settings } from 'lucide-react'
 import {
   obtenerResumenesDashboard,
   obtenerEstadisticasEmpresariales,
   obtenerKPIsDashboard,
   consultarUtilidadActual,
+  consultarVariacionPrecios, // Added import for price variation function
 } from "@/app/actions/dashboard-actions"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listDesplegableZonas } from "@/app/actions/zonas"
@@ -37,7 +26,7 @@ import Image from "next/image"
 import { useAuth } from "@/contexts/auth-context"
 import { ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Info } from "lucide-react"
+import { Info } from 'lucide-react'
 import {
   BarChart,
   Bar,
@@ -113,6 +102,15 @@ interface UtilidadActualItem {
   sprecioactualporcentajeutilidad: number
 }
 
+interface VariacionPreciosItem {
+  sproductoid: number
+  snombre: string
+  sprecioventasiniva: number
+  sprecioventaconivaaa: number
+  sdiferencia: number
+  svaraa: number
+}
+
 const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4"]
 
 /* ==================================================
@@ -140,6 +138,17 @@ export default function DashboardPage() {
   const [costoUtilidadAnual, setCostoUtilidadAnual] = useState(0)
 
   const [utilidadActualData, setUtilidadActualData] = useState<UtilidadActualItem[]>([])
+
+  const [variacionPreciosData, setVariacionPreciosData] = useState<VariacionPreciosItem[]>([])
+
+  const [costoanualTab, setCostoanualTab] = useState<'monto' | 'promedio'>('monto')
+  const [utilidadTab, setUtilidadTab] = useState<'monto' | 'promedio'>('monto')
+  const [costoUtilidadTab, setCostoUtilidadTab] = useState<'monto' | 'promedio'>('monto')
+  const [cantidadRegistros, setCantidadRegistros] = useState(0)
+
+  const formatearNumeroConComas = (numero: number): string => {
+    return numero.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
 
   /* ================================================== 
     Al cargar la pagina
@@ -254,6 +263,7 @@ export default function DashboardPage() {
             0,
           )
 
+          setCantidadRegistros(filteredData.length)
           setCostoAnualTotal(totalCosto)
           setUtilidadAnual(totalUtilidad)
           setCostoUtilidadAnual(totalCostoUtilidad)
@@ -276,6 +286,21 @@ export default function DashboardPage() {
       }
     }
     cargarUtilidadActual()
+  }, [filtroClienteId, filtroZonaId])
+
+  useEffect(() => {
+    const cargarVariacionPrecios = async () => {
+      if (filtroClienteId) {
+        const result = await consultarVariacionPrecios(Number(filtroClienteId), Number(filtroZonaId))
+        if (result.success && result.data) {
+          const top10 = result.data
+            .sort((a: any, b: any) => b.svaraa - a.svaraa)
+            .slice(0, 10)
+          setVariacionPreciosData(top10)
+        }
+      }
+    }
+    cargarVariacionPrecios()
   }, [filtroClienteId, filtroZonaId])
 
   if (loading) {
@@ -386,19 +411,49 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="border-blue-200 shadow-sm hover:shadow-lg transition-all bg-gradient-to-br from-blue-50 to-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-sm text-blue-700 font-medium">Costo Anual Total</p>
-                  <p className="text-3xl font-bold text-blue-900 mt-1">${costoAnualTotal.toFixed(2)}</p>
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex-1">
+                  <p className="text-[10px] text-blue-700 font-medium">Costo Anual Total</p>
                 </div>
-                <div className="bg-blue-100 p-3 rounded-xl">
-                  <DollarSign className="h-8 w-8 text-blue-600" />
+                <div className="bg-blue-100 p-1.5 rounded-lg">
+                  <DollarSign className="h-4 w-4 text-blue-600" />
                 </div>
               </div>
-              <div className="h-16">
+              
+              <div className="flex gap-1 mb-2">
+                <button
+                  onClick={() => setCostoanualTab('monto')}
+                  className={`flex-1 px-1.5 py-0.5 text-[10px] font-medium rounded transition-colors ${
+                    costoanualTab === 'monto'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                  }`}
+                >
+                  Monto
+                </button>
+                <button
+                  onClick={() => setCostoanualTab('promedio')}
+                  className={`flex-1 px-1.5 py-0.5 text-[10px] font-medium rounded transition-colors ${
+                    costoanualTab === 'promedio'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                  }`}
+                >
+                  Promedio
+                </button>
+              </div>
+
+              <p className="text-xl font-bold text-blue-900">
+                ${costoanualTab === 'monto' 
+                  ? formatearNumeroConComas(costoAnualTotal)
+                  : formatearNumeroConComas(cantidadRegistros > 0 ? costoAnualTotal / cantidadRegistros : 0)
+                }
+              </p>
+              
+              <div className="h-10 mt-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={[{ value: costoAnualTotal * 0.8 }, { value: costoAnualTotal }]}>
                     <Area type="monotone" dataKey="value" stroke="#3B82F6" fill="#DBEAFE" strokeWidth={2} />
@@ -409,17 +464,47 @@ export default function DashboardPage() {
           </Card>
 
           <Card className="border-green-200 shadow-sm hover:shadow-lg transition-all bg-gradient-to-br from-green-50 to-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-sm text-green-700 font-medium">Utilidad Anual</p>
-                  <p className="text-3xl font-bold text-green-900 mt-1">${utilidadAnual.toFixed(2)}</p>
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex-1">
+                  <p className="text-[10px] text-green-700 font-medium">Utilidad Anual</p>
                 </div>
-                <div className="bg-green-100 p-3 rounded-xl">
-                  <TrendingUp className="h-8 w-8 text-green-600" />
+                <div className="bg-green-100 p-1.5 rounded-lg">
+                  <TrendingUp className="h-4 w-4 text-green-600" />
                 </div>
               </div>
-              <div className="h-16">
+              
+              <div className="flex gap-1 mb-2">
+                <button
+                  onClick={() => setUtilidadTab('monto')}
+                  className={`flex-1 px-1.5 py-0.5 text-[10px] font-medium rounded transition-colors ${
+                    utilidadTab === 'monto'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-green-100 text-green-700 hover:bg-green-200'
+                  }`}
+                >
+                  Monto
+                </button>
+                <button
+                  onClick={() => setUtilidadTab('promedio')}
+                  className={`flex-1 px-1.5 py-0.5 text-[10px] font-medium rounded transition-colors ${
+                    utilidadTab === 'promedio'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-green-100 text-green-700 hover:bg-green-200'
+                  }`}
+                >
+                  Promedio
+                </button>
+              </div>
+
+              <p className="text-xl font-bold text-green-900">
+                ${utilidadTab === 'monto'
+                  ? formatearNumeroConComas(utilidadAnual)
+                  : formatearNumeroConComas(cantidadRegistros > 0 ? utilidadAnual / cantidadRegistros : 0)
+                }
+              </p>
+              
+              <div className="h-10 mt-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={[{ value: utilidadAnual * 0.7 }, { value: utilidadAnual * 0.9 }, { value: utilidadAnual }]}
@@ -432,17 +517,47 @@ export default function DashboardPage() {
           </Card>
 
           <Card className="border-purple-200 shadow-sm hover:shadow-lg transition-all bg-gradient-to-br from-purple-50 to-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-sm text-purple-700 font-medium">Costo/Utilidad Anual</p>
-                  <p className="text-3xl font-bold text-purple-900 mt-1">{(costoUtilidadAnual * 100).toFixed(2)}%</p>
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex-1">
+                  <p className="text-[10px] text-purple-700 font-medium">Costo/Utilidad Anual</p>
                 </div>
-                <div className="bg-purple-100 p-3 rounded-xl">
-                  <Activity className="h-8 w-8 text-purple-600" />
+                <div className="bg-purple-100 p-1.5 rounded-lg">
+                  <Activity className="h-4 w-4 text-purple-600" />
                 </div>
               </div>
-              <div className="h-16">
+              
+              <div className="flex gap-1 mb-2">
+                <button
+                  onClick={() => setCostoUtilidadTab('monto')}
+                  className={`flex-1 px-1.5 py-0.5 text-[10px] font-medium rounded transition-colors ${
+                    costoUtilidadTab === 'monto'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                  }`}
+                >
+                  Monto
+                </button>
+                <button
+                  onClick={() => setCostoUtilidadTab('promedio')}
+                  className={`flex-1 px-1.5 py-0.5 text-[10px] font-medium rounded transition-colors ${
+                    costoUtilidadTab === 'promedio'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                  }`}
+                >
+                  Promedio
+                </button>
+              </div>
+
+              <p className="text-xl font-bold text-purple-900">
+                {costoUtilidadTab === 'monto'
+                  ? formatearNumeroConComas(costoUtilidadAnual * 100)
+                  : formatearNumeroConComas(cantidadRegistros > 0 ? (costoUtilidadAnual / cantidadRegistros) * 100 : 0)
+                }%
+              </p>
+              
+              <div className="h-10 mt-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
                     data={[
@@ -595,7 +710,7 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-slate-800">
                 <BarChart3 className="h-5 w-5 text-blue-600" />
-                Productos por Cliente
+                Total Productos Registrados por Cliente
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -606,7 +721,11 @@ export default function DashboardPage() {
                     <XAxis dataKey="cliente" tick={{ fontSize: 12 }} stroke="#64748b" />
                     <YAxis stroke="#64748b" />
                     <ChartTooltip content={<ChartTooltipContent />} cursor={{ fill: "rgba(59, 130, 246, 0.1)" }} />
-                    <Bar dataKey="cantidad" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="cantidad" radius={[4, 4, 0, 0]}>
+                      {estadisticas?.productosPorCliente.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -616,63 +735,174 @@ export default function DashboardPage() {
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-slate-800">
-                <PieChart className="h-5 w-5 text-green-600" />
-                Ingredientes por Categoría
+                <TrendingUp className="h-5 w-5 text-indigo-600" />
+                Variación de Precios
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RechartsPieChart>
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    {estadisticas?.ingredientesPorCategoria.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </RechartsPieChart>
-                </ResponsiveContainer>
+              <div className="overflow-auto max-h-80">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-gradient-to-r from-indigo-50 to-purple-50 z-10">
+                    <tr>
+                      <th className="text-left p-2 text-indigo-900 font-semibold text-xs border-b-2 border-indigo-200">
+                        Producto
+                      </th>
+                      <th className="text-right p-2 text-indigo-900 font-semibold text-xs border-b-2 border-indigo-200">
+                        Precio Actual(s/IVA)
+                      </th>
+                      <th className="text-right p-2 text-indigo-900 font-semibold text-xs border-b-2 border-indigo-200">
+                        Precio AA(2025)
+                      </th>
+                      <th className="text-right p-2 text-indigo-900 font-semibold text-xs border-b-2 border-indigo-200">
+                        Diferencia
+                      </th>
+                      <th className="text-center p-2 text-indigo-900 font-semibold text-xs border-b-2 border-indigo-200">
+                        Var %
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <TooltipProvider>
+                      {variacionPreciosData.map((item, index) => (
+                        <Tooltip key={index}>
+                          <TooltipTrigger asChild>
+                            <tr className="hover:bg-indigo-50 transition-colors cursor-help border-b border-slate-100">
+                              <td className="p-2 text-slate-700 font-medium max-w-[200px] truncate">
+                                {item.snombre}
+                              </td>
+                              <td className="text-right p-2 text-slate-700">
+                                ${item.sprecioventasiniva.toFixed(2)}
+                              </td>
+                              <td className="text-right p-2 text-slate-700">
+                                ${item.sprecioventaconivaaa.toFixed(2)}
+                              </td>
+                              <td className="text-right p-2 text-slate-700 font-semibold">
+                                ${item.sdiferencia.toFixed(2)}
+                              </td>
+                              <td className="text-center p-2">
+                                <span
+                                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
+                                    item.svaraa < 0
+                                      ? "bg-red-100 text-red-700 border border-red-200"
+                                      : "bg-green-100 text-green-700 border border-green-200"
+                                  }`}
+                                >
+                                  {item.svaraa < 0 ? "-" : "+"}
+                                  {Math.abs(item.svaraa).toFixed(2)}%
+                                </span>
+                              </td>
+                            </tr>
+                          </TooltipTrigger>
+                          <TooltipContent
+                            side="left"
+                            className="w-96 p-0 border-0 shadow-2xl bg-gradient-to-br from-indigo-50 via-white to-purple-50"
+                          >
+                            <div className="p-6 space-y-4">
+                              <div className="flex items-start gap-3 pb-4 border-b-2 border-gradient-to-r from-indigo-200 to-purple-200">
+                                <div className="p-3 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl shadow-sm">
+                                  <Package className="h-6 w-6 text-indigo-600" />
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-bold text-slate-900 text-lg mb-1">{item.snombre}</h4>
+                                  <p className="text-xs text-slate-600 flex items-center gap-1">
+                                    <span className="inline-block w-2 h-2 bg-indigo-500 rounded-full"></span>
+                                    ID: {item.sproductoid}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-3">
+                                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-200 shadow-sm">
+                                  <p className="text-xs font-semibold text-blue-700 mb-2 flex items-center gap-1">
+                                    <DollarSign className="h-3 w-3" />
+                                    Precio sin IVA
+                                  </p>
+                                  <p className="text-2xl font-bold text-blue-900">
+                                    ${item.sprecioventasiniva.toFixed(2)}
+                                  </p>
+                                </div>
+                                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border-2 border-purple-200 shadow-sm">
+                                  <p className="text-xs font-semibold text-purple-700 mb-2 flex items-center gap-1">
+                                    <DollarSign className="h-3 w-3" />
+                                    Precio con IVA
+                                  </p>
+                                  <p className="text-2xl font-bold text-purple-900">
+                                    ${item.sprecioventaconivaaa.toFixed(2)}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="space-y-3">
+                                <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border-2 border-amber-200">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-sm font-bold text-amber-800 flex items-center gap-2">
+                                      <TrendingUp className="h-4 w-4" />
+                                      Diferencia
+                                    </span>
+                                    <span className="text-xl font-bold text-amber-900">
+                                      ${item.sdiferencia.toFixed(2)}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div
+                                  className={`rounded-xl p-5 border-3 shadow-md ${
+                                    item.svaraa < 0
+                                      ? "bg-gradient-to-br from-red-50 to-red-100 border-red-300"
+                                      : "bg-gradient-to-br from-green-50 to-green-100 border-green-300"
+                                  }`}
+                                >
+                                  <div className="flex justify-between items-center">
+                                    <span
+                                      className={`text-sm font-bold flex items-center gap-2 ${
+                                        item.svaraa < 0 ? "text-red-800" : "text-green-800"
+                                      }`}
+                                    >
+                                      <Activity className="h-5 w-5" />
+                                      Variación %
+                                    </span>
+                                    <span
+                                      className={`text-3xl font-bold ${
+                                        item.svaraa < 0 ? "text-red-900" : "text-green-900"
+                                      }`}
+                                    >
+                                      {item.svaraa < 0 ? "-" : "+"}
+                                      {Math.abs(item.svaraa).toFixed(2)}%
+                                    </span>
+                                  </div>
+                                  <p className="text-xs mt-2 text-slate-600 text-center">
+                                    {item.svaraa < 0
+                                      ? "⚠️ Precio por debajo del esperado"
+                                      : "✓ Precio óptimo alcanzado"}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      ))}
+                    </TooltipProvider>
+                  </tbody>
+                </table>
+                {variacionPreciosData.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-12 px-4">
+                    <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                      <TrendingUp className="h-8 w-8 text-indigo-600" />
+                    </div>
+                    <p className="text-sm text-slate-500 text-center font-medium">
+                      Seleccione un cliente y zona para visualizar la variación de precios
+                    </p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+        {/*<Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-slate-800">
-              <TrendingUp className="h-5 w-5 text-purple-600" />
-              Análisis de Costos Promedio
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                <Package className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                <p className="text-2xl font-bold text-blue-700">
-                  ${(estadisticas?.promediosCostos.productos || 0).toFixed(2)}
-                </p>
-                <p className="text-sm text-blue-600 font-medium">Costo Promedio Productos</p>
-              </div>
-              <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
-                <Beaker className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                <p className="text-2xl font-bold text-green-700">
-                  ${(estadisticas?.promediosCostos.formulas || 0).toFixed(2)}
-                </p>
-                <p className="text-sm text-green-600 font-medium">Costo Promedio Fórmulas</p>
-              </div>
-              <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
-                <ShoppingCart className="h-12 w-12 text-purple-600 mx-auto mb-4" />
-                <p className="text-2xl font-bold text-purple-700">
-                  ${(estadisticas?.promediosCostos.ingredientes || 0).toFixed(2)}
-                </p>
-                <p className="text-sm text-purple-600 font-medium">Costo Promedio Ingredientes</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-800">
-              <Activity className="h-5 w-5 text-indigo-600" />
+              <Activity className="h-5 w-5 text-green-600" />
               Acciones Rápidas
             </CardTitle>
           </CardHeader>
@@ -740,6 +970,7 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
+        */}
 
         <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader>

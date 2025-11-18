@@ -914,8 +914,20 @@ export default function CostearPage() {
                         <span className="ml-2 text-gray-900">${(producto.preciohl || 0).toFixed(2)}</span>
                       </div>
                       <div>
+                        <span className="font-semibold text-amber-700">Precio venta(2025):</span>
+                        <span className="ml-2 text-gray-900">${(productoXCliente.sprecioventaconivaa || 0).toFixed(2)}</span>
+                      </div>
+                       <div>
+                        <span className="font-semibold text-amber-700">Precio actual(sin IVA):</span>
+                        <span className="ml-2 text-gray-900">${(productoXCliente.sprecioventasiniva || 0).toFixed(2)}</span>
+                      </div>
+                      <div>
                         <span className="font-semibold text-amber-700">Utilidad:</span>
                         <span className="ml-2 text-gray-900">${(producto.utilidadhl || 0).toFixed(6)}</span>
+                      </div>
+                       <div>
+                        <span className="font-semibold text-amber-700">Ultima Modificacion:</span>
+                        <span className="ml-2 text-gray-900">{productoXCliente.sfechaultimamodificacion || "N/A"}</span>
                       </div>
                     </div>
                   </div>
@@ -992,12 +1004,12 @@ export default function CostearPage() {
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
-                  <label htmlFor="txtfechamodificacion" className="justify-Right text-sm font-medium text-righ mb-2">
+                  <label htmlFor="txtfechamodificacion" className="flex justify-end text-sm font-medium text-righ mb-2">
                     Fecha Ultima Modificacion: {productoXCliente.sfechaultimamodificacion}
                   </label>
 
-                  <div className="mb-6 mt-4">
-                    <div className="flex justify-end gap-2 mb-2">
+                  <div className="mb-4">
+                    <div className="flex gap-2 mb-2">
                       
                         {!porcentajesEditables ? (
                         <div className="relative group">
