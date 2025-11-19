@@ -4,16 +4,17 @@
   Imports:
 ================================================== */
 // -- Assets --
-import { useState, useEffect, useMemo } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect, useMemo, useRef } from "react"
+import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight, Trash2, AppWindow } from "lucide-react"
+import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight, Trash2, AppWindow, Plus, Copy, FilePlus, FlaskConical } from 'lucide-react'
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { oFormula } from "@/types/formulas"
+import type { ddlItem } from "@/types/common.types"
 import type {
   propsPageLoadingScreen,
   propsPageTitlePlusNew,
@@ -31,10 +32,18 @@ import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
 import { PageModalTutorial } from "@/components/page-modal-tutorial"
 // -- Dialog components for details modal
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
-import { obtenerFormulas, estatusActivoFormula } from "@/app/actions/formulas"
+import { 
+  obtenerFormulas, 
+  estatusActivoFormula, 
+  listaDesplegableFormulasBuscar,
+  obtenerMateriasPrimasXFormula,
+  obtenerFormulasXFormula
+} from "@/app/actions/formulas"
+import { listaDesplegableClientes } from "@/app/actions/clientes"
+import { listDesplegableZonas } from "@/app/actions/zonas"
 
 /* ==================================================
 	Componente Principal (Pagina)
@@ -67,6 +76,27 @@ export default function FormulasPage() {
   const [showModalTutorial, setShowModalTutorial] = useState(false)
   const [showPageTituloMasNuevo, setShowPageTituloMasNuevo] = useState(false)
   const [showElementoDetallesModal, setShowElementoDetallesModal] = useState(false)
+  
+  // Estados para Modales de Creación/Derivación
+  const [showSelectionModal, setShowSelectionModal] = useState(false)
+  const [showDeriveModal, setShowDeriveModal] = useState(false)
+  
+  // Estados para Derivación
+  const [deriveClienteId, setDeriveClienteId] = useState("")
+  const [deriveZonaId, setDeriveZonaId] = useState("")
+  const [deriveFormulaBuscar, setDeriveFormulaBuscar] = useState("")
+  const [deriveFormulasResultados, setDeriveFormulasResultados] = useState<ddlItem[]>([])
+  const [deriveShowFormulasDropdown, setDeriveShowFormulasDropdown] = useState(false)
+  const [deriveFormulaSeleccionada, setDeriveFormulaSeleccionada] = useState<any>(null)
+  const [deriveFormulaDetalles, setDeriveFormulaDetalles] = useState<{
+    materiasPrimas: any[],
+    formulas: any[]
+  }>({ materiasPrimas: [], formulas: [] })
+  
+  const [clientesOptions, setClientesOptions] = useState<ddlItem[]>([])
+  const [zonasOptions, setZonasOptions] = useState<ddlItem[]>([])
+  const deriveFormulaSearchRef = useRef<HTMLDivElement>(null)
+
   // Cargar componentes
   const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState<propsPageTitlePlusNew>({
     Titulo: "",
@@ -88,6 +118,93 @@ export default function FormulasPage() {
   }, [Listado, paginaActual])
 
   // -- Funciones --
+  
+  // Cargar Clientes para el modal de derivación
+  useEffect(() => {
+    const cargarClientes = async () => {
+      const result = await listaDesplegableClientes(-1, "", "True")
+      if (result.success && result.data) {
+        const options: ddlItem[] = result.data.map((c: any) => ({
+          value: c.id.toString(),
+          text: c.nombre,
+        }))
+        setClientesOptions(options)
+      }
+    }
+    cargarClientes()
+  }, [])
+
+  // Cargar Zonas cuando cambia el cliente en derivación
+  useEffect(() => {
+    const cargarZonas = async () => {
+      if (deriveClienteId) {
+        const result = await listDesplegableZonas(-1, "", Number(deriveClienteId))
+        if (result.success && result.data) {
+          setZonasOptions(result.data)
+          setDeriveZonaId("")
+        }
+      } else {
+        setZonasOptions([])
+        setDeriveZonaId("")
+      }
+    }
+    cargarZonas()
+  }, [deriveClienteId])
+
+  // Buscar fórmulas para derivación
+  useEffect(() => {
+    const buscarFormulas = async () => {
+      if (deriveFormulaBuscar.trim().length >= 2) {
+        const resultados = await listaDesplegableFormulasBuscar(deriveFormulaBuscar)
+        setDeriveFormulasResultados(resultados)
+        setDeriveShowFormulasDropdown(true)
+      } else {
+        setDeriveFormulasResultados([])
+        setDeriveShowFormulasDropdown(false)
+      }
+    }
+
+    const timeoutId = setTimeout(buscarFormulas, 300)
+    return () => clearTimeout(timeoutId)
+  }, [deriveFormulaBuscar])
+
+  // Manejar selección de fórmula en derivación
+  const handleDeriveFormulaSelect = async (formulaId: string, formulaText: string) => {
+    setDeriveFormulaBuscar(formulaText)
+    setDeriveShowFormulasDropdown(false)
+
+    // Obtener detalles generales
+    const formulasResult = await obtenerFormulas(Number(formulaId), "", "", "True", -1, -1)
+    
+    if (formulasResult.success && formulasResult.data && formulasResult.data.length > 0) {
+      const formula = formulasResult.data[0]
+      setDeriveFormulaSeleccionada(formula)
+      
+      // Obtener composición (Materias Primas y Fórmulas)
+      // La función obtenerFormulas ya trae las relaciones anidadas.
+      
+      setDeriveFormulaDetalles({
+        materiasPrimas: formula.materiasprimasxformula || [],
+        formulas: formula.formulasxformula || []
+      })
+    }
+  }
+
+  // Handlers para modales
+  const handleCrearFormulaClick = () => {
+    setShowSelectionModal(true)
+  }
+
+  const handleCrearNueva = () => {
+    setShowSelectionModal(false)
+    router.push("/formulas/crear")
+  }
+
+  const handleDerivar = () => {
+    setShowSelectionModal(false)
+    setShowDeriveModal(true)
+  }
+
   // --- Función de búsqueda, no es la busqueda inicial ---
   const ejecutarBusqueda = async (id: number, nombre: string, codigo: string, estatus: string, clienteid: number) => {
     // Validar usuario activo
@@ -110,7 +227,7 @@ export default function FormulasPage() {
 
     // Ejecutar Consulta principal
     try {
-      console.log("auxId: " + auxId + " codigo: " + codigo + " nombre: " + nombre + " auxEstatus: " + auxEstatus)
+      console.log("auxId: " + auxId + "codigo: " + codigo + " nombre: " + nombre + " auxEstatus: " + auxEstatus)
       const result = await obtenerFormulas(auxId, codigo, nombre, auxEstatus, clienteid, -1)
       console.log("Success: " + result.success + " Data: " + result.data)
       if (result.success && result.data) {
@@ -142,6 +259,8 @@ export default function FormulasPage() {
         return { success: true, mensaje: "Se ejecuto correctamente cada proceso." }
       } else {
         console.log("No hay datos o la consulta falló.")
+        setListado([]) // Clear list if no data
+        setTotalListado(0)
         return { success: false, mensaje: "No hay datos o la consulta falló." + result.error }
       }
 
@@ -172,7 +291,7 @@ export default function FormulasPage() {
       setPageTituloMasNuevo({
         Titulo: "Fórmulas",
         Subtitulo: "Gestión completa de Fórmulas",
-        Visible: esAdminDOs == true ? true : false,
+        Visible: false, // Ocultamos el componente original para usar nuestro header personalizado
         BotonTexto: "Crear Nueva Fórmula",
         Ruta: "/formulas/crear",
       })
@@ -246,7 +365,13 @@ export default function FormulasPage() {
     const Codigo: string = filtroCodigo.trim()
     const Estatus = filtroEstatus === "-1" ? "Todos" : filtroEstatus
 
-    ejecutarBusqueda(Id, Nombre, Codigo, Estatus)
+    // Ejecutar búsqueda si hay algún filtro activo o si el ID está presente
+    if (Id !== -1 || Nombre !== "" || Codigo !== "" || Estatus !== "Todos") {
+      ejecutarBusqueda(Id, Nombre, Codigo, Estatus, user?.RolId ?? -1) // Pasar clienteid si es necesario
+    } else {
+      // Si no hay filtros, recargar la lista completa (o la vista por defecto)
+      cargarDatosIniciales()
+    }
   }
 
   // Busqueda - Limpiar o Resetear
@@ -286,7 +411,7 @@ export default function FormulasPage() {
   // --- Contenido ---
   return (
     <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
-      {/* -- Componentes -- */}
+      {/* -- Componentes Modales -- */}
       {showModalAlert && (
         <PageModalAlert
           Titulo={ModalAlert.Titulo}
@@ -315,16 +440,270 @@ export default function FormulasPage() {
         />
       )}
 
-      {/* 1. Título y Botón */}
-      {showPageTituloMasNuevo && (
-        <PageTitlePlusNew
-          Titulo={PageTituloMasNuevo.Titulo}
-          Subtitulo={PageTituloMasNuevo.Subtitulo}
-          Visible={PageTituloMasNuevo.Visible}
-          BotonTexto={PageTituloMasNuevo.BotonTexto}
-          Ruta={PageTituloMasNuevo.Ruta}
-        />
-      )}
+      {/* 1. Título y Botón (Personalizado) */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Fórmulas</h1>
+          <p className="text-muted-foreground mt-1">Gestión completa de Fórmulas</p>
+        </div>
+        {esAdminDOs && (
+          <Button 
+            onClick={handleCrearFormulaClick}
+            className="bg-black hover:bg-gray-800 text-white"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Crear Nueva Fórmula
+          </Button>
+        )}
+      </div>
+
+      {/* Modal de Selección (Crear vs Derivar) */}
+      <Dialog open={showSelectionModal} onOpenChange={setShowSelectionModal}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center mb-2">Seleccione una opción</DialogTitle>
+            <DialogDescription className="text-center">
+              Elija cómo desea comenzar a crear su nueva fórmula
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6">
+            {/* Tarjeta Crear Nueva */}
+            <div 
+              className="group relative flex flex-col items-center p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer"
+              onClick={handleCrearNueva}
+            >
+              <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
+                <FilePlus className="h-8 w-8 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Crear nueva fórmula</h3>
+              <p className="text-sm text-gray-500 text-center">
+                Cree una fórmula nueva partiendo desde cero, definiendo todos sus componentes y características manualmente.
+              </p>
+            </div>
+
+            {/* Tarjeta Derivar */}
+            <div 
+              className="group relative flex flex-col items-center p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all cursor-pointer"
+              onClick={handleDerivar}
+            >
+              <div className="h-16 w-16 rounded-full bg-purple-100 flex items-center justify-center mb-4 group-hover:bg-purple-200 transition-colors">
+                <Copy className="h-8 w-8 text-purple-600" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Derivar Fórmula</h3>
+              <p className="text-sm text-gray-500 text-center">
+                Use una fórmula existente como base para la creación de la composición, heredando sus materias primas y estructura.
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Derivar Fórmula */}
+      <Dialog open={showDeriveModal} onOpenChange={setShowDeriveModal}>
+        <DialogContent className="max-w-4xl max-h-[700px] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <FlaskConical className="h-6 w-6 text-purple-600" />
+              Derivar Fórmula
+            </DialogTitle>
+            <DialogDescription>
+              Seleccione la fórmula base y los parámetros para crear una nueva derivación.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* Inputs de Selección */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg border">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Cliente</label>
+                <Select value={deriveClienteId} onValueChange={setDeriveClienteId}>
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Seleccione cliente" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clientesOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.text}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Zona</label>
+                <Select value={deriveZonaId} onValueChange={setDeriveZonaId}>
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Seleccione zona" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {zonasOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.text}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2 relative" ref={deriveFormulaSearchRef}>
+                <label className="text-sm font-medium text-gray-700">Fórmula Base</label>
+                <Input
+                  type="text"
+                  placeholder="Buscar por código o nombre..."
+                  value={deriveFormulaBuscar}
+                  onChange={(e) => setDeriveFormulaBuscar(e.target.value)}
+                  onFocus={() => deriveFormulasResultados.length > 0 && setDeriveShowFormulasDropdown(true)}
+                  className="bg-white"
+                />
+                {deriveShowFormulasDropdown && deriveFormulasResultados.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    {deriveFormulasResultados.map((formula) => (
+                      <button
+                        key={formula.value}
+                        type="button"
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+                        onClick={() => handleDeriveFormulaSelect(formula.value, formula.text)}
+                      >
+                        {formula.text}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Información de la Fórmula Seleccionada */}
+            {deriveFormulaSeleccionada && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {/* Info General */}
+                <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+                  <div className="bg-purple-50 px-4 py-3 border-b border-purple-100 flex justify-between items-center">
+                    <h3 className="font-semibold text-purple-900">Información General</h3>
+                    <span className="text-xs font-medium px-2 py-1 bg-purple-200 text-purple-800 rounded-full">
+                      ID: {deriveFormulaSeleccionada.id}
+                    </span>
+                  </div>
+                  <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <span className="block text-gray-500 text-xs">Código</span>
+                      <span className="font-medium">{deriveFormulaSeleccionada.codigo}</span>
+                    </div>
+                    <div className="md:col-span-2">
+                      <span className="block text-gray-500 text-xs">Nombre</span>
+                      <span className="font-medium">{deriveFormulaSeleccionada.nombre}</span>
+                    </div>
+                    <div>
+                      <span className="block text-gray-500 text-xs">Unidad Medida</span>
+                      <span className="font-medium">{deriveFormulaSeleccionada.unidadesmedida?.descripcion || "N/A"}</span>
+                    </div>
+                    <div>
+                      <span className="block text-gray-500 text-xs">Costo Actual</span>
+                      <span className="font-medium text-green-600">
+                        {new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 6, maximumFractionDigits: 6 }).format(deriveFormulaSeleccionada.costo || 0)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="block text-gray-500 text-xs">Fecha Creación</span>
+                      <span className="font-medium">
+                        {deriveFormulaSeleccionada.fechacreacion ? new Date(deriveFormulaSeleccionada.fechacreacion).toLocaleDateString() : "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Composición */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-gray-900 border-b pb-2">Composición de la Fórmula</h3>
+                  
+                  {/* Materias Primas */}
+                  {deriveFormulaDetalles.materiasPrimas.length > 0 && (
+                    <div className="rounded-lg border overflow-hidden">
+                      <div className="bg-gray-50 px-4 py-2 border-b text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Materias Primas
+                      </div>
+                      <table className="w-full text-sm">
+                        <thead className="bg-white">
+                          <tr className="border-b">
+                            <th className="text-left py-2 px-4 font-medium text-gray-600">Código</th>
+                            <th className="text-left py-2 px-4 font-medium text-gray-600">Nombre</th>
+                            <th className="text-right py-2 px-4 font-medium text-gray-600">Cantidad</th>
+                            <th className="text-right py-2 px-4 font-medium text-gray-600">Costo Parcial</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {deriveFormulaDetalles.materiasPrimas.map((mp: any, idx: number) => (
+                            <tr key={`mp-${idx}`} className="border-b last:border-0 hover:bg-gray-50">
+                              <td className="py-2 px-4">{mp.materiasprima?.codigo}</td>
+                              <td className="py-2 px-4">{mp.materiasprima?.nombre}</td>
+                              <td className="py-2 px-4 text-right">{mp.cantidad} {mp.materiasprima?.unidadesmedida?.descripcion}</td>
+                              <td className="py-2 px-4 text-right">
+                                {new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 6 }).format(mp.costoparcial || 0)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {/* Fórmulas Anidadas */}
+                  {deriveFormulaDetalles.formulas.length > 0 && (
+                    <div className="rounded-lg border overflow-hidden mt-4">
+                      <div className="bg-gray-50 px-4 py-2 border-b text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Fórmulas Integradas
+                      </div>
+                      <table className="w-full text-sm">
+                        <thead className="bg-white">
+                          <tr className="border-b">
+                            <th className="text-left py-2 px-4 font-medium text-gray-600">Código</th>
+                            <th className="text-left py-2 px-4 font-medium text-gray-600">Nombre</th>
+                            <th className="text-right py-2 px-4 font-medium text-gray-600">Cantidad</th>
+                            <th className="text-right py-2 px-4 font-medium text-gray-600">Costo Parcial</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {deriveFormulaDetalles.formulas.map((f: any, idx: number) => (
+                            <tr key={`f-${idx}`} className="border-b last:border-0 hover:bg-gray-50">
+                              <td className="py-2 px-4">{f.formulas?.codigo}</td>
+                              <td className="py-2 px-4">{f.formulas?.nombre}</td>
+                              <td className="py-2 px-4 text-right">{f.cantidad} {f.formulas?.unidadesmedida?.descripcion}</td>
+                              <td className="py-2 px-4 text-right">
+                                {new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 6 }).format(f.costoparcial || 0)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {deriveFormulaDetalles.materiasPrimas.length === 0 && deriveFormulaDetalles.formulas.length === 0 && (
+                    <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed">
+                      Esta fórmula no tiene componentes registrados.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeriveModal(false)}>Cancelar</Button>
+            <Button 
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+              disabled={!deriveFormulaSeleccionada}
+              onClick={() => {
+                // Aquí iría la lógica para proceder con la derivación
+                // Por ahora solo cerramos o redirigimos
+                router.push(`/formulas/crear?baseId=${deriveFormulaSeleccionada?.id}&clienteId=${deriveClienteId}&zonaId=${deriveZonaId}`)
+              }}
+            >
+              Utilizar esta fórmula
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* 2. Filtros de Búsqueda */}
       <Card className="rounded-xs border bg-card text-card-foreground shadow">

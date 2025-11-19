@@ -245,6 +245,7 @@ export async function obtenerMateriasPrimas(
         codigo,
         nombre,
         imgurl,
+        costo,
         unidadmedidaid,
         unidadesmedida(descripcion),
         costo,

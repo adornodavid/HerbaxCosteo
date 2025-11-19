@@ -53,6 +53,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
     - listaDesplegableFormulas / ddlFormulas
     - estadisticasFormulas / statsFormulas
     - recalcularFormula / recalcularFormula
+    - copiarComposicionFormula: Función para copiar materias primas y formulas de una formula base a una nueva
 ================================================== */
 
 /*==================================================
@@ -527,7 +528,7 @@ export async function obtenerMateriasPrimasXFormula(
         unidadesmedida!unidadmedidaid(descripcion),
         materiasprimasxformula!formulaid(
           materiaprimaid,
-          materiasprima!materiaprimaid(
+          materiasprima:materiaprimaid(
             codigo,
             nombre,
             imgurl,
@@ -592,7 +593,7 @@ export async function obtenerFormulasXFormula(
         unidadesmedida!unidadmedidaid(descripcion),
         formulasxformula!formulaid(
           secundariaid,
-          formulas!secundariaid(
+          formulas:secundariaid(
             codigo,
             nombre,
             imgurl,
@@ -1063,12 +1064,85 @@ export async function recalcularFormula(formulaid: number) {
     revalidatePath("/formulas")
 
     // Paso 10: Return resultados
-    return { success: true, error: false }
+    return { success: true, error: null }
   } catch (error) {
     console.error("Error en recalcularFormula de actions/formulas: " + error)
     return {
       success: false,
       error: "Error interno del servidor, al ejecutar funcion recalcularFormula de actions/formulas: " + error,
     }
+  }
+}
+
+// Función: copiarComposicionFormula: Copia materias primas y fórmulas de una fórmula base a una nueva
+export async function copiarComposicionFormula(newFormulaId: number, baseFormulaId: number) {
+  try {
+    if (!newFormulaId || !baseFormulaId) {
+      return { success: false, error: "IDs de fórmula inválidos" }
+    }
+
+    // 1. Copiar Materias Primas
+    const { data: mps, error: errorMPs } = await supabase
+      .from("materiasprimasxformula")
+      .select("materiaprimaid, cantidad, costoparcial")
+      .eq("formulaid", baseFormulaId)
+
+    if (errorMPs) {
+      console.error("Error leyendo MPs base:", errorMPs)
+      return { success: false, error: errorMPs.message }
+    }
+
+    if (mps && mps.length > 0) {
+      const mpsToInsert = mps.map((mp) => ({
+        formulaid: newFormulaId,
+        materiaprimaid: mp.materiaprimaid,
+        cantidad: mp.cantidad,
+        costoparcial: mp.costoparcial,
+        fechacreacion: new Date().toISOString().split("T")[0],
+        activo: true,
+      }))
+
+      const { error: insertMPs } = await supabase.from("materiasprimasxformula").insert(mpsToInsert)
+      if (insertMPs) {
+        console.error("Error copiando MPs:", insertMPs)
+        return { success: false, error: insertMPs.message }
+      }
+    }
+
+    // 2. Copiar Fórmulas Anidadas
+    const { data: formulas, error: errorFormulas } = await supabase
+      .from("formulasxformula")
+      .select("secundariaid, cantidad, costoparcial")
+      .eq("formulaid", baseFormulaId)
+
+    if (errorFormulas) {
+      console.error("Error leyendo Fórmulas base:", errorFormulas)
+      return { success: false, error: errorFormulas.message }
+    }
+
+    if (formulas && formulas.length > 0) {
+      const formulasToInsert = formulas.map((f) => ({
+        formulaid: newFormulaId,
+        secundariaid: f.secundariaid,
+        cantidad: f.cantidad,
+        costoparcial: f.costoparcial,
+        fechacreacion: new Date().toISOString().split("T")[0],
+        activo: true,
+      }))
+
+      const { error: insertFormulas } = await supabase.from("formulasxformula").insert(formulasToInsert)
+      if (insertFormulas) {
+        console.error("Error copiando Fórmulas:", insertFormulas)
+        return { success: false, error: insertFormulas.message }
+      }
+    }
+
+    // 3. Recalcular la nueva fórmula para asegurar consistencia
+    await recalcularFormula(newFormulaId)
+
+    return { success: true }
+  } catch (error) {
+    console.error("Error en copiarComposicionFormula:", error)
+    return { success: false, error: "Error interno al copiar composición" }
   }
 }
