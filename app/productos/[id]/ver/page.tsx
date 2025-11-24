@@ -8,7 +8,7 @@ import { useState, useEffect, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Edit, Trash2, ArrowLeft, Flag as Flask, Package } from "lucide-react"
+import { Edit, ArrowLeft, Flag as Flask, Package } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type { oProducto } from "@/types/productos.types"
 import type {
@@ -55,6 +55,7 @@ export default function VerProductoPage() {
     | "caracteristicas"
     | "formulas"
     | "materialetiquetado"
+    | "materialenvase"
     | "elaboracion"
     | "costeo"
     | "costeooptimo"
@@ -295,7 +296,7 @@ export default function VerProductoPage() {
                         <span className="font-semibold text-green-700">MP:</span>
                         <span className="ml-2 text-gray-900">${(producto.mp || 0).toFixed(6)}</span>
                       </div>
-                       <div>
+                      <div>
                         <span className="font-semibold text-green-700">MEM:</span>
                         <span className="ml-2 text-gray-900">${(producto.mem || 0).toFixed(6)}</span>
                       </div>
@@ -402,6 +403,17 @@ export default function VerProductoPage() {
               }`}
             >
               Material de empaque
+            </button>
+
+            <button
+              onClick={() => setActiveTab("materialenvase")}
+              className={`px-6 py-3 font-semibold transition-colors ${
+                activeTab === "materialenvase"
+                  ? "border-b-2 border-blue-500 text-blue-600"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Material de Envase
             </button>
 
             <button
@@ -600,42 +612,97 @@ export default function VerProductoPage() {
               <CardContent className="p-6">
                 <h2 className="text-2xl font-bold mb-4">Material de Empaque</h2>
                 <div className="space-y-2">
-                  {producto.materialesetiquetadoxproducto && producto.materialesetiquetadoxproducto.length > 0 ? (
+                  {producto.materialesetiquetadoxproducto &&
+                  producto.materialesetiquetadoxproducto.filter((m) => m.materialesetiquetado?.tipomaterialid === 1)
+                    .length > 0 ? (
                     <div className="space-y-3">
-                      {producto.materialesetiquetadoxproducto.map((materialRel, index) => (
-                        <div key={index} className="flex items-center gap-4 border rounded p-3 max-h-20">
-                          {/* Icon on left */}
-                          <div className="flex-shrink-0">
-                            <div className="w-14 h-14 bg-orange-100 rounded-lg flex items-center justify-center">
-                              <Package className="h-7 w-7 text-orange-600" />
-                            </div>
-                          </div>
-
-                          {/* Info on right */}
-                          <div className="flex-1 min-w-0">
-                            {/* Line 1: Código, Nombre */}
-                            <div className="flex items-center gap-3 mb-1">
-                              <span className="text-sm font-semibold text-gray-700">
-                                {materialRel.materialesetiquetado?.codigo || "N/A"}
-                              </span>
-                              <span className="text-sm text-gray-900 truncate">
-                                {materialRel.materialesetiquetado?.nombre || "N/A"}
-                              </span>
+                      {producto.materialesetiquetadoxproducto
+                        .filter((m) => m.materialesetiquetado?.tipomaterialid === 1)
+                        .map((materialRele, index) => (
+                          <div key={index} className="flex items-center gap-4 border rounded p-3 max-h-20">
+                            {/* Icon on left */}
+                            <div className="flex-shrink-0">
+                              <div className="w-14 h-14 bg-orange-100 rounded-lg flex items-center justify-center">
+                                <Package className="h-7 w-7 text-orange-600" />
+                              </div>
                             </div>
 
-                            {/* Line 2: Unidad de medida, Costo */}
-                            <div className="flex items-center gap-3 text-xs text-gray-600">
-                              <span>{materialRel.materialesetiquetado?.unidadesmedida?.descripcion || "N/A"}</span>
-                              <span className="font-semibold text-green-600">
-                                ${materialRel.materialesetiquetado?.costo?.toFixed(6) || "0.000000"}
-                              </span>
+                            {/* Info on right */}
+                            <div className="flex-1 min-w-0">
+                              {/* Line 1: Código, Nombre */}
+                              <div className="flex items-center gap-3 mb-1">
+                                <span className="text-sm font-semibold text-gray-700">
+                                  {materialRele.materialesetiquetado?.codigo || "N/A"}
+                                </span>
+                                <span className="text-sm text-gray-900 truncate">
+                                  {materialRele.materialesetiquetado?.nombre || "N/A"}
+                                </span>
+                              </div>
+
+                              {/* Line 2: Unidad de medida, Costo */}
+                              <div className="flex items-center gap-3 text-xs text-gray-600">
+                                <span>{materialRele.materialesetiquetado?.unidadesmedida?.descripcion || "N/A"}</span>
+                                <span className="font-semibold text-green-600">
+                                  ${materialRele.materialesetiquetado?.costo?.toFixed(6) || "0.000000"}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   ) : (
                     <p className="text-gray-500">No hay material de empaque asignado</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {activeTab === "materialenvase" && (
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="text-2xl font-bold mb-4">Material de Envase</h2>
+                <div className="space-y-2">
+                  {producto.materialesetiquetadoxproducto &&
+                  producto.materialesetiquetadoxproducto.filter((m) => m.materialesetiquetado?.tipomaterialid === 2)
+                    .length > 0 ? (
+                    <div className="space-y-3">
+                      {producto.materialesetiquetadoxproducto
+                        .filter((m) => m.materialesetiquetado?.tipomaterialid === 2)
+                        .map((materialRel, index) => (
+                          <div key={index} className="flex items-center gap-4 border rounded p-3 max-h-20">
+                            {/* Icon on left */}
+                            <div className="flex-shrink-0">
+                              <div className="w-14 h-14 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <Package className="h-7 w-7 text-purple-600" />
+                              </div>
+                            </div>
+
+                            {/* Info on right */}
+                            <div className="flex-1 min-w-0">
+                              {/* Line 1: Código, Nombre */}
+                              <div className="flex items-center gap-3 mb-1">
+                                <span className="text-sm font-semibold text-gray-700">
+                                  {materialRel.materialesetiquetado?.codigo || "N/A"}
+                                </span>
+                                <span className="text-sm text-gray-900 truncate">
+                                  {materialRel.materialesetiquetado?.nombre || "N/A"}
+                                </span>
+                              </div>
+
+                              {/* Line 2: Unidad de medida, Costo */}
+                              <div className="flex items-center gap-3 text-xs text-gray-600">
+                                <span>{materialRel.materialesetiquetado?.unidadesmedida?.descripcion || "N/A"}</span>
+                                <span className="font-semibold text-green-600">
+                                  ${materialRel.materialesetiquetado?.costo?.toFixed(6) || "0.000000"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500">No hay material de envase asignado</p>
                   )}
                 </div>
               </CardContent>
@@ -684,13 +751,25 @@ export default function VerProductoPage() {
                           </tr>
                         ))}
 
-                        {/* Material de Etiquetado */}
+                        {/* Material de Etiquetado y Envase */}
                         {producto.materialesetiquetadoxproducto?.map((materialRel, index) => (
                           <tr key={`material-${index}`} className="border-b border-gray-200 hover:bg-gray-50">
                             <td className="p-3">
-                              <Package className="h-5 w-5 text-orange-600" />
+                              <Package
+                                className={`h-5 w-5 ${
+                                  materialRel.materialesetiquetado?.tipomaterialid === 2
+                                    ? "text-purple-600"
+                                    : "text-orange-600"
+                                }`}
+                              />
                             </td>
-                            <td className="p-3">Material de empaque</td>
+                            <td className="p-3">
+                              {materialRel.materialesetiquetado?.tipomaterialid === 1
+                                ? "Material de empaque"
+                                : materialRel.materialesetiquetado?.tipomaterialid === 2
+                                  ? "Material de envase"
+                                  : "Material"}
+                            </td>
                             <td className="p-3">{materialRel.materialesetiquetado?.codigo || "N/A"}</td>
                             <td className="p-3">{materialRel.materialesetiquetado?.nombre || "N/A"}</td>
                             <td className="p-3">

@@ -46,6 +46,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { obtenerProductos, estatusActivoProducto } from "@/app/actions/productos"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
+import { listDesplegableZonas } from "@/app/actions/zonas"
 
 /* ==================================================
 	Componente Principal (Pagina)
@@ -91,8 +92,10 @@ export default function ProductosPage() {
   const [filtroEstatus, setFiltroEstatus] = useState("-1")
   const [filtroCliente, setFiltroCliente] = useState("-1")
   const [filtroCatalogo, setFiltroCatalogo] = useState("-1")
+  const [filtroZona, setFiltroZona] = useState("-1") // Declare filtroZona
   const [clientes, setClientes] = useState<ddlItem[]>([])
   const [catalogos, setCatalogos] = useState<ddlItem[]>([])
+  const [zonasOptions, setZonasOptions] = useState<ddlItem[]>([{ value: "-1", text: "Todos" }])
 
   // Estados para el modal de detalles mejorado
   const [selectedProductoDetails, setSelectedProductoDetails] = useState<ProductoDetail[] | null>(null)
@@ -140,6 +143,7 @@ export default function ProductosPage() {
   const ejecutarBusquedaProductos = async (
     productonombre: string,
     clienteid: number,
+    zonaid: number,
     catalogoid: number,
     estatus: string,
   ) => {
@@ -165,7 +169,7 @@ export default function ProductosPage() {
         -1, // productoid
         productonombre,
         clienteid,
-        -1, // zonaid
+        zonaid,
         catalogoid,
         auxEstatus,
       )
@@ -317,7 +321,7 @@ export default function ProductosPage() {
       setShowPageTituloMasNuevo(true)
 
       // Ejecutar funcio de busqueda para cargar listado inicial
-      const Result = await ejecutarBusquedaProductos("", auxClienteId, -1, "True")
+      const Result = await ejecutarBusquedaProductos("", auxClienteId, -1, -1, "True")
       if (!Result.success) {
         setModalAlert({
           Titulo: "En ejecución de búsqueda de carga inicial",
@@ -392,16 +396,18 @@ export default function ProductosPage() {
     e.preventDefault()
     const Nombre: string = filtroNombre.trim()
     const ClienteId = Number.parseInt(filtroCliente, 10)
+    const ZonaId = Number.parseInt(filtroZona, 10)
     const CatalogoId = Number.parseInt(filtroCatalogo, 10)
     const Estatus = filtroEstatus === "-1" ? "Todos" : filtroEstatus
 
-    ejecutarBusquedaProductos(Nombre, ClienteId, CatalogoId, Estatus)
+    ejecutarBusquedaProductos(Nombre, ClienteId, ZonaId, CatalogoId, Estatus)
   }
 
   // Busqueda - Limpiar o Resetear
   const handleLimpiar = () => {
     setFiltroNombre("")
     setFiltroCliente("-1")
+    setFiltroZona("-1")
     setFiltroCatalogo("-1")
     setFiltroEstatus("-1")
     handleClienteChange("-1")
@@ -537,6 +543,21 @@ export default function ProductosPage() {
     }
   }, [authLoading, user, router, esAdmin, esAdminDDLs, esAdminDOs])
 
+  useEffect(() => {
+    const cargarZonas = async () => {
+      if (filtroCliente && filtroCliente !== "-1") {
+        const result = await listDesplegableZonas(-1, "", Number(filtroCliente))
+        if (result.success && result.data) {
+          setZonasOptions([{ value: "-1", text: "Todos" }, ...result.data])
+        }
+      } else {
+        setZonasOptions([{ value: "-1", text: "Todos" }])
+        setFiltroZona("-1")
+      }
+    }
+    cargarZonas()
+  }, [filtroCliente])
+
   // --- Renders (contenidos auxiliares) ---
   // Loading
   if (showPageLoading) {
@@ -629,8 +650,24 @@ export default function ProductosPage() {
                 </SelectContent>
               </Select>
             </div>
-            {/*
             <div className="lg:col-span-2">
+              <label htmlFor="ddlZona" className="text-sm font-medium">
+                Zona
+              </label>
+              <Select name="ddlZona" value={filtroZona} onValueChange={setFiltroZona}>
+                <SelectTrigger id="ddlZona">
+                  <SelectValue placeholder="Selecciona una zona" />
+                </SelectTrigger>
+                <SelectContent>
+                  {zonasOptions.map((z) => (
+                    <SelectItem key={z.value} value={z.value}>
+                      {z.text}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {/*<div className="lg:col-span-2">
               <label htmlFor="ddlCatalogo" className="text-sm font-medium">
                 Catálogo
               </label>
@@ -646,8 +683,7 @@ export default function ProductosPage() {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-            */}
+            </div>*/}
             <div className="lg:col-span-2">
               <label htmlFor="ddlEstatus" className="text-sm font-medium">
                 Estatus
@@ -708,14 +744,6 @@ export default function ProductosPage() {
             </div>
           )}
 
-          {/*{isSearching ? (
-            <div className="flex justify-center items-center h-48">
-              <Loader2 className="mx-auto h-8 w-8 animate-spin" />
-              <br/>
-              <span className="ml-2 text-lg">Cargando productos...</span>
-            </div>
-          ) : */}
-
           {!isSearching && elementosPaginados.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {elementosPaginados.map((p, index) => (
@@ -748,6 +776,7 @@ export default function ProductosPage() {
                     {/* Nombre */}
                     <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{p.nombre}</h3>
                     {/* Código */}
+                    {p.zonas && <p className="text-xs text-gray-500 mb-2">{p.zonas.nombre}</p>}
                     <p className="text-sm text-gray-600 mb-2">Código: {p.codigo || "Sin código."}</p>
                     <div className="text-sm">
                       <p>
