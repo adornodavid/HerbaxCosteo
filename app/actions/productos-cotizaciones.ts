@@ -659,7 +659,7 @@ export async function cotizacionOptima25(
         error: `Error al consultar cotizacionoptima25: ${error.message}`,
       }
     }
-  
+
     // Retorno exitoso
     return {
       success: true,
@@ -743,6 +743,7 @@ export async function calcularCotizacion(
   PorcentajeReembolsos: number,
   PorcentajeTarjeta: number,
   PorcentajeEnvio: number,
+  conversionMoneda: number,
 ): Promise<{
   success: boolean
   error?: string
@@ -766,7 +767,7 @@ export async function calcularCotizacion(
       porcentajereembolsos: PorcentajeReembolsos,
       porcentajetarjeta: PorcentajeTarjeta,
       porcentajeenvio: PorcentajeEnvio,
-
+      conversionmoneda: conversionMoneda,
     })
 
     if (error) {
@@ -815,6 +816,7 @@ export async function actualizarCotizacion(
   PorcentajeReembolsos: number,
   PorcentajeTarjeta: number,
   PorcentajeEnvio: number,
+  conversionMoneda: number,
 ): Promise<{
   success: boolean
   error?: string
@@ -838,6 +840,7 @@ export async function actualizarCotizacion(
       porcentajereembolsos: PorcentajeReembolsos,
       porcentajetarjeta: PorcentajeTarjeta,
       porcentajeenvio: PorcentajeEnvio,
+      conversionmoneda: conversionMoneda,
     })
 
     if (error) {

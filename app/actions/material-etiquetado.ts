@@ -265,7 +265,8 @@ export async function obtenerMaterialesEtiquetados(
         unidadesmedida!unidadmedidaid(descripcion),
         costo,
         fechacreacion,
-        activo
+        activo,
+        tipomaterialid
       `)
 
     // Paso 3: Filtros en query, dependiendo parametros

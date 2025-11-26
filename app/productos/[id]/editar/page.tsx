@@ -164,6 +164,8 @@ export default function EditarProductoPage() {
     zonaid: "",
   })
 
+  const [zonasLoaded, setZonasLoaded] = useState(false)
+
   useEffect(() => {
     const cargarCatalogos = async () => {
       // Cargar unidades de medida
@@ -177,18 +179,20 @@ export default function EditarProductoPage() {
 
   useEffect(() => {
     const cargarZonas = async () => {
-      if (formData.clienteid && formData.clienteid !== "") {
-        const zonasResult = await listDesplegableZonas(-1, "", Number(formData.clienteid))
+      if (producto?.clienteid) {
+        setZonasLoaded(false)
+        const zonasResult = await listDesplegableZonas(-1, "", Number(producto.clienteid))
         if (zonasResult.success && zonasResult.data) {
           setZonas(zonasResult.data)
         }
+        setZonasLoaded(true)
       }
     }
     cargarZonas()
-  }, [formData.clienteid])
+  }, [producto?.clienteid])
 
   useEffect(() => {
-    if (producto) {
+    if (producto && zonasLoaded) {
       setFormData({
         nombre: producto.nombre || "",
         codigo: producto.codigo || "",
@@ -198,7 +202,7 @@ export default function EditarProductoPage() {
       setExistingImageUrl(producto.imgurl || "")
       setImagePreview(producto.imgurl || null)
     }
-  }, [producto])
+  }, [producto, zonasLoaded])
 
   useEffect(() => {
     const buscarFormulas = async () => {
@@ -352,16 +356,29 @@ export default function EditarProductoPage() {
     const formDataToSend = new FormData(form)
     const nombre = formDataToSend.get("nombre") as string
     const codigo = formDataToSend.get("codigo") as string
+    const zonaid = formDataToSend.get("zonaid") as string
 
     // Validar variables obligatorias
     if (!nombre || nombre.trim().length < 3) {
       setModalValidation({
         Titulo: "Datos incompletos",
-        Mensaje: "Completa los datos obligatorios, no se pueden quedar en blanco.",
+        Mensaje: "El nombre del producto debe tener al menos 3 caracteres.",
       })
       setShowModalValidation(true)
       return
     }
+
+    // Validar que la zona no sea 0 o nulo
+    console.log("zona: " + zonaid)
+    if (!zonaid || zonaid === "0") {
+      setModalValidation({
+        Titulo: "Datos incompletos",
+        Mensaje: "Debe seleccionar una zona válida para el producto.",
+      })
+      setShowModalValidation(true)
+      return
+    }
+    // </CHANGE>
 
     setShowProcessing(true)
     setIsSubmitting(true)
@@ -1435,7 +1452,9 @@ export default function EditarProductoPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="ddlZona">Zona</Label>
+                    <Label htmlFor="ddlZona">
+                      <span className="text-red-500">*</span> Zona
+                    </Label>
                     <Select
                       name="zonaid"
                       value={formData.zonaid}
@@ -1445,6 +1464,7 @@ export default function EditarProductoPage() {
                         <SelectValue placeholder="Selecciona una zona" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="0">Sin zona seleccionada</SelectItem>
                         {zonas.map((zona) => (
                           <SelectItem key={zona.value} value={zona.value}>
                             {zona.text}
@@ -1909,7 +1929,7 @@ export default function EditarProductoPage() {
               {/* </CHANGE> */}
 
               <div className="space-y-4">
-                <h3 className="text-lg mt-18 font-semibold">Agregar Material Empaque</h3>
+                <h3 className="text-lg font-semibold">Agregar Material Empaque</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                   <div className="space-y-2 relative" ref={materialEtiquetadoSearchRef}>

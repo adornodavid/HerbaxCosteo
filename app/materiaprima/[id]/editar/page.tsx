@@ -7,14 +7,17 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
 import { PageModalValidation } from "@/components/page-modal-validation"
 import { PageProcessing } from "@/components/page-processing"
-import { obtenerMateriasPrima, actualizarMateriaPrima } from "@/app/actions/materia-prima"
+import { obtenerMateriasPrimas, actualizarMateriaPrima } from "@/app/actions/materia-prima"
+import { listaDesplegableUnidadesMedida } from "@/app/actions/catalogos"
 import type { PageModalAlertType, PageModalErrorType, PageModalValidationType } from "@/types/common"
 import type { MateriaPrima } from "@/types/materia-prima"
+import type { ddlItem } from "@/types/common.types"
 
 export default function EditarMateriaPrimaPage({
   params,
@@ -25,6 +28,10 @@ export default function EditarMateriaPrimaPage({
   const [materiaId, setMateriaId] = useState<number>(0)
   const [materia, setMateria] = useState<MateriaPrima | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+
+  // Estados para unidades de medida
+  const [unidadesMedida, setUnidadesMedida] = useState<ddlItem[]>([])
+  const [selectedUnidadMedida, setSelectedUnidadMedida] = useState<string>("")
 
   // Estados para los modales
   const [showModalValidation, setShowModalValidation] = useState(false)
@@ -45,13 +52,24 @@ export default function EditarMateriaPrimaPage({
       const id = Number.parseInt(resolvedParams.id)
       setMateriaId(id)
 
-      const result = await obtenerMateriasPrima(id, "", "", "Todos", -1, -1)
+      // Cargar unidades de medida
+      const unidadesResult = await listaDesplegableUnidadesMedida()
+      if (unidadesResult.success && unidadesResult.data) {
+        setUnidadesMedida(unidadesResult.data)
+      }
+
+      // Cargar datos de la materia prima por ID
+      const result = await obtenerMateriasPrimas(id, "", "", "Todos", -1, -1)
 
       if (result.success && result.data && result.data.length > 0) {
         const materiaData = result.data[0]
         setMateria(materiaData)
         if (materiaData.ImgUrl) {
           setImagePreview(materiaData.ImgUrl)
+        }
+        // Establecer la unidad de medida seleccionada
+        if (materiaData.UnidadMedidaId) {
+          setSelectedUnidadMedida(materiaData.UnidadMedidaId.toString())
         }
       }
 
@@ -80,6 +98,9 @@ export default function EditarMateriaPrimaPage({
 
     // Agregar el ID al formData
     formData.append("id", materiaId.toString())
+
+    // Agregar la unidad de medida seleccionada
+    formData.append("unidadmedidaid", selectedUnidadMedida)
 
     // Validar campos requeridos
     const nombre = formData.get("nombre") as string
@@ -153,6 +174,11 @@ export default function EditarMateriaPrimaPage({
           {/* Columna izquierda - Campos del formulario */}
           <div className="space-y-4">
             <div className="space-y-2">
+              <Label htmlFor="id">ID</Label>
+              <Input id="id" name="id" value={materia.id} disabled className="bg-gray-100" />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="codigo">Código *</Label>
               <Input id="codigo" name="codigo" placeholder="Ingrese el código" defaultValue={materia.Codigo} required />
             </div>
@@ -164,13 +190,18 @@ export default function EditarMateriaPrimaPage({
 
             <div className="space-y-2">
               <Label htmlFor="unidadmedidaid">Unidad de Medida</Label>
-              <Input
-                id="unidadmedidaid"
-                name="unidadmedidaid"
-                type="number"
-                placeholder="ID de unidad de medida"
-                defaultValue={materia.UnidadMedidaId || ""}
-              />
+              <Select value={selectedUnidadMedida} onValueChange={setSelectedUnidadMedida}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccione unidad de medida" />
+                </SelectTrigger>
+                <SelectContent>
+                  {unidadesMedida.map((unidad) => (
+                    <SelectItem key={unidad.value} value={unidad.value}>
+                      {unidad.text}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -179,9 +210,33 @@ export default function EditarMateriaPrimaPage({
                 id="costo"
                 name="costo"
                 type="number"
-                step="0.01"
+                step="0.000001"
                 placeholder="0.00"
                 defaultValue={materia.Costo || 0}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="factorimportacion">Factor Importación</Label>
+              <Input
+                id="factorimportacion"
+                name="factorimportacion"
+                type="number"
+                step="0.000001"
+                placeholder="0.00"
+                defaultValue={materia.FactorImportacion || 0}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="costoconfactorimportacion">Costo con Factor Importación</Label>
+              <Input
+                id="costoconfactorimportacion"
+                name="costoconfactorimportacion"
+                type="number"
+                step="0.000001"
+                placeholder="0.00"
+                defaultValue={materia.CostoConFactorImportacion || 0}
               />
             </div>
 
@@ -195,12 +250,12 @@ export default function EditarMateriaPrimaPage({
           {/* Columna derecha - Vista previa de imagen */}
           <div className="space-y-2">
             <Label>Vista Previa</Label>
-            <div className="border rounded-md h-[350px] flex items-center justify-center bg-gray-100">
+            <div className="border rounded-md h-[450px] flex items-center justify-center bg-gray-100">
               {imagePreview ? (
                 <img
                   src={imagePreview || "/placeholder.svg"}
                   alt="Vista previa"
-                  className="w-full h-auto object-cover"
+                  className="max-w-full max-h-full object-contain"
                 />
               ) : (
                 <p className="text-muted-foreground">No hay imagen</p>

@@ -122,6 +122,7 @@ export default function MaterialEtiquetadoPage() {
           costo: x.costo,
           fechacreacion: x.fechacreacion,
           activo: x.activo,
+          tipomaterialid: x.tipomaterialid,
         }))
 
         const Listado: MaterialEtiquetado[] = transformedData.map((x: MaterialEtiquetado) => ({
@@ -134,6 +135,7 @@ export default function MaterialEtiquetadoPage() {
           MaterialEtiquetadoCosto: x.costo || 0,
           MaterialEtiquetadoFechaCreacion: x.fechacreacion,
           MaterialEtiquetadoActivo: x.activo === true,
+          MaterialEtiquetadoTipoMaterialId: x.tipomaterialid,
         }))
 
         setListado(Listado)
@@ -168,7 +170,7 @@ export default function MaterialEtiquetadoPage() {
       setPageTituloMasNuevo({
         Titulo: "Material Etiquetado",
         Subtitulo: "Gestión completa de Material Etiquetado",
-        Visible: esAdminDOs == true ? true : false,
+        Visible: false /*esAdminDOs == true ? true : false,*/,
         BotonTexto: "Crear Nuevo Material Etiquetado",
         Ruta: "/materialetiquetado/crear",
       })
@@ -479,6 +481,21 @@ export default function MaterialEtiquetadoPage() {
                       </div>
 
                       <div>
+                        <span className="font-semibold text-gray-700">Tipo de Material:</span>
+                        <span
+                          className={`ml-2 px-2 py-1 rounded-full text-sm font-semibold ${
+                            elementoDetalles.MaterialEtiquetadoTipoMaterialId === 1
+                              ? "bg-orange-100 text-orange-700"
+                              : "bg-purple-100 text-purple-700"
+                          }`}
+                        >
+                          {elementoDetalles.MaterialEtiquetadoTipoMaterialId === 1
+                            ? "Material de Empaque"
+                            : "Material de Envase"}
+                        </span>
+                      </div>
+
+                      <div>
                         <span className="font-semibold text-gray-700">Fecha de Creación:</span>
                         <span className="ml-2 text-gray-900">
                           {elementoDetalles.MaterialEtiquetadoFechaCreacion
@@ -511,13 +528,14 @@ export default function MaterialEtiquetadoPage() {
                   <th className="text-left py-3 px-4 font-medium">Nombre</th>
                   <th className="text-left py-3 px-4 font-medium">Costo</th>
                   <th className="text-left py-3 px-4 font-medium">Estatus</th>
+                  <th className="text-left py-3 px-4 font-medium">Tipo de Material</th>
                   <th className="text-left py-3 px-4 font-medium">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {isSearching && (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                    <td colSpan={7} className="py-8 text-center text-muted-foreground">
                       <div className="flex items-center justify-center gap-2">
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
                         <span>Buscando resultados.....</span>
@@ -528,7 +546,7 @@ export default function MaterialEtiquetadoPage() {
 
                 {!isSearching && Listado.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                    <td colSpan={7} className="py-8 text-center text-muted-foreground">
                       <div className="flex items-center justify-center gap-2">
                         <span>No se encontraron resultados con los parametros indicados, favor de verificar.</span>
                       </div>
@@ -550,6 +568,19 @@ export default function MaterialEtiquetadoPage() {
                           }`}
                         >
                           {elemento.MaterialEtiquetadoActivo ? "Activo" : "Inactivo"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`px-2 py-1 text-xs rounded-full font-semibold ${
+                            elemento.MaterialEtiquetadoTipoMaterialId === 1
+                              ? "bg-orange-100 text-orange-700"
+                              : "bg-purple-100 text-purple-700"
+                          }`}
+                        >
+                          {elemento.MaterialEtiquetadoTipoMaterialId === 1
+                            ? "Material de Empaque"
+                            : "Material de Envase"}
                         </span>
                       </td>
                       <td className="py-3 px-4">

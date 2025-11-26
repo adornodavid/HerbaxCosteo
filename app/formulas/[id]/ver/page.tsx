@@ -8,7 +8,7 @@ import { useState, useEffect, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Edit, Trash2, ArrowLeft, Package, Flag as Flask } from "lucide-react"
+import { Edit, Trash2, ArrowLeft, Package, Flag as Flask, ShoppingBag } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type { oFormula } from "@/types/formulas.types"
 import type {
@@ -28,7 +28,7 @@ import { PageModalError } from "@/components/page-modal-error"
 import { PageModalTutorial } from "@/components/page-modal-tutorial"
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
-import { objetoFormula } from "@/app/actions/formulas"
+import { objetoFormula, obtenerProductosXFormulas } from "@/app/actions/formulas"
 
 /* ==================================================
 	Componente Principal (Pagina)
@@ -45,10 +45,11 @@ export default function VerFormulaPage() {
   // Cargar contenido en variables
   const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
   const [formula, setFormula] = useState<oFormula | null>(null)
+  const [productosRelacionados, setProductosRelacionados] = useState<any[]>([])
   const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
   const [ModalError, setModalError] = useState<propsPageModalError>()
   const [ModalTutorial, setModalTutorial] = useState<propsPageModalTutorial>()
-  const [activeTab, setActiveTab] = useState<"materiasprima" | "formulas" | "elaboracion">("elaboracion")
+  const [activeTab, setActiveTab] = useState<"materiasprima" | "formulas" | "elaboracion" | "productos">("elaboracion")
   // Mostrar/Ocultar contenido
   const [showPageLoading, setShowPageLoading] = useState(true)
   const [showModalAlert, setShowModalAlert] = useState(false)
@@ -71,6 +72,11 @@ export default function VerFormulaPage() {
           const result = await objetoFormula(formulaId, "", "", "Todos", -1, -1)
           if (result.success && result.data) {
             setFormula(result.data)
+          }
+
+          const resultProductos = await obtenerProductosXFormulas(formulaId)
+          if (resultProductos.success && resultProductos.data) {
+            setProductosRelacionados(resultProductos.data)
           }
         } catch (error) {
           console.error("Error al cargar información: ", error)
@@ -248,6 +254,17 @@ export default function VerFormulaPage() {
         >
           Elaboración
         </button>
+
+        <button
+          onClick={() => setActiveTab("productos")}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === "productos"
+              ? "border-b-2 border-purple-500 text-purple-600"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          Productos
+        </button>
       </div>
 
       {activeTab === "materiasprima" && (
@@ -422,6 +439,67 @@ export default function VerFormulaPage() {
             ) : (
               <p className="text-gray-500">No hay materias prima ni fórmulas asociadas a esta fórmula.</p>
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {activeTab === "productos" && (
+        <Card>
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <ShoppingBag className="h-6 w-6 text-purple-600" />
+              Productos que utilizan esta Fórmula
+            </h2>
+            <div className="space-y-2">
+              {productosRelacionados && productosRelacionados.length > 0 ? (
+                <div className="space-y-3">
+                  {productosRelacionados.map((producto, index) => (
+                    <div
+                      key={index}
+                      onClick={() => router.push(`/productos/${producto.productoid}/ver`)}
+                      className="flex items-center gap-4 border rounded-lg p-3 hover:bg-purple-50 hover:border-purple-300 cursor-pointer transition-all duration-200"
+                    >
+                      {/* Imagen del producto */}
+                      <div className="flex-shrink-0">
+                        <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                          {producto.imagen && producto.imagen !== "Sin imagen" ? (
+                            <img
+                              src={producto.imagen || "/placeholder.svg"}
+                              alt={producto.producto || "Producto"}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <ShoppingBag className="h-8 w-8 text-purple-400" />
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Info del producto */}
+                      <div className="flex-1 min-w-0">
+                        {/* Línea 1: ID, Código, Nombre */}
+                        <div className="flex items-center gap-3 mb-1">
+                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                            ID: {producto.productoid}
+                          </span>
+                          <span className="text-sm font-semibold text-purple-700">{producto.codigoproducto || "N/A"}</span>
+                          <span className="text-sm text-gray-900 truncate font-medium">
+                            {producto.producto || "N/A"}
+                          </span>
+                        </div>
+
+                        
+                      </div>
+
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <ShoppingBag className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">No hay productos que utilicen esta fórmula</p>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}

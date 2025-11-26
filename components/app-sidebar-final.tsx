@@ -71,7 +71,7 @@ export function AppSidebar() {
     return [
       {
         name: "Inicio",
-        href: "/inicio",
+        href: "/dashboard",
         icon: Icons.LayoutDashboard,
       },
       {

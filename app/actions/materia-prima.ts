@@ -245,10 +245,11 @@ export async function obtenerMateriasPrimas(
         codigo,
         nombre,
         imgurl,
-        costo,
         unidadmedidaid,
         unidadesmedida(descripcion),
         costo,
+        factorimportacion,
+        costoconfactorimportacion,
         fechacreacion,
         activo
       `)
@@ -394,6 +395,8 @@ export async function actualizarMateriaPrima(formData: FormData) {
     const imagen = formData.get("imagen") as File
     const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || null
     const costo = Number.parseFloat(formData.get("costo") as string) || 0
+    const factorimportacion = Number.parseFloat(formData.get("factorimportacion") as string) || 0
+    const costoconfactorimportacion = Number.parseFloat(formData.get("costoconfactorimportacion") as string) || 0
 
     // Paso 2: Validar variables obligatorias
     if (!nombre || nombre.length < 3) {
@@ -448,6 +451,8 @@ export async function actualizarMateriaPrima(formData: FormData) {
         imgurl: imagenurl,
         unidadmedidaid,
         costo,
+        factorimportacion,
+        costoconfactorimportacion,
       })
       .eq("id", id)
       .select("id")

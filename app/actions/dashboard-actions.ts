@@ -49,7 +49,7 @@ export async function obtenerResumenesDashboard() {
   try {
     // const supabase = createSupabaseServerClient()
 
-    // // Obtener conteo de hoteles activos
+    // Obtener conteo de hoteles activos
     // const { count: hotelesCount, error: hotelesError } = await supabase
     //   .from("hoteles")
     //   .select("*", { count: "exact", head: true })
@@ -59,7 +59,7 @@ export async function obtenerResumenesDashboard() {
     //   console.error("Error obteniendo hoteles:", hotelesError)
     // }
 
-    // // Obtener conteo de restaurantes activos
+    // Obtener conteo de restaurantes activos
     // const { count: restaurantesCount, error: restaurantesError } = await supabase
     //   .from("restaurantes")
     //   .select("*", { count: "exact", head: true })
@@ -69,7 +69,7 @@ export async function obtenerResumenesDashboard() {
     //   console.error("Error obteniendo restaurantes:", restaurantesError)
     // }
 
-    // // Obtener conteo de menús activos
+    // Obtener conteo de menús activos
     // const { count: menusCount, error: menusError } = await supabase
     //   .from("menus_restaurantes")
     //   .select("*", { count: "exact", head: true })
@@ -79,7 +79,7 @@ export async function obtenerResumenesDashboard() {
     //   console.error("Error obteniendo menús:", menusError)
     // }
 
-    // // Obtener conteo de platillos activos
+    // Obtener conteo de platillos activos
     // const { count: platillosCount, error: platillosError } = await supabase
     //   .from("platillos")
     //   .select("*", { count: "exact", head: true })
@@ -89,7 +89,7 @@ export async function obtenerResumenesDashboard() {
     //   console.error("Error obteniendo platillos:", platillosError)
     // }
 
-    // // Obtener conteo de ingredientes activos
+    // Obtener conteo de ingredientes activos
     // const { count: ingredientesCount, error: ingredientesError } = await supabase
     //   .from("ingredientes")
     //   .select("*", { count: "exact", head: true })
@@ -377,6 +377,56 @@ export async function consultarVariacionPrecios(clientesid: number, zonasid: num
     return {
       success: false,
       error: "Error al consultar variación de precios",
+      data: [],
+    }
+  }
+}
+
+export async function obtenerProductosPorZona(clientesid: number) {
+  try {
+    const supabase = createSupabaseServerClient()
+
+    const { data, error } = await supabase
+      .from("productos")
+      .select(`
+        id,
+        zonaid,
+        zonas!inner(nombre)
+      `)
+      .eq("clienteid", clientesid)
+      .eq("activo", true)
+
+    if (error) {
+      console.error("Error obteniendo productos por zona:", error)
+      return {
+        success: false,
+        error: error.message,
+        data: [],
+      }
+    }
+
+    // Agrupar productos por zona
+    const productosAgrupados =
+      data?.reduce((acc: any, item: any) => {
+        const zonaNombre = item.zonas?.nombre || "Sin zona"
+        acc[zonaNombre] = (acc[zonaNombre] || 0) + 1
+        return acc
+      }, {}) || {}
+
+    const resultado = Object.entries(productosAgrupados).map(([zona, cantidad]) => ({
+      zona,
+      cantidad: cantidad as number,
+    }))
+
+    return {
+      success: true,
+      data: resultado,
+    }
+  } catch (error) {
+    console.error("Error en obtenerProductosPorZona:", error)
+    return {
+      success: false,
+      error: "Error al obtener productos por zona",
       data: [],
     }
   }

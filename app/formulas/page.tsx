@@ -5,12 +5,25 @@
 ================================================== */
 // -- Assets --
 import { useState, useEffect, useMemo, useRef } from "react"
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, Eye, Edit, ToggleLeft, ToggleRight, Trash2, AppWindow, Plus, Copy, FilePlus, FlaskConical } from 'lucide-react'
+import {
+  Search,
+  RotateCcw,
+  Eye,
+  Edit,
+  ToggleLeft,
+  ToggleRight,
+  Trash2,
+  AppWindow,
+  Plus,
+  Copy,
+  FilePlus,
+  FlaskConical,
+} from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { oFormula } from "@/types/formulas"
@@ -25,23 +38,22 @@ import type {
 // -- Librerias --
 // Configuraciones
 import { RolesAdmin, RolesAdminDDLs, RolesAdminDOs, arrActivoTrue, arrActivoFalse } from "@/lib/config"
-// -- Componentes --
-import { PageTitlePlusNew } from "@/components/page-title-plus-new"
 import { PageLoadingScreen } from "@/components/page-loading-screen"
 import { PageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError } from "@/components/page-modal-error"
 import { PageModalTutorial } from "@/components/page-modal-tutorial"
 // -- Dialog components for details modal
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
-import { 
-  obtenerFormulas, 
-  estatusActivoFormula, 
-  listaDesplegableFormulasBuscar,
-  obtenerMateriasPrimasXFormula,
-  obtenerFormulasXFormula
-} from "@/app/actions/formulas"
+import { obtenerFormulas, estatusActivoFormula, listaDesplegableFormulasBuscar } from "@/app/actions/formulas"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listDesplegableZonas } from "@/app/actions/zonas"
 
@@ -76,11 +88,11 @@ export default function FormulasPage() {
   const [showModalTutorial, setShowModalTutorial] = useState(false)
   const [showPageTituloMasNuevo, setShowPageTituloMasNuevo] = useState(false)
   const [showElementoDetallesModal, setShowElementoDetallesModal] = useState(false)
-  
+
   // Estados para Modales de Creación/Derivación
   const [showSelectionModal, setShowSelectionModal] = useState(false)
   const [showDeriveModal, setShowDeriveModal] = useState(false)
-  
+
   // Estados para Derivación
   const [deriveClienteId, setDeriveClienteId] = useState("")
   const [deriveZonaId, setDeriveZonaId] = useState("")
@@ -89,10 +101,10 @@ export default function FormulasPage() {
   const [deriveShowFormulasDropdown, setDeriveShowFormulasDropdown] = useState(false)
   const [deriveFormulaSeleccionada, setDeriveFormulaSeleccionada] = useState<any>(null)
   const [deriveFormulaDetalles, setDeriveFormulaDetalles] = useState<{
-    materiasPrimas: any[],
+    materiasPrimas: any[]
     formulas: any[]
   }>({ materiasPrimas: [], formulas: [] })
-  
+
   const [clientesOptions, setClientesOptions] = useState<ddlItem[]>([])
   const [zonasOptions, setZonasOptions] = useState<ddlItem[]>([])
   const deriveFormulaSearchRef = useRef<HTMLDivElement>(null)
@@ -118,7 +130,7 @@ export default function FormulasPage() {
   }, [Listado, paginaActual])
 
   // -- Funciones --
-  
+
   // Cargar Clientes para el modal de derivación
   useEffect(() => {
     const cargarClientes = async () => {
@@ -175,17 +187,17 @@ export default function FormulasPage() {
 
     // Obtener detalles generales
     const formulasResult = await obtenerFormulas(Number(formulaId), "", "", "True", -1, -1)
-    
+
     if (formulasResult.success && formulasResult.data && formulasResult.data.length > 0) {
       const formula = formulasResult.data[0]
       setDeriveFormulaSeleccionada(formula)
-      
+
       // Obtener composición (Materias Primas y Fórmulas)
       // La función obtenerFormulas ya trae las relaciones anidadas.
-      
+
       setDeriveFormulaDetalles({
         materiasPrimas: formula.materiasprimasxformula || [],
-        formulas: formula.formulasxformula || []
+        formulas: formula.formulasxformula || [],
       })
     }
   }
@@ -447,10 +459,7 @@ export default function FormulasPage() {
           <p className="text-muted-foreground mt-1">Gestión completa de Fórmulas</p>
         </div>
         {esAdminDOs && (
-          <Button 
-            onClick={handleCrearFormulaClick}
-            className="bg-black hover:bg-gray-800 text-white"
-          >
+          <Button onClick={handleCrearFormulaClick} className="bg-black hover:bg-gray-800 text-white">
             <Plus className="mr-2 h-4 w-4" /> Crear Nueva Fórmula
           </Button>
         )}
@@ -465,10 +474,10 @@ export default function FormulasPage() {
               Elija cómo desea comenzar a crear su nueva fórmula
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6">
             {/* Tarjeta Crear Nueva */}
-            <div 
+            <div
               className="group relative flex flex-col items-center p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer"
               onClick={handleCrearNueva}
             >
@@ -477,12 +486,13 @@ export default function FormulasPage() {
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Crear nueva fórmula</h3>
               <p className="text-sm text-gray-500 text-center">
-                Cree una fórmula nueva partiendo desde cero, definiendo todos sus componentes y características manualmente.
+                Cree una fórmula nueva partiendo desde cero, definiendo todos sus componentes y características
+                manualmente.
               </p>
             </div>
 
             {/* Tarjeta Derivar */}
-            <div 
+            <div
               className="group relative flex flex-col items-center p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all cursor-pointer"
               onClick={handleDerivar}
             >
@@ -491,7 +501,8 @@ export default function FormulasPage() {
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Derivar Fórmula</h3>
               <p className="text-sm text-gray-500 text-center">
-                Use una fórmula existente como base para la creación de la composición, heredando sus materias primas y estructura.
+                Use una fórmula existente como base para la creación de la composición, heredando sus materias primas y
+                estructura.
               </p>
             </div>
           </div>
@@ -514,7 +525,7 @@ export default function FormulasPage() {
           <div className="space-y-6 py-4">
             {/* Inputs de Selección */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg border">
-              <div className="space-y-2">
+              {/*<div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">Cliente</label>
                 <Select value={deriveClienteId} onValueChange={setDeriveClienteId}>
                   <SelectTrigger className="bg-white">
@@ -544,7 +555,7 @@ export default function FormulasPage() {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
 
               <div className="space-y-2 relative" ref={deriveFormulaSearchRef}>
                 <label className="text-sm font-medium text-gray-700">Fórmula Base</label>
@@ -595,18 +606,27 @@ export default function FormulasPage() {
                     </div>
                     <div>
                       <span className="block text-gray-500 text-xs">Unidad Medida</span>
-                      <span className="font-medium">{deriveFormulaSeleccionada.unidadesmedida?.descripcion || "N/A"}</span>
+                      <span className="font-medium">
+                        {deriveFormulaSeleccionada.unidadesmedida?.descripcion || "N/A"}
+                      </span>
                     </div>
                     <div>
                       <span className="block text-gray-500 text-xs">Costo Actual</span>
                       <span className="font-medium text-green-600">
-                        {new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 6, maximumFractionDigits: 6 }).format(deriveFormulaSeleccionada.costo || 0)}
+                        {new Intl.NumberFormat("es-MX", {
+                          style: "currency",
+                          currency: "MXN",
+                          minimumFractionDigits: 6,
+                          maximumFractionDigits: 6,
+                        }).format(deriveFormulaSeleccionada.costo || 0)}
                       </span>
                     </div>
                     <div>
                       <span className="block text-gray-500 text-xs">Fecha Creación</span>
                       <span className="font-medium">
-                        {deriveFormulaSeleccionada.fechacreacion ? new Date(deriveFormulaSeleccionada.fechacreacion).toLocaleDateString() : "N/A"}
+                        {deriveFormulaSeleccionada.fechacreacion
+                          ? new Date(deriveFormulaSeleccionada.fechacreacion).toLocaleDateString()
+                          : "N/A"}
                       </span>
                     </div>
                   </div>
@@ -615,7 +635,7 @@ export default function FormulasPage() {
                 {/* Composición */}
                 <div className="space-y-4">
                   <h3 className="font-semibold text-gray-900 border-b pb-2">Composición de la Fórmula</h3>
-                  
+
                   {/* Materias Primas */}
                   {deriveFormulaDetalles.materiasPrimas.length > 0 && (
                     <div className="rounded-lg border overflow-hidden">
@@ -636,9 +656,15 @@ export default function FormulasPage() {
                             <tr key={`mp-${idx}`} className="border-b last:border-0 hover:bg-gray-50">
                               <td className="py-2 px-4">{mp.materiasprima?.codigo}</td>
                               <td className="py-2 px-4">{mp.materiasprima?.nombre}</td>
-                              <td className="py-2 px-4 text-right">{mp.cantidad} {mp.materiasprima?.unidadesmedida?.descripcion}</td>
                               <td className="py-2 px-4 text-right">
-                                {new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 6 }).format(mp.costoparcial || 0)}
+                                {mp.cantidad} {mp.materiasprima?.unidadesmedida?.descripcion}
+                              </td>
+                              <td className="py-2 px-4 text-right">
+                                {new Intl.NumberFormat("es-MX", {
+                                  style: "currency",
+                                  currency: "MXN",
+                                  maximumFractionDigits: 6,
+                                }).format(mp.costoparcial || 0)}
                               </td>
                             </tr>
                           ))}
@@ -667,9 +693,15 @@ export default function FormulasPage() {
                             <tr key={`f-${idx}`} className="border-b last:border-0 hover:bg-gray-50">
                               <td className="py-2 px-4">{f.formulas?.codigo}</td>
                               <td className="py-2 px-4">{f.formulas?.nombre}</td>
-                              <td className="py-2 px-4 text-right">{f.cantidad} {f.formulas?.unidadesmedida?.descripcion}</td>
                               <td className="py-2 px-4 text-right">
-                                {new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 6 }).format(f.costoparcial || 0)}
+                                {f.cantidad} {f.formulas?.unidadesmedida?.descripcion}
+                              </td>
+                              <td className="py-2 px-4 text-right">
+                                {new Intl.NumberFormat("es-MX", {
+                                  style: "currency",
+                                  currency: "MXN",
+                                  maximumFractionDigits: 6,
+                                }).format(f.costoparcial || 0)}
                               </td>
                             </tr>
                           ))}
@@ -687,16 +719,20 @@ export default function FormulasPage() {
               </div>
             )}
           </div>
-          
+
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeriveModal(false)}>Cancelar</Button>
-            <Button 
+            <Button variant="outline" onClick={() => setShowDeriveModal(false)}>
+              Cancelar
+            </Button>
+            <Button
               className="bg-purple-600 hover:bg-purple-700 text-white"
               disabled={!deriveFormulaSeleccionada}
               onClick={() => {
                 // Aquí iría la lógica para proceder con la derivación
                 // Por ahora solo cerramos o redirigimos
-                router.push(`/formulas/crear?baseId=${deriveFormulaSeleccionada?.id}&clienteId=${deriveClienteId}&zonaId=${deriveZonaId}`)
+                router.push(
+                  `/formulas/crear?baseId=${deriveFormulaSeleccionada?.id}&clienteId=${deriveClienteId}&zonaId=${deriveZonaId}`,
+                )
               }}
             >
               Utilizar esta fórmula
@@ -916,7 +952,11 @@ export default function FormulasPage() {
 
                 {!isSearching &&
                   Listado?.map((elemento) => (
-                    <tr key={elemento.FormulaId} className="border-b hover:bg-gray-50">
+                    <tr
+                      key={elemento.FormulaId}
+                      className="border-b hover:bg-gray-50 cursor-pointer"
+                      onClick={() => router.push(`/formulas/${elemento.FormulaId}/ver`)}
+                    >
                       <td className="py-3 px-4">{elemento.FormulaId}</td>
                       <td className="py-3 px-4">{elemento.FormulaCodigo}</td>
                       <td className="py-3 px-4">{elemento.FormulaNombre}</td>

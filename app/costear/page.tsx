@@ -125,6 +125,8 @@ export default function CostearPage() {
   const [porcentajeTarjeta, setPorcentajeTarjeta] = useState("")
   const [porcentajeEnvio, setPorcentajeEnvio] = useState("")
 
+  const [conversionMoneda, setConversionMoneda] = useState("")
+
   // Estados de búsqueda
   const [isSearching, setIsSearching] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
@@ -371,8 +373,8 @@ export default function CostearPage() {
         setProductoXCliente(resultCotizacion.data[0] || null)
         console.log(resultCotizacion.data[0])
 
-        if (resultCotizacion.data[0]?.sprecioventasiniva) {
-          setPrecioVentaSinIVA(resultCotizacion.data[0].sprecioventasiniva.toString())
+        if (resultCotizacion.data[0]?.sprecioacostear) {
+          setPrecioVentaSinIVA(resultCotizacion.data[0].sprecioacostear.toString())
         }
 
         if (resultCotizacion.data[0]?.sforecast) {
@@ -397,7 +399,7 @@ export default function CostearPage() {
         if (resultCotizacion.data[0]?.scda !== undefined) {
           setPorcentajeCDA(resultCotizacion.data[0].scda.toString())
         }
-        console.log("result", resultCotizacion.data[0])
+        
 
         if (resultCotizacion.data[0]?.sporcentajeconstructor !== undefined) {
           setPorcentajeConstructor(resultCotizacion.data[0].sporcentajeconstructor.toString())
@@ -413,6 +415,9 @@ export default function CostearPage() {
         }
         if (resultCotizacion.data[0]?.sporcentajeenvio !== undefined) {
           setPorcentajeEnvio(resultCotizacion.data[0].sporcentajeenvio.toString())
+        }
+        if (resultCotizacion.data[0]?.sconversionmoneda !== undefined) {
+          setConversionMoneda(resultCotizacion.data[0].sconversionmoneda.toString())
         }
       }
 
@@ -479,6 +484,7 @@ export default function CostearPage() {
         Number(porcentajeReembolsos),
         Number(porcentajeTarjeta),
         Number(porcentajeEnvio),
+        Number(conversionMoneda),
       )
 
       const elapsedTime = Date.now() - startTime
@@ -542,6 +548,7 @@ export default function CostearPage() {
     setPorcentajeTarjeta("")
     setPorcentajeEnvio("")
     setPorcentajesEditables(false)
+    setConversionMoneda("") // Reset conversionMoneda
   }
 
   const handleSelectProducto = (producto: ddlItem) => {
@@ -831,10 +838,9 @@ export default function CostearPage() {
                         >
                           {producto.activo ? "Activo" : "Inactivo"}
                         </span>
-                        
                       </div>
-                      <div className ="py-1">
-                          <span className="font-semibold text-sky-700">Categoria:</span>
+                      <div className="py-1">
+                        <span className="font-semibold text-sky-700">Categoria:</span>
                         <span className="ml-2 text-white bg-blue-500 py-1 rounded px-2">
                           {productoXCliente.scategoria || "Sin categoria"}
                         </span>
@@ -897,7 +903,7 @@ export default function CostearPage() {
                         <span className="font-semibold text-amber-700">MP $:</span>
                         <span className="ml-2 text-gray-900">${(producto.mp_costeado || 0).toFixed(2)}</span>
                       </div>
-                       <div>
+                      <div>
                         <span className="font-semibold text-amber-700">MEM $:</span>
                         <span className="ml-2 text-gray-900">${(producto.mem_costeado || 0).toFixed(2)}</span>
                       </div>
@@ -915,17 +921,21 @@ export default function CostearPage() {
                       </div>
                       <div>
                         <span className="font-semibold text-amber-700">Precio venta(2025):</span>
-                        <span className="ml-2 text-gray-900">${(productoXCliente.sprecioventaconivaa || 0).toFixed(2)}</span>
+                        <span className="ml-2 text-gray-900">
+                          ${(productoXCliente.sprecioventasinivaaa || 0).toFixed(2)}
+                        </span>
                       </div>
-                       <div>
+                      <div>
                         <span className="font-semibold text-amber-700">Precio actual(sin IVA):</span>
-                        <span className="ml-2 text-gray-900">${(productoXCliente.sprecioventasiniva || 0).toFixed(2)}</span>
+                        <span className="ml-2 text-gray-900">
+                          ${(productoXCliente.sprecioventasiniva || 0).toFixed(2)}
+                        </span>
                       </div>
                       <div>
                         <span className="font-semibold text-amber-700">Utilidad:</span>
                         <span className="ml-2 text-gray-900">${(producto.utilidadhl || 0).toFixed(6)}</span>
                       </div>
-                       <div>
+                      <div>
                         <span className="font-semibold text-amber-700">Ultima Modificacion:</span>
                         <span className="ml-2 text-gray-900">{productoXCliente.sfechaultimamodificacion || "N/A"}</span>
                       </div>
@@ -1010,8 +1020,7 @@ export default function CostearPage() {
 
                   <div className="mb-4">
                     <div className="flex gap-2 mb-2">
-                      
-                        {!porcentajesEditables ? (
+                      {!porcentajesEditables ? (
                         <div className="relative group">
                           <Button
                             type="button"
@@ -1040,13 +1049,14 @@ export default function CostearPage() {
                           Cancelar
                         </Button>
                       )}
-
                     </div>
                   </div>
 
-                  <table className="w-full border-collapse">
+
+                  {/* Segunda tabla de valores calculados */}
+                  <table className="w-full border-collapse mt-4">
                     <thead>
-                      <tr className="bg-gray-100 text-xs">
+                    <tr className="bg-gray-100 text-xs">
                         <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[130px]">
                           % Generacional
                         </th>
@@ -1069,8 +1079,12 @@ export default function CostearPage() {
                         <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[100px]">
                           % Tarjeta
                         </th>
-                        <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[100px]">Envio</th>
+                        <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[100px]">% Envio</th>
+                        <th className="border p-2 text-left font-semibold bg-purple-500 text-white w-[130px]">
+                          Conversion Moneda
+                        </th>
                       </tr>
+
                       <tr>
                         <td className="border p-1">
                           <Input
@@ -1112,7 +1126,6 @@ export default function CostearPage() {
                             disabled={!porcentajesEditables}
                           />
                         </td>
-
                         <td className="border p-1">
                           <Input
                             type="text"
@@ -1183,9 +1196,18 @@ export default function CostearPage() {
                             disabled={!porcentajesEditables}
                           />
                         </td>
-
+                        <td className="border p-1">
+                          <Input
+                            type="text"
+                            step="0.01"
+                            value={conversionMoneda}
+                            onChange={(e) => setConversionMoneda(e.target.value)}
+                            className="h-8 text-xs"
+                            disabled={!porcentajesEditables}
+                          />
+                        </td>
                       </tr>
-                         
+
                       <tr className="bg-gray-100">
                         <th className="border p-2 text-left text-sm font-semibold bg-red-500 text-white">
                           Plan Generacional
@@ -1208,10 +1230,11 @@ export default function CostearPage() {
                           Tarjeta Credito
                         </th>
                         <th className="border p-2 text-left text-sm font-semibold bg-red-500 text-white">Envio</th>
-                        <th className="border p-2 text-left text-sm font-semibold bg-red-500 text-white">
+                        
+                        <th className="border p-2 text-left text-sm font-semibold bg-red-800 text-white">
                           Costo Producto
                         </th>
-                        <th className="border p-2 text-left text-sm font-semibold bg-red-500 text-white">% Costo</th>
+                        <th className="border p-2 text-left text-sm font-semibold bg-red-800 text-white">% Costo</th>
                         <th className="border p-2 text-left text-sm font-semibold bg-red-800 text-white">
                           Total Costos
                         </th>
@@ -1226,24 +1249,24 @@ export default function CostearPage() {
                     <tbody>
                       <tr>
                         <td className="border p-2 text-sm">
-                          ${productoXCliente.splangeneracional?.toFixed(2) || "0.00"}
+                          ${productoXCliente.splangeneracional?.toFixed(3) || "0.00"}
                         </td>
-                        <td className="border p-2 text-sm">${productoXCliente.splannivel?.toFixed(2) || "0.00"}</td>
-                        <td className="border p-2 text-sm">${productoXCliente.splaninfinito?.toFixed(2) || "0.00"}</td>
-                        <td className="border p-2 text-sm">${productoXCliente.sivapagado?.toFixed(2) || "0.00"}</td>
-                        <td className="border p-2 text-sm">${productoXCliente.scda?.toFixed(2) || "0.00"}</td>
+                        <td className="border p-2 text-sm">${productoXCliente.splannivel?.toFixed(3) || "0.00"}</td>
+                        <td className="border p-2 text-sm">${productoXCliente.splaninfinito?.toFixed(3) || "0.00"}</td>
+                        <td className="border p-2 text-sm">${productoXCliente.sivapagado?.toFixed(3) || "0.00"}</td>
+                        <td className="border p-2 text-sm">${productoXCliente.scda?.toFixed(3) || "0.00"}</td>
                         <td className="border p-2 text-sm">
-                          ${productoXCliente.sbonoiniciorapido?.toFixed(2) || "0.00"}
+                          ${productoXCliente.sbonoiniciorapido?.toFixed(3) || "0.00"}
                         </td>
                         <td className="border p-2 text-sm">
-                          ${productoXCliente.sconstructoriniciorapido?.toFixed(2) || "0.00"}
+                          ${productoXCliente.sconstructoriniciorapido?.toFixed(3) || "0.00"}
                         </td>
-                        <td className="border p-2 text-sm">${productoXCliente.srutaexito?.toFixed(2) || "0.00"}</td>
-                        <td className="border p-2 text-sm">${productoXCliente.sreembolsos?.toFixed(2) || "0.00"}</td>
+                        <td className="border p-2 text-sm">${productoXCliente.srutaexito?.toFixed(3) || "0.00"}</td>
+                        <td className="border p-2 text-sm">${productoXCliente.sreembolsos?.toFixed(3) || "0.00"}</td>
                         <td className="border p-2 text-sm">
                           ${productoXCliente.starjetacredito?.toFixed(2) || "0.00"}
                         </td>
-                        <td className="border p-2 text-sm">${productoXCliente.senvio?.toFixed(2) || "0.00"}</td>
+                        <td className="border p-2 text-sm">${productoXCliente.senvio?.toFixed(3) || "0.00"}</td>
                         <td className="border p-2 text-sm">${productoXCliente.spreciohl?.toFixed(2) || "0.00"}</td>
                         <td className="border p-2 text-sm">
                           {productoXCliente.sporcentajecosto?.toFixed(2) || "0.00"}%
@@ -1318,7 +1341,7 @@ export default function CostearPage() {
                           %
                         </td>
                         <td className="border p-2 text-sm">
-                          {productoXClienteOptimo25.scomisionesmascosto?.toFixed(2) || "0.00"}%
+                          {productoXCliente.scomisionesmascosto?.toFixed(2) || "0.00"}%
                         </td>
                         <td className="border p-2 text-sm">
                           ${productoXCliente.sprecioventasiniva?.toFixed(2) || "0.00"}

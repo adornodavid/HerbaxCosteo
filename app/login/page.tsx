@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 /* ==================================================
   Imports
 ================================================== */
@@ -16,7 +18,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Icons } from "@/components/icons"
 import { UserCheck } from "lucide-react"
 // Backend
 import { procesarInicioSesion } from "@/app/actions/login"
@@ -30,6 +31,7 @@ export default function LoginPage() {
   const [showModal, setShowModal] = useState(false)
   const [modalMessage, setModalMessage] = useState("")
   const [shouldRedirect, setShouldRedirect] = useState(false)
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const router = useRouter()
 
   // Gestion  Modal
@@ -70,9 +72,8 @@ export default function LoginPage() {
       const result = await procesarInicioSesion(txtCorreo.value, txtPassword.value)
 
       if (result.success) {
-        showModalMessage(result.message, true)
+        setShowSuccessMessage(true)
         setTimeout(() => {
-          setShowModal(false)
           router.push("/dashboard")
         }, 2000)
       } else {
@@ -85,6 +86,12 @@ export default function LoginPage() {
     }
   }
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      validateLogin()
+    }
+  }
+
   // Render, HTML
   return (
     <div className="min-h-screen relative overflow-hidden bg-[url('https://twoxhneqaxrljrbkehao.supabase.co/storage/v1/object/public/herbax/1034899_6498.svg')] bg-cover bg-center">
@@ -94,7 +101,6 @@ export default function LoginPage() {
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
         <div className="flex items-center justify-center w-full max-w-6xl">
           {/* Left side - Decorative image */}
-         
 
           {/* Right side - Login form */}
           <div className="w-full lg:w-1/2 flex justify-center">
@@ -110,12 +116,15 @@ export default function LoginPage() {
                   <div className="mb-6">
                     <div className="inline-flex items-center justify-center w-64 h-32 bg-gradient-to-br mb-4">
                       {/*<Icons.Utensils className="w-8 h-8 text-slate-700" />*/}
-                      <img className="shrink-0 size-15 rounded-full" src="/images/design-mode/healthylab.png" alt="Avatar" />
+                      <img
+                        className="shrink-0 size-15 rounded-full"
+                        src="/images/design-mode/healthylab.png"
+                        alt="Avatar"
+                      />
                     </div>
                     <h1 className="text-xl font-bold text-slate-800 leading-tight">
                       Sistema de Costeo
                       <br />
-                      
                     </h1>
                   </div>
                   <h2 className="text-2xl font-bold text-slate-800">Iniciar Sesión</h2>
@@ -132,6 +141,7 @@ export default function LoginPage() {
                       placeholder="Usuario / Correo electrónico"
                       className="bg-white/70 backdrop-blur-sm border-white/50 focus:border-blue-400/60 focus:ring-blue-400/20 rounded-xl h-12 text-slate-700 placeholder:text-slate-500"
                       autoComplete="email"
+                      onKeyPress={handleKeyPress}
                     />
                   </div>
 
@@ -144,6 +154,7 @@ export default function LoginPage() {
                       placeholder="Contraseña de acceso"
                       className="bg-white/70 backdrop-blur-sm border-white/50 focus:border-blue-400/60 focus:ring-blue-400/20 rounded-xl h-12 text-slate-700 placeholder:text-slate-500"
                       autoComplete="current-password"
+                      onKeyPress={handleKeyPress}
                     />
                   </div>
 
@@ -167,6 +178,24 @@ export default function LoginPage() {
                       </div>
                     )}
                   </Button>
+
+                  {showSuccessMessage && (
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center space-x-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-green-800">Validación correcta</p>
+                        <p className="text-xs text-green-600 mt-0.5">Redirigiendo al sistema...</p>
+                      </div>
+                    </div>
+                  )}
                 </form>
 
                 {/* Footer */}

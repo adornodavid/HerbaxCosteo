@@ -315,8 +315,6 @@ export default function ProductosPage() {
         Titulo: "Productos",
         Subtitulo: "Gestión completa de Productos",
         Visible: esAdminDOs == true ? true : false,
-        BotonTexto: "Crear Nuevo Producto",
-        Ruta: "/productos/crear",
       })
       setShowPageTituloMasNuevo(true)
 
@@ -602,7 +600,7 @@ export default function ProductosPage() {
           Titulo={PageTituloMasNuevo.Titulo}
           Subtitulo={PageTituloMasNuevo.Subtitulo}
           Visible={PageTituloMasNuevo.Visible}
-          BotonTexto={PageTituloMasNuevo.BotonTexto}
+          //BotonTexto={PageTituloMasNuevo.BotonTexto}
           Ruta={PageTituloMasNuevo.Ruta}
         />
       )}
@@ -790,12 +788,14 @@ export default function ProductosPage() {
                     <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
                       <div className="flex gap-3 justify-center mt-auto">
                         {/* Detalles - Opens modal */}
+                        {/*
                         <div className="flex flex-col items-center">
                           <Button variant="ghost" size="icon" title="Ver Detalles" onClick={() => handleVerDetalles(p)}>
                             <AppWindow className="h-4 w-4" />
                           </Button>
                           <span className="text-xs text-muted-foreground mt-1">Detalles</span>
                         </div>
+                        */}
 
                         {/* Ver - Navigates to ver page */}
                         <div className="flex flex-col items-center">

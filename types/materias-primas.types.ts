@@ -19,6 +19,8 @@ export interface MateriaPrima {
   costo: number | null
   fechacreacion: Date | null
   activo: boolean | null
+  factorimportacion: string | null
+  costoconfactorimportacion: string | null
 }
 
 export interface MateriaPrimaCrear {

@@ -40,6 +40,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
     - obtenerMateriasPrimasXFormula: Función para obtener materias primas relacionadas a una formula
     - obtenerFormulasXFormula: Función para obtener formulas relacionadas a una formula
     - listaDesplegableFormulasBuscar
+    - obtenerProductosXFormulas: Función para obtener productos relacionados a una formula
   
   * UPDATES: EDIT/ACTUALIZAR/UPDATE
     - actualizarFormula / updFormula    
@@ -663,6 +664,37 @@ export async function listaDesplegableFormulasBuscar(buscar: string): Promise<dd
   } catch (error) {
     console.error("Error en app/actions/formulas en listaDesplegableFormulasBuscar:", error)
     return []
+  }
+}
+
+// Función: obtenerProductosXFormulas: Función para obtener productos relacionados a una formula
+export async function obtenerProductosXFormulas(formulasid: number) {
+  try {
+    // Paso 1: Validar parámetro
+    if (!formulasid || formulasid <= 0) {
+      return {
+        success: false,
+        error: "ID de fórmula inválido",
+      }
+    }
+
+    // Paso 2: Ejecutar función de Supabase
+    const { data, error } = await supabase.rpc("productosxformulas", {
+      formulasid: formulasid,
+    })
+
+    if (error) {
+      console.error("Error en obtenerProductosXFormulas:", error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data: data || [] }
+  } catch (error) {
+    console.error("Error en obtenerProductosXFormulas de actions/formulas:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerProductosXFormulas de actions/formulas",
+    }
   }
 }
 

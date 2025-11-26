@@ -310,7 +310,7 @@ export default function ZonasPage() {
         <PageTitlePlusNew
           Titulo={PageTituloMasNuevo.Titulo}
           Subtitulo={PageTituloMasNuevo.Subtitulo}
-          Visible={PageTituloMasNuevo.Visible}
+          Visible={false /*PageTituloMasNuevo.Visible*/}
           BotonTexto={PageTituloMasNuevo.BotonTexto}
           Ruta={PageTituloMasNuevo.Ruta}
         />
