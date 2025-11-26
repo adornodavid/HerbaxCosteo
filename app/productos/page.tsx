@@ -314,7 +314,9 @@ export default function ProductosPage() {
       setPageTituloMasNuevo({
         Titulo: "Productos",
         Subtitulo: "Gestión completa de Productos",
-        Visible: esAdminDOs == true ? true : false,
+        Visible: esAdminDOs == false ? false : false,
+        BotonTexto: "Crear Producto", // Agregar texto
+        Ruta: "/productos/crear", // Agregar ruta
       })
       setShowPageTituloMasNuevo(true)
 
@@ -600,7 +602,7 @@ export default function ProductosPage() {
           Titulo={PageTituloMasNuevo.Titulo}
           Subtitulo={PageTituloMasNuevo.Subtitulo}
           Visible={PageTituloMasNuevo.Visible}
-          //BotonTexto={PageTituloMasNuevo.BotonTexto}
+          BotonTexto={PageTituloMasNuevo.BotonTexto}
           Ruta={PageTituloMasNuevo.Ruta}
         />
       )}
