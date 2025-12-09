@@ -1,7 +1,7 @@
 /* ==================================================
   Imports
 ================================================== */
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createServerSupabaseClient } from "@/lib/supabase-server"
 import { cookies } from "next/headers"
 
 /* ==================================================
@@ -34,7 +34,7 @@ export async function crearSesionConExpiracion(userData: {
   RolId: number
   Permisos: string[]
 }) {
-  const supabase = createServerComponentClient({ cookies })
+  const supabase = createServerSupabaseClient()
   const expirationTime = new Date(Date.now() + 60 * 60 * 1000) // 1 hora de expiración
 
   cookies().set("UsuarioId", userData.UsuarioId, { expires: expirationTime, httpOnly: true, secure: true })

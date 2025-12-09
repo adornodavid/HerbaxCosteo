@@ -90,6 +90,11 @@ export function AppSidebar() {
         submenus: [{ name: "Reportes de Costeo", href: "/reportecosteo", icon: Icons.BarChart }],
       },
       {
+        name: "Configuraciones",
+        href: "/configuraciones",
+        icon: Icons.Settings,
+      },
+      {
         name: "Perfil",
         icon: Icons.User,
         submenus: [

@@ -490,8 +490,8 @@ export default function MaterialEtiquetadoPage() {
                           }`}
                         >
                           {elementoDetalles.MaterialEtiquetadoTipoMaterialId === 1
-                            ? "Material de Empaque"
-                            : "Material de Envase"}
+                            ? "Empaque"
+                            : "Envase"}
                         </span>
                       </div>
 
@@ -579,8 +579,8 @@ export default function MaterialEtiquetadoPage() {
                           }`}
                         >
                           {elemento.MaterialEtiquetadoTipoMaterialId === 1
-                            ? "Material de Empaque"
-                            : "Material de Envase"}
+                            ? "Empaque"
+                            : "Envase"}
                         </span>
                       </td>
                       <td className="py-3 px-4">

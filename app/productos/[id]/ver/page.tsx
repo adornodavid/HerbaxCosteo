@@ -797,6 +797,10 @@ export default function VerProductoPage() {
                             <span>${(producto.mp || 0).toFixed(6)}</span>
                           </div>
                           <div className="flex justify-between py-2 border-b border-gray-200">
+                            <span className="font-semibold">MEM:</span>
+                            <span>${(producto.mem || 0).toFixed(6)}</span>
+                          </div>
+                          <div className="flex justify-between py-2 border-b border-gray-200">
                             <span className="font-semibold">ME:</span>
                             <span>${(producto.me || 0).toFixed(6)}</span>
                           </div>
@@ -816,6 +820,10 @@ export default function VerProductoPage() {
                             <span>{((producto.mp_porcentaje || 0) * 100).toFixed(2)}%</span>
                           </div>
                           <div className="flex justify-between py-2 border-b border-gray-200">
+                            <span className="font-semibold">MEM %:</span>
+                            <span>{((producto.mem_porcentaje || 0) * 100).toFixed(2)}%</span>
+                          </div>
+                          <div className="flex justify-between py-2 border-b border-gray-200">
                             <span className="font-semibold">ME %:</span>
                             <span>{((producto.me_porcentaje || 0) * 100).toFixed(2)}%</span>
                           </div>
@@ -829,6 +837,10 @@ export default function VerProductoPage() {
                           <div className="flex justify-between py-2 border-b border-gray-200">
                             <span className="font-semibold">MP Costo:</span>
                             <span>${(producto.mp_costeado || 0).toFixed(6)}</span>
+                          </div>
+                          <div className="flex justify-between py-2 border-b border-gray-200">
+                            <span className="font-semibold">MEM Costo:</span>
+                            <span>${(producto.mem_costeado || 0).toFixed(6)}</span>
                           </div>
                           <div className="flex justify-between py-2 border-b border-gray-200">
                             <span className="font-semibold">ME Costo:</span>

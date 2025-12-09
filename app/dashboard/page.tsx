@@ -708,7 +708,7 @@ export default function DashboardPage() {
                               <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-lg border-2 border-emerald-300">
                                 <span className="text-xs font-bold text-emerald-800">% Utilidad</span>
                                 <span className="text-base font-bold text-emerald-900">
-                                  {(item.sprecioactualporcentajeutilidad * 100).toFixed(2)}%
+                                  {(item.sprecioactualporcentajeutilidad).toFixed(2)}%
                                 </span>
                               </div>
                             </div>

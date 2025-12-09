@@ -4,7 +4,7 @@
   Imports
 ================================================== */
 import { redirect } from "next/navigation"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createServerSupabaseClient } from "@/lib/supabase-server"
 
 /* ==================================================
   Interfaces
@@ -27,7 +27,7 @@ export async function loginUser(formData: FormData): Promise<LoginResult> {
       }
     }
 
-    const supabase = createClientComponentClient()
+    const supabase = createServerSupabaseClient()
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
@@ -56,7 +56,7 @@ export async function loginUser(formData: FormData): Promise<LoginResult> {
 }
 
 export async function logoutUser() {
-  const supabase = createClientComponentClient()
+  const supabase = createServerSupabaseClient()
   try {
     const { error } = await supabase.auth.signOut()
     if (error) {

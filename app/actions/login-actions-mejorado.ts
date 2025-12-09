@@ -1,10 +1,8 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { createServerSupabaseClient } from "@/lib/supabase-server"
 import { type SessionData, setSessionCookies, clearSession } from "./session-actions"
-import type { Database } from "@/lib/types-sistema-costeo"
 
 export async function obtenerVariablesSesion(): Promise<SessionData> {
-  const supabase = createServerComponentClient<Database>({ cookies })
+  const supabase = createServerSupabaseClient()
 
   try {
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
@@ -52,7 +50,7 @@ export async function obtenerVariablesSesion(): Promise<SessionData> {
 export async function procesarInicioSesion(formData: FormData) {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
-  const supabase = createServerComponentClient<Database>({ cookies })
+  const supabase = createServerSupabaseClient()
 
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -97,7 +95,7 @@ export async function procesarInicioSesion(formData: FormData) {
 }
 
 export async function logout() {
-  const supabase = createServerComponentClient<Database>({ cookies })
+  const supabase = createServerSupabaseClient()
   try {
     await supabase.auth.signOut()
     await clearSession()
