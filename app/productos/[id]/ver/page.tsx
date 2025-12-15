@@ -8,7 +8,7 @@ import { useState, useEffect, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Edit, ArrowLeft, Flag as Flask, Package } from "lucide-react"
+import { Edit, ArrowLeft, Flag as Flask, Package, HelpCircle } from "lucide-react" // Added HelpCircle
 // -- Tipados (interfaces, clases, objetos) --
 import type { oProducto } from "@/types/productos.types"
 import type {
@@ -31,6 +31,8 @@ import { useAuth } from "@/contexts/auth-context"
 import { obtenerProductos } from "@/app/actions/productos"
 import { cotizacionProducto, cotizacionOptima25, cotizacionOptima30 } from "@/app/actions/productos-cotizaciones"
 import type { ProductoXClienteN, ProductoXClienteOptimoN, ProductoXClienteOptimo } from "@/types/productos.types"
+// -- Libraries --
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip" // Added Tooltip components
 
 /* ==================================================
 	Componente Principal (Pagina)
@@ -255,12 +257,34 @@ export default function VerProductoPage() {
                         <span className="ml-2 text-gray-900">{producto.id}</span>
                       </div>
                       <div>
-                        <span className="font-semibold text-sky-700">Código:</span>
-                        <span className="ml-2 text-gray-900">{producto.codigo || "Sin código"}</span>
+                        <span className="font-semibold text-sky-700">Producto:</span>
+                        <span className="ml-2 text-gray-900">{producto.producto || "Sin producto"}</span>
                       </div>
                       <div>
                         <span className="font-semibold text-sky-700">Nombre:</span>
                         <span className="ml-2 text-gray-900">{producto.nombre || "Sin nombre"}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-sky-700">Forma Farmacéutica:</span>
+                        <span className="ml-2 text-gray-900">
+                          {producto.formasfarmaceuticas?.nombre || "Sin forma farmacéutica"}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-sky-700">Porción:</span>
+                        <span className="ml-2 text-gray-900">{producto.porcion || "Sin porción"}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-sky-700">Sistema:</span>
+                        <span className="ml-2 text-gray-900">{producto.sistemas?.nombre || "Sin sistema"}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-sky-700">Código Maestro:</span>
+                        <span className="ml-2 text-gray-900">{producto.codigomaestro || "Sin código maestro"}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-sky-700">Código:</span>
+                        <span className="ml-2 text-gray-900">{producto.codigo || "Sin código"}</span>
                       </div>
                       <div>
                         <span className="font-semibold text-sky-700">Cliente:</span>
@@ -269,6 +293,18 @@ export default function VerProductoPage() {
                       <div>
                         <span className="font-semibold text-sky-700">Zona:</span>
                         <span className="ml-2 text-gray-900">{producto.zonas?.nombre || "Sin zona"}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-sky-700">Envase:</span>
+                        <span className="ml-2 text-gray-900">{producto.envase || "Sin envase"}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-sky-700">Envase ml:</span>
+                        <span className="ml-2 text-gray-900">{producto.envaseml || "Sin envase ml"}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-sky-700">Categoría:</span>
+                        <span className="ml-2 text-gray-900">{producto.categoria || "Sin categoría"}</span>
                       </div>
                       <div>
                         <span className="font-semibold text-sky-700">Unidad de Medida:</span>
@@ -356,10 +392,23 @@ export default function VerProductoPage() {
                         <span className="font-semibold text-amber-700">MS $:</span>
                         <span className="ml-2 text-gray-900">${(producto.ms_costeado || 0).toFixed(6)}</span>
                       </div>
+                      <div className="bg-blue-50 p-1 rounded">
+                        <span className="font-semibold text-amber-700">Costo $:</span>
+                        <span className="ml-2 text-gray-900 font-bold">
+                          $
+                          {(
+                            (producto.mp_costeado || 0) +
+                            (producto.mem_costeado || 0) +
+                            (producto.me_costeado || 0) +
+                            (producto.ms_costeado || 0)
+                          ).toFixed(6)}
+                        </span>
+                      </div>
                       <div>
                         <span className="font-semibold text-amber-700">Precio Healthy Lab:</span>
                         <span className="ml-2 text-gray-900">${(producto.preciohl || 0).toFixed(6)}</span>
                       </div>
+
                       <div>
                         <span className="font-semibold text-amber-700">Utilidad:</span>
                         <span className="ml-2 text-gray-900">${(producto.utilidadhl || 0).toFixed(6)}</span>
@@ -850,10 +899,38 @@ export default function VerProductoPage() {
                             <span className="font-semibold">MS Costo:</span>
                             <span>${(producto.ms_costeado || 0).toFixed(6)}</span>
                           </div>
+                          <div className="flex justify-between py-2 border-b border-gray-200 bg-blue-50">
+                            <span className="font-bold text-blue-700">Costo Total:</span>
+                            <span className="text-blue-700 font-semibold">
+                              $
+                              {(
+                                (producto.mp_costeado || 0) +
+                                (producto.mem_costeado || 0) +
+                                (producto.me_costeado || 0) +
+                                (producto.ms_costeado || 0)
+                              ).toFixed(6)}
+                            </span>
+                          </div>
                           <div className="flex justify-between py-2 border-b border-gray-200">
-                            <span className="font-bold">Precio Healthy Lab:</span>
+                            <span className="font-bold flex items-center gap-1">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+                                  </TooltipTrigger>
+                                  <TooltipContent className="max-w-xs bg-gray-800 text-white p-3">
+                                    <p className="text-sm">
+                                      Si el Costo Total es menor a $50, el Precio Healthy Lab se asignará por defecto
+                                      con el valor de $50.
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              Precio Healthy Lab:
+                            </span>
                             <span className="text-green-600">${(producto.preciohl || 0).toFixed(6)}</span>
                           </div>
+
                           <div className="flex justify-between py-2 border-b border-gray-200">
                             <span className="font-bold">Utilidad:</span>
                             <span className="text-green-600">${(producto.utilidadhl || 0).toFixed(6)}</span>
@@ -917,13 +994,13 @@ export default function VerProductoPage() {
                               <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[100px]">
                                 % Ruta
                               </th>
-                              <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[120px]">
+                              <th className="border p-2 text-left text-sm font-semibold bg-blue-500 text-white w-[120px]">
                                 % Reembolsos
                               </th>
-                              <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[100px]">
+                              <th className="border p-2 text-left text-sm font-semibold bg-blue-500 text-white w-[100px]">
                                 % Tarjeta
                               </th>
-                              <th className="border p-2 text-left font-semibold bg-blue-500 text-white w-[100px]">
+                              <th className="border p-2 text-left text-sm font-semibold bg-blue-500 text-white w-[100px]">
                                 Envio
                               </th>
                             </tr>

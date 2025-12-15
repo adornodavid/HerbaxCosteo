@@ -173,10 +173,26 @@ export default function ProductosPage() {
         catalogoid,
         auxEstatus,
       )
+      console.log("result: " + result.success)
+      console.log("result.data: " + result.data)
       if (result.success && result.data) {
         const transformedData: oProducto[] = result.data.map((p: oProducto) => ({
           id: p.id,
+          producto: p.producto,
+          nombre: p.nombre,
+          formafarmaceuticaid: p.formafarmaceuticaid,
+          formasfarmaceuticas: {
+            nombre: p.formasfarmaceuticas?.nombre || null,
+          },
+          porcion: p.porcion,
+          sistemaid: p.sistemaid,
+          sistemas: {
+            nombre: p.sistemas?.nombre || null,
+          },
+          codigomaestro: p.codigomaestro || null,
           codigo: p.codigo,
+          envase: p.envase || null,
+          envaseml: p.envaseml || null,
           clienteid: p.clienteid,
           clientes: {
             nombre: p.clientes?.nombre || null,
@@ -185,25 +201,31 @@ export default function ProductosPage() {
           zonas: {
             nombre: p.zonas?.nombre || null,
           },
-          nombre: p.nombre,
+          categoria: p.categoria,
           imgurl: p.imgurl,
           unidadmedidaid: p.unidadmedidaid,
           unidadesmedida: {
             descripcion: p.unidadesmedida?.descripcion || null,
           },
           mp: p.mp,
+          mem: p.mem,
           me: p.me,
           ms: p.ms,
-          costo: p.costo,
           mp_porcentaje: p.mp_porcentaje,
+          mem_porcentaje: p.mem_porcentaje,
           me_porcentaje: p.me_porcentaje,
           ms_porcentaje: p.ms_porcentaje,
           mp_costeado: p.mp_costeado,
+          mem_costeado: p.mem_costeado,
           me_costeado: p.me_costeado,
           ms_costeado: p.ms_costeado,
+          costo: p.costo,
           preciohl: p.preciohl,
           utilidadhl: p.utilidadhl,
           forecasthl: p.forecasthl,
+          preciosinivaaa: p.preciosinivaaa,
+          precioconivaaa: p.precioconivaaa,
+          fechacreacion: p.fechacreacion,
           activo: p.activo,
           productoscaracteristicas: {
             descripcion: p.productoscaracteristicas?.descripcion || null,
@@ -320,7 +342,7 @@ export default function ProductosPage() {
       })
       setShowPageTituloMasNuevo(true)
 
-      // Ejecutar funcio de busqueda para cargar listado inicial
+      // Ejecutar funcion de busqueda para cargar listado inicial
       const Result = await ejecutarBusquedaProductos("", auxClienteId, -1, -1, "True")
       if (!Result.success) {
         setModalAlert({

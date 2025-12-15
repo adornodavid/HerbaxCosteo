@@ -17,6 +17,8 @@ import type {
   propsPageModalAlert,
   propsPageModalError,
 } from "@/types/common.types"
+import { Input } from "@/components/ui/input"
+import { Loader2 } from "lucide-react"
 
 // -- Componentes --
 import { PageTitlePlusNew } from "@/components/page-title-plus-new"
@@ -30,7 +32,11 @@ import { useUserSession } from "@/hooks/use-user-session"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listDesplegableZonas } from "@/app/actions/zonas"
 import { listaDesplegableProductosXClientes } from "@/app/actions/productos"
-import { obtenerReporteCosteo } from "@/app/actions/reportecosteo"
+import {
+  obtenerReporteCosteo,
+  recalcularCotizacionReporte,
+  actualizarRegistrosModificados,
+} from "@/app/actions/reportecosteo"
 import type { oProducto } from "@/types/productos.types"
 
 type ColumnConfig = {
@@ -84,6 +90,10 @@ export default function ReporteCosteoPage() {
   const recordsPerPage = 30
 
   const [columnConfigs, setColumnConfigs] = useState<ColumnConfig[]>([])
+
+  const [recalculandoFila, setRecalculandoFila] = useState<number | null>(null)
+  const [registrosModificados, setRegistrosModificados] = useState<Set<number>>(new Set())
+  const [actualizando, setActualizando] = useState(false)
 
   // -- Funciones --
 
@@ -206,6 +216,182 @@ export default function ReporteCosteoPage() {
       setShowModalError(true)
     } finally {
       setIsSearching(false)
+    }
+  }
+
+  const handlePrecioSinIvaChange = async (rowIndex: number, nuevoValor: number, row: any) => {
+    const actualIndex = indexOfFirstRecord + rowIndex
+    setRecalculandoFila(actualIndex)
+
+    console.log("[v0] handlePrecioSinIvaChange called", {
+      rowIndex,
+      actualIndex,
+      nuevoValor,
+      folio: row.folio,
+      clienteId: filtroClienteId,
+      zonaId: filtroZonaId,
+      forecast: row.sforecast,
+    })
+
+    try {
+      const result = await recalcularCotizacionReporte(
+        row.folio, // productosid
+        Number(filtroClienteId), // clientesid
+        Number(filtroZonaId), // zonasid
+        nuevoValor, // preciosiniva
+        row.sforecast || 0, // forecasts
+      )
+
+      console.log("[v0] recalcularCotizacionReporte result", result)
+
+      if (result.success && result.data) {
+        const nuevosDatos = Array.isArray(result.data) ? result.data[0] : result.data
+
+        console.log("[v0] Nuevos datos a aplicar", nuevosDatos)
+
+        setRegistrosModificados((prev) => {
+          const newSet = new Set(prev)
+          newSet.add(row.folio)
+          return newSet
+        })
+
+        // Actualizar el estado con los nuevos valores calculados
+        setReporteData((prevData) => {
+          const newData = [...prevData]
+          newData[actualIndex] = {
+            ...newData[actualIndex],
+            sprecioventasiniva: nuevoValor,
+            sprecioventaconiva: nuevosDatos.sprecioventaconiva,
+            splangeneracional: nuevosDatos.splangeneracional,
+            splannivel: nuevosDatos.splannivel,
+            splaninfinito: nuevosDatos.splaninfinito,
+            sivapagado: nuevosDatos.sivapagado,
+            scda: nuevosDatos.scda,
+            sbonoiniciorapido: nuevosDatos.sbonoiniciorapido,
+            sconstructoriniciorapido: nuevosDatos.sconstructoriniciorapido,
+            srutaexito: nuevosDatos.srutaexito,
+            sreembolsos: nuevosDatos.sreembolsos,
+            starjetacredito: nuevosDatos.starjetacredito,
+            senvio: nuevosDatos.senvio,
+            spreciohl: nuevosDatos.spreciohl,
+            sporcentajecosto: nuevosDatos.sporcentajecosto,
+            stotalcostos: nuevosDatos.stotalcostos,
+            sutilidadmarginal: nuevosDatos.sutilidadmarginal,
+            sprecioactualporcentajeutilidad: nuevosDatos.sprecioactualporcentajeutilidad,
+            sutilidadoptima: nuevosDatos.sutilidadoptima,
+            scomisiones_porcentaje: nuevosDatos.scomisiones_porcentaje * 100,
+            scosto_porcentaje: nuevosDatos.scosto_porcentaje * 100,
+            scomisionesmascosto: nuevosDatos.scomisionesmascosto,
+            spreciosiniva: nuevosDatos.sprecioventasiniva || nuevosDatos.spreciosiniva,
+            sprecioconiva: nuevosDatos.sprecioventaconiva || nuevosDatos.sprecioconiva,
+            spreciometa: nuevosDatos.spreciometa,
+            spreciometaconiva: nuevosDatos.spreciometaconiva,
+            sdiferenciautilidadesperada: nuevosDatos.sdiferenciautilidadesperada,
+            sutilidadoptima30: nuevosDatos.sutilidadoptima30,
+            scomisiones_porcentaje30: nuevosDatos.scomisiones_porcentaje30 * 100,
+            scosto_porcentaje30: nuevosDatos.scosto_porcentaje30 * 100,
+            scomisionesmascosto30: nuevosDatos.scomisionesmascosto30,
+            spreciosiniva30: nuevosDatos.sprecioventasiniva30 || nuevosDatos.spreciosiniva30,
+            sprecioconiva30: nuevosDatos.sprecioventaconiva30 || nuevosDatos.sprecioconiva30,
+            spreciometa30: nuevosDatos.spreciometa30,
+            spreciometaconiva30: nuevosDatos.spreciometaconiva30,
+            sdiferenciautilidadesperada30: nuevosDatos.sdiferenciautilidadesperada30,
+            scostoanual: nuevosDatos.scostoanual,
+            sutilidadanual: nuevosDatos.sutilidadanual,
+            scostoutilidadanual: nuevosDatos.scostoutilidadanual * 100,
+          }
+          console.log("[v0] Datos actualizados en estado:", newData[actualIndex])
+          return newData
+        })
+      } else {
+        // alert(`Error al recalcular: ${result.error || "Error desconocido"}`)
+        setModalError({
+          Titulo: "Error al recalcular",
+          Mensaje: result.error || "Error desconocido",
+          isOpen: true,
+          onClose: () => setShowModalError(false),
+        })
+        setShowModalError(true)
+      }
+    } catch (error) {
+      console.error("Error en handlePrecioSinIvaChange:", error)
+      // alert("Error al procesar el cambio de precio")
+      setModalError({
+        Titulo: "Error al procesar",
+        Mensaje: "Ocurrió un error al procesar el cambio de precio.",
+        isOpen: true,
+        onClose: () => setShowModalError(false),
+      })
+      setShowModalError(true)
+    } finally {
+      setRecalculandoFila(null)
+    }
+  }
+
+  const handleActualizarRegistros = async () => {
+    if (registrosModificados.size === 0) {
+      // alert("No hay registros modificados para actualizar")
+      setModalAlert({
+        Titulo: "Sin modificaciones",
+        Mensaje: "No hay registros modificados para actualizar.",
+        isOpen: true,
+        onClose: () => setShowModalAlert(false),
+      })
+      setShowModalAlert(true)
+      return
+    }
+
+    const confirmar = window.confirm(
+      `¿Está seguro de actualizar ${registrosModificados.size} registro(s) modificado(s)?\n\nEsto actualizará las tablas productosxcliente y productosxclienteoptimos.`,
+    )
+
+    if (!confirmar) return
+
+    setActualizando(true)
+
+    try {
+      // Obtener los datos completos de los registros modificados
+      const registrosParaActualizar = reporteData.filter((row) => registrosModificados.has(row.folio))
+
+      console.log("[v0] Registros a actualizar:", registrosParaActualizar)
+
+      const result = await actualizarRegistrosModificados(registrosParaActualizar, Number(filtroClienteId))
+
+      if (result.success) {
+        // alert(
+        //   `Actualización exitosa:\n- ProductosXCliente: ${result.actualizados.productosxcliente}\n- Óptimos 25%: ${result.actualizados.optimos25}\n- Óptimos 30%: ${result.actualizados.optimos30}`,
+        // )
+        setModalAlert({
+          Titulo: "Actualización Exitosa",
+          Mensaje: `Actualización exitosa:\n- ProductosXCliente: ${result.actualizados.productosxcliente}\n- Óptimos 25%: ${result.actualizados.optimos25}\n- Óptimos 30%: ${result.actualizados.optimos30}`,
+          isOpen: true,
+          onClose: () => setShowModalAlert(false),
+        })
+        setShowModalAlert(true)
+        // Limpiar los registros modificados
+        setRegistrosModificados(new Set())
+      } else {
+        // alert(`Error en la actualización: ${result.error}`)
+        setModalError({
+          Titulo: "Error en la actualización",
+          Mensaje: result.error,
+          isOpen: true,
+          onClose: () => setShowModalError(false),
+        })
+        setShowModalError(true)
+      }
+    } catch (error) {
+      console.error("Error al actualizar registros:", error)
+      // alert("Error al actualizar los registros")
+      setModalError({
+        Titulo: "Error al actualizar",
+        Mensaje: `Ocurrió un error al actualizar los registros: ${error instanceof Error ? error.message : String(error)}`,
+        isOpen: true,
+        onClose: () => setShowModalError(false),
+      })
+      setShowModalError(true)
+    } finally {
+      setActualizando(false)
     }
   }
 
@@ -569,10 +755,27 @@ export default function ReporteCosteoPage() {
             <div className="text-sm text-gray-600">
               Mostrando {indexOfFirstRecord + 1} - {Math.min(indexOfLastRecord, reporteData.length)} de{" "}
               {reporteData.length} registros
+              {registrosModificados.size > 0 && (
+                <span className="ml-4 text-orange-600 font-semibold">
+                  ({registrosModificados.size} modificado{registrosModificados.size !== 1 ? "s" : ""})
+                </span>
+              )}
             </div>
-            <Button type="button" className="bg-green-600 text-white hover:bg-green-700" onClick={exportarExcel}>
-              <Download className="mr-2 h-4 w-4" /> Exportar
-            </Button>
+            <div className="flex gap-2">
+              {registrosModificados.size > 0 && (
+                <Button
+                  type="button"
+                  className="bg-blue-600 text-white hover:bg-blue-700"
+                  onClick={handleActualizarRegistros}
+                  disabled={actualizando}
+                >
+                  {actualizando ? "Actualizando..." : `Actualizar (${registrosModificados.size})`}
+                </Button>
+              )}
+              <Button type="button" className="bg-green-600 text-white hover:bg-green-700" onClick={exportarExcel}>
+                <Download className="mr-2 h-4 w-4" /> Exportar
+              </Button>
+            </div>
           </div>
 
           <Card className="rounded-xs border bg-card text-card-foreground shadow">
@@ -580,7 +783,6 @@ export default function ReporteCosteoPage() {
               <CardTitle>Reporte de Costeo de Productos</CardTitle>
             </CardHeader>
             <CardContent>
-              {/* Start of updates */}
               <div className="overflow-x-auto relative" style={{ maxHeight: "600px", overflow: "auto" }}>
                 <table className="w-full border-collapse border border-gray-300">
                   <thead>
@@ -810,8 +1012,8 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 27 - Precio Con IVA */}
                       <th
-                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900 sticky z-10"
-                        style={{ top: "0px", minWidth: "140px" }}
+                        className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                        style={{ top: "0px", minWidth: "140px", position: "sticky" }}
                       >
                         PRECIO CON IVA
                       </th>
@@ -1000,12 +1202,31 @@ export default function ReporteCosteoPage() {
 
                         {/* Columna 4 - Precio Venta Sin IVA */}
                         <td
-                          className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                          className="border border-gray-300 p-1 text-sm text-gray-700 text-right sticky"
                           style={{ top: "0px", minWidth: "150px", position: "sticky" }}
                         >
-                          {typeof row.sprecioventasiniva === "number"
-                            ? `$${row.sprecioventasiniva.toFixed(2)}`
-                            : row.sprecioventasiniva || "-"}
+                          <div className="relative">
+                            <Input
+                              type="number"
+                              step="0.01"
+                              className="w-full text-right pr-2 h-8 text-sm"
+                              defaultValue={
+                                typeof row.sprecioventasiniva === "number" ? row.sprecioventasiniva.toFixed(2) : ""
+                              }
+                              onBlur={(e) => {
+                                const nuevoValor = Number.parseFloat(e.target.value) || 0
+                                if (nuevoValor !== row.sprecioventasiniva) {
+                                  handlePrecioSinIvaChange(rowIndex, nuevoValor, row)
+                                }
+                              }}
+                              disabled={recalculandoFila === indexOfFirstRecord + rowIndex}
+                            />
+                            {recalculandoFila === indexOfFirstRecord + rowIndex && (
+                              <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+                                <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                              </div>
+                            )}
+                          </div>
                         </td>
 
                         {/* Columna 5 - Precio Venta Con IVA */}
@@ -1387,7 +1608,6 @@ export default function ReporteCosteoPage() {
                   </tbody>
                 </table>
               </div>
-              {/* End of updates */}
 
               <div className="flex justify-between items-center mt-4 pt-4 border-t">
                 <Button

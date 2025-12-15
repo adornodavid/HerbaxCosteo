@@ -21,10 +21,24 @@
     - ProductosEstadisticas
 ================================================== */
 
-// Objetos
+// Objetos 
 export interface oProducto {
   id: number
+  producto: string | null
+  nombre: string | null
+  formafarmaceuticaid: number
+  formasfarmaceuticas: {
+    nombre: string | null
+  }
+  porcion: number | null
+  sistemaid: number
+  sistemas: {
+    nombre: string | null
+  }
+  codigomaestro: string | null
   codigo: string | null
+  envase: string | null
+  envaseml: number | null
   clienteid: number | null
   clientes: {
     nombre: string | null
@@ -33,7 +47,7 @@ export interface oProducto {
   zonas: {
     nombre: string | null
   }
-  nombre: string | null
+  categoria: string | null
   imgurl: string | null
   unidadmedidaid: number
   unidadesmedida: {
@@ -43,7 +57,6 @@ export interface oProducto {
   mem: number | null
   me: number | null
   ms: number | null
-  costo: number | null
   mp_porcentaje: number | null
   mem_porcentaje: number | null
   me_porcentaje: number | null
@@ -52,9 +65,13 @@ export interface oProducto {
   mem_costeado: number | null
   me_costeado: number | null
   ms_costeado: number | null
+  costo: number | null
   preciohl: number | null
   utilidadhl: number | null
   forecasthl:number | null
+  preciosinivaaa: number | null
+  precioconivaaa: number | null
+  fechacreacion: string | null
   activo: boolean | null
   productoscaracteristicas: {
     descripcion: string | null

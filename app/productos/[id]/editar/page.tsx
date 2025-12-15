@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trash2 } from "lucide-react"
+import { Trash2, HelpCircle } from "lucide-react"
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
 import type { Cliente } from "@/types/clientes"
@@ -39,6 +39,11 @@ import { useAuth } from "@/contexts/auth-context"
 import { obtenerProductos, actualizarProducto, recalcularProducto } from "@/app/actions/productos"
 import { obtenerClientes } from "@/app/actions/clientes"
 import {
+  listaDesplegableUnidadesMedida,
+  listaDesplegableFormasFarmaceuticas,
+  listaDesplegableSistemas,
+} from "@/app/actions/catalogos"
+import {
   obtenerFormulas,
   listaDesplegableFormulasBuscar,
   crearFormulaXProducto,
@@ -49,7 +54,6 @@ import {
   crearMaterialEtiquetadoXProducto,
   eliminarMaterialEtiquetadoXProducto,
 } from "@/app/actions/material-etiquetado"
-import { listaDesplegableUnidadesMedida } from "@/app/actions/catalogos"
 import { listDesplegableZonas } from "@/app/actions/zonas"
 
 /* ==================================================
@@ -78,6 +82,9 @@ export default function EditarProductoPage() {
   const [formulas, setFormulas] = useState<Formula[]>([])
   const [zonas, setZonas] = useState<ddlItem[]>([])
   const [unidadesMedida, setUnidadesMedida] = useState<ddlItem[]>([])
+  const [formasFarmaceuticas, setFormasFarmaceuticas] = useState<ddlItem[]>([])
+  const [sistemas, setSistemas] = useState<ddlItem[]>([])
+  // </CHANGE>
   const [activeTab, setActiveTab] = useState<"informacion" | "caracteristicas" | "elaboracion" | "cotizacion">(
     "informacion",
   )
@@ -162,16 +169,50 @@ export default function EditarProductoPage() {
     codigo: "",
     clienteid: "",
     zonaid: "",
+    producto: "",
+    formafarmaceuticaid: "",
+    porcion: "",
+    sistemaid: "",
+    codigomaestro: "",
+    envase: "",
+    envaseml: "",
+    categoria: "",
+    unidadmedidaid: "",
+    // </CHANGE>
   })
 
   const [zonasLoaded, setZonasLoaded] = useState(false)
 
   useEffect(() => {
     const cargarCatalogos = async () => {
-      // Cargar unidades de medida
-      const unidadesResult = await listaDesplegableUnidadesMedida()
-      if (unidadesResult.success && unidadesResult.data) {
-        setUnidadesMedida(unidadesResult.data)
+      console.log("[v0] Cargando catálogos...")
+      try {
+        const [unidadesResult, formasResult, sistemasResult] = await Promise.all([
+          listaDesplegableUnidadesMedida(),
+          listaDesplegableFormasFarmaceuticas(),
+          listaDesplegableSistemas(),
+        ])
+
+        console.log("[v0] Unidades de medida:", unidadesResult)
+        console.log("[v0] Formas farmacéuticas:", formasResult)
+        console.log("[v0] Sistemas:", sistemasResult)
+
+        if (unidadesResult.success && unidadesResult.data) {
+          setUnidadesMedida(unidadesResult.data)
+        }
+        if (formasResult.success && formasResult.data) {
+          setFormasFarmaceuticas(formasResult.data)
+        }
+        if (sistemasResult.success && sistemasResult.data) {
+          setSistemas(sistemasResult.data)
+        }
+      } catch (error) {
+        console.error("[v0] Error al cargar catálogos:", error)
+        setModalError({
+          Titulo: "Error al cargar catálogos",
+          Mensaje: "Ocurrió un error al cargar las listas desplegables.",
+        })
+        setShowModalError(true)
       }
     }
     cargarCatalogos()
@@ -198,6 +239,16 @@ export default function EditarProductoPage() {
         codigo: producto.codigo || "",
         clienteid: producto.clienteid?.toString() || "",
         zonaid: producto.zonaid?.toString() || "",
+        producto: producto.producto || "",
+        formafarmaceuticaid: producto.formafarmaceuticaid?.toString() || "",
+        porcion: producto.porcion || "",
+        sistemaid: producto.sistemaid?.toString() || "",
+        codigomaestro: producto.codigomaestro || "",
+        envase: producto.envase || "",
+        envaseml: producto.envaseml || "",
+        categoria: producto.categoria || "",
+        unidadmedidaid: producto.unidadmedidaid?.toString() || "",
+        // </CHANGE>
       })
       setExistingImageUrl(producto.imgurl || "")
       setImagePreview(producto.imgurl || null)
@@ -357,6 +408,8 @@ export default function EditarProductoPage() {
     const nombre = formDataToSend.get("nombre") as string
     const codigo = formDataToSend.get("codigo") as string
     const zonaid = formDataToSend.get("zonaid") as string
+    const productoName = formDataToSend.get("producto") as string
+    const codigomaestro = formDataToSend.get("codigomaestro") as string
 
     // Validar variables obligatorias
     if (!nombre || nombre.trim().length < 3) {
@@ -374,6 +427,24 @@ export default function EditarProductoPage() {
       setModalValidation({
         Titulo: "Datos incompletos",
         Mensaje: "Debe seleccionar una zona válida para el producto.",
+      })
+      setShowModalValidation(true)
+      return
+    }
+
+    if (!productoName || productoName.trim().length < 3) {
+      setModalValidation({
+        Titulo: "Datos incompletos",
+        Mensaje: "El nombre del producto debe tener al menos 3 caracteres.",
+      })
+      setShowModalValidation(true)
+      return
+    }
+
+    if (!codigomaestro || codigomaestro.trim().length < 3) {
+      setModalValidation({
+        Titulo: "Datos incompletos",
+        Mensaje: "El Código Maestro debe tener al menos 3 caracteres.",
       })
       setShowModalValidation(true)
       return
@@ -1398,8 +1469,22 @@ export default function EditarProductoPage() {
               {existingImageUrl && <input type="hidden" name="imgurl" value={existingImageUrl} />}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Left column: All inputs */}
+                {/* Left column: Basic info inputs */}
                 <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="txtProducto">
+                      <span className="text-red-500">*</span> Producto
+                    </Label>
+                    <Input
+                      id="txtProducto"
+                      name="producto"
+                      type="text"
+                      placeholder="Ingrese el producto"
+                      value={formData.producto}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="txtNombre">
                       <span className="text-red-500">*</span> Nombre
@@ -1410,6 +1495,72 @@ export default function EditarProductoPage() {
                       type="text"
                       placeholder="Ingrese el nombre del producto"
                       value={formData.nombre}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="ddlFormaFarmaceutica">Forma Farmacéutica</Label>
+                    <Select
+                      name="formafarmaceuticaid"
+                      value={formData.formafarmaceuticaid}
+                      onValueChange={(value) => handleSelectChange("formafarmaceuticaid", value)}
+                    >
+                      <SelectTrigger id="ddlFormaFarmaceutica">
+                        <SelectValue placeholder="Selecciona una forma farmacéutica" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {formasFarmaceuticas.map((forma) => (
+                          <SelectItem key={forma.value} value={forma.value}>
+                            {forma.text}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="txtPorcion">Porción</Label>
+                    <Input
+                      id="txtPorcion"
+                      name="porcion"
+                      type="text"
+                      placeholder="Ingrese la porción"
+                      value={formData.porcion}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="ddlSistema">Sistema</Label>
+                    <Select
+                      name="sistemaid"
+                      value={formData.sistemaid}
+                      onValueChange={(value) => handleSelectChange("sistemaid", value)}
+                    >
+                      <SelectTrigger id="ddlSistema">
+                        <SelectValue placeholder="Selecciona un sistema" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sistemas.map((sistema) => (
+                          <SelectItem key={sistema.value} value={sistema.value}>
+                            {sistema.text}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="txtCodigoMaestro">
+                      <span className="text-red-500">*</span> Código Maestro
+                    </Label>
+                    <Input
+                      id="txtCodigoMaestro"
+                      name="codigomaestro"
+                      type="text"
+                      placeholder="Ingrese el código maestro"
+                      value={formData.codigomaestro}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -1473,26 +1624,85 @@ export default function EditarProductoPage() {
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+
+                {/* Right column: Additional inputs and image */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="txtEnvase">Envase</Label>
+                    <Input
+                      id="txtEnvase"
+                      name="envase"
+                      type="text"
+                      placeholder="Ingrese el envase"
+                      value={formData.envase}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="txtEnvaseMl">Envase ml</Label>
+                    <Input
+                      id="txtEnvaseMl"
+                      name="envaseml"
+                      type="text"
+                      placeholder="Ingrese envase ml"
+                      value={formData.envaseml}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="txtCategoria">Categoría</Label>
+                    <Input
+                      id="txtCategoria"
+                      name="categoria"
+                      type="text"
+                      placeholder="Ingrese la categoría"
+                      value={formData.categoria}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="ddlUnidadMedida">Unidad de Medida</Label>
+                    <Select
+                      name="unidadmedidaid"
+                      value={formData.unidadmedidaid}
+                      onValueChange={(value) => handleSelectChange("unidadmedidaid", value)}
+                      // </CHANGE>
+                    >
+                      <SelectTrigger id="ddlUnidadMedida">
+                        <SelectValue placeholder="Selecciona una unidad de medida" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {unidadesMedida.map((unidad) => (
+                          <SelectItem key={unidad.value} value={unidad.value}>
+                            {unidad.text}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="imageImg">Imagen</Label>
                     <Input id="imageImg" name="imagen" type="file" accept="image/*" onChange={handleImageChange} />
                   </div>
-                </div>
 
-                {/* Right column: Image preview only */}
-                <div className="space-y-2">
-                  <Label>Previsualización de Imagen</Label>
-                  <div className="border rounded-md flex items-center justify-center bg-muted max-h-[350px] h-[350px]">
-                    {imagePreview ? (
-                      <img
-                        src={imagePreview || "/placeholder.svg"}
-                        alt="Preview"
-                        className="h-full w-auto object-contain"
-                      />
-                    ) : (
-                      <span className="text-muted-foreground text-sm">Sin imagen seleccionada</span>
-                    )}
+                  <div className="space-y-2">
+                    <Label>Previsualización de Imagen</Label>
+                    <div className="border rounded-md flex items-center justify-center bg-muted max-h-[350px] h-[350px]">
+                      {imagePreview ? (
+                        <img
+                          src={imagePreview || "/placeholder.svg"}
+                          alt="Preview"
+                          className="h-full w-auto object-contain"
+                        />
+                      ) : (
+                        <span className="text-muted-foreground text-sm">Sin imagen seleccionada</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1501,7 +1711,7 @@ export default function EditarProductoPage() {
                 <>
                   <Card className="rounded-xs border bg-card text-foreground shadow mt-6">
                     <CardContent className="p-6">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div className="space-y-2">
                           <h3 className="font-bold text-lg text-sky-700 border-b pb-1">Información Básica</h3>
                           <div className="space-y-1 text-sm">
@@ -1510,12 +1720,36 @@ export default function EditarProductoPage() {
                               <span className="ml-2 text-gray-900">{producto.id}</span>
                             </div>
                             <div>
-                              <span className="font-semibold text-sky-700">Código:</span>
-                              <span className="ml-2 text-gray-900">{producto.codigo || "Sin código"}</span>
+                              <span className="font-semibold text-sky-700">Producto:</span>
+                              <span className="ml-2 text-gray-900">{producto.producto || "Sin producto"}</span>
                             </div>
                             <div>
                               <span className="font-semibold text-sky-700">Nombre:</span>
                               <span className="ml-2 text-gray-900">{producto.nombre || "Sin nombre"}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Forma Farmacéutica:</span>
+                              <span className="ml-2 text-gray-900">
+                                {producto.formasfarmaceuticas?.nombre || "Sin forma farmacéutica"}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Porción:</span>
+                              <span className="ml-2 text-gray-900">{producto.porcion || "Sin porción"}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Sistema:</span>
+                              <span className="ml-2 text-gray-900">{producto.sistemas?.nombre || "Sin sistema"}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Código Maestro:</span>
+                              <span className="ml-2 text-gray-900">
+                                {producto.codigomaestro || "Sin código maestro"}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Código:</span>
+                              <span className="ml-2 text-gray-900">{producto.codigo || "Sin código"}</span>
                             </div>
                             <div>
                               <span className="font-semibold text-sky-700">Cliente:</span>
@@ -1524,6 +1758,18 @@ export default function EditarProductoPage() {
                             <div>
                               <span className="font-semibold text-sky-700">Zona:</span>
                               <span className="ml-2 text-gray-900">{producto.zonas?.nombre || "Sin zona"}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Envase:</span>
+                              <span className="ml-2 text-gray-900">{producto.envase || "Sin envase"}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Envase ml:</span>
+                              <span className="ml-2 text-gray-900">{producto.envaseml || "Sin envase ml"}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Categoría:</span>
+                              <span className="ml-2 text-gray-900">{producto.categoria || "Sin categoría"}</span>
                             </div>
                             <div>
                               <span className="font-semibold text-sky-700">Unidad de Medida:</span>
@@ -1618,6 +1864,18 @@ export default function EditarProductoPage() {
                             <div>
                               <span className="font-semibold text-amber-700">MS $:</span>
                               <span className="ml-2 text-gray-900">${(producto.ms_costeado || 0).toFixed(2)}</span>
+                            </div>
+                            <div className="bg-blue-50 p-1 rounded">
+                              <span className="font-semibold text-amber-700">Costo $:</span>
+                              <span className="ml-2 text-gray-900 font-bold">
+                                $
+                                {(
+                                  (producto.mp_costeado || 0) +
+                                  (producto.mem_costeado || 0) +
+                                  (producto.me_costeado || 0) +
+                                  (producto.ms_costeado || 0)
+                                ).toFixed(2)}
+                              </span>
                             </div>
                             <div>
                               <span className="font-semibold text-amber-700">Precio Healthy Lab:</span>
@@ -2085,7 +2343,7 @@ export default function EditarProductoPage() {
               <div className="border-t-2 border-[#6db8c9] mt-4 pt-4 flex justify-end"></div>
 
               <div className="space-y-4">
-                <h3 className="text-lg mt-18 font-semibold">Agregar Material de Envase</h3>
+                <h3 className="text-lg font-semibold">Agregar Material de Envase</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                   <div className="space-y-2 relative" ref={materialEnvaseSearchRef}>
@@ -2291,14 +2549,37 @@ export default function EditarProductoPage() {
                       <span className="font-semibold">ME Costo:</span>
                       <span>${(producto?.me_costeado || 0).toFixed(6)}</span>
                     </div>
+                    {/* rest of the code */}
                     <div className="flex justify-between py-2 border-b border-gray-200">
                       <span className="font-semibold">MS Costo:</span>
                       <span>${(producto?.ms_costeado || 0).toFixed(6)}</span>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-gray-200">
-                      <span className="font-bold">Precio Healthy Lab:</span>
+                    <div className="flex justify-between py-2 border-b-2 border-blue-300 bg-blue-50 px-2 rounded">
+                      <span className="font-bold text-blue-700">Costo Total:</span>
+                      <span className="font-bold text-blue-700">
+                        $
+                        {(
+                          (producto?.mp_costeado || 0) +
+                          (producto?.mem_costeado || 0) +
+                          (producto?.me_costeado || 0) +
+                          (producto?.ms_costeado || 0)
+                        ).toFixed(6)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-gray-200 items-center">
+                      <span className="font-bold flex items-center gap-1">
+                        <span className="relative group">
+                          <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+                          <span className="absolute left-6 top-0 z-50 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg">
+                            Si el costo total es menor a $50, el precio de Healthy Lab se asignará por defecto con el
+                            valor de $50.
+                          </span>
+                        </span>
+                        Precio Healthy Lab:
+                      </span>
                       <span className="text-green-600">${(producto?.preciohl || 0).toFixed(6)}</span>
                     </div>
+                    {/* </CHANGE> */}
                     <div className="flex justify-between py-2 border-b border-gray-200">
                       <span className="font-bold">Utilidad:</span>
                       <span className="text-green-600">${(producto?.utilidadhl || 0).toFixed(6)}</span>

@@ -916,6 +916,18 @@ export default function CostearPage() {
                         <span className="ml-2 text-gray-900">${(producto.ms_costeado || 0).toFixed(2)}</span>
                       </div>
                       <div>
+                        <span className="font-semibold text-amber-700">Costo Total:</span>
+                        <span className="ml-2 text-gray-900">
+                          $
+                          {(
+                            (producto.mp_costeado || 0) +
+                            (producto.mem_costeado || 0) +
+                            (producto.me_costeado || 0) +
+                            (producto.ms_costeado || 0)
+                          ).toFixed(6)}
+                        </span>
+                      </div>
+                      <div>
                         <span className="font-semibold text-amber-700">Precio Healthy Lab:</span>
                         <span className="ml-2 text-gray-900">${(producto.preciohl || 0).toFixed(2)}</span>
                       </div>

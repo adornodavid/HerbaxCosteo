@@ -856,10 +856,48 @@ export async function actualizarCotizacion(
       data: data,
     }
   } catch (error) {
-    // Retorno con error
     return {
       success: false,
-      error: `Ocurrió un error en la función actualizarcotizacion de app/actions/productos-cotizaciones: ${error instanceof Error ? error.message : String(error)}`,
+      error: `Error en actualizarcotizacion: ${error instanceof Error ? error.message : String(error)}`,
+    }
+  }
+}
+
+export async function recalcularCotizacionReporte(
+  productosid: number,
+  clientesid: number,
+  zonasid: number,
+  preciosiniva: number,
+  forecasts: number,
+): Promise<{
+  success: boolean
+  error?: string
+  data?: any
+}> {
+  try {
+    const { data, error } = await supabase.rpc("reportecosteocalculo", {
+      productosid,
+      clientesid,
+      zonasid,
+      preciosiniva,
+      forecasts,
+    })
+
+    if (error) {
+      return {
+        success: false,
+        error: `Error al recalcular cotización: ${error.message}`,
+      }
+    }
+
+    return {
+      success: true,
+      data: data,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: `Error en recalcularCotizacionReporte: ${error instanceof Error ? error.message : String(error)}`,
     }
   }
 }

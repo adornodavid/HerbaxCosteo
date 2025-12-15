@@ -65,7 +65,204 @@ export async function listaDesplegableUnidadesMedida(id = -1, descripcion = "") 
   }
 }
 
-//Función: selCatalogosXFiltros / obtenerCatalogosFiltrados: funcio que ejecuta el bloque de busqueda en la pagina de listado
+// Función: listaDesplegableFormasFarmaceuticas: función que se utiliza para los dropdownlist y puede contener id y / o nombre
+export async function listaDesplegableFormasFarmaceuticas(id = -1, nombre = "") {
+  try {
+    // Query principal
+    let query = supabase.from("formasfarmaceuticas").select("id, nombre")
+
+    // Filtros en query, dependiendo parametros
+    if (id !== -1) {
+      query = query.eq("id", id)
+    }
+    if (nombre !== "") {
+      query = query.ilike("nombre", `%${nombre}%`)
+    }
+
+    // Ejecutar query
+    query = query.order("nombre", { ascending: true })
+
+    // Varaibles y resultados del query
+    const { data: formas, error } = await query
+
+    if (error) {
+      console.error("Error obteniendo la lista desplegable de formas farmacéuticas:", error)
+      return { success: false, error: error.message }
+    }
+
+    const data: ddlItem[] = formas
+      ? formas.map((forma) => ({
+          value: forma.id.toString(),
+          text: forma.nombre,
+        }))
+      : []
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en listaDesplegableFormasFarmaceuticas:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: listaDesplegableSistemas: función que se utiliza para los dropdownlist y puede contener id y / o nombre
+export async function listaDesplegableSistemas(id = -1, nombre = "") {
+  try {
+    console.log("[v0] listaDesplegableSistemas called with:", { id, nombre })
+
+    // Query principal
+    let query = supabase.from("sistemas").select("id, nombre")
+
+    // Filtros en query, dependiendo parametros
+    if (id !== -1) {
+      query = query.eq("id", id)
+    }
+    if (nombre !== "") {
+      query = query.ilike("nombre", `%${nombre}%`)
+    }
+
+    // Ejecutar query
+    query = query.order("nombre", { ascending: true })
+
+    // Varaibles y resultados del query
+    const { data: sistemas, error } = await query
+
+    console.log("[v0] sistemas query result:", { sistemas, error })
+
+    if (error) {
+      console.error("Error obteniendo la lista desplegable de sistemas:", error)
+      return { success: false, error: error.message }
+    }
+
+    const data: ddlItem[] = sistemas
+      ? sistemas.map((sistema) => ({
+          value: sistema.id.toString(),
+          text: sistema.nombre,
+        }))
+      : []
+
+    console.log("[v0] sistemas mapped data:", data)
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en listaDesplegableSistemas:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: listaDesplegableProductosCategorias: función que se utiliza para los dropdownlist de categorías de productos
+export async function listaDesplegableProductosCategorias(id = "", value = "") {
+  try {
+    // Query principal con DISTINCT
+    let query = supabase.from("productos").select("categoria").not("categoria", "is", null)
+
+    // Filtros en query, dependiendo parametros
+    if (id !== "") {
+      query = query.eq("categoria", `%${value}%`)
+    }
+    if (value !== "") {
+      query = query.ilike("categoria", `%${value}%`)
+    }
+
+    // Ejecutar query
+    const { data: categorias, error } = await query
+
+    if (error) {
+      console.error("Error obteniendo la lista desplegable de categorías de productos:", error)
+      return { success: false, error: error.message }
+    }
+
+    // Obtener valores únicos (DISTINCT) y ordenar
+    const categoriasUnicas = Array.from(new Set(categorias?.map((item) => item.categoria) || []))
+      .filter((cat) => cat !== null && cat !== "")
+      .sort()
+
+    const data: ddlItem[] = categoriasUnicas.map((categoria) => ({
+      value: categoria,
+      text: categoria,
+    }))
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en listaDesplegableProductosCategorias:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: listaDesplegableEnvase: función que se utiliza para los dropdownlist de envases de productos
+export async function listaDesplegableEnvase(id = "", value = "") {
+  try {
+    // Query principal con DISTINCT
+    let query = supabase.from("productos").select("envase").not("envase", "is", null)
+
+    // Filtros en query, dependiendo parametros
+    if (id !== "") {
+      query = query.eq("envase", `%${value}%`)
+    }
+    if (value !== "") {
+      query = query.ilike("envase", `%${value}%`)
+    }
+
+    // Ejecutar query
+    const { data: envases, error } = await query
+
+    if (error) {
+      console.error("Error obteniendo la lista desplegable de envases de productos:", error)
+      return { success: false, error: error.message }
+    }
+
+    // Obtener valores únicos (DISTINCT) y ordenar
+    const envasesUnicos = Array.from(new Set(envases?.map((item) => item.envase) || []))
+      .filter((env) => env !== null && env !== "")
+      .sort()
+
+    const data: ddlItem[] = envasesUnicos.map((envase) => ({
+      value: envase,
+      text: envase,
+    }))
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en listaDesplegableEnvase:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: listaDesplegableCatalogos: función para obtener el listado de catalogos para dropdownlist con filtros opcionales
+export async function listaDesplegableCatalogos(id = -1, nombre = "", clienteid = -1) {
+  try {
+    let query = supabase.from("catalogos").select("id, nombre").eq("activo", true)
+
+    if (id > 0) {
+      query = query.eq("id", id)
+    }
+    if (nombre && nombre !== "" && nombre !== null) {
+      query = query.eq("nombre", nombre)
+    }
+    if (clienteid > 0) {
+      query = query.eq("clienteid", clienteid)
+    }
+
+    const { data, error } = await query.order("nombre", { ascending: true })
+
+    if (error) throw error
+
+    return {
+      data: (data || []).map((catalogo) => ({
+        id: catalogo.id,
+        nombre: catalogo.nombre,
+      })),
+      error: null,
+    }
+  } catch (error: any) {
+    console.error("Error en listaDesplegableCatalogos:", error.message)
+    return {
+      data: [],
+      error: error.message,
+    }
+  }
+}
+
+// Función: obtenerCatalogosFiltrados: función que ejecuta el bloque de búsqueda en la página de listado
 export async function obtenerCatalogosFiltrados(
   nombre = "",
   clienteId = "-1",
@@ -134,7 +331,7 @@ export async function obtenerCatalogosFiltrados(
   }
 }
 
-//Función: selClientesDDL / obtenerClientesParaDropdown: función para obtener el listado para un dropdownlist
+// Función: obtenerClientesParaDropdown: función para obtener el listado para un dropdownlist
 export async function obtenerClientesParaDropdown() {
   try {
     const { data, error } = await supabase
@@ -161,7 +358,7 @@ export async function obtenerClientesParaDropdown() {
   }
 }
 
-//Función: selCatalogoXId / obtenerDetalleCatalogo: Función para obtener a detalle un catalogo pot Id
+// Función: obtenerDetalleCatalogo: Función para obtener a detalle un catálogo por Id
 export async function obtenerDetalleCatalogo(catalogoId: string) {
   try {
     const { data, error } = await supabase
@@ -211,42 +408,7 @@ export async function obtenerDetalleCatalogo(catalogoId: string) {
   }
 }
 
-//Función: listaDesplegableCatalogos: función para obtener el listado de catalogos para dropdownlist con filtros opcionales
-export async function listaDesplegableCatalogos(id = -1, nombre = "", clienteid = -1) {
-  try {
-    let query = supabase.from("catalogos").select("id, nombre").eq("activo", true)
-
-    if (id > 0) {
-      query = query.eq("id", id)
-    }
-    if (nombre && nombre !== "" && nombre !== null) {
-      query = query.eq("nombre", nombre)
-    }
-    if (clienteid > 0) {
-      query = query.eq("clienteid", clienteid)
-    }
-
-    const { data, error } = await query.order("nombre", { ascending: true })
-
-    if (error) throw error
-
-    return {
-      data: (data || []).map((catalogo) => ({
-        id: catalogo.id,
-        nombre: catalogo.nombre,
-      })),
-      error: null,
-    }
-  } catch (error: any) {
-    console.error("Error en listaDesplegableCatalogos:", error.message)
-    return {
-      data: [],
-      error: error.message,
-    }
-  }
-}
-
-//Función: obtenerProductosCatalogo: función para obtener productos relacionados a un catálogo
+// Función: obtenerProductosCatalogo: función para obtener productos relacionados a un catálogo
 export async function obtenerProductosCatalogo(catalogoId: string) {
   try {
     const { data, error } = await supabase
@@ -298,7 +460,7 @@ export async function obtenerProductosCatalogo(catalogoId: string) {
   }
 }
 
-//Función: obtenerProductosDisponiblesParaCatalogo: función para obtener productos disponibles del cliente para agregar al catálogo
+// Función: obtenerProductosDisponiblesParaCatalogo: función para obtener productos disponibles del cliente para agregar al catálogo
 export async function obtenerProductosDisponiblesParaCatalogo(catalogoId: string) {
   try {
     // Primero obtenemos los productos del cliente relacionado al catálogo
@@ -357,7 +519,7 @@ export async function obtenerProductosDisponiblesParaCatalogo(catalogoId: string
   }
 }
 
-//Función: asociarProductoACatalogo: función para asociar un producto a un catálogo
+// Función: asociarProductoACatalogo: función para asociar un producto a un catálogo
 export async function asociarProductoACatalogo(
   catalogoId: string,
   productoId: string,
@@ -392,7 +554,7 @@ export async function asociarProductoACatalogo(
   }
 }
 
-//Función: crearCatalogo: función para crear un nuevo catálogo con imagen
+// Función: crearCatalogo: función para crear un nuevo catálogo con imagen
 export async function crearCatalogo(clienteId: string, nombre: string, descripcion: string, imageFile: File | null) {
   try {
     let imgUrl = null
@@ -445,7 +607,7 @@ export async function crearCatalogo(clienteId: string, nombre: string, descripci
   }
 }
 
-//Función: eliminarProductoDeCatalogo: función para eliminar un producto de un catálogo
+// Función: eliminarProductoDeCatalogo: función para eliminar un producto de un catálogo
 export async function eliminarProductoDeCatalogo(catalogoId: string, productoId: string) {
   try {
     const { error } = await supabase
@@ -469,7 +631,7 @@ export async function eliminarProductoDeCatalogo(catalogoId: string, productoId:
   }
 }
 
-//Función: actualizarPrecioProductoCatalogo: función para actualizar el precio de venta de un producto en un catálogo
+// Función: actualizarPrecioProductoCatalogo: función para actualizar el precio de venta de un producto en un catálogo
 export async function actualizarPrecioProductoCatalogo(
   catalogoId: string,
   productoId: string,

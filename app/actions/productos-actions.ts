@@ -84,8 +84,14 @@ export async function crearProducto(formData: FormData) {
     const nombre = formData.get("nombre") as string
     const descripcion = formData.get("descripcion") as string
     const clienteid = Number.parseInt(formData.get("clienteid") as string)
-    const presentacion = formData.get("presentacion") as string
+    const producto = formData.get("producto") as string
+    const formafarmaceuticaid = Number.parseInt(formData.get("formafarmaceuticaid") as string) || null
     const porcion = formData.get("porcion") as string
+    const sistemaid = Number.parseInt(formData.get("sistemaid") as string) || null
+    const codigomaestro = formData.get("codigomaestro") as string
+    const envase = formData.get("envase") as string
+    const envaseml = formData.get("envaseml") as string
+    const presentacion = formData.get("presentacion") as string
     const modouso = formData.get("modouso") as string
     const porcionenvase = formData.get("porcionenvase") as string
     const formaid = Number.parseInt(formData.get("formaid") as string) || null
@@ -107,8 +113,14 @@ export async function crearProducto(formData: FormData) {
         nombre,
         descripcion,
         clienteid,
-        presentacion,
+        producto,
+        formafarmaceuticaid,
         porcion,
+        sistemaid,
+        codigomaestro,
+        envase,
+        envaseml,
+        presentacion,
         modouso,
         porcionenvase,
         formaid,
@@ -152,6 +164,13 @@ export async function actualizarProducto(
     costototal?: number | null
     imgurl?: string | null
     activo?: boolean
+    producto?: string
+    formafarmaceuticaid?: number | null
+    porcion?: string
+    sistemaid?: number | null
+    codigomaestro?: string
+    envase?: string
+    envaseml?: string
   },
 ) {
   try {
@@ -727,9 +746,14 @@ export async function actualizarProductoEtapa1(productoId: number, formData: For
       nombre: formData.get("nombre") as string,
       descripcion: formData.get("descripcion") as string,
       clienteid: Number.parseInt(formData.get("clienteid") as string),
-      //catalogoid: Number.parseInt(formData.get("catalogoid") as string) || null,
-      presentacion: formData.get("presentacion") as string,
+      producto: formData.get("producto") as string,
+      formafarmaceuticaid: Number.parseInt(formData.get("formafarmaceuticaid") as string) || null,
       porcion: formData.get("porcion") as string,
+      sistemaid: Number.parseInt(formData.get("sistemaid") as string) || null,
+      codigomaestro: formData.get("codigomaestro") as string,
+      envase: formData.get("envase") as string,
+      envaseml: formData.get("envaseml") as string,
+      presentacion: formData.get("presentacion") as string,
       modouso: formData.get("modouso") as string,
       porcionenvase: formData.get("porcionenvase") as string,
       formaid: Number.parseInt(formData.get("formaid") as string) || null,
