@@ -765,6 +765,16 @@ export async function actualizarProducto(formData: FormData) {
 
     const updateData: any = {}
 
+    if (formData.get("producto")) updateData.producto = formData.get("producto") as string
+    if (formData.get("formafarmaceuticaid"))
+      updateData.formafarmaceuticaid = Number.parseInt(formData.get("formafarmaceuticaid") as string)
+    if (formData.get("porcion")) updateData.porcion = formData.get("porcion") as string
+    if (formData.get("sistemaid")) updateData.sistemaid = Number.parseInt(formData.get("sistemaid") as string)
+    if (formData.get("codigomaestro")) updateData.codigomaestro = formData.get("codigomaestro") as string
+    if (formData.get("envase")) updateData.envase = formData.get("envase") as string
+    if (formData.get("envaseml")) updateData.envaseml = formData.get("envaseml") as string
+    // </CHANGE>
+
     if (formData.get("codigo")) updateData.codigo = formData.get("codigo") as string
     if (formData.get("nombre")) updateData.nombre = formData.get("nombre") as string
     if (formData.get("clienteid")) updateData.clienteid = Number.parseInt(formData.get("clienteid") as string)
@@ -1115,8 +1125,6 @@ export async function recalcularProducto(productoid: number): Promise<{ success:
     const costoelaboracion = mp + mem + me + ms
 
     const preciohl = mp_costeado + mem_costeado + me_costeado + ms_costeado
-
-    const utilidadhl = preciohl - costoelaboracion
 
     const preciohlFinal = preciohl <= 50.0 ? 50.0 : preciohl
     const utilidadhlFinal = preciohlFinal - costoelaboracion
