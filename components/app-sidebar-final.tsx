@@ -87,7 +87,10 @@ export function AppSidebar() {
       {
         name: "Reportes",
         icon: Icons.FileText,
-        submenus: [{ name: "Reportes de Costeo", href: "/reportecosteo", icon: Icons.BarChart }],
+        submenus: [
+          { name: "Reportes de Costeo", href: "/reportecosteo", icon: Icons.BarChart },
+          { name: "Reporte de Productos", href: "/reporteproductos", icon: Icons.Package },
+        ],
       },
       {
         name: "Configuraciones",

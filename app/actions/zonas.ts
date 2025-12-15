@@ -344,7 +344,7 @@ export async function listDesplegableZonas(zonaid = -1, zonanombre = "", cliente
 
     // Paso 2: Filtros en query, dependiendo parametros
     if (zonaid !== -1) {
-      query = query.eq("id", zonaid)
+      query = query.eq("zonaid", zonaid)
     }
     if (zonanombre !== "") {
       query = query.ilike("zonas.nombre", `%${zonanombre}%`)

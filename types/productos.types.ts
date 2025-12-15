@@ -25,6 +25,7 @@
 export interface oProducto {
   id: number
   producto: string | null
+  presentacion: string | null
   nombre: string | null
   formafarmaceuticaid: number
   formasfarmaceuticas: {

@@ -170,6 +170,7 @@ export default function EditarProductoPage() {
     clienteid: "",
     zonaid: "",
     producto: "",
+    presentacion: "", // added presentacion field
     formafarmaceuticaid: "",
     porcion: "",
     sistemaid: "",
@@ -240,6 +241,7 @@ export default function EditarProductoPage() {
         clienteid: producto.clienteid?.toString() || "",
         zonaid: producto.zonaid?.toString() || "",
         producto: producto.producto || "",
+        presentacion: producto.presentacion || "", // set presentacion field
         formafarmaceuticaid: producto.formafarmaceuticaid?.toString() || "",
         porcion: producto.porcion || "",
         sistemaid: producto.sistemaid?.toString() || "",
@@ -1485,6 +1487,19 @@ export default function EditarProductoPage() {
                     />
                   </div>
 
+                  {/* Updated: Added presentacion input below producto */}
+                  <div className="space-y-2">
+                    <Label htmlFor="txtPresentacion">Presentación</Label>
+                    <Input
+                      id="txtPresentacion"
+                      name="presentacion"
+                      type="text"
+                      placeholder="Ingrese la presentación"
+                      value={formData.presentacion}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="txtNombre">
                       <span className="text-red-500">*</span> Nombre
@@ -1686,6 +1701,18 @@ export default function EditarProductoPage() {
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="txtPresentacion">Presentación</Label> {/* added presentacion label */}
+                    <Input
+                      id="txtPresentacion"
+                      name="presentacion"
+                      type="text"
+                      placeholder="Ingrese la presentación"
+                      value={formData.presentacion}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="imageImg">Imagen</Label>
                     <Input id="imageImg" name="imagen" type="file" accept="image/*" onChange={handleImageChange} />
                   </div>
@@ -1726,6 +1753,11 @@ export default function EditarProductoPage() {
                             <div>
                               <span className="font-semibold text-sky-700">Nombre:</span>
                               <span className="ml-2 text-gray-900">{producto.nombre || "Sin nombre"}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-sky-700">Presentación:</span>{" "}
+                              {/* display presentacion */}
+                              <span className="ml-2 text-gray-900">{producto.presentacion || "Sin presentación"}</span>
                             </div>
                             <div>
                               <span className="font-semibold text-sky-700">Forma Farmacéutica:</span>
@@ -2183,7 +2215,7 @@ export default function EditarProductoPage() {
                   <p className="text-gray-500">No hay fórmulas asignadas a este producto.</p>
                 )}
               </div>
-              <div className="border-t-2 border-[#6db8c9] mt-4 pt-4 flex justify-end"></div>
+              <div className="border-t-2 border-[#6dbac9] mt-4 pt-4 flex justify-end"></div>
               {/* </CHANGE> */}
 
               <div className="space-y-4">

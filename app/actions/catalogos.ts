@@ -149,8 +149,8 @@ export async function listaDesplegableSistemas(id = -1, nombre = "") {
   }
 }
 
-// Función: listaDesplegableProductosCategorias: función que se utiliza para los dropdownlist de categorías de productos
-export async function listaDesplegableProductosCategorias(id = "", value = "") {
+// Función: listaDesplegableProductosTiposComisiones: función que se utiliza para los dropdownlist de tipos de comisiones de productos
+export async function listaDesplegableProductosTiposComisiones(id = "", value = "") {
   try {
     // Query principal con DISTINCT
     let query = supabase.from("productos").select("categoria").not("categoria", "is", null)
@@ -167,7 +167,7 @@ export async function listaDesplegableProductosCategorias(id = "", value = "") {
     const { data: categorias, error } = await query
 
     if (error) {
-      console.error("Error obteniendo la lista desplegable de categorías de productos:", error)
+      console.error("Error obteniendo la lista desplegable de tipos de comisiones de productos:", error)
       return { success: false, error: error.message }
     }
 
@@ -176,14 +176,17 @@ export async function listaDesplegableProductosCategorias(id = "", value = "") {
       .filter((cat) => cat !== null && cat !== "")
       .sort()
 
-    const data: ddlItem[] = categoriasUnicas.map((categoria) => ({
-      value: categoria,
-      text: categoria,
-    }))
+    const data: ddlItem[] = [
+      { value: "0", text: "n/a" },
+      ...categoriasUnicas.map((categoria) => ({
+        value: categoria,
+        text: categoria,
+      })),
+    ]
 
     return { success: true, data }
   } catch (error) {
-    console.error("Error en listaDesplegableProductosCategorias:", error)
+    console.error("Error en listaDesplegableProductosTiposComisiones:", error)
     return { success: false, error: "Error interno del servidor" }
   }
 }

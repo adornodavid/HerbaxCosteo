@@ -292,6 +292,7 @@ export async function obtenerProductos(
     let query = supabase.from("productos").select(`
         id,
         producto,
+        presentacion,
         nombre,
         formafarmaceuticaid,
         formasfarmaceuticas!formafarmaceuticaid(nombre),
@@ -410,7 +411,7 @@ export async function obtenerProductos(
       query = query.eq("zonaid", zonaid)
     }
     if (productonombre !== "") {
-      query = query.ilike("nombre", `%${productonombre}%`)
+      query = query.ilike("producto", `%${productonombre}%`)
     }
     if (catalogoid > 0) {
       query = query.in("id", Ids)
@@ -766,6 +767,7 @@ export async function actualizarProducto(formData: FormData) {
     const updateData: any = {}
 
     if (formData.get("producto")) updateData.producto = formData.get("producto") as string
+    if (formData.get("presentacion")) updateData.presentacion = formData.get("presentacion") as string
     if (formData.get("formafarmaceuticaid"))
       updateData.formafarmaceuticaid = Number.parseInt(formData.get("formafarmaceuticaid") as string)
     if (formData.get("porcion")) updateData.porcion = formData.get("porcion") as string
