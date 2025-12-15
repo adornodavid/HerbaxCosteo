@@ -7,6 +7,7 @@ import { useUserSession } from "@/hooks/use-user-session"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Search, FileDown, ChevronLeft, ChevronRight } from "lucide-react"
 import { PageModalAlert, type propsPageModalAlert } from "@/components/page-modal-alert"
 import { PageModalError, type propsPageModalError } from "@/components/page-modal-error"
@@ -72,6 +73,25 @@ export default function ReporteProductosPage() {
   // Variables para mostrar modales
   const [showModalAlert, setShowModalAlert] = useState(false)
   const [showModalError, setShowModalError] = useState(false)
+
+  const columnNames: Record<string, string> = {
+    id: "ID",
+    codigo: "Código",
+    nombre: "Nombre",
+    producto: "Producto",
+    presentacion: "Presentación",
+    porcion: "Porción",
+    unidaddemedida: "Unidad de Medida",
+    envase: "Envase",
+    envaseml: "Envase ML",
+    categoria: "Categoría",
+    formafarmaceutica: "Forma Farmacéutica",
+    sistema: "Sistema/Objetivo",
+    codigomaestro: "Código Maestro",
+    cliente: "Cliente",
+    zona: "Zona",
+    estatus: "Estatus",
+  }
 
   // Cargar opciones iniciales
   useEffect(() => {
@@ -171,43 +191,25 @@ export default function ReporteProductosPage() {
 
   // Ejecutar búsqueda
   const ejecutarBusqueda = async () => {
-    if (!filtroClienteId || filtroClienteId === "-1") {
-      setModalAlert({
-        Titulo: "Validación",
-        Mensaje: "Debe seleccionar un cliente",
-      })
-      setShowModalAlert(true)
-      return
-    }
-
-    if (!filtroZonaId || filtroZonaId === "-1") {
-      setModalAlert({
-        Titulo: "Validación",
-        Mensaje: "Debe seleccionar una zona",
-      })
-      setShowModalAlert(true)
-      return
-    }
-
     setIsSearching(true)
     setHasSearched(false)
 
-    console.log("prod",Number.parseInt(filtroProductoId))
-    console.log("clie",Number.parseInt(filtroClienteId))
-    console.log("zon",Number.parseInt(filtroZonaId))
-    console.log("cate",filtroCategoria)
-    console.log("FF",Number.parseInt(filtroFormaFarmaceutica))
-    console.log("obje",Number.parseInt(filtroObjetivo))
-    console.log("enva",Number.parseInt(filtroTipoEnvase))
+    console.log("prod", Number.parseInt(filtroProductoId))
+    console.log("clie", Number.parseInt(filtroClienteId))
+    console.log("zon", Number.parseInt(filtroZonaId))
+    console.log("cate", filtroCategoria)
+    console.log("FF", Number.parseInt(filtroFormaFarmaceutica))
+    console.log("obje", Number.parseInt(filtroObjetivo))
+    console.log("enva", filtroTipoEnvase)
 
     try {
       const result = await obtenerReporteCatalogoProductos(
-        filtroProductoId === "-1" ? 0 : Number.parseInt(filtroProductoId),
-        Number.parseInt(filtroClienteId),
-        Number.parseInt(filtroZonaId),
+        filtroProductoId === "-1" ? -1 : Number.parseInt(filtroProductoId),
+        filtroClienteId === "-1" ? -1 : Number.parseInt(filtroClienteId),
+        filtroZonaId === "-1" ? -1 : Number.parseInt(filtroZonaId),
         filtroCategoria === "-1" ? "" : filtroCategoria,
-        filtroFormaFarmaceutica === "-1" ? 0 : Number.parseInt(filtroFormaFarmaceutica),
-        filtroObjetivo === "-1" ? 0 : Number.parseInt(filtroObjetivo),
+        filtroFormaFarmaceutica === "-1" ? -1 : Number.parseInt(filtroFormaFarmaceutica),
+        filtroObjetivo === "-1" ? -1 : Number.parseInt(filtroObjetivo),
         filtroTipoEnvase === "-1" ? "" : filtroTipoEnvase,
       )
 
@@ -322,7 +324,7 @@ export default function ReporteProductosPage() {
             {/* Cliente */}
             <div>
               <label htmlFor="ddlCliente" className="text-sm font-medium text-gray-700 mb-1 block">
-                Cliente <span className="text-red-500">*</span>
+                Cliente
               </label>
               <Select value={filtroClienteId} onValueChange={setFiltroClienteId}>
                 <SelectTrigger id="ddlCliente" className="bg-white">
@@ -341,7 +343,7 @@ export default function ReporteProductosPage() {
             {/* Zona */}
             <div>
               <label htmlFor="ddlZona" className="text-sm font-medium text-gray-700 mb-1 block">
-                Zona <span className="text-red-500">*</span>
+                Zona
               </label>
               <Select value={filtroZonaId} onValueChange={setFiltroZonaId}>
                 <SelectTrigger id="ddlZona" className="bg-white">
@@ -389,118 +391,120 @@ export default function ReporteProductosPage() {
                 </SelectContent>
               </Select>
             </div>
-
-            {/* Categoría */}
-            <div>
-              <label htmlFor="ddlCategoria" className="text-sm font-medium text-gray-700 mb-1 block">
-                Categoría
-              </label>
-              <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
-                <SelectTrigger id="ddlCategoria" className="bg-white">
-                  <SelectValue placeholder="Todos" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categoriasOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.text}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Forma Farmacéutica */}
-            <div>
-              <label htmlFor="ddlFormaFarmaceutica" className="text-sm font-medium text-gray-700 mb-1 block">
-                Forma Farmacéutica
-              </label>
-              <Select value={filtroFormaFarmaceutica} onValueChange={setFiltroFormaFarmaceutica}>
-                <SelectTrigger id="ddlFormaFarmaceutica" className="bg-white">
-                  <SelectValue placeholder="Todas" />
-                </SelectTrigger>
-                <SelectContent>
-                  {formasFarmaceuticasOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.text}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Objetivos */}
-            <div>
-              <label htmlFor="ddlObjetivo" className="text-sm font-medium text-gray-700 mb-1 block">
-                Objetivo
-              </label>
-              <Select value={filtroObjetivo} onValueChange={setFiltroObjetivo}>
-                <SelectTrigger id="ddlObjetivo" className="bg-white">
-                  <SelectValue placeholder="Todos" />
-                </SelectTrigger>
-                <SelectContent>
-                  {objetivosOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.text}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Tipo Envase */}
-            <div>
-              <label htmlFor="ddlTipoEnvase" className="text-sm font-medium text-gray-700 mb-1 block">
-                Tipo Envase
-              </label>
-              <Select value={filtroTipoEnvase} onValueChange={setFiltroTipoEnvase}>
-                <SelectTrigger id="ddlTipoEnvase" className="bg-white">
-                  <SelectValue placeholder="Todos" />
-                </SelectTrigger>
-                <SelectContent>
-                  {envasesOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.text}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           </div>
 
-          <div className="flex gap-3 justify-end mt-6">
-            <Button
-              type="button"
-              className="bg-blue-600 text-white hover:bg-blue-700 shadow-md"
-              onClick={ejecutarBusqueda}
-              disabled={isSearching}
-            >
-              <Search className="mr-2 h-4 w-4" />
-              {isSearching ? "Buscando..." : "Buscar"}
-            </Button>
+          <Accordion type="single" collapsible className="mt-4">
+            <AccordionItem value="advanced-filters" className="border-t border-gray-200">
+              <AccordionTrigger className="text-sm font-medium text-blue-700 hover:text-blue-800 py-3">
+                Filtros Avanzados
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                  {/* Categoría */}
+                  <div>
+                    <label htmlFor="ddlCategoria" className="text-sm font-medium text-gray-700 mb-1 block">
+                      Categoría
+                    </label>
+                    <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
+                      <SelectTrigger id="ddlCategoria" className="bg-white">
+                        <SelectValue placeholder="Todos" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categoriasOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.text}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-            {reporteData.length > 0 && (
-              <Button
-                type="button"
-                variant="outline"
-                className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent"
-                onClick={exportarExcel}
-              >
-                <FileDown className="mr-2 h-4 w-4" />
-                Exportar
-              </Button>
-            )}
+                  {/* Forma Farmacéutica */}
+                  <div>
+                    <label htmlFor="ddlFormaFarmaceutica" className="text-sm font-medium text-gray-700 mb-1 block">
+                      Forma Farmacéutica
+                    </label>
+                    <Select value={filtroFormaFarmaceutica} onValueChange={setFiltroFormaFarmaceutica}>
+                      <SelectTrigger id="ddlFormaFarmaceutica" className="bg-white">
+                        <SelectValue placeholder="Todas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {formasFarmaceuticasOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.text}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Objetivos */}
+                  <div>
+                    <label htmlFor="ddlObjetivo" className="text-sm font-medium text-gray-700 mb-1 block">
+                      Objetivo
+                    </label>
+                    <Select value={filtroObjetivo} onValueChange={setFiltroObjetivo}>
+                      <SelectTrigger id="ddlObjetivo" className="bg-white">
+                        <SelectValue placeholder="Todos" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {objetivosOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.text}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Tipo Envase */}
+                  <div>
+                    <label htmlFor="ddlTipoEnvase" className="text-sm font-medium text-gray-700 mb-1 block">
+                      Tipo Envase
+                    </label>
+                    <Select value={filtroTipoEnvase} onValueChange={setFiltroTipoEnvase}>
+                      <SelectTrigger id="ddlTipoEnvase" className="bg-white">
+                        <SelectValue placeholder="Todos" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {envasesOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.text}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+          {/* Botón de buscar */}
+          <div className="mt-6 flex justify-center">
+            <Button
+              onClick={ejecutarBusqueda}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-2 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105"
+            >
+              <Search className="h-4 w-4 mr-2" />
+              Buscar
+            </Button>
           </div>
         </CardContent>
       </Card>
 
       {hasSearched && reporteData.length > 0 && (
-        <Card className="rounded-lg border-2 border-gray-200 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-gray-700 to-gray-800 text-white rounded-t-lg">
+        <Card className="rounded-lg border-2 border-green-100 bg-gradient-to-br from-white to-green-50/30 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
             <CardTitle className="flex items-center justify-between">
-              <span>Resultados del Reporte</span>
-              <span className="text-sm font-normal">
-                Mostrando {startIndex + 1} - {Math.min(endIndex, reporteData.length)} de {reporteData.length} registros
+              <span className="flex items-center gap-2">
+                <FileDown className="h-5 w-5" />
+                Resultados del Reporte
               </span>
+              <Button onClick={exportarExcel} variant="secondary" size="sm" className="bg-white text-green-700">
+                <FileDown className="h-4 w-4 mr-2" />
+                Exportar a Excel
+              </Button>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
@@ -514,7 +518,7 @@ export default function ReporteProductosPage() {
                           key={index}
                           className="border border-gray-300 p-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap"
                         >
-                          {column.replace(/_/g, " ").toUpperCase()}
+                          {columnNames[column.toLowerCase()] || column.replace(/_/g, " ").toUpperCase()}
                         </th>
                       ))}
                   </tr>
@@ -527,7 +531,7 @@ export default function ReporteProductosPage() {
                           key={cellIndex}
                           className="border border-gray-300 p-3 text-sm text-gray-700 whitespace-nowrap"
                         >
-                          {typeof cell === "number" ? cell.toFixed(2) : cell || "-"}
+                          {cell !== null && cell !== undefined ? String(cell) : "-"}
                         </td>
                       ))}
                     </tr>
