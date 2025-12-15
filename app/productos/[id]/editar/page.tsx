@@ -441,10 +441,10 @@ export default function EditarProductoPage() {
       return
     }
 
-    if (!codigomaestro || codigomaestro.trim().length < 3) {
+    if (!codigomaestro || codigomaestro.trim().length < 1) {
       setModalValidation({
         Titulo: "Datos incompletos",
-        Mensaje: "El Código Maestro debe tener al menos 3 caracteres.",
+        Mensaje: "El Código Maestro debe tener al menos 1 caracter.",
       })
       setShowModalValidation(true)
       return
