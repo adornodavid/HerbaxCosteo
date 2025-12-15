@@ -74,24 +74,36 @@ export default function ReporteProductosPage() {
   const [showModalAlert, setShowModalAlert] = useState(false)
   const [showModalError, setShowModalError] = useState(false)
 
-  const columnNames: Record<string, string> = {
-    id: "ID",
-    codigo: "Código",
-    nombre: "Nombre",
-    producto: "Producto",
-    presentacion: "Presentación",
-    porcion: "Porción",
-    unidaddemedida: "Unidad de Medida",
-    envase: "Envase",
-    envaseml: "Envase ML",
-    categoria: "Categoría",
-    formafarmaceutica: "Forma Farmacéutica",
-    sistema: "Sistema/Objetivo",
-    codigomaestro: "Código Maestro",
-    cliente: "Cliente",
-    zona: "Zona",
-    estatus: "Estatus",
-  }
+  const columns = [
+    { header: "ID", field: "sid" },
+    { header: "Código", field: "scodigo" },
+    { header: "Producto", field: "sproducto" },
+    { header: "Nombre", field: "snombreproducto" },
+    { header: "Cliente", field: "scliente" },
+    { header: "Zona", field: "szona" },
+    { header: "Unidad de Medida", field: "sunidadmedida" },
+    { header: "Categoría", field: "scategoria" },
+    { header: "Objetivo", field: "sobjetivo" },
+    { header: "Forma Farmacéutica", field: "sformafarmaceutica" },
+    { header: "Porción", field: "sporcion" },
+    { header: "Código Maestro", field: "scodigomaestro" },
+    { header: "Envase", field: "senvase" },
+    { header: "Envase ML", field: "senvaseml" },
+    { header: "Costo", field: "scosto" },
+    { header: "MP", field: "smp" },
+    { header: "MEM", field: "smem" },
+    { header: "ME", field: "sme" },
+    { header: "MS", field: "sms" },
+    { header: "MP %", field: "smp_porcentaje" },
+    { header: "MEM %", field: "smem_porcentaje" },
+    { header: "ME %", field: "sme_porcentaje" },
+    { header: "MS %", field: "sms_porcentaje" },
+    { header: "MP Costeado", field: "smp_costeado" },
+    { header: "MEM Costeado", field: "smem_costeado" },
+    { header: "ME Costeado", field: "sme_costeado" },
+    { header: "MS Costeado", field: "sms_costeado" },
+    { header: "Precio HL", field: "spreciohl" },
+  ]
 
   // Cargar opciones iniciales
   useEffect(() => {
@@ -260,10 +272,10 @@ export default function ReporteProductosPage() {
   const exportarExcel = () => {
     if (reporteData.length === 0) return
 
-    const headers = Object.keys(reporteData[0])
+    const headers = columns.map((column) => column.header).join(",")
     const csvContent = [
-      headers.join(","),
-      ...reporteData.map((row) => headers.map((header) => row[header] || "").join(",")),
+      headers,
+      ...reporteData.map((row) => columns.map((column) => row[column.field] || "").join(",")),
     ].join("\n")
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
@@ -509,29 +521,30 @@ export default function ReporteProductosPage() {
           </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto" style={{ maxHeight: "600px", overflow: "auto" }}>
-              <table className="w-full border-collapse">
+              <table className="min-w-full border-collapse border border-gray-300">
                 <thead className="sticky top-0 z-10">
                   <tr className="bg-gray-100 border-b-2 border-gray-300">
-                    {reporteData.length > 0 &&
-                      Object.keys(reporteData[0]).map((column, index) => (
-                        <th
-                          key={index}
-                          className="border border-gray-300 p-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap"
-                        >
-                          {columnNames[column.toLowerCase()] || column.replace(/_/g, " ").toUpperCase()}
-                        </th>
-                      ))}
+                    {columns.map((column, index) => (
+                      <th
+                        key={index}
+                        className="border border-gray-300 p-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap"
+                      >
+                        {column.header}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
                   {currentData.map((row, rowIndex) => (
                     <tr key={rowIndex} className="hover:bg-blue-50 transition-colors border-b border-gray-200">
-                      {Object.values(row).map((cell: any, cellIndex) => (
+                      {columns.map((column, cellIndex) => (
                         <td
                           key={cellIndex}
                           className="border border-gray-300 p-3 text-sm text-gray-700 whitespace-nowrap"
                         >
-                          {cell !== null && cell !== undefined ? String(cell) : "-"}
+                          {row[column.field] !== null && row[column.field] !== undefined
+                            ? String(row[column.field])
+                            : "-"}
                         </td>
                       ))}
                     </tr>
