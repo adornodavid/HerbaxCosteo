@@ -9,10 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Search, FileDown, ChevronLeft, ChevronRight } from "lucide-react"
-import { PageModalAlert, type propsPageModalAlert } from "@/components/page-modal-alert"
-import { PageModalError, type propsPageModalError } from "@/components/page-modal-error"
-import { PageTitlePlusNew, type propsPageTitlePlusNew } from "@/components/page-title-plus-new"
-import type { propsPageLoadingScreen } from "@/components/page-loading-screen"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listDesplegableZonas } from "@/app/actions/zonas"
 import { listaDesplegableProductosXClientes } from "@/app/actions/productos"
@@ -23,27 +19,31 @@ import {
   listaDesplegableSistemas,
 } from "@/app/actions/catalogos"
 import { obtenerReporteCatalogoProductos } from "@/app/actions/reporteproductos"
+import { actualizarProducto, recalcularProducto } from "@/app/actions/productos"
 import type { ddlItem } from "@/types/common.types"
 import type { oProducto } from "@/types/common.types"
 
 export default function ReporteProductosPage() {
   const router = useRouter()
-  const { user, isLoading: authLoading } = useAuth()
-  const { user: sessionUser, loading: sessionLoading } = useUserSession()
+  const { user } = useAuth()
+  const { session, isLoading: sessionLoading } = useUserSession()
 
-  // --- Estados ---
-  const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
-  const [showPageLoading, setShowPageLoading] = useState(true)
-  const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
-  const [ModalError, setModalError] = useState<propsPageModalError>()
-  const [showPageTituloMasNuevo, setShowPageTituloMasNuevo] = useState(false)
-  const [PageTituloMasNuevo, setPageTituloMasNuevo] = useState<propsPageTitlePlusNew>({
-    Titulo: "",
-    Subtitulo: "",
-    Visible: false,
-    BotonTexto: "",
-    Ruta: "",
-  })
+  // Estados principales
+  const [reporteData, setReporteData] = useState<any[]>([])
+  const [reporteDataOriginal, setReporteDataOriginal] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+  const [actualizando, setActualizando] = useState(false)
+  const [productosModificados, setProductosModificados] = useState<Set<number>>(new Set())
+
+  // Estados para modales de actualización
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [showLoadingModal, setShowLoadingModal] = useState(false)
+  const [showResultModal, setShowResultModal] = useState(false)
+  const [resultadoActualizacion, setResultadoActualizacion] = useState<{
+    exitosos: number
+    fallidos: number
+    error?: string
+  } | null>(null)
 
   // Estados de filtros
   const [filtroClienteId, setFiltroClienteId] = useState("-1")
@@ -62,30 +62,19 @@ export default function ReporteProductosPage() {
   const [objetivosOptions, setObjetivosOptions] = useState<ddlItem[]>([])
   const [envasesOptions, setEnvasesOptions] = useState<ddlItem[]>([])
 
-  // Estados de reporte
-  const [reporteData, setReporteData] = useState<any[]>([])
-  const [isSearching, setIsSearching] = useState(false)
-  const [hasSearched, setHasSearched] = useState(false)
-
-  const [currentPage, setCurrentPage] = useState(1)
-  const recordsPerPage = 30
-
-  // Variables para mostrar modales
-  const [showModalAlert, setShowModalAlert] = useState(false)
-  const [showModalError, setShowModalError] = useState(false)
-
   const columns = [
-    { header: "ID", field: "sid" },
+    { header: "ID", field: "sid", width: "40px" },
     { header: "Código", field: "scodigo" },
     { header: "Producto", field: "sproducto" },
+    { header: "Presentacion", field: "spresentacion", width: "190px" },
     { header: "Nombre", field: "snombreproducto" },
     { header: "Cliente", field: "scliente" },
     { header: "Zona", field: "szona" },
-    { header: "Unidad de Medida", field: "sunidadmedida" },
-    { header: "Categoría", field: "scategoria" },
-    { header: "Objetivo", field: "sobjetivo" },
     { header: "Forma Farmacéutica", field: "sformafarmaceutica" },
     { header: "Porción", field: "sporcion" },
+    { header: "Objetivo", field: "sobjetivo" },
+    { header: "Unidad de Medida", field: "sunidadmedida" },
+    { header: "Categoría", field: "scategoria" },
     { header: "Código Maestro", field: "scodigomaestro" },
     { header: "Envase", field: "senvase" },
     { header: "Envase ML", field: "senvaseml" },
@@ -102,6 +91,7 @@ export default function ReporteProductosPage() {
     { header: "MEM Costeado", field: "smem_costeado" },
     { header: "ME Costeado", field: "sme_costeado" },
     { header: "MS Costeado", field: "sms_costeado" },
+    { header: "Costo Total", field: "scostototal" },
     { header: "Precio HL", field: "spreciohl" },
   ]
 
@@ -203,8 +193,7 @@ export default function ReporteProductosPage() {
 
   // Ejecutar búsqueda
   const ejecutarBusqueda = async () => {
-    setIsSearching(true)
-    setHasSearched(false)
+    setLoading(true)
 
     console.log("prod", Number.parseInt(filtroProductoId))
     console.log("clie", Number.parseInt(filtroClienteId))
@@ -227,34 +216,28 @@ export default function ReporteProductosPage() {
 
       if (result.success && result.data) {
         setReporteData(result.data)
-        setCurrentPage(1)
+        setReporteDataOriginal(JSON.parse(JSON.stringify(result.data)))
+        setCurrentPage(1) // Reset pagination when new data is loaded
       } else {
-        setModalError({
-          Titulo: "Error",
-          Mensaje: result.error || "Error al obtener el reporte",
-        })
-        setShowModalError(true)
+        alert("Error al obtener el reporte")
         setReporteData([])
       }
     } catch (error) {
       console.error("Error en búsqueda:", error)
-      setModalError({
-        Titulo: "Error",
-        Mensaje: "Error al ejecutar la búsqueda",
-      })
-      setShowModalError(true)
+      alert("Error al ejecutar la búsqueda")
       setReporteData([])
     } finally {
-      setIsSearching(false)
-      setHasSearched(true)
+      setLoading(false)
     }
   }
 
   // Paginación
-  const totalPages = Math.ceil(reporteData.length / recordsPerPage)
-  const startIndex = (currentPage - 1) * recordsPerPage
-  const endIndex = startIndex + recordsPerPage
-  const currentData = reporteData.slice(startIndex, endIndex)
+  const itemsPerPage = 30
+  const [currentPage, setCurrentPage] = useState(1)
+  const totalPages = Math.ceil(reporteData.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentItems = reporteData.slice(startIndex, endIndex)
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
@@ -272,51 +255,259 @@ export default function ReporteProductosPage() {
   const exportarExcel = () => {
     if (reporteData.length === 0) return
 
-    const headers = columns.map((column) => column.header).join(",")
-    const csvContent = [
-      headers,
-      ...reporteData.map((row) => columns.map((column) => row[column.field] || "").join(",")),
-    ].join("\n")
+    import("xlsx").then((XLSX) => {
+      // Crear los datos para el worksheet
+      const wsData = [
+        // Headers
+        columns.map((column) => column.header),
+        // Data rows
+        ...reporteData.map((row) => columns.map((column) => row[column.field] ?? "")),
+      ]
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-    const link = document.createElement("a")
-    const url = URL.createObjectURL(blob)
-    link.setAttribute("href", url)
-    link.setAttribute("download", `reporte_productos_${new Date().getTime()}.csv`)
-    link.style.visibility = "hidden"
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+      // Crear worksheet y workbook
+      const ws = XLSX.utils.aoa_to_sheet(wsData)
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, "Reporte Productos")
+
+      // Generar archivo XLSX como buffer
+      const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" })
+
+      // Crear blob y descargar
+      const blob = new Blob([wbout], { type: "application/octet-stream" })
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `reporte_productos_${new Date().getTime()}.xlsx`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    })
+  }
+
+  // Actualizar productos en la base de datos
+  const handleActualizarProductos = async () => {
+    if (productosModificados.size === 0) {
+      alert("No hay productos modificados para actualizar")
+      return
+    }
+
+    setShowConfirmModal(true)
+  }
+
+  const ejecutarActualizacion = async () => {
+    setShowConfirmModal(false)
+    setShowLoadingModal(true)
+    setActualizando(true)
+
+    try {
+      const productosParaActualizar = reporteData.filter((row) => productosModificados.has(row.sid))
+
+      console.log("[v0] Productos a actualizar:", productosParaActualizar)
+
+      let exitosos = 0
+      let fallidos = 0
+
+      for (const producto of productosParaActualizar) {
+        try {
+          // Crear FormData con los datos del producto
+          const formData = new FormData()
+          formData.append("productoid", String(producto.sid))
+          formData.append("nombre", producto.snombreproducto || "")
+          formData.append("codigo", producto.scodigo || "")
+          formData.append("producto", producto.sproducto || "")
+          formData.append("mp_porcentaje", String(producto.smp_porcentaje || 0))
+          formData.append("mem_porcentaje", String(producto.smem_porcentaje || 0))
+          formData.append("me_porcentaje", String(producto.sme_porcentaje || 0))
+          formData.append("ms_porcentaje", String(producto.sms_porcentaje || 0))
+
+          // Ejecutar actualizarProducto
+          const resultadoActualizar = await actualizarProducto(formData)
+
+          if (!resultadoActualizar.success) {
+            console.error(`Error actualizando producto ${producto.sid}:`, resultadoActualizar.error)
+            fallidos++
+            continue
+          }
+
+          // Ejecutar recalcularProducto
+          const resultadoRecalcular = await recalcularProducto(producto.sid)
+
+          if (!resultadoRecalcular.success) {
+            console.error(`Error recalculando producto ${producto.sid}:`, resultadoRecalcular.error)
+            fallidos++
+            continue
+          }
+
+          exitosos++
+        } catch (error) {
+          console.error(`Error procesando producto ${producto.sid}:`, error)
+          fallidos++
+        }
+      }
+
+      setResultadoActualizacion({ exitosos, fallidos })
+      setShowLoadingModal(false)
+      setShowResultModal(true)
+
+      // Limpiar productos modificados si hubo éxitos
+      if (exitosos > 0) {
+        setProductosModificados(new Set())
+        // Recargar el reporte
+        ejecutarBusqueda()
+      }
+    } catch (error) {
+      console.error("Error al actualizar productos:", error)
+      setResultadoActualizacion({ exitosos: 0, fallidos: productosModificados.size, error: String(error) })
+      setShowLoadingModal(false)
+      setShowResultModal(true)
+    } finally {
+      setActualizando(false)
+    }
+  }
+
+  const handlePorcentajeChange = (rowIndex: number, field: string, newValue: string) => {
+    const value = Number.parseFloat(newValue) || 0
+
+    setReporteData((prevData) => {
+      const newData = [...prevData]
+      const row = { ...newData[rowIndex] }
+
+      // Actualizar el porcentaje modificado
+      row[field] = value
+
+      // Obtener valores actuales
+      const mp = Number.parseFloat(row.smp) || 0
+      const mem = Number.parseFloat(row.smem) || 0
+      const me = Number.parseFloat(row.sme) || 0
+      const ms = Number.parseFloat(row.sms) || 0
+
+      const mp_porcentaje = (Number.parseFloat(row.smp_porcentaje) || 0) / 100
+      const mem_porcentaje = (Number.parseFloat(row.smem_porcentaje) || 0) / 100
+      const me_porcentaje = (Number.parseFloat(row.sme_porcentaje) || 0) / 100
+      const ms_porcentaje = (Number.parseFloat(row.sms_porcentaje) || 0) / 100
+
+      row.smp_costeado = mp_porcentaje !== 0 ? Number.parseFloat((mp / mp_porcentaje).toFixed(6)) : 0
+      row.smem_costeado = mem_porcentaje !== 0 ? Number.parseFloat((mem / mem_porcentaje).toFixed(6)) : 0
+      row.sme_costeado = me_porcentaje !== 0 ? Number.parseFloat((me / me_porcentaje).toFixed(6)) : 0
+      row.sms_costeado = ms_porcentaje !== 0 ? Number.parseFloat((ms / ms_porcentaje).toFixed(6)) : 0
+
+      const costoTotal = row.smp_costeado + row.smem_costeado + row.sme_costeado + row.sms_costeado
+      row.scostototal = Number.parseFloat(costoTotal.toFixed(6))
+
+      row.spreciohl = Number.parseFloat((costoTotal < 50 ? 50 : costoTotal).toFixed(6))
+
+      newData[rowIndex] = row
+
+      const originalRow = reporteDataOriginal[rowIndex]
+      const hasChanged =
+        Number.parseFloat(row.smp_porcentaje).toFixed(2) !== Number.parseFloat(originalRow.smp_porcentaje).toFixed(2) ||
+        Number.parseFloat(row.smem_porcentaje).toFixed(2) !==
+          Number.parseFloat(originalRow.smem_porcentaje).toFixed(2) ||
+        Number.parseFloat(row.sme_porcentaje).toFixed(2) !== Number.parseFloat(originalRow.sme_porcentaje).toFixed(2) ||
+        Number.parseFloat(row.sms_porcentaje).toFixed(2) !== Number.parseFloat(originalRow.sms_porcentaje).toFixed(2)
+
+      setProductosModificados((prev) => {
+        const newSet = new Set(prev)
+        if (hasChanged) {
+          newSet.add(row.sid)
+        } else {
+          newSet.delete(row.sid)
+        }
+        return newSet
+      })
+
+      return newData
+    })
   }
 
   return (
-    <div className="container-fluid mx-auto p-4 md:p-6 lg:p-8 space-y-6">
-      {showModalAlert && ModalAlert && (
-        <PageModalAlert
-          Titulo={ModalAlert.Titulo}
-          Mensaje={ModalAlert.Mensaje}
-          isOpen={true}
-          onClose={() => setShowModalAlert(false)}
-        />
+    <div className="container mx-auto p-6 space-y-6">
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-orange-600">⚠️ Confirmar Actualización</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-gray-700">
+                ¿Está seguro de actualizar <strong>{productosModificados.size}</strong> producto(s) modificado(s)?
+              </p>
+              <div className="bg-orange-50 border-l-4 border-orange-500 p-3 rounded">
+                <p className="text-sm text-orange-800 font-semibold">
+                  ⚠️ ADVERTENCIA: La actualización de costos afectará también a aquellos productos que ya han sido
+                  costeados.
+                </p>
+              </div>
+              <div className="flex gap-3 justify-end">
+                <Button variant="outline" onClick={() => setShowConfirmModal(false)}>
+                  Cancelar
+                </Button>
+                <Button className="bg-blue-500 hover:bg-blue-600" onClick={ejecutarActualizacion}>
+                  Aceptar y Actualizar
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
-      {showModalError && ModalError && (
-        <PageModalError
-          Titulo={ModalError.Titulo}
-          Mensaje={ModalError.Mensaje}
-          isOpen={true}
-          onClose={() => setShowModalError(false)}
-        />
+      {showLoadingModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md">
+            <CardContent className="p-8 text-center space-y-4">
+              <div className="flex justify-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500" />
+              </div>
+              <h3 className="text-xl font-semibold">Actualizando productos...</h3>
+              <p className="text-gray-600">Por favor espere mientras se procesan los cambios</p>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
-      {showPageTituloMasNuevo && (
-        <PageTitlePlusNew
-          Titulo={PageTituloMasNuevo.Titulo}
-          Subtitulo={PageTituloMasNuevo.Subtitulo}
-          Visible={PageTituloMasNuevo.Visible}
-          BotonTexto={PageTituloMasNuevo.BotonTexto}
-          Ruta={PageTituloMasNuevo.Ruta}
-        />
+      {showResultModal && resultadoActualizacion && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle
+                className={`text-xl font-bold ${resultadoActualizacion.exitosos > 0 ? "text-green-600" : "text-red-600"}`}
+              >
+                {resultadoActualizacion.exitosos > 0 ? "✓ Actualización Completada" : "✗ Error en Actualización"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {resultadoActualizacion.error ? (
+                <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded">
+                  <p className="text-sm text-red-800">{resultadoActualizacion.error}</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <p className="flex justify-between">
+                    <span>Productos actualizados exitosamente:</span>
+                    <strong className="text-green-600">{resultadoActualizacion.exitosos}</strong>
+                  </p>
+                  {resultadoActualizacion.fallidos > 0 && (
+                    <p className="flex justify-between">
+                      <span>Productos con error:</span>
+                      <strong className="text-red-600">{resultadoActualizacion.fallidos}</strong>
+                    </p>
+                  )}
+                </div>
+              )}
+              <div className="flex justify-end">
+                <Button
+                  onClick={() => {
+                    setShowResultModal(false)
+                    setResultadoActualizacion(null)
+                  }}
+                >
+                  Cerrar
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       <div className="mb-6">
@@ -505,48 +696,157 @@ export default function ReporteProductosPage() {
         </CardContent>
       </Card>
 
-      {hasSearched && reporteData.length > 0 && (
+      {reporteData.length > 0 && (
         <Card className="rounded-lg border-2 border-green-100 bg-gradient-to-br from-white to-green-50/30 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <FileDown className="h-5 w-5" />
                 Resultados del Reporte
+                {productosModificados.size > 0 && (
+                  <span className="ml-4 text-yellow-300 font-semibold">
+                    ({productosModificados.size} modificado{productosModificados.size !== 1 ? "s" : ""})
+                  </span>
+                )}
               </span>
-              <Button onClick={exportarExcel} variant="secondary" size="sm" className="bg-white text-green-700">
-                <FileDown className="h-4 w-4 mr-2" />
-                Exportar a Excel
-              </Button>
+              <div className="flex gap-2">
+                {productosModificados.size > 0 && (
+                  <Button
+                    onClick={handleActualizarProductos}
+                    variant="secondary"
+                    size="sm"
+                    className="bg-blue-500 text-white hover:bg-blue-600"
+                    disabled={actualizando}
+                  >
+                    {actualizando ? "Actualizando..." : `Actualizar (${productosModificados.size})`}
+                  </Button>
+                )}
+                <Button onClick={exportarExcel} variant="secondary" size="sm" className="bg-white text-green-700">
+                  <FileDown className="h-4 w-4 mr-2" />
+                  Exportar a Excel
+                </Button>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto" style={{ maxHeight: "600px", overflow: "auto" }}>
               <table className="min-w-full border-collapse border border-gray-300">
-                <thead className="sticky top-0 z-10">
-                  <tr className="bg-gray-100 border-b-2 border-gray-300">
-                    {columns.map((column, index) => (
-                      <th
-                        key={index}
-                        className="border border-gray-300 p-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap"
-                      >
-                        {column.header}
-                      </th>
-                    ))}
+                <thead className="bg-gradient-to-r from-gray-600 to-gray-700 text-white sticky top-0 z-20">
+                  <tr>
+                    {columns.map((column, index) => {
+                      // Definir cuáles columnas son sticky y su posición left
+                      const stickyColumns = [
+                        { index: 0, left: "0px", width: "40px" }, // ID
+                        { index: 1, left: "80px", width: "120px" }, // Código
+                        { index: 2, left: "200px", width: "150px" }, // Producto
+                        { index: 3, left: "350px", width: "190px" }, // Presentacion
+                      ]
+                      const stickyConfig = stickyColumns.find((s) => s.index === index)
+
+                      return (
+                        <th
+                          key={index}
+                          className={`border border-gray-500 p-3 text-left font-semibold uppercase text-xs tracking-wide ${
+                            stickyConfig ? "z-30" : ""
+                          }`}
+                          style={
+                            stickyConfig
+                              ? {
+                                  position: "sticky",
+                                  left: stickyConfig.left,
+                                  minWidth: stickyConfig.width,
+                                  maxWidth: stickyConfig.width,
+                                  backgroundColor: "bg-gradient-to-r from-gray-600 to-gray-700",
+                                  boxShadow: "2px 0 5px -2px rgba(0, 0, 0, 0.3)",
+                                }
+                              : {}
+                          }
+                        >
+                          {column.header}
+                        </th>
+                      )
+                    })}
                   </tr>
                 </thead>
                 <tbody>
-                  {currentData.map((row, rowIndex) => (
-                    <tr key={rowIndex} className="hover:bg-blue-50 transition-colors border-b border-gray-200">
-                      {columns.map((column, cellIndex) => (
-                        <td
-                          key={cellIndex}
-                          className="border border-gray-300 p-3 text-sm text-gray-700 whitespace-nowrap"
-                        >
-                          {row[column.field] !== null && row[column.field] !== undefined
-                            ? String(row[column.field])
-                            : "-"}
-                        </td>
-                      ))}
+                  {currentItems.map((row, rowIndex) => (
+                    <tr key={rowIndex} className="hover:bg-green-50 transition-colors">
+                      {columns.map((column, cellIndex) => {
+                        // Definir cuáles columnas son sticky y su posición left
+                        const stickyColumns = [
+                          { index: 0, left: "0px", width: "80px" }, // ID
+                          { index: 1, left: "80px", width: "120px" }, // Código
+                          { index: 2, left: "200px", width: "150px" }, // Producto
+                          { index: 3, left: "350px", width: "150px" }, // Presentacion
+                        ]
+                        const stickyConfig = stickyColumns.find((s) => s.index === cellIndex)
+
+                        const isEditable = [
+                          "smp_porcentaje",
+                          "smem_porcentaje",
+                          "sme_porcentaje",
+                          "sms_porcentaje",
+                        ].includes(column.field)
+
+                        return (
+                          <td
+                            key={cellIndex}
+                            className={`border border-gray-300 p-3 text-sm text-gray-700 whitespace-nowrap ${
+                              stickyConfig ? "bg-white z-10" : ""
+                            }`}
+                            style={
+                              stickyConfig
+                                ? {
+                                    position: "sticky",
+                                    left: stickyConfig.left,
+                                    minWidth: stickyConfig.width,
+                                    maxWidth: stickyConfig.width,
+                                    boxShadow: "2px 0 5px -2px rgba(0, 0, 0, 0.1)",
+                                  }
+                                : isEditable
+                                  ? { minWidth: "120px" }
+                                  : {}
+                            }
+                          >
+                            {isEditable ? (
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={row[column.field] || ""}
+                                onBlur={(e) =>
+                                  handlePorcentajeChange(
+                                    (currentPage - 1) * itemsPerPage + rowIndex,
+                                    column.field,
+                                    e.target.value,
+                                  )
+                                }
+                                onChange={(e) => {
+                                  // Update display value immediately
+                                  const newData = [...reporteData]
+                                  newData[(currentPage - 1) * itemsPerPage + rowIndex][column.field] = e.target.value
+                                  setReporteData(newData)
+                                }}
+                                className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                            ) : row[column.field] !== null && row[column.field] !== undefined ? (
+                              [
+                                "smp_costeado",
+                                "smem_costeado",
+                                "sme_costeado",
+                                "sms_costeado",
+                                "scostototal",
+                                "spreciohl",
+                              ].includes(column.field) ? (
+                                Number.parseFloat(row[column.field]).toFixed(6)
+                              ) : (
+                                String(row[column.field])
+                              )
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+                        )
+                      })}
                     </tr>
                   ))}
                 </tbody>
@@ -584,7 +884,7 @@ export default function ReporteProductosPage() {
         </Card>
       )}
 
-      {hasSearched && reporteData.length === 0 && (
+      {reporteData.length === 0 && (
         <Card className="rounded-lg border-2 border-gray-200 shadow-lg">
           <CardContent className="p-12 text-center">
             <div className="text-gray-400 mb-4">
