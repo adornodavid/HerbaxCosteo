@@ -59,6 +59,8 @@ export default function ReporteCosteoPage() {
   const [pageLoading, setPageLoading] = useState<propsPageLoadingScreen>()
   const [showPageLoading, setShowPageLoading] = useState(true)
   const [ModalAlert, setModalAlert] = useState<propsPageModalAlert>()
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [successMessage, setSuccessMessage] = useState("")
   const [ModalError, setModalError] = useState<propsPageModalError>()
   const [showModalAlert, setShowModalAlert] = useState(false)
   const [showModalError, setShowModalError] = useState(false)
@@ -75,7 +77,7 @@ export default function ReporteCosteoPage() {
   const [filtroClienteId, setFiltroClienteId] = useState("")
   const [filtroZonaId, setFiltroZonaId] = useState("")
   const [filtroProductoId, setFiltroProductoId] = useState("-1")
-  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  // const [showSuccessModal, setShowSuccessModal] = useState(false) // This line was removed as it's now defined above.
   const [clientesOptions, setClientesOptions] = useState<ddlItem[]>([])
   const [zonasOptions, setZonasOptions] = useState<ddlItem[]>([])
   const [productosCliente, setProductosCliente] = useState<oProducto[]>([])
@@ -94,6 +96,10 @@ export default function ReporteCosteoPage() {
   const [recalculandoFila, setRecalculandoFila] = useState<number | null>(null)
   const [registrosModificados, setRegistrosModificados] = useState<Set<number>>(new Set())
   const [actualizando, setActualizando] = useState(false)
+  const [reporteDataOriginal, setReporteDataOriginal] = useState<any[]>([])
+
+  const [showModalConfirmacion, setShowModalConfirmacion] = useState(false)
+  const [showModalCargando, setShowModalCargando] = useState(false)
 
   // -- Funciones --
 
@@ -165,7 +171,10 @@ export default function ReporteCosteoPage() {
       const result = await obtenerReporteCosteo(Number(filtroProductoId), Number(filtroClienteId), Number(filtroZonaId))
 
       if (result.success && result.data) {
-        setReporteData(result.data)
+        // setReporteData(result.data) // Original line
+        const reporteCompleto = result.data
+        setReporteData(reporteCompleto)
+        setReporteDataOriginal(JSON.parse(JSON.stringify(reporteCompleto)))
 
         if (result.data.length > 0) {
           const columns = Object.keys(result.data[0])
@@ -249,9 +258,18 @@ export default function ReporteCosteoPage() {
 
         console.log("[v0] Nuevos datos a aplicar", nuevosDatos)
 
+        const registroOriginal = reporteDataOriginal[actualIndex]
+        const valorOriginal = registroOriginal?.sprecioventasiniva
+
         setRegistrosModificados((prev) => {
           const newSet = new Set(prev)
-          newSet.add(row.folio)
+          // Solo agregar si el valor es diferente al original
+          if (nuevoValor !== valorOriginal) {
+            newSet.add(row.folio)
+          } else {
+            // Remover si volvió al valor original
+            newSet.delete(row.folio)
+          }
           return newSet
         })
 
@@ -341,12 +359,13 @@ export default function ReporteCosteoPage() {
       return
     }
 
-    const confirmar = window.confirm(
-      `¿Está seguro de actualizar ${registrosModificados.size} registro(s) modificado(s)?\n\nEsto actualizará las tablas productosxcliente y productosxclienteoptimos.`,
-    )
+    // Show confirmation modal instead of window.confirm
+    setShowModalConfirmacion(true)
+  }
 
-    if (!confirmar) return
-
+  const ejecutarActualizacion = async () => {
+    setShowModalConfirmacion(false)
+    setShowModalCargando(true)
     setActualizando(true)
 
     try {
@@ -357,17 +376,13 @@ export default function ReporteCosteoPage() {
 
       const result = await actualizarRegistrosModificados(registrosParaActualizar, Number(filtroClienteId))
 
+      setShowModalCargando(false)
+
       if (result.success) {
-        // alert(
-        //   `Actualización exitosa:\n- ProductosXCliente: ${result.actualizados.productosxcliente}\n- Óptimos 25%: ${result.actualizados.optimos25}\n- Óptimos 30%: ${result.actualizados.optimos30}`,
-        // )
-        setModalAlert({
-          Titulo: "Actualización Exitosa",
-          Mensaje: `Actualización exitosa:\n- ProductosXCliente: ${result.actualizados.productosxcliente}\n- Óptimos 25%: ${result.actualizados.optimos25}\n- Óptimos 30%: ${result.actualizados.optimos30}`,
-          isOpen: true,
-          onClose: () => setShowModalAlert(false),
-        })
-        setShowModalAlert(true)
+        setSuccessMessage(
+          `Actualización exitosa:\n- ProductosXCliente: ${result.actualizados.productosxcliente}`,
+        )
+        setShowSuccessModal(true)
         // Limpiar los registros modificados
         setRegistrosModificados(new Set())
       } else {
@@ -383,6 +398,7 @@ export default function ReporteCosteoPage() {
     } catch (error) {
       console.error("Error al actualizar registros:", error)
       // alert("Error al actualizar los registros")
+      setShowModalCargando(false)
       setModalError({
         Titulo: "Error al actualizar",
         Mensaje: `Ocurrió un error al actualizar los registros: ${error instanceof Error ? error.message : String(error)}`,
@@ -418,6 +434,8 @@ export default function ReporteCosteoPage() {
           "FOLIO",
           "CÓDIGO",
           "NOMBRE",
+          "CATEGORIA",
+          "PRECIO VENTA 2025",
           "PRECIO VENTA SIN IVA",
           "PRECIO VENTA CON IVA",
           "PLAN GENERACIONAL",
@@ -464,6 +482,10 @@ export default function ReporteCosteoPage() {
           row.folio || "-",
           row.scodigo || "-",
           row.snombre || "-",
+          row.scategoria || "-",
+          typeof row.sprecioventaconivaaa === "number"
+            ? row.sprecioventaconivaaa.toFixed(2)
+            : row.sprecioventaconivaaa || "-",
           typeof row.sprecioventasiniva === "number"
             ? row.sprecioventasiniva.toFixed(2)
             : row.sprecioventasiniva || "-",
@@ -627,21 +649,20 @@ export default function ReporteCosteoPage() {
         />
       )}
 
-      {/* Added custom success modal with cyan theme */}
       {showSuccessModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div className="bg-cyan-500 rounded-t-lg p-6 flex flex-col items-center">
+            <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-t-lg p-6 flex flex-col items-center">
               <div className="bg-white rounded-full p-3 mb-4">
-                <CheckCircle2 className="h-12 w-12 text-cyan-500" />
+                <CheckCircle2 className="h-12 w-12 text-green-500" />
               </div>
-              <h3 className="text-xl font-semibold text-white text-center">Exportación Exitosa</h3>
+              <h3 className="text-xl font-semibold text-white text-center">Actualización Exitosa</h3>
             </div>
             <div className="p-6">
-              <p className="text-gray-700 text-center mb-6">El archivo Excel se ha descargado correctamente.</p>
+              <p className="text-gray-700 text-center whitespace-pre-line mb-6">{successMessage}</p>
               <Button
                 onClick={() => setShowSuccessModal(false)}
-                className="w-full bg-cyan-500 hover:bg-cyan-600 text-white"
+                className="w-full bg-green-500 hover:bg-green-600 text-white"
               >
                 Aceptar
               </Button>
@@ -1012,7 +1033,7 @@ export default function ReporteCosteoPage() {
 
                       {/* Columna 27 - Precio Con IVA */}
                       <th
-                        className="border border-gray-300 p-3 text-sm text-gray-700 text-right sticky"
+                        className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-green-900 sticky z-10"
                         style={{ top: "0px", minWidth: "140px", position: "sticky" }}
                       >
                         PRECIO CON IVA
@@ -1647,6 +1668,46 @@ export default function ReporteCosteoPage() {
             <p className="text-center text-gray-500">No se encontraron datos para los filtros seleccionados.</p>
           </CardContent>
         </Card>
+      )}
+
+      {showModalConfirmacion && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">Confirmar Actualización</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-gray-600">
+                ¿Está seguro de actualizar {registrosModificados.size} registro(s) modificado(s)?
+              </p>
+              <div className="rounded-md bg-yellow-50 border border-yellow-200 p-3">
+                <p className="text-sm text-yellow-800 font-medium">
+                  ⚠️ Advertencia: La actualización de costos afectará al costeo del producto.
+                </p>
+              </div>
+              <div className="flex justify-end gap-3">
+                <Button variant="outline" onClick={() => setShowModalConfirmacion(false)}>
+                  Cancelar
+                </Button>
+                <Button className="bg-blue-600 hover:bg-blue-700" onClick={ejecutarActualizacion}>
+                  Aceptar
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {showModalCargando && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <Card className="w-full max-w-md">
+            <CardContent className="flex flex-col items-center justify-center py-8">
+              <Loader2 className="h-12 w-12 animate-spin text-blue-600 mb-4" />
+              <p className="text-lg font-medium">Actualizando registros...</p>
+              <p className="text-sm text-gray-500 mt-2">Por favor espere</p>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   )
