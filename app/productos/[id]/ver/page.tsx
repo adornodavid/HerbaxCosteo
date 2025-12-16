@@ -615,36 +615,155 @@ export default function VerProductoPage() {
                 <h2 className="text-2xl font-bold mb-4">Fórmulas Asignadas</h2>
                 <div className="space-y-2">
                   {producto.formulasxproducto && producto.formulasxproducto.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-6">
                       {producto.formulasxproducto.map((formulaRel, index) => (
-                        <div key={index} className="flex items-center gap-4 border rounded p-3 max-h-20">
-                          {/* Icon on left */}
-                          <div className="flex-shrink-0">
-                            <div className="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center">
-                              <Flask className="h-7 w-7 text-blue-600" />
+                        <div key={index} className="border rounded-lg p-4 space-y-4">
+                          <div className="flex items-center gap-4 border-b pb-3">
+                            {/* Icon on left */}
+                            <div className="flex-shrink-0">
+                              <div className="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <Flask className="h-7 w-7 text-blue-600" />
+                              </div>
+                            </div>
+
+                            {/* Info on right */}
+                            <div className="flex-1 min-w-0">
+                              {/* Line 1: Código, Nombre */}
+                              <div className="flex items-center gap-3 mb-1">
+                                <span className="text-sm font-semibold text-gray-700">
+                                  {formulaRel.formulas?.codigo || "N/A"}
+                                </span>
+                                <span className="text-sm text-gray-900 truncate">
+                                  {formulaRel.formulas?.nombre || "N/A"}
+                                </span>
+                              </div>
+
+                              {/* Line 2: Unidad de medida, Costo */}
+                              <div className="flex items-center gap-3 text-xs text-gray-600">
+                                <span>{formulaRel.formulas?.unidadesmedida?.descripcion || "N/A"}</span>
+                                <span className="font-semibold text-green-600">
+                                  ${formulaRel.formulas?.costo?.toFixed(6) || "0.000000"}
+                                </span>
+                              </div>
                             </div>
                           </div>
 
-                          {/* Info on right */}
-                          <div className="flex-1 min-w-0">
-                            {/* Line 1: Código, Nombre */}
-                            <div className="flex items-center gap-3 mb-1">
-                              <span className="text-sm font-semibold text-gray-700">
-                                {formulaRel.formulas?.codigo || "N/A"}
-                              </span>
-                              <span className="text-sm text-gray-900 truncate">
-                                {formulaRel.formulas?.nombre || "N/A"}
-                              </span>
-                            </div>
+                          {formulaRel.formulas?.materiasprimasxformula &&
+                            formulaRel.formulas.materiasprimasxformula.length > 0 && (
+                              <div className="mt-4">
+                                <h3 className="text-lg font-semibold mb-3 text-gray-700">Materias Primas</h3>
+                                <div className="overflow-x-auto">
+                                  <table className="min-w-full divide-y divide-gray-200 text-sm">
+                                    <thead className="bg-gray-50">
+                                      <tr>
+                                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                          Código
+                                        </th>
+                                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                          Nombre
+                                        </th>
+                                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                          Costo
+                                        </th>
+                                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                          Unidad
+                                        </th>
+                                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                          Factor Imp.
+                                        </th>
+                                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                          Cantidad
+                                        </th>
+                                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                          Costo Parcial
+                                        </th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                      {formulaRel.formulas.materiasprimasxformula.map((mpRel, mpIndex) => (
+                                        <tr key={mpIndex} className="hover:bg-gray-50">
+                                          <td className="px-3 py-2 whitespace-nowrap text-gray-700">
+                                            {mpRel.materiasprima?.codigo || "N/A"}
+                                          </td>
+                                          <td className="px-3 py-2 text-gray-900">
+                                            {mpRel.materiasprima?.nombre || "N/A"}
+                                          </td>
+                                          <td className="px-3 py-2 whitespace-nowrap text-green-600 font-semibold">
+                                            ${mpRel.materiasprima?.costo?.toFixed(6) || "0.000000"}
+                                          </td>
+                                          <td className="px-3 py-2 whitespace-nowrap text-gray-600">
+                                            {mpRel.materiasprima?.unidadesmedida?.descripcion || "N/A"}
+                                          </td>
+                                          <td className="px-3 py-2 whitespace-nowrap text-gray-600">
+                                            {mpRel.materiasprima?.factorimportacion?.toFixed(4) || "0.0000"}
+                                          </td>
+                                          <td className="px-3 py-2 whitespace-nowrap text-gray-700">
+                                            {mpRel.cantidad?.toFixed(6) || "0.000000"}
+                                          </td>
+                                          <td className="px-3 py-2 whitespace-nowrap text-blue-600 font-semibold">
+                                            ${mpRel.costoparcial?.toFixed(6) || "0.000000"}
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            )}
 
-                            {/* Line 2: Unidad de medida, Costo */}
-                            <div className="flex items-center gap-3 text-xs text-gray-600">
-                              <span>{formulaRel.formulas?.unidadesmedida?.descripcion || "N/A"}</span>
-                              <span className="font-semibold text-green-600">
-                                ${formulaRel.formulas?.costo?.toFixed(6) || "0.000000"}
-                              </span>
+                          {formulaRel.formulas?.formulasxformula && formulaRel.formulas.formulasxformula.length > 0 && (
+                            <div className="mt-4">
+                              <h3 className="text-lg font-semibold mb-3 text-gray-700">Fórmulas Relacionadas</h3>
+                              <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200 text-sm">
+                                  <thead className="bg-gray-50">
+                                    <tr>
+                                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                        Código
+                                      </th>
+                                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                        Nombre
+                                      </th>
+                                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                        Costo
+                                      </th>
+                                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                        Unidad
+                                      </th>
+                                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                        Cantidad
+                                      </th>
+                                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                        Costo Parcial
+                                      </th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="bg-white divide-y divide-gray-200">
+                                    {formulaRel.formulas.formulasxformula.map((formRel, formIndex) => (
+                                      <tr key={formIndex} className="hover:bg-gray-50">
+                                        <td className="px-3 py-2 whitespace-nowrap text-gray-700">
+                                          {formRel.formulas?.codigo || "N/A"}
+                                        </td>
+                                        <td className="px-3 py-2 text-gray-900">{formRel.formulas?.nombre || "N/A"}</td>
+                                        <td className="px-3 py-2 whitespace-nowrap text-green-600 font-semibold">
+                                          ${formRel.formulas?.costo?.toFixed(6) || "0.000000"}
+                                        </td>
+                                        <td className="px-3 py-2 whitespace-nowrap text-gray-600">
+                                          {formRel.formulas?.unidadesmedida?.descripcion || "N/A"}
+                                        </td>
+                                        <td className="px-3 py-2 whitespace-nowrap text-gray-700">
+                                          {formRel.cantidad?.toFixed(6) || "0.000000"}
+                                        </td>
+                                        <td className="px-3 py-2 whitespace-nowrap text-blue-600 font-semibold">
+                                          ${formRel.costoparcial?.toFixed(6) || "0.000000"}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </div>
                       ))}
                     </div>
