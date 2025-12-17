@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Eye, Loader2, RotateCcw, Edit, ToggleRight, ToggleLeft, X, AppWindow } from "lucide-react"
+import { Search, Eye, Loader2, RotateCcw, Edit, ToggleRight, ToggleLeft, X } from "lucide-react"
 //import toast from "react-hot-toast" // Import for toast
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
@@ -112,7 +112,7 @@ export default function ProductosPage() {
     costoTotal: 0, // Inicializado a 0
     tiempoPromedio: "N/A",
   })
-  const [productosFiltrados, setProductosFiltrados] = useState<ProductoListado[]>([])
+  const [productosFiltrados, setProductosFiltrados] = useState<oProducto[]>([])
   const [totalProductos, setTotalProductos] = useState(0)
 
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
@@ -179,6 +179,7 @@ export default function ProductosPage() {
         const transformedData: oProducto[] = result.data.map((p: oProducto) => ({
           id: p.id,
           producto: p.producto,
+          presentacion: p.presentacion,
           nombre: p.nombre,
           formafarmaceuticaid: p.formafarmaceuticaid,
           formasfarmaceuticas: {
@@ -767,151 +768,170 @@ export default function ProductosPage() {
           )}
 
           {!isSearching && elementosPaginados.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-              {elementosPaginados.map((p, index) => (
-                <Card
-                  key={`${p.id}-${p.CatalogoId}-${index}`}
-                  className="border bg-card text-card-foreground relative flex flex-col overflow-hidden rounded-xs shadow-lg hover:shadow-xl transition-shadow duration-300"
-                >
-                  {/* Image at top */}
-                  <div
-                    className="relative w-full h-48 overflow-hidden cursor-pointer bg-gray-100"
-                    onClick={() => handleVerDetalles(p)}
-                    title="Ver detalles del producto"
+            <>
+              {totalPaginas > 1 && (
+                <div className="flex items-center justify-center space-x-2 pb-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPaginaActual((p) => Math.max(1, p - 1))}
+                    disabled={paginaActual === 1}
                   >
-                    <img
-                      src={p.imgurl || "/placeholder.svg?height=200&width=200&text=Producto"}
-                      alt={p.nombre}
-                      className="w-full h-full object-contain rounded-t-xs"
-                    />
-                    <div className="absolute top-2 right-2">
-                      <span
-                        className={`px-2 py-1 text-xs rounded-xs font-semibold ${p.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
-                      >
-                        {p.activo ? "Activo" : "Inactivo"}
-                      </span>
-                    </div>
-                  </div>
+                    Anterior
+                  </Button>
+                  <span className="text-sm">
+                    Página {paginaActual} de {totalPaginas}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPaginaActual((p) => Math.min(totalPaginas, p + 1))}
+                    disabled={paginaActual === totalPaginas}
+                  >
+                    Siguiente
+                  </Button>
+                </div>
+              )}
 
-                  {/* Card content */}
-                  <CardContent className="flex flex-col flex-grow p-4">
-                    {/* Nombre */}
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{p.nombre}</h3>
-                    {/* Código */}
-                    {p.zonas && <p className="text-xs text-gray-500 mb-2">{p.zonas.nombre}</p>}
-                    <p className="text-sm text-gray-600 mb-2">Código: {p.codigo || "Sin código."}</p>
-                    <div className="text-sm">
-                      <p>
-                        <span className="font-bold text-black">Costo:</span> {formatCurrency(p.costo)}
-                      </p>
-                      <p>
-                        <span className="font-bold text-black">Precio HL:</span> {formatCurrency(p.preciohl)}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
-                      <div className="flex gap-3 justify-center mt-auto">
-                        {/* Detalles - Opens modal */}
-                        {/*
-                        <div className="flex flex-col items-center">
-                          <Button variant="ghost" size="icon" title="Ver Detalles" onClick={() => handleVerDetalles(p)}>
-                            <AppWindow className="h-4 w-4" />
-                          </Button>
-                          <span className="text-xs text-muted-foreground mt-1">Detalles</span>
-                        </div>
-                        */}
-
-                        {/* Ver - Navigates to ver page */}
-                        <div className="flex flex-col items-center">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title="Ver Cliente"
-                            onClick={() => router.push(`/productos/${p.id}/ver`)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <span className="text-xs text-muted-foreground mt-1">Ver</span>
-                        </div>
-
-                        {/* Conditional div to show "hola" if esAdminDOs is true */}
-                        {esAdminDOs && (
-                          <>
-                            <div className="flex flex-col items-center">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                title="Editar"
-                                onClick={() => router.push(`/productos/${p.id}/editar`)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <span className="text-xs text-muted-foreground mt-1">Editar</span>
-                            </div>
-
-                            {/* Toggle status button */}
-                            <div className="flex flex-col items-center">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                title={p.activo ? "Inactivar" : "Activar"}
-                                onClick={() => handleToggleStatusClickActivo(p.id, p.activo)}
-                              >
-                                {p.activo ? (
-                                  <ToggleRight className="h-4 w-4 text-red-500" />
-                                ) : (
-                                  <ToggleLeft className="h-4 w-4 text-green-500" />
-                                )}
-                              </Button>
-                              <span className="text-xs text-muted-foreground mt-1">Estatus</span>
-                            </div>
-
-                            {/* Delete button */}
-                            <div className="flex flex-col items-center">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                title="Eliminar"
-                                onClick={() => router.push(`/productos/${p.id}/eliminar`)}
-                              >
-                                <X className="h-4 w-4 text-red-500" />
-                              </Button>
-                              <span className="text-xs text-muted-foreground mt-1">Eliminar</span>
-                            </div>
-                          </>
-                        )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                {elementosPaginados.map((p, index) => (
+                  <Card
+                    key={`${p.id}-${p.CatalogoId}-${index}`}
+                    className="border bg-card text-card-foreground relative flex flex-col overflow-hidden rounded-xs shadow-lg hover:shadow-xl transition-shadow duration-300"
+                  >
+                    {/* Image at top */}
+                    <div
+                      className="relative w-full h-48 overflow-hidden cursor-pointer bg-gray-100"
+                      onClick={() => handleVerDetalles(p)}
+                      title="Ver detalles del producto"
+                    >
+                      <img
+                        src={p.imgurl || "/placeholder.svg?height=200&width=200&text=Producto"}
+                        alt={p.nombre}
+                        className="w-full h-full object-contain rounded-t-xs"
+                      />
+                      <div className="absolute top-2 right-2">
+                        <span
+                          className={`px-2 py-1 text-xs rounded-xs font-semibold ${p.activo ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
+                        >
+                          {p.activo ? "Activo" : "Inactivo"}
+                        </span>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+
+                    {/* Card content */}
+                    <CardContent className="flex flex-col flex-grow p-4">
+                      <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{p.producto}</h3>
+                      {/* Código */}
+                      {p.zonas && <p className="text-xs text-gray-500 mb-2">{p.zonas.nombre}</p>}
+                      <p className="text-sm text-gray-600 mb-2">Código: {p.codigo || "Sin código."}</p>
+                      <div className="text-sm">
+                        <p>
+                          <span className="font-bold text-black">Presentación:</span> {p.presentacion || "N/A"}
+                        </p>
+                        <p>
+                          <span className="font-bold text-black">Forma farmacéutica:</span>{" "}
+                          {p.formafarmaceutica || "N/A"}
+                        </p>
+                        <p>
+                          <span className="font-bold text-black">Precio HL:</span> {formatCurrency(p.preciohl)}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
+                        <div className="flex gap-3 justify-center mt-auto">
+                          {/* Ver - Navigates to ver page */}
+                          <div className="flex flex-col items-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Ver Cliente"
+                              onClick={() => router.push(`/productos/${p.id}/ver`)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <span className="text-xs text-muted-foreground mt-1">Ver</span>
+                          </div>
+
+                          {/* Conditional div to show "hola" if esAdminDOs is true */}
+                          {esAdminDOs && (
+                            <>
+                              <div className="flex flex-col items-center">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  title="Editar"
+                                  onClick={() => router.push(`/productos/${p.id}/editar`)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <span className="text-xs text-muted-foreground mt-1">Editar</span>
+                              </div>
+
+                              {/* Toggle status button */}
+                              <div className="flex flex-col items-center">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  title={p.activo ? "Inactivar" : "Activar"}
+                                  onClick={() => handleToggleStatusClickActivo(p.id, p.activo)}
+                                >
+                                  {p.activo ? (
+                                    <ToggleRight className="h-4 w-4 text-red-500" />
+                                  ) : (
+                                    <ToggleLeft className="h-4 w-4 text-green-500" />
+                                  )}
+                                </Button>
+                                <span className="text-xs text-muted-foreground mt-1">Estatus</span>
+                              </div>
+
+                              {/* Delete button */}
+                              <div className="flex flex-col items-center">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  title="Eliminar"
+                                  onClick={() => router.push(`/productos/${p.id}/eliminar`)}
+                                >
+                                  <X className="h-4 w-4 text-red-500" />
+                                </Button>
+                                <span className="text-xs text-muted-foreground mt-1">Eliminar</span>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {totalPaginas > 1 && (
+                <div className="flex items-center justify-center space-x-2 pt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPaginaActual((p) => Math.max(1, p - 1))}
+                    disabled={paginaActual === 1}
+                  >
+                    Anterior
+                  </Button>
+                  <span className="text-sm">
+                    Página {paginaActual} de {totalPaginas}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPaginaActual((p) => Math.min(totalPaginas, p + 1))}
+                    disabled={paginaActual === totalPaginas}
+                  >
+                    Siguiente
+                  </Button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-8 text-muted-foreground">No se encontraron resultados.</div>
-          )}
-
-          {!isSearching && totalPaginas > 1 && (
-            <div className="flex items-center justify-center space-x-2 pt-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPaginaActual((p) => Math.max(1, p - 1))}
-                disabled={paginaActual === 1}
-              >
-                Anterior
-              </Button>
-              <span className="text-sm">
-                Página {paginaActual} de {totalPaginas}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPaginaActual((p) => Math.min(totalPaginas, p + 1))}
-                disabled={paginaActual === totalPaginas}
-              >
-                Siguiente
-              </Button>
-            </div>
           )}
         </CardContent>
       </Card>
