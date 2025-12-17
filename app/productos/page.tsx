@@ -10,7 +10,18 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Eye, Loader2, RotateCcw, Edit, ToggleRight, ToggleLeft, X } from "lucide-react"
+import {
+  Search,
+  Eye,
+  Loader2,
+  RotateCcw,
+  Edit,
+  ToggleRight,
+  ToggleLeft,
+  X,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react"
 //import toast from "react-hot-toast" // Import for toast
 // -- Tipados (interfaces, clases, objetos) --
 import type React from "react"
@@ -45,8 +56,16 @@ import { PageModalTutorial } from "@/components/page-modal-tutorial"
 import { useAuth } from "@/contexts/auth-context"
 import { obtenerProductos, estatusActivoProducto } from "@/app/actions/productos"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
-import { listaDesplegableCatalogos } from "@/app/actions/catalogos"
+import {
+  listaDesplegableCatalogos,
+  listaDesplegableFormasFarmaceuticas,
+  listaDesplegableSistemas,
+  listaDesplegableEnvase,
+} from "@/app/actions/catalogos"
 import { listDesplegableZonas } from "@/app/actions/zonas"
+import { listaDesplegableFormulasBuscar } from "@/app/actions/formulas"
+import { listaDesplegableMateriasPrimasBuscar } from "@/app/actions/materia-prima"
+import { listaDesplegableMaterialesEtiquetadosBuscar } from "@/app/actions/material-etiquetado"
 
 /* ==================================================
 	Componente Principal (Pagina)
@@ -104,6 +123,11 @@ export default function ProductosPage() {
   const [selectedIngredientesAsociados, setSelectedIngredientesAsociados] = useState<IngredienteAsociado[]>([])
   const [isDetailsLoading, setIsDetailsLoading] = useState(false)
 
+  // Estados para el modal de detalles mejorado
+  const [formasFarmaceuticasOptions, setFormasFarmaceuticasOptions] = useState<ddlItem[]>([])
+  const [objetivosOptions, setObjetivosOptions] = useState<ddlItem[]>([])
+  const [envasesOptions, setEnvasesOptions] = useState<ddlItem[]>([])
+
   // --- Estados ---
   const [productos, setProductos] = useState<ProductoListado[]>([])
   const [estadisticas, setEstadisticas] = useState<ProductosEstadisticas>({
@@ -121,6 +145,39 @@ export default function ProductosPage() {
   const [productoToDelete, setProductoToDelete] = useState<number | null>(null)
 
   // Filtros
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
+  const [filtroPresentacion, setFiltroPresentacion] = useState("")
+  const [filtroFormaFarmaceutica, setFiltroFormaFarmaceutica] = useState("-1")
+  const [filtroObjetivo, setFiltroObjetivo] = useState("-1")
+  const [filtroEnvase, setFiltroEnvase] = useState("-1")
+  const [filtroFormula, setFiltroFormula] = useState("")
+  const [filtroMateriaPrima, setFiltroMateriaPrima] = useState("")
+  const [filtroEnvaseAvanzado, setFiltroEnvaseAvanzado] = useState("")
+  const [filtroEmpaque, setFiltroEmpaque] = useState("")
+
+  const [formulaBuscar, setFormulaBuscar] = useState("")
+  const [formulasResultados, setFormulasResultados] = useState<any[]>([])
+  const [formulaSeleccionada, setFormulaSeleccionada] = useState<{ id: number; text: string } | null>(null)
+  const [formulaid, setFormulaid] = useState<number | null>(null)
+  const [showFormulasDropdown, setShowFormulasDropdown] = useState(false)
+
+  const [materiaprimaBuscar, setMateriaprimaBuscar] = useState("")
+  const [materiaprimasResultados, setMateriaprimasResultados] = useState<any[]>([])
+  const [materiaprimaSeleccionada, setMateriaprimaSeleccionada] = useState<{ id: number; text: string } | null>(null)
+  const [materiaprimaid, setMateriaprimaid] = useState<number | null>(null)
+  const [showMateriaprimasDropdown, setShowMateriaprimasDropdown] = useState(false)
+
+  const [envaseBuscar, setEnvaseBuscar] = useState("")
+  const [envasesResultadosBuscar, setEnvasesResultadosBuscar] = useState<any[]>([])
+  const [envaseSeleccionado, setEnvaseSeleccionado] = useState<{ id: number; text: string } | null>(null)
+  const [envaseid, setEnvaseid] = useState<number | null>(null)
+  const [showEnvasesDropdown, setShowEnvasesDropdown] = useState(false)
+
+  const [empaqueBuscar, setEmpaqueBuscar] = useState("")
+  const [empaquesResultados, setEmpaquesResultados] = useState<any[]>([])
+  const [empaqueSeleccionado, setEmpaqueSeleccionado] = useState<{ id: number; text: string } | null>(null)
+  const [empaqueid, setEmpaqueid] = useState<number | null>(null)
+  const [showEmpaqueDropdown, setShowEmpaqueDropdown] = useState(false)
 
   // --- Variables (post carga elementos) ---
   const elementosPaginadosssssss = useMemo(() => {
@@ -146,7 +203,35 @@ export default function ProductosPage() {
     zonaid: number,
     catalogoid: number,
     estatus: string,
+    presentacion: string, // Added for advanced search
+    formafarmaceuticaid: number, // Added for advanced search
+    objetivo: string, // Added for advanced search
+    envase: string, // Added for advanced search
+    formula: string, // Added for advanced search
+    materiaprima: string, // Added for advanced search
+    envaseavanzado: string, // Added for advanced search
+    empaque: string, // Added for advanced search
   ) => {
+    sessionStorage.setItem(
+      "productosFilter",
+      JSON.stringify({
+        productonombre,
+        clienteid,
+        zonaid,
+        catalogoid,
+        estatus,
+        presentacion,
+        formafarmaceuticaid,
+        objetivo,
+        envase,
+        formula,
+        materiaprima,
+        envaseavanzado,
+        empaque,
+        paginaActual,
+      }),
+    )
+
     // Validar usuario activo
     if (!user) return
 
@@ -172,6 +257,14 @@ export default function ProductosPage() {
         zonaid,
         catalogoid,
         auxEstatus,
+        presentacion, // Pass advanced filters
+        formafarmaceuticaid,
+        objetivo,
+        envase,
+        formula,
+        materiaprima,
+        envaseavanzado,
+        empaque,
       )
       console.log("result: " + result.success)
       console.log("result.data: " + result.data)
@@ -343,14 +436,26 @@ export default function ProductosPage() {
       })
       setShowPageTituloMasNuevo(true)
 
-      // Ejecutar funcion de busqueda para cargar listado inicial
-      const Result = await ejecutarBusquedaProductos("", auxClienteId, -1, -1, "True")
-      if (!Result.success) {
-        setModalAlert({
-          Titulo: "En ejecución de búsqueda de carga inicial",
-          Mensaje: Result.mensaje,
-        })
-        setShowModalAlert(true)
+      const savedFilters = sessionStorage.getItem("productosFilter")
+
+      if (savedFilters) {
+        const filters = JSON.parse(savedFilters)
+
+        // Restaurar los estados de los filtros
+        setFiltroNombre(filters.productonombre || "")
+        setFiltroCliente(filters.clienteid?.toString() || "-1")
+        setFiltroZona(filters.zonaid?.toString() || "-1")
+        setFiltroCatalogo(filters.catalogoid?.toString() || "-1")
+        setFiltroEstatus(filters.estatus || "-1")
+        setFiltroPresentacion(filters.presentacion || "")
+        setFiltroFormaFarmaceutica(filters.formafarmaceuticaid?.toString() || "-1")
+        setFiltroObjetivo(filters.objetivo || "-1")
+        setFiltroEnvase(filters.envase || "-1")
+        setFiltroFormula(filters.formula || "")
+        setFiltroMateriaPrima(filters.materiaprima || "")
+        setFiltroEnvaseAvanzado(filters.envaseavanzado || "")
+        setFiltroEmpaque(filters.empaque || "")
+        setPaginaActual(filters.paginaActual || 1)
       }
 
       // -- Cargar DDLs
@@ -362,12 +467,14 @@ export default function ProductosPage() {
             ? [{ id: -1, nombre: "Todos" }, ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))]
             : (clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
         setClientes(clientesConTodos)
-        // Seleccion de opcion en DDL por filtro de tipo de rol
-        if (esAdminDDLs) {
-          setFiltroCliente("-1")
-        } else {
-          const aux = clientesData.id
-          setFiltroCliente(aux)
+
+        if (!savedFilters) {
+          if (esAdminDDLs) {
+            setFiltroCliente("-1")
+          } else {
+            const aux = clientesData.id
+            setFiltroCliente(aux)
+          }
         }
       } else {
         console.error("Error cargando clientes:", clientesError)
@@ -384,12 +491,14 @@ export default function ProductosPage() {
               ]
             : (catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre }))
         setCatalogos(catalogosConTodos)
-        // Seleccion de opcion en DDL por filtro de tipo de rol
-        if (esAdminDDLs === true) {
-          setFiltroCatalogo("-1")
-        } else {
-          if (catalogosResult.data && catalogosResult.data.length > 0) {
-            setFiltroCatalogo(catalogosResult.data[0].id.toString())
+
+        if (!savedFilters) {
+          if (esAdminDDLs === true) {
+            setFiltroCatalogo("-1")
+          } else {
+            if (catalogosResult.data && catalogosResult.data.length > 0) {
+              setFiltroCatalogo(catalogosResult.data[0].id.toString())
+            }
           }
         }
       } else {
@@ -399,6 +508,61 @@ export default function ProductosPage() {
           Mensaje: catalogosResult.error,
         })
         setShowModalError(true)
+      }
+
+      if (savedFilters) {
+        const filters = JSON.parse(savedFilters)
+
+        if (filters.clienteid && filters.clienteid !== -1) {
+          const zonasResult = await listDesplegableZonas(-1, "", Number(filters.clienteid))
+          if (!zonasResult.error && zonasResult.data) {
+            const zonasConTodos = [
+              { value: "-1", text: "Todos" },
+              ...zonasResult.data.map((z: any) => ({ value: z.value, text: z.text })),
+            ]
+            setZonasOptions(zonasConTodos)
+          }
+        }
+
+        await ejecutarBusquedaProductos(
+          filters.productonombre || "",
+          filters.clienteid || auxClienteId,
+          filters.zonaid || -1,
+          filters.catalogoid || -1,
+          filters.estatus || "True",
+          filters.presentacion || "",
+          filters.formafarmaceuticaid || -1,
+          filters.objetivo || "-1",
+          filters.envase || "-1",
+          filters.formula || "",
+          filters.materiaprima || "",
+          filters.envaseavanzado || "",
+          filters.empaque || "",
+        )
+      } else {
+        // Ejecutar funcion de busqueda para cargar listado inicial
+        const Result = await ejecutarBusquedaProductos(
+          "", // filtroNombre
+          auxClienteId, // clienteid
+          -1, // zonaid
+          -1, // catalogoid
+          "True", // estatus
+          "", // filtroPresentacion
+          -1, // filtroFormaFarmaceutica
+          "-1", // filtroObjetivo
+          "-1", // filtroEnvase
+          "", // filtroFormula
+          "", // filtroMateriaPrima
+          "", // filtroEnvaseAvanzado
+          "", // filtroEmpaque
+        )
+        if (!Result.success) {
+          setModalAlert({
+            Titulo: "En ejecución de búsqueda de carga inicial",
+            Mensaje: Result.mensaje,
+          })
+          setShowModalAlert(true)
+        }
       }
     } catch (error) {
       console.error("Error al cargar datos iniciales: ", error)
@@ -413,7 +577,106 @@ export default function ProductosPage() {
     }
   }
 
-  // -- Manejadores (Handles) --
+  // --- Cargar Opciones para DDLs Avanzados ---
+  useEffect(() => {
+    const cargarOpciones = async () => {
+      try {
+        const [formasResult, objetivosResult, envasesResult] = await Promise.all([
+          listaDesplegableFormasFarmaceuticas(),
+          listaDesplegableSistemas(), // Assuming 'listaDesplegableSistemas' provides data for 'Objetivo (Uso)'
+          listaDesplegableEnvase(),
+        ])
+
+        if (formasResult.success && formasResult.data) {
+          setFormasFarmaceuticasOptions(formasResult.data)
+        }
+
+        if (objetivosResult.success && objetivosResult.data) {
+          setObjetivosOptions(objetivosResult.data)
+        }
+
+        if (envasesResult.success && envasesResult.data) {
+          setEnvasesOptions(envasesResult.data)
+        }
+      } catch (error) {
+        console.error("Error loading dropdown options:", error)
+        setModalError({
+          Titulo: "Error al cargar opciones de filtros",
+          Mensaje: `Hubo un error al cargar las opciones para los filtros avanzados: ${error}`,
+        })
+        setShowModalError(true)
+      }
+    }
+    cargarOpciones()
+  }, [])
+
+  useEffect(() => {
+    const buscarFormulas = async () => {
+      if (formulaBuscar.trim().length >= 2) {
+        const resultados = await listaDesplegableFormulasBuscar(formulaBuscar)
+        setFormulasResultados(resultados)
+        setShowFormulasDropdown(true)
+      } else {
+        setFormulasResultados([])
+        setShowFormulasDropdown(false)
+      }
+    }
+
+    const timeoutId = setTimeout(buscarFormulas, 300)
+    return () => clearTimeout(timeoutId)
+  }, [formulaBuscar])
+
+  useEffect(() => {
+    const buscarMateriaPrimas = async () => {
+      if (materiaprimaBuscar.trim().length >= 2) {
+        const resultados = await listaDesplegableMateriasPrimasBuscar(materiaprimaBuscar)
+        setMateriaprimasResultados(resultados)
+        setShowMateriaprimasDropdown(true)
+      } else {
+        setMateriaprimasResultados([])
+        setShowMateriaprimasDropdown(false)
+      }
+    }
+
+    const timeoutId = setTimeout(buscarMateriaPrimas, 300)
+    return () => clearTimeout(timeoutId)
+  }, [materiaprimaBuscar])
+
+  useEffect(() => {
+    const buscarEnvases = async () => {
+      if (envaseBuscar.trim().length >= 2) {
+        const resultados = await listaDesplegableMaterialesEtiquetadosBuscar(envaseBuscar)
+        const envasesFiltrados = resultados.filter((m) => m.tipomaterialid === 2)
+        setEnvasesResultadosBuscar(envasesFiltrados)
+        setShowEnvasesDropdown(envasesFiltrados.length > 0)
+      } else {
+        setEnvasesResultadosBuscar([])
+        setShowEnvasesDropdown(false)
+      }
+    }
+
+    const timeoutId = setTimeout(buscarEnvases, 300)
+    return () => clearTimeout(timeoutId)
+  }, [envaseBuscar])
+
+  useEffect(() => {
+    const buscarEmpaques = async () => {
+      if (empaqueBuscar.trim().length >= 2) {
+        const resultados = await listaDesplegableMaterialesEtiquetadosBuscar(empaqueBuscar)
+        const empaquesFiltrados = resultados.filter((m) => m.tipomaterialid === 1)
+        setEmpaquesResultados(empaquesFiltrados)
+        setShowEmpaqueDropdown(empaquesFiltrados.length > 0)
+      } else {
+        setEmpaquesResultados([])
+        setShowEmpaqueDropdown(false)
+      }
+    }
+
+    const timeoutId = setTimeout(buscarEmpaques, 300)
+    return () => clearTimeout(timeoutId)
+  }, [empaqueBuscar])
+
+  // --- Manejadores (Handles) --
   // Busqueda - Ejecutar
   const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -421,21 +684,64 @@ export default function ProductosPage() {
     const ClienteId = Number.parseInt(filtroCliente, 10)
     const ZonaId = Number.parseInt(filtroZona, 10)
     const CatalogoId = Number.parseInt(filtroCatalogo, 10)
-    const Estatus = filtroEstatus === "-1" ? "Todos" : filtroEstatus
+    const Estatus = filtroEstatus
+    const Presentacion = filtroPresentacion.trim()
+    const FormaFarmaceuticaId = Number.parseInt(filtroFormaFarmaceutica, 10)
+    const Objetivo = filtroObjetivo
+    const Envase = filtroEnvase
+    const Formula = filtroFormula.trim()
+    const MateriaPrima = filtroMateriaPrima.trim()
+    const EnvaseAvanzado = filtroEnvaseAvanzado.trim()
+    const Empaque = filtroEmpaque.trim()
 
-    ejecutarBusquedaProductos(Nombre, ClienteId, ZonaId, CatalogoId, Estatus)
+    ejecutarBusquedaProductos(
+      Nombre,
+      ClienteId,
+      ZonaId,
+      CatalogoId,
+      Estatus,
+      Presentacion,
+      FormaFarmaceuticaId,
+      Objetivo,
+      Envase,
+      Formula,
+      MateriaPrima,
+      EnvaseAvanzado,
+      Empaque,
+    )
   }
 
   // Busqueda - Limpiar o Resetear
-  const handleLimpiar = () => {
-    setFiltroNombre("")
-    setFiltroCliente("-1")
-    setFiltroZona("-1")
-    setFiltroCatalogo("-1")
-    setFiltroEstatus("-1")
-    handleClienteChange("-1")
+  const handleLimpiarClick = () => {
+    sessionStorage.removeItem("productosFilter")
 
-    cargarDatosIniciales()
+    setFiltroNombre("")
+    setFiltroEstatus("-1")
+    setFiltroCliente(esAdminDDLs === true ? "-1" : user?.ClienteId?.toString() || "-1")
+    setFiltroCatalogo("-1")
+    setFiltroZona("-1")
+    setFiltroPresentacion("")
+    setFiltroFormaFarmaceutica("-1")
+    setFiltroObjetivo("-1")
+    setFiltroEnvase("-1")
+    setFiltroFormula("")
+    setFiltroMateriaPrima("")
+    setFiltroEnvaseAvanzado("")
+    setFiltroEmpaque("")
+
+    // Reset autocomplete states
+    setFormulaBuscar("")
+    setFormulaSeleccionada(null)
+    setMateriaprimaBuscar("")
+    setMateriaprimaSeleccionada(null)
+    setEnvaseBuscar("")
+    setEnvaseSeleccionado(null)
+    setEmpaqueBuscar("")
+    setEmpaqueSeleccionado(null)
+
+    setPaginaActual(1)
+    setProductos([])
+    setTotalProductos(0)
   }
 
   // Busqueda, camabiar cliente seleccionado
@@ -548,6 +854,38 @@ export default function ProductosPage() {
     console.log(`View details for product ID: ${productId}`)
   }
 
+  const handleFormulaSelect = (formula: any) => {
+    setFormulaSeleccionada({ id: formula.value, text: formula.text })
+    setFormulaid(formula.value)
+    setFormulaBuscar(formula.text)
+    setShowFormulasDropdown(false)
+    setFiltroFormula(formula.text) // Update the filter directly
+  }
+
+  const handleMateriaprimaSelect = (materiaPrima: any) => {
+    setMateriaprimaSeleccionada({ id: materiaPrima.value, text: materiaPrima.text })
+    setMateriaprimaid(materiaPrima.value)
+    setMateriaprimaBuscar(materiaPrima.text)
+    setShowMateriaprimasDropdown(false)
+    setFiltroMateriaPrima(materiaPrima.text) // Update the filter directly
+  }
+
+  const handleEnvaseSelect = (envase: any) => {
+    setEnvaseSeleccionado({ id: envase.id, text: envase.nombre })
+    setEnvaseid(envase.id)
+    setEnvaseBuscar(envase.nombre)
+    setShowEnvasesDropdown(false)
+    setFiltroEnvaseAvanzado(envase.nombre) // Update the filter directly
+  }
+
+  const handleEmpaqueSelect = (empaque: any) => {
+    setEmpaqueSeleccionado({ id: empaque.id, text: empaque.nombre })
+    setEmpaqueid(empaque.id)
+    setEmpaqueBuscar(empaque.nombre)
+    setShowEmpaqueDropdown(false)
+    setFiltroEmpaque(empaque.nombre) // Update the filter directly
+  }
+
   // --- Carga Inicial y Seguridad ---
   useEffect(() => {
     if (!authLoading) {
@@ -636,101 +974,314 @@ export default function ProductosPage() {
           <CardTitle>Filtros de Búsqueda</CardTitle>
         </CardHeader>
         <CardContent>
-          <form
-            id="frmProductosBuscar"
-            name="frmProductosBuscar"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 gap-4 items-end"
-            onSubmit={handleBuscar}
-          >
-            <div className="lg:col-span-2">
-              <label htmlFor="txtProductoNombre" className="text-sm font-medium">
-                Nombre
-              </label>
-              <Input
-                id="txtProductoNombre"
-                name="txtProductoNombre"
-                type="text"
-                placeholder="Buscar por nombre..."
-                maxLength={150}
-                value={filtroNombre}
-                onChange={(e) => setFiltroNombre(e.target.value)}
-              />
+          <form id="frmProductosBuscar" name="frmProductosBuscar" className="space-y-4" onSubmit={handleBuscar}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label htmlFor="txtProductoNombre" className="text-sm font-medium">
+                  Producto
+                </label>
+                <Input
+                  id="txtProductoNombre"
+                  name="txtProductoNombre"
+                  type="text"
+                  placeholder="Buscar por producto..."
+                  maxLength={150}
+                  value={filtroNombre}
+                  onChange={(e) => setFiltroNombre(e.target.value)}
+                />
+              </div>
+              <div>
+                <label htmlFor="ddlClientes" className="text-sm font-medium">
+                  Cliente
+                </label>
+                <Select name="ddlCliente" value={filtroCliente} onValueChange={handleClienteChange}>
+                  <SelectTrigger id="ddlClientes">
+                    <SelectValue placeholder="Selecciona un cliente" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clientes.map((c) => (
+                      <SelectItem key={c.id} value={c.id.toString()}>
+                        {c.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label htmlFor="ddlZona" className="text-sm font-medium">
+                  Zona
+                </label>
+                <Select name="ddlZona" value={filtroZona} onValueChange={setFiltroZona}>
+                  <SelectTrigger id="ddlZona">
+                    <SelectValue placeholder="Selecciona una zona" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {zonasOptions.map((z) => (
+                      <SelectItem key={z.value} value={z.value}>
+                        {z.text}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label htmlFor="ddlEstatus" className="text-sm font-medium">
+                  Estatus
+                </label>
+                <Select name="ddlEstatus" value={filtroEstatus} onValueChange={setFiltroEstatus}>
+                  <SelectTrigger id="ddlEstatus">
+                    <SelectValue placeholder="Selecciona un estatus" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="-1">Todos</SelectItem>
+                    <SelectItem value="true">Activo</SelectItem>
+                    <SelectItem value="false">Inactivo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="lg:col-span-2">
-              <label htmlFor="ddlClientes" className="text-sm font-medium">
-                Cliente
-              </label>
-              <Select name="ddlCliente" value={filtroCliente} onValueChange={handleClienteChange}>
-                <SelectTrigger id="ddlClientes">
-                  <SelectValue placeholder="Selecciona un cliente" />
-                </SelectTrigger>
-                <SelectContent>
-                  {clientes.map((c) => (
-                    <SelectItem key={c.id} value={c.id.toString()}>
-                      {c.nombre}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+
+            <div className="flex items-center gap-2 pt-4">
+              <button
+                type="button"
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                className="text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-2"
+              >
+                {showAdvancedFilters ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                Avanzada
+              </button>
+              <div className="flex-grow border-t border-muted-foreground/30"></div>
             </div>
-            <div className="lg:col-span-2">
-              <label htmlFor="ddlZona" className="text-sm font-medium">
-                Zona
-              </label>
-              <Select name="ddlZona" value={filtroZona} onValueChange={setFiltroZona}>
-                <SelectTrigger id="ddlZona">
-                  <SelectValue placeholder="Selecciona una zona" />
-                </SelectTrigger>
-                <SelectContent>
-                  {zonasOptions.map((z) => (
-                    <SelectItem key={z.value} value={z.value}>
-                      {z.text}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            {/*<div className="lg:col-span-2">
-              <label htmlFor="ddlCatalogo" className="text-sm font-medium">
-                Catálogo
-              </label>
-              <Select name="ddlCatalogo" value={filtroCatalogo} onValueChange={setFiltroCatalogo}>
-                <SelectTrigger id="ddlCatalogo">
-                  <SelectValue placeholder="Selecciona un catálogo" />
-                </SelectTrigger>
-                <SelectContent>
-                  {catalogos.map((c) => (
-                    <SelectItem key={c.id} value={c.id.toString()}>
-                      {c.nombre}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>*/}
-            <div className="lg:col-span-2">
-              <label htmlFor="ddlEstatus" className="text-sm font-medium">
-                Estatus
-              </label>
-              <Select name="ddlEstatus" value={filtroEstatus} onValueChange={setFiltroEstatus}>
-                <SelectTrigger id="ddlEstatus">
-                  <SelectValue placeholder="Selecciona un estatus" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="-1">Todos</SelectItem>
-                  <SelectItem value="true">Activo</SelectItem>
-                  <SelectItem value="false">Inactivo</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex gap-2 col-span-full md:col-span-2 lg:col-span-2 justify-end">
+
+            {showAdvancedFilters && (
+              <div className="space-y-4 pt-4 border-t">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <label htmlFor="txtPresentacion" className="text-sm font-medium">
+                      Presentación
+                    </label>
+                    <Input
+                      id="txtPresentacion"
+                      name="txtPresentacion"
+                      type="text"
+                      placeholder="Buscar por presentación..."
+                      value={filtroPresentacion}
+                      onChange={(e) => setFiltroPresentacion(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="ddlFormaFarmaceutica" className="text-sm font-medium">
+                      Forma farmacéutica
+                    </label>
+                    <Select
+                      name="ddlFormaFarmaceutica"
+                      value={filtroFormaFarmaceutica}
+                      onValueChange={setFiltroFormaFarmaceutica}
+                    >
+                      <SelectTrigger id="ddlFormaFarmaceutica">
+                        <SelectValue placeholder="Selecciona forma" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="-1">Todos</SelectItem>
+                        {formasFarmaceuticasOptions.map((forma) => (
+                          <SelectItem key={forma.value} value={forma.value}>
+                            {forma.text}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label htmlFor="ddlObjetivo" className="text-sm font-medium">
+                      Objetivo (Uso)
+                    </label>
+                    <Select name="ddlObjetivo" value={filtroObjetivo} onValueChange={setFiltroObjetivo}>
+                      <SelectTrigger id="ddlObjetivo">
+                        <SelectValue placeholder="Selecciona objetivo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="-1">Todos</SelectItem>
+                        {objetivosOptions.map((objetivo) => (
+                          <SelectItem key={objetivo.value} value={objetivo.value}>
+                            {objetivo.text}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label htmlFor="ddlEnvase" className="text-sm font-medium">
+                      Envase
+                    </label>
+                    <Select name="ddlEnvase" value={filtroEnvase} onValueChange={setFiltroEnvase}>
+                      <SelectTrigger id="ddlEnvase">
+                        <SelectValue placeholder="Selecciona envase" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="-1">Todos</SelectItem>
+                        {envasesOptions.map((envase) => (
+                          <SelectItem key={envase.value} value={envase.value}>
+                            {envase.text}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Fórmula */}
+                  <div className="relative">
+                    <label htmlFor="txtFormula" className="text-sm font-medium">
+                      Fórmula
+                    </label>
+                    <Input
+                      id="txtFormula"
+                      name="txtFormula"
+                      type="text"
+                      placeholder="Buscar por fórmula..."
+                      value={formulaBuscar}
+                      onChange={(e) => {
+                        setFormulaBuscar(e.target.value)
+                        setFiltroFormula(e.target.value) // Also update filtroFormula directly
+                      }}
+                      onFocus={() => formulasResultados.length > 0 && setShowFormulasDropdown(true)}
+                      autoComplete="off"
+                    />
+                    {showFormulasDropdown && formulasResultados.length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {formulasResultados.map((formula) => (
+                          <button
+                            key={formula.value}
+                            type="button"
+                            className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+                            onClick={() => handleFormulaSelect(formula)}
+                          >
+                            {formula.text}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <input type="hidden" name="formulaid" value={formulaid || ""} />
+                  </div>
+
+                  {/* Materia Prima */}
+                  <div className="relative">
+                    <label htmlFor="txtMateriaPrima" className="text-sm font-medium">
+                      Materia prima
+                    </label>
+                    <Input
+                      id="txtMateriaPrima"
+                      name="txtMateriaPrima"
+                      type="text"
+                      placeholder="Buscar por materia prima..."
+                      value={materiaprimaBuscar}
+                      onChange={(e) => {
+                        setMateriaprimaBuscar(e.target.value)
+                        setFiltroMateriaPrima(e.target.value) // Also update filtroMateriaPrima directly
+                      }}
+                      onFocus={() => materiaprimasResultados.length > 0 && setShowMateriaprimasDropdown(true)}
+                      autoComplete="off"
+                    />
+                    {showMateriaprimasDropdown && materiaprimasResultados.length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {materiaprimasResultados.map((materiaPrima) => (
+                          <button
+                            key={materiaPrima.value}
+                            type="button"
+                            className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+                            onClick={() => handleMateriaprimaSelect(materiaPrima)}
+                          >
+                            {materiaPrima.text}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <input type="hidden" name="materiaprimaid" value={materiaprimaid || ""} />
+                  </div>
+
+                  {/* Envase Avanzado */}
+                  <div className="relative">
+                    <label htmlFor="txtEnvaseAvanzado" className="text-sm font-medium">
+                      Envase
+                    </label>
+                    <Input
+                      id="txtEnvaseAvanzado"
+                      name="txtEnvaseAvanzado"
+                      type="text"
+                      placeholder="Buscar por envase..."
+                      value={envaseBuscar}
+                      onChange={(e) => {
+                        setEnvaseBuscar(e.target.value)
+                        setFiltroEnvaseAvanzado(e.target.value) // Also update filtroEnvaseAvanzado directly
+                      }}
+                      onFocus={() => envasesResultadosBuscar.length > 0 && setShowEnvasesDropdown(true)}
+                      autoComplete="off"
+                    />
+                    {showEnvasesDropdown && envasesResultadosBuscar.length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {envasesResultadosBuscar.map((envase) => (
+                          <button
+                            key={envase.id}
+                            type="button"
+                            className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+                            onClick={() => handleEnvaseSelect(envase)}
+                          >
+                            {envase.codigo} - {envase.nombre}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <input type="hidden" name="envaseid" value={envaseid || ""} />
+                  </div>
+
+                  {/* Empaque */}
+                  <div className="relative">
+                    <label htmlFor="txtEmpaque" className="text-sm font-medium">
+                      Empaque
+                    </label>
+                    <Input
+                      id="txtEmpaque"
+                      name="txtEmpaque"
+                      type="text"
+                      placeholder="Buscar por empaque..."
+                      value={empaqueBuscar}
+                      onChange={(e) => {
+                        setEmpaqueBuscar(e.target.value)
+                        setFiltroEmpaque(e.target.value) // Also update filtroEmpaque directly
+                      }}
+                      onFocus={() => empaquesResultados.length > 0 && setShowEmpaqueDropdown(true)}
+                      autoComplete="off"
+                    />
+                    {showEmpaqueDropdown && empaquesResultados.length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {empaquesResultados.map((empaque) => (
+                          <button
+                            key={empaque.id}
+                            type="button"
+                            className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+                            onClick={() => handleEmpaqueSelect(empaque)}
+                          >
+                            {empaque.codigo} - {empaque.nombre}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <input type="hidden" name="empaqueid" value={empaqueid || ""} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-2 justify-end pt-4">
               <Button
                 id="btnProductosLimpiar"
                 name="btnProductosLimpiar"
                 type="button"
                 variant="outline"
-                className="w-full md:w-auto bg-[#4a4a4a] text-white hover:bg-[#333333]"
+                className="bg-[#4a4a4a] text-white hover:bg-[#333333]"
                 style={{ fontSize: "12px" }}
-                onClick={handleLimpiar}
+                onClick={handleLimpiarClick}
               >
                 <RotateCcw className="mr-2 h-3 w-3" /> Limpiar
               </Button>
@@ -738,7 +1289,7 @@ export default function ProductosPage() {
                 id="btnProductosBuscar"
                 name="btnProductosBuscar"
                 type="submit"
-                className="w-full md:w-auto bg-[#4a4a4a] text-white hover:bg-[#333333]"
+                className="bg-[#4a4a4a] text-white hover:bg-[#333333]"
                 style={{ fontSize: "12px" }}
                 disabled={isSearching}
               >
@@ -767,7 +1318,7 @@ export default function ProductosPage() {
             </div>
           )}
 
-          {!isSearching && elementosPaginados.length > 0 ? (
+          {!isSearching && (productosFiltrados.length > 0 || elementosPaginados.length > 0) ? (
             <>
               {totalPaginas > 1 && (
                 <div className="flex items-center justify-center space-x-2 pb-4">
@@ -819,87 +1370,61 @@ export default function ProductosPage() {
                       </div>
                     </div>
 
-                    {/* Card content */}
-                    <CardContent className="flex flex-col flex-grow p-4">
-                      <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{p.producto}</h3>
-                      {/* Código */}
-                      {p.zonas && <p className="text-xs text-gray-500 mb-2">{p.zonas.nombre}</p>}
-                      <p className="text-sm text-gray-600 mb-2">Código: {p.codigo || "Sin código."}</p>
-                      <div className="text-sm">
-                        <p>
-                          <span className="font-bold text-black">Presentación:</span> {p.presentacion || "N/A"}
+                    <CardContent className="flex-grow flex flex-col justify-between p-4">
+                      <div>
+                        <CardTitle className="text-lg font-semibold mb-1 truncate">{p.nombre}</CardTitle>
+                        <CardDescription className="text-xs text-muted-foreground mb-2 truncate">
+                          {p.presentacion}
+                        </CardDescription>
+                        <p className="text-xs mb-1">
+                          <span className="font-medium">Cliente:</span> {p.clientes?.nombre || "N/A"}
                         </p>
-                        <p>
-                          <span className="font-bold text-black">Forma farmacéutica:</span>{" "}
-                          {p.formafarmaceutica || "N/A"}
+                        <p className="text-xs mb-1">
+                          <span className="font-medium">Código:</span> {p.codigo || "N/A"}
                         </p>
-                        <p>
-                          <span className="font-bold text-black">Precio HL:</span> {formatCurrency(p.preciohl)}
+                        <p className="text-xs mb-1">
+                          <span className="font-medium">Costo:</span> {formatCurrency(p.costo)}
                         </p>
                       </div>
-
-                      <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
-                        <div className="flex gap-3 justify-center mt-auto">
-                          {/* Ver - Navigates to ver page */}
-                          <div className="flex flex-col items-center">
+                      <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => handleToggleStatusClickActivo(p.id, p.activo)}
+                            title={p.activo ? "Inactivar producto" : "Activar producto"}
+                          >
+                            {p.activo ? (
+                              <ToggleLeft className="h-4 w-4 text-red-500" />
+                            ) : (
+                              <ToggleRight className="h-4 w-4 text-green-500" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => handleVerDetalles(p)}
+                            title="Ver detalles"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          {esAdmin && (
                             <Button
                               variant="ghost"
                               size="icon"
-                              title="Ver Cliente"
-                              onClick={() => router.push(`/productos/${p.id}/ver`)}
+                              className="h-7 w-7"
+                              onClick={() => router.push(`/productos/${p.id}/editar`)}
+                              title="Editar producto"
                             >
-                              <Eye className="h-4 w-4" />
+                              <Edit className="h-4 w-4" />
                             </Button>
-                            <span className="text-xs text-muted-foreground mt-1">Ver</span>
-                          </div>
-
-                          {/* Conditional div to show "hola" if esAdminDOs is true */}
-                          {esAdminDOs && (
-                            <>
-                              <div className="flex flex-col items-center">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  title="Editar"
-                                  onClick={() => router.push(`/productos/${p.id}/editar`)}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <span className="text-xs text-muted-foreground mt-1">Editar</span>
-                              </div>
-
-                              {/* Toggle status button */}
-                              <div className="flex flex-col items-center">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  title={p.activo ? "Inactivar" : "Activar"}
-                                  onClick={() => handleToggleStatusClickActivo(p.id, p.activo)}
-                                >
-                                  {p.activo ? (
-                                    <ToggleRight className="h-4 w-4 text-red-500" />
-                                  ) : (
-                                    <ToggleLeft className="h-4 w-4 text-green-500" />
-                                  )}
-                                </Button>
-                                <span className="text-xs text-muted-foreground mt-1">Estatus</span>
-                              </div>
-
-                              {/* Delete button */}
-                              <div className="flex flex-col items-center">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  title="Eliminar"
-                                  onClick={() => router.push(`/productos/${p.id}/eliminar`)}
-                                >
-                                  <X className="h-4 w-4 text-red-500" />
-                                </Button>
-                                <span className="text-xs text-muted-foreground mt-1">Eliminar</span>
-                              </div>
-                            </>
                           )}
                         </div>
+                        <span className="text-xs font-medium">
+                          {p.productosxcatalogo?.length > 0 ? `Precios: ${p.productosxcatalogo.length}` : ""}
+                        </span>
                       </div>
                     </CardContent>
                   </Card>
@@ -907,7 +1432,7 @@ export default function ProductosPage() {
               </div>
 
               {totalPaginas > 1 && (
-                <div className="flex items-center justify-center space-x-2 pt-4">
+                <div className="flex items-center justify-center space-x-2 pt-6">
                   <Button
                     variant="outline"
                     size="sm"
@@ -931,12 +1456,33 @@ export default function ProductosPage() {
               )}
             </>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">No se encontraron resultados.</div>
+            !isSearching && (
+              <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
+                <X className="h-12 w-12" />
+                <p className="text-lg font-medium">No se encontraron productos.</p>
+                <p className="text-sm">Intenta ajustar tus filtros de búsqueda.</p>
+              </div>
+            )
           )}
         </CardContent>
       </Card>
 
-      {/* Removed modal dialog for product details */}
+      {/* --- Modales --- */}
+      {/* Modal de Confirmación */}
+      {showConfirmDialog && (
+        <PageModalAlert
+          Titulo="Confirmar Acción"
+          Mensaje={`¿Está seguro que desea ${productoToToggle?.activo ? "inactivar" : "activar"} este producto?`}
+          isOpen={true}
+          onClose={() => {
+            setShowConfirmDialog(false)
+            setProductoToToggle(null)
+          }}
+          ConfirmButtonText={productoToToggle?.activo ? "Inactivar" : "Activar"}
+          ConfirmButtonVariant="destructive"
+          onConfirm={cambiarEstadoProducto}
+        />
+      )}
     </div>
   )
 }
