@@ -212,32 +212,32 @@ export default function ProductosPage() {
     envaseavanzado: string, // Added for advanced search
     empaque: string, // Added for advanced search
   ) => {
-    sessionStorage.setItem(
-      "productosFilter",
-      JSON.stringify({
-        productonombre,
-        clienteid,
-        zonaid,
-        catalogoid,
-        estatus,
-        presentacion,
-        formafarmaceuticaid,
-        objetivo,
-        envase,
-        formula,
-        materiaprima,
-        envaseavanzado,
-        empaque,
-        paginaActual,
-      }),
-    )
-
     // Validar usuario activo
     if (!user) return
 
     // Actualizar estados
     setIsSearching(true)
     setPaginaActual(1)
+
+    // Guardar filters en sessionStorage para persistencia
+    sessionStorage.setItem(
+      "productosFilters",
+      JSON.stringify({
+        filtroNombre: productonombre,
+        filtroCliente: clienteid.toString(),
+        filtroZona: zonaid.toString(),
+        filtroCatalogo: catalogoid.toString(),
+        filtroEstatus: estatus,
+        filtroPresentacion: presentacion,
+        filtroFormaFarmaceutica: formafarmaceuticaid.toString(),
+        filtroObjetivo: objetivo,
+        filtroEnvase: envase,
+        filtroFormula: formula,
+        filtroMateriaPrima: materiaprima,
+        filtroEnvaseAvanzado: envaseavanzado,
+        filtroEmpaque: empaque,
+      }),
+    )
 
     // Formatear variables a mandar como parametros
     const auxEstatus =
@@ -426,6 +426,8 @@ export default function ProductosPage() {
       // Auxiliar para definir DDLs
       const auxClienteId = esAdminDDLs === true ? -1 : user.ClienteId
 
+      console.log("[v0] cargarDatosIniciales - auxClienteId:", auxClienteId)
+
       // Titulo de la página
       setPageTituloMasNuevo({
         Titulo: "Productos",
@@ -436,111 +438,132 @@ export default function ProductosPage() {
       })
       setShowPageTituloMasNuevo(true)
 
-      const savedFilters = sessionStorage.getItem("productosFilter")
+      const savedFilters = sessionStorage.getItem("productosFilters")
+      console.log("[v0] savedFilters:", savedFilters)
 
-      if (savedFilters) {
-        const filters = JSON.parse(savedFilters)
-
-        // Restaurar los estados de los filtros
-        setFiltroNombre(filters.productonombre || "")
-        setFiltroCliente(filters.clienteid?.toString() || "-1")
-        setFiltroZona(filters.zonaid?.toString() || "-1")
-        setFiltroCatalogo(filters.catalogoid?.toString() || "-1")
-        setFiltroEstatus(filters.estatus || "-1")
-        setFiltroPresentacion(filters.presentacion || "")
-        setFiltroFormaFarmaceutica(filters.formafarmaceuticaid?.toString() || "-1")
-        setFiltroObjetivo(filters.objetivo || "-1")
-        setFiltroEnvase(filters.envase || "-1")
-        setFiltroFormula(filters.formula || "")
-        setFiltroMateriaPrima(filters.materiaprima || "")
-        setFiltroEnvaseAvanzado(filters.envaseavanzado || "")
-        setFiltroEmpaque(filters.empaque || "")
-        setPaginaActual(filters.paginaActual || 1)
-      }
-
-      // -- Cargar DDLs
+      // -- Cargar DDLs primero
       // DDL Clientes
+      console.log("[v0] Calling listaDesplegableClientes with:", auxClienteId)
       const { data: clientesData, error: clientesError } = await listaDesplegableClientes(auxClienteId, "")
-      if (!clientesError) {
-        const clientesConTodos =
-          esAdminDDLs === true
-            ? [{ id: -1, nombre: "Todos" }, ...(clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))]
-            : (clientesData || []).map((c: any) => ({ id: c.id, nombre: c.nombre }))
-        setClientes(clientesConTodos)
-
-        if (!savedFilters) {
-          if (esAdminDDLs) {
-            setFiltroCliente("-1")
-          } else {
-            const aux = clientesData.id
-            setFiltroCliente(aux)
-          }
-        }
-      } else {
-        console.error("Error cargando clientes:", clientesError)
-      }
-
-      // DDL catalogos
-      const catalogosResult = await listaDesplegableCatalogos(-1, "", auxClienteId)
-      if (!catalogosResult.error) {
-        const catalogosConTodos =
-          esAdminDDLs === true
-            ? [
-                { id: -1, nombre: "Todos" },
-                ...(catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre })),
-              ]
-            : (catalogosResult.data || []).map((m: any) => ({ id: m.id, nombre: m.nombre }))
-        setCatalogos(catalogosConTodos)
-
-        if (!savedFilters) {
-          if (esAdminDDLs === true) {
-            setFiltroCatalogo("-1")
-          } else {
-            if (catalogosResult.data && catalogosResult.data.length > 0) {
-              setFiltroCatalogo(catalogosResult.data[0].id.toString())
-            }
-          }
-        }
-      } else {
-        console.error("Error cargando catálogos iniciales: ", catalogosResult.error)
+      console.log("[v0] clientesData:", clientesData, "clientesError:", clientesError)
+      if (clientesError || !clientesData) {
+        console.log("Error al cargar clientes:", clientesError)
         setModalError({
-          Titulo: "Error cargando catálogos iniciales",
-          Mensaje: catalogosResult.error,
+          Titulo: "Error al cargar Clientes",
+          Mensaje: clientesError || "Error desconocido.",
         })
         setShowModalError(true)
+      } else {
+        const clientesTransformados = clientesData.map((c: any) => ({
+          value: c.id.toString(),
+          text: c.nombre,
+        }))
+        const clientesConTodos = [{ value: "-1", text: "Todos" }, ...clientesTransformados]
+        console.log("[v0] Setting clientes with:", clientesConTodos)
+        setClientes(clientesConTodos)
+      }
+
+      // DDL Catalogos
+      console.log("[v0] Calling listaDesplegableCatalogos with:", -1, "")
+      const { data: catalogosData, error: catalogosError } = await listaDesplegableCatalogos(-1, "")
+      console.log("[v0] catalogosData:", catalogosData, "catalogosError:", catalogosError)
+      if (catalogosError || !catalogosData) {
+        console.log("Error al cargar catálogos:", catalogosError)
+        setModalError({
+          Titulo: "Error al cargar Catálogos",
+          Mensaje: catalogosError || "Error desconocido.",
+        })
+        setShowModalError(true)
+      } else {
+        const catalogosConTodos = [{ value: "-1", text: "Todos" }, ...catalogosData]
+        console.log("[v0] Setting catalogos with:", catalogosConTodos)
+        setCatalogos(catalogosConTodos)
+      }
+
+      // Cargar opciones de filtros avanzados
+      const formasResult = await listaDesplegableFormasFarmaceuticas(-1, "")
+      if (formasResult.success && formasResult.data) {
+        setFormasFarmaceuticasOptions([{ value: "-1", text: "Todos" }, ...formasResult.data])
+      } else {
+        console.log("Error al cargar Formas Farmacéuticas:", formasResult.error)
+      }
+
+      const sistemasResult = await listaDesplegableSistemas(-1, "")
+      if (sistemasResult.success && sistemasResult.data) {
+        setObjetivosOptions([{ value: "-1", text: "Todos" }, ...sistemasResult.data])
+      } else {
+        console.log("Error al cargar Sistemas (Objetivos):", sistemasResult.error)
+      }
+
+      const envasesResult = await listaDesplegableEnvase(-1, "")
+      if (envasesResult.success && envasesResult.data) {
+        setEnvasesOptions([{ value: "Todos", text: "Todos" }, ...envasesResult.data])
+      } else {
+        console.log("Error al cargar Envases:", envasesResult.error)
       }
 
       if (savedFilters) {
         const filters = JSON.parse(savedFilters)
+        console.log("[v0] Loaded filters from sessionStorage:", filters)
 
-        if (filters.clienteid && filters.clienteid !== -1) {
-          const zonasResult = await listDesplegableZonas(-1, "", Number(filters.clienteid))
-          if (!zonasResult.error && zonasResult.data) {
-            const zonasConTodos = [
-              { value: "-1", text: "Todos" },
-              ...zonasResult.data.map((z: any) => ({ value: z.value, text: z.text })),
-            ]
-            setZonasOptions(zonasConTodos)
+        // Restaurar estados de filtros
+        setFiltroNombre(filters.filtroNombre || "")
+        setFiltroCliente(filters.filtroCliente || "-1")
+        setFiltroZona(filters.filtroZona || "-1")
+        setFiltroCatalogo(filters.filtroCatalogo || "-1")
+        setFiltroEstatus(filters.filtroEstatus || "-1")
+        setFiltroPresentacion(filters.filtroPresentacion || "")
+        setFiltroFormaFarmaceutica(filters.filtroFormaFarmaceutica || "-1")
+        setFiltroObjetivo(filters.filtroObjetivo || "-1")
+        setFiltroEnvase(filters.filtroEnvase || "-1")
+        setFiltroFormula(filters.filtroFormula || "")
+        setFiltroMateriaPrima(filters.filtroMateriaPrima || "")
+        setFiltroEnvaseAvanzado(filters.filtroEnvaseAvanzado || "")
+        setFiltroEmpaque(filters.filtroEmpaque || "")
+
+        // If there is a selected client, load zones
+        if (filters.filtroCliente && filters.filtroCliente !== "-1") {
+          const zonasResult = await listDesplegableZonas(-1, "", Number(filters.filtroCliente))
+          if (zonasResult.success && zonasResult.data) {
+            setZonasOptions([{ value: "-1", text: "Todos" }, ...zonasResult.data])
+            console.log("[v0] Loaded zones after restoring filters:", zonasResult.data)
+          } else {
+            console.log("Error al cargar Zonas:", zonasResult.error)
+            setZonasOptions([{ value: "-1", text: "Todos" }]) // Reset zones if error
+            setModalError({
+              Titulo: "Error al cargar Zonas",
+              Mensaje: zonasResult.error || "No se pudieron cargar las zonas para este cliente.",
+            })
+            setShowModalError(true)
           }
         }
 
-        await ejecutarBusquedaProductos(
-          filters.productonombre || "",
-          filters.clienteid || auxClienteId,
-          filters.zonaid || -1,
-          filters.catalogoid || -1,
-          filters.estatus || "True",
-          filters.presentacion || "",
-          filters.formafarmaceuticaid || -1,
-          filters.objetivo || "-1",
-          filters.envase || "-1",
-          filters.formula || "",
-          filters.materiaprima || "",
-          filters.envaseavanzado || "",
-          filters.empaque || "",
+        // Execute search with saved filters
+        const Result = await ejecutarBusquedaProductos(
+          filters.filtroNombre || "",
+          Number(filters.filtroCliente) || auxClienteId,
+          Number(filters.filtroZona) || -1,
+          Number(filters.filtroCatalogo) || -1,
+          filters.filtroEstatus || "True",
+          filters.filtroPresentacion || "",
+          Number(filters.filtroFormaFarmaceutica) || -1,
+          filters.filtroObjetivo || "-1",
+          filters.filtroEnvase || "-1",
+          filters.filtroFormula || "",
+          filters.filtroMateriaPrima || "",
+          filters.filtroEnvaseAvanzado || "",
+          filters.filtroEmpaque || "",
         )
+
+        if (!Result.success) {
+          setModalAlert({
+            Titulo: "En ejecución de búsqueda con filtros guardados",
+            Mensaje: Result.mensaje,
+          })
+          setShowModalAlert(true)
+        }
       } else {
-        // Ejecutar funcion de busqueda para cargar listado inicial
+        console.log("[v0] No saved filters found, performing initial search.")
         const Result = await ejecutarBusquedaProductos(
           "", // filtroNombre
           auxClienteId, // clienteid
@@ -581,22 +604,22 @@ export default function ProductosPage() {
   useEffect(() => {
     const cargarOpciones = async () => {
       try {
-        const [formasResult, objetivosResult, envasesResult] = await Promise.all([
-          listaDesplegableFormasFarmaceuticas(),
-          listaDesplegableSistemas(), // Assuming 'listaDesplegableSistemas' provides data for 'Objetivo (Uso)'
-          listaDesplegableEnvase(),
+        const [formasResult, sistemasResult, envasesResult] = await Promise.all([
+          listaDesplegableFormasFarmaceuticas(-1, ""),
+          listaDesplegableSistemas(-1, ""), // Assuming 'listaDesplegableSistemas' provides data for 'Objetivo (Uso)'
+          listaDesplegableEnvase(-1, ""),
         ])
 
         if (formasResult.success && formasResult.data) {
-          setFormasFarmaceuticasOptions(formasResult.data)
+          setFormasFarmaceuticasOptions([{ value: "-1", text: "Todos" }, ...formasResult.data])
         }
 
-        if (objetivosResult.success && objetivosResult.data) {
-          setObjetivosOptions(objetivosResult.data)
+        if (sistemasResult.success && sistemasResult.data) {
+          setObjetivosOptions([{ value: "-1", text: "Todos" }, ...sistemasResult.data])
         }
 
         if (envasesResult.success && envasesResult.data) {
-          setEnvasesOptions(envasesResult.data)
+          setEnvasesOptions([{ value: "Todos", text: "Todos" }, ...envasesResult.data])
         }
       } catch (error) {
         console.error("Error loading dropdown options:", error)
@@ -607,8 +630,16 @@ export default function ProductosPage() {
         setShowModalError(true)
       }
     }
-    cargarOpciones()
-  }, [])
+    // Solo cargar opciones si los DDLs básicos ya están cargados o si es necesario
+    if (clientes.length > 0 && catalogos.length > 0) {
+      cargarOpciones()
+    } else if (clientes.length === 0 && catalogos.length === 0 && !showPageLoading) {
+      // Si los DDLs básicos no se cargaron correctamente y la página no está en loading, intentar cargar opciones
+      // Esto previene carga doble si cargarDatosIniciales ya las cargó.
+      // O si hubo error en DDLs básicos, quizás queramos intentar cargar opciones de filtros avanzados de todos modos.
+      cargarOpciones()
+    }
+  }, [clientes, catalogos, showPageLoading]) // Dependencia ajustada
 
   useEffect(() => {
     const buscarFormulas = async () => {
@@ -712,12 +743,13 @@ export default function ProductosPage() {
   }
 
   // Busqueda - Limpiar o Resetear
-  const handleLimpiarClick = () => {
-    sessionStorage.removeItem("productosFilter")
+  const handleLimpiar = () => {
+    sessionStorage.removeItem("productosFilters")
 
+    // Restablecer filtros
     setFiltroNombre("")
     setFiltroEstatus("-1")
-    setFiltroCliente(esAdminDDLs === true ? "-1" : user?.ClienteId?.toString() || "-1")
+    setFiltroCliente(esAdminDDLs ? "-1" : user?.ClienteId.toString() || "-1")
     setFiltroCatalogo("-1")
     setFiltroZona("-1")
     setFiltroPresentacion("")
@@ -728,20 +760,19 @@ export default function ProductosPage() {
     setFiltroMateriaPrima("")
     setFiltroEnvaseAvanzado("")
     setFiltroEmpaque("")
-
-    // Reset autocomplete states
     setFormulaBuscar("")
-    setFormulaSeleccionada(null)
-    setMateriaprimaBuscar("")
-    setMateriaprimaSeleccionada(null)
+    setMateriaprimaBuscar("") // Corrected state variable name
     setEnvaseBuscar("")
-    setEnvaseSeleccionado(null)
     setEmpaqueBuscar("")
+    setFormulaSeleccionada(null)
+    setMateriaprimaSeleccionada(null) // Corrected state variable name
+    setEnvaseSeleccionado(null)
     setEmpaqueSeleccionado(null)
 
-    setPaginaActual(1)
+    // Limpiar resultados
     setProductos([])
     setTotalProductos(0)
+    setPaginaActual(1)
   }
 
   // Busqueda, camabiar cliente seleccionado
@@ -753,28 +784,50 @@ export default function ProductosPage() {
     try {
       // Transformar variable recibida
       const clienteIdNum = Number.parseInt(value, 10)
-      // Preparar query
-      let query = supabase.from("catalogos").select(`id, nombre`).eq("activo", true).order("nombre")
-      // Filtros para el query
+
+      // Cargar Zonas
       if (clienteIdNum !== -1) {
-        query = query.eq("clienteid", clienteIdNum)
+        const result = await listDesplegableZonas(-1, "", clienteIdNum)
+        if (result.success && result.data) {
+          setZonasOptions([{ value: "-1", text: "Todos" }, ...result.data])
+          console.log("[v0] handleClienteChange - Loaded zones:", result.data)
+        } else {
+          console.error("Error cargando zonas por cliente:", result.error)
+          setZonasOptions([{ value: "-1", text: "Todos" }]) // Reset zones if error
+          setModalError({
+            Titulo: "Error al cargar Zonas",
+            Mensaje: result.error || "No se pudieron cargar las zonas para este cliente.",
+          })
+          setShowModalError(true)
+        }
+      } else {
+        setZonasOptions([{ value: "-1", text: "Todos" }])
+        setFiltroZona("-1") // Reset zona if "Todos" client is selected
+        console.log("[v0] handleClienteChange - Resetting zones for 'Todos' client.")
       }
-      // Ejecutar Query
-      const { data, error } = await query
-      if (!error) {
+
+      // Preparar query para catálogos
+      console.log("[v0] Calling listaDesplegableCatalogos with clienteIdNum:", clienteIdNum)
+      const { data: catalogosData, error: catalogosError } = await listaDesplegableCatalogos(
+        -1,
+        "",
+        clienteIdNum === -1 ? undefined : clienteIdNum, // Pass undefined if "Todos" client
+      )
+      console.log("[v0] catalogosData after handleClienteChange:", catalogosData, "catalogosError:", catalogosError)
+
+      if (!catalogosError && catalogosData) {
         // Cargar input de filtro
-        const catalogosConTodos = [
-          { id: -1, nombre: "Todos" },
-          ...(data || []).map((c: any) => ({ id: c.id, nombre: c.nombre })),
-        ]
+        const catalogosConTodos = [{ value: "-1", text: "Todos" }, ...catalogosData]
         setCatalogos(catalogosConTodos)
+        setFiltroCatalogo("-1") // Reset catalog filter when client changes
+        console.log("[v0] handleClienteChange - Setting catalogs with:", catalogosConTodos)
       } else {
         // Mostrar error
-        console.error("Error al cargar catálogos por cliente: ", error)
-        console.log("Error al cargar catálogos por cliente: ", error)
+        console.error("Error al cargar catálogos por cliente: ", catalogosError)
+        setCatalogos([{ value: "-1", text: "Todos" }]) // Reset catalogs if error
         setModalError({
-          Titulo: "Error al cargar catálogos por cliente",
-          Mensaje: error,
+          Titulo: "Error al cargar Catálogos",
+          Mensaje: catalogosError || "Error desconocido.",
         })
         setShowModalError(true)
       }
@@ -796,12 +849,14 @@ export default function ProductosPage() {
       const nuevoEstatus = !productoActivo
       const resultado = await estatusActivoProducto(productoId, nuevoEstatus)
 
-      if (resultado) {
-        await cargarDatosIniciales()
+      if (resultado.success) {
+        // Actualizar el estado local para reflejar el cambio sin recargar todo
+        setProductos((prev) => prev.map((p) => (p.id === productoId ? { ...p, activo: nuevoEstatus } : p)))
+        // toast.success(`Producto ${nuevoEstatus ? "activado" : "inactivado"} correctamente.`)
       } else {
         setModalError({
           Titulo: "Error al cambiar estatus",
-          Mensaje: "No se pudo cambiar el estatus del producto. Por favor, intente nuevamente.",
+          Mensaje: resultado.message || "No se pudo cambiar el estatus del producto. Por favor, intente nuevamente.",
         })
         setShowModalError(true)
       }
@@ -815,7 +870,8 @@ export default function ProductosPage() {
     }
   }
 
-  const handleVerDetalles = (producto: Producto) => {
+  const handleVerDetalles = (producto: oProducto) => {
+    // Changed type to oProducto
     router.push(`/productos/${producto.id}/ver`)
   }
 
@@ -837,7 +893,7 @@ export default function ProductosPage() {
         //toast.error(`Error al cambiar estado del producto.`)
       } else {
         // Actualizar el estado local para reflejar el cambio sin recargar todo
-        setProductos((prev) => prev.map((p) => (p.ProductoId === id ? { ...p, ProductoActivo: nuevoEstado } : p)))
+        setProductos((prev) => prev.map((p) => (p.id === id ? { ...p, activo: nuevoEstado } : p))) // Corrected property name
         //toast.success(`Producto ${nuevoEstado ? "activado" : "inactivado"} correctamente.`)
       }
     } catch (error) {
@@ -910,13 +966,21 @@ export default function ProductosPage() {
         const result = await listDesplegableZonas(-1, "", Number(filtroCliente))
         if (result.success && result.data) {
           setZonasOptions([{ value: "-1", text: "Todos" }, ...result.data])
+          console.log("[v0] useEffect filtroCliente - Loaded zones:", result.data)
+        } else {
+          console.error("Error cargando zonas:", result.error)
+          setZonasOptions([{ value: "-1", text: "Todos" }]) // Reset zones on error
         }
       } else {
         setZonasOptions([{ value: "-1", text: "Todos" }])
         setFiltroZona("-1")
+        console.log("[v0] useEffect filtroCliente - Resetting zones for 'Todos' client.")
       }
     }
-    cargarZonas()
+    // Only call if filtroCliente has changed and is not the initial "-1" or if it becomes "-1"
+    if (filtroCliente) {
+      cargarZonas()
+    }
   }, [filtroCliente])
 
   // --- Renders (contenidos auxiliares) ---
@@ -1000,8 +1064,8 @@ export default function ProductosPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {clientes.map((c) => (
-                      <SelectItem key={c.id} value={c.id.toString()}>
-                        {c.nombre}
+                      <SelectItem key={c.value} value={c.value}>
+                        {c.text}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -1082,7 +1146,6 @@ export default function ProductosPage() {
                         <SelectValue placeholder="Selecciona forma" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="-1">Todos</SelectItem>
                         {formasFarmaceuticasOptions.map((forma) => (
                           <SelectItem key={forma.value} value={forma.value}>
                             {forma.text}
@@ -1100,7 +1163,6 @@ export default function ProductosPage() {
                         <SelectValue placeholder="Selecciona objetivo" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="-1">Todos</SelectItem>
                         {objetivosOptions.map((objetivo) => (
                           <SelectItem key={objetivo.value} value={objetivo.value}>
                             {objetivo.text}
@@ -1118,7 +1180,6 @@ export default function ProductosPage() {
                         <SelectValue placeholder="Selecciona envase" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="-1">Todos</SelectItem>
                         {envasesOptions.map((envase) => (
                           <SelectItem key={envase.value} value={envase.value}>
                             {envase.text}
@@ -1281,7 +1342,7 @@ export default function ProductosPage() {
                 variant="outline"
                 className="bg-[#4a4a4a] text-white hover:bg-[#333333]"
                 style={{ fontSize: "12px" }}
-                onClick={handleLimpiarClick}
+                onClick={handleLimpiar}
               >
                 <RotateCcw className="mr-2 h-3 w-3" /> Limpiar
               </Button>
@@ -1370,61 +1431,85 @@ export default function ProductosPage() {
                       </div>
                     </div>
 
-                    <CardContent className="flex-grow flex flex-col justify-between p-4">
-                      <div>
-                        <CardTitle className="text-lg font-semibold mb-1 truncate">{p.nombre}</CardTitle>
-                        <CardDescription className="text-xs text-muted-foreground mb-2 truncate">
-                          {p.presentacion}
-                        </CardDescription>
-                        <p className="text-xs mb-1">
-                          <span className="font-medium">Cliente:</span> {p.clientes?.nombre || "N/A"}
+                    {/* Card content */}
+                    <CardContent className="flex flex-col flex-grow p-4">
+                      <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{p.producto}</h3>
+                      {/* Código */}
+                      {p.zonas && <p className="text-xs text-gray-500 mb-2">{p.zonas.nombre}</p>}
+                      {/* Presentación above Código and removed label */}
+                      <p className="text-sm text-gray-600 mb-2">{p.presentacion || "n/A"}</p>
+                      <p className="text-sm text-gray-600 mb-2">Código: {p.codigo || "Sin código."}</p>
+                      <div className="text-sm">
+                        <p>
+                          <span className="font-bold text-black">Forma:</span> {p.formasfarmaceuticas?.nombre || "n/A"}
                         </p>
-                        <p className="text-xs mb-1">
-                          <span className="font-medium">Código:</span> {p.codigo || "N/A"}
-                        </p>
-                        <p className="text-xs mb-1">
-                          <span className="font-medium">Costo:</span> {formatCurrency(p.costo)}
+                        <p>
+                          <span className="font-bold text-black">Precio HL:</span> {formatCurrency(p.preciohl)}
                         </p>
                       </div>
-                      <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => handleToggleStatusClickActivo(p.id, p.activo)}
-                            title={p.activo ? "Inactivar producto" : "Activar producto"}
-                          >
-                            {p.activo ? (
-                              <ToggleLeft className="h-4 w-4 text-red-500" />
-                            ) : (
-                              <ToggleRight className="h-4 w-4 text-green-500" />
-                            )}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => handleVerDetalles(p)}
-                            title="Ver detalles"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          {esAdmin && (
+
+                      <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
+                        <div className="flex gap-3 justify-center mt-auto w-full">
+                          {/* Ver - Navigates to ver page */}
+                          <div className="flex flex-col items-center">
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7"
-                              onClick={() => router.push(`/productos/${p.id}/editar`)}
-                              title="Editar producto"
+                              title="Ver Cliente"
+                              onClick={() => router.push(`/productos/${p.id}/ver`)}
                             >
-                              <Edit className="h-4 w-4" />
+                              <Eye className="h-4 w-4" />
                             </Button>
+                            <span className="text-xs text-muted-foreground mt-1">Ver</span>
+                          </div>
+
+                          {/* Conditional div to show "hola" if esAdminDOs is true */}
+                          {esAdminDOs && (
+                            <>
+                              <div className="flex flex-col items-center">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  title="Editar"
+                                  onClick={() => router.push(`/productos/${p.id}/editar`)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <span className="text-xs text-muted-foreground mt-1">Editar</span>
+                              </div>
+
+                              {/* Toggle status button */}
+                              <div className="flex flex-col items-center">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  title={p.activo ? "Inactivar" : "Activar"}
+                                  onClick={() => handleToggleStatusClickActivo(p.id, p.activo)}
+                                >
+                                  {p.activo ? (
+                                    <ToggleRight className="h-4 w-4 text-red-500" />
+                                  ) : (
+                                    <ToggleLeft className="h-4 w-4 text-green-500" />
+                                  )}
+                                </Button>
+                                <span className="text-xs text-muted-foreground mt-1">Estatus</span>
+                              </div>
+
+                              {/* Delete button */}
+                              <div className="flex flex-col items-center">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  title="Eliminar"
+                                  onClick={() => router.push(`/productos/${p.id}/eliminar`)}
+                                >
+                                  <X className="h-4 w-4 text-red-500" />
+                                </Button>
+                                <span className="text-xs text-muted-foreground mt-1">Eliminar</span>
+                              </div>
+                            </>
                           )}
                         </div>
-                        <span className="text-xs font-medium">
-                          {p.productosxcatalogo?.length > 0 ? `Precios: ${p.productosxcatalogo.length}` : ""}
-                        </span>
                       </div>
                     </CardContent>
                   </Card>
@@ -1432,7 +1517,7 @@ export default function ProductosPage() {
               </div>
 
               {totalPaginas > 1 && (
-                <div className="flex items-center justify-center space-x-2 pt-6">
+                <div className="flex items-center justify-center space-x-2 pt-4">
                   <Button
                     variant="outline"
                     size="sm"
@@ -1456,33 +1541,12 @@ export default function ProductosPage() {
               )}
             </>
           ) : (
-            !isSearching && (
-              <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
-                <X className="h-12 w-12" />
-                <p className="text-lg font-medium">No se encontraron productos.</p>
-                <p className="text-sm">Intenta ajustar tus filtros de búsqueda.</p>
-              </div>
-            )
+            <div className="text-center py-8 text-muted-foreground">No se encontraron resultados.</div>
           )}
         </CardContent>
       </Card>
 
-      {/* --- Modales --- */}
-      {/* Modal de Confirmación */}
-      {showConfirmDialog && (
-        <PageModalAlert
-          Titulo="Confirmar Acción"
-          Mensaje={`¿Está seguro que desea ${productoToToggle?.activo ? "inactivar" : "activar"} este producto?`}
-          isOpen={true}
-          onClose={() => {
-            setShowConfirmDialog(false)
-            setProductoToToggle(null)
-          }}
-          ConfirmButtonText={productoToToggle?.activo ? "Inactivar" : "Activar"}
-          ConfirmButtonVariant="destructive"
-          onConfirm={cambiarEstadoProducto}
-        />
-      )}
+      {/* Removed modal dialog for product details */}
     </div>
   )
 }
