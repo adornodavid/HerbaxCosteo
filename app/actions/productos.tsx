@@ -1208,6 +1208,7 @@ export async function actualizarCosteoProducto(
   PorcentajeReembolsos: number,
   PorcentajeTarjeta: number,
   PorcentajeEnvio: number,
+  ConversionMoneda: number,
 ): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
     const { data, error } = await supabase.rpc("actualizarcotizacion", {
@@ -1226,6 +1227,7 @@ export async function actualizarCosteoProducto(
       porcentajereembolsos: PorcentajeReembolsos,
       porcentajetarjeta: PorcentajeTarjeta,
       porcentajeenvio: PorcentajeEnvio,
+      conversionmoneda: ConversionMoneda,
     })
 
     if (error) {

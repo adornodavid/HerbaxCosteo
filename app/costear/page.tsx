@@ -290,6 +290,7 @@ export default function CostearPage() {
         Number(porcentajeReembolsos),
         Number(porcentajeTarjeta),
         Number(porcentajeEnvio),
+        Number(conversionMoneda),
       )
 
       const elapsedTime = Date.now() - startTime
