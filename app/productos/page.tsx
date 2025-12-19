@@ -61,6 +61,8 @@ import {
   listaDesplegableFormasFarmaceuticas,
   listaDesplegableSistemas,
   listaDesplegableEnvase,
+  listaDesplegableProductosTiposComisiones, // Import for commission types
+  listaDesplegableEnvaseMl, // Import for ML units
 } from "@/app/actions/catalogos"
 import { listDesplegableZonas } from "@/app/actions/zonas"
 import { listaDesplegableFormulasBuscar } from "@/app/actions/formulas"
@@ -155,6 +157,11 @@ export default function ProductosPage() {
   const [filtroEnvaseAvanzado, setFiltroEnvaseAvanzado] = useState("")
   const [filtroEmpaque, setFiltroEmpaque] = useState("")
 
+  const [filtroCodigo, setFiltroCodigo] = useState("")
+  const [filtroTipoComision, setFiltroTipoComision] = useState("-1")
+  const [filtroEnvaseMl, setFiltroEnvaseMl] = useState("-1")
+  const [filtroMaterialEnvaseEmpaque, setFiltroMaterialEnvaseEmpaque] = useState("")
+
   const [formulaBuscar, setFormulaBuscar] = useState("")
   const [formulasResultados, setFormulasResultados] = useState<any[]>([])
   const [formulaSeleccionada, setFormulaSeleccionada] = useState<{ id: number; text: string } | null>(null)
@@ -178,6 +185,17 @@ export default function ProductosPage() {
   const [empaqueSeleccionado, setEmpaqueSeleccionado] = useState<{ id: number; text: string } | null>(null)
   const [empaqueid, setEmpaqueid] = useState<number | null>(null)
   const [showEmpaqueDropdown, setShowEmpaqueDropdown] = useState(false)
+
+  const [tiposComisionesOptions, setTiposComisionesOptions] = useState<ddlItem[]>([])
+  const [envaseMlOptions, setEnvaseMlOptions] = useState<ddlItem[]>([])
+
+  const [materialEnvaseBuscar, setMaterialEnvaseBuscar] = useState("")
+  const [materialesEnvaseResultados, setMaterialesEnvaseResultados] = useState<any[]>([])
+  const [materialEnvaseSeleccionado, setMaterialEnvaseSeleccionado] = useState<{ id: number; text: string } | null>(
+    null,
+  )
+  const [materialEnvaseid, setMaterialEnvaseid] = useState<number | null>(null)
+  const [showMaterialEnvaseDropdown, setShowMaterialEnvaseDropdown] = useState(false)
 
   // --- Variables (post carga elementos) ---
   const elementosPaginadosssssss = useMemo(() => {
@@ -204,13 +222,21 @@ export default function ProductosPage() {
     catalogoid: number,
     estatus: string,
     presentacion: string, // Added for advanced search
-    formafarmaceuticaid: number, // Added for advanced search
-    objetivo: string, // Added for advanced search
-    envase: string, // Added for advanced search
-    formula: string, // Added for advanced search
-    materiaprima: string, // Added for advanced search
-    envaseavanzado: string, // Added for advanced search
-    empaque: string, // Added for advanced search
+    formafarmaceuticaid: number, // Changed to string to match state
+    objetivo: number, // Changed to string to match state
+    envase: string, // Changed to string to match state
+    // formulaid: number | null, // Changed to accept ID
+    filtroFormulaId: number | -1,
+    // materiaprmaid: number | null, // Changed to accept ID
+    filtroMateriaPrimaId: number | -1,
+    envaseavanzado: string, // Changed to string to match state
+    empaque: string, // Changed to string to match state
+    // Passing new filters to the backend call
+    codigo: string,
+    tipocomision: string,
+    envaseeml: string,
+    // materialenvaseempId: number | null, // Changed to accept ID
+    filtroMaterialEnvaseEmpId: number | -1,
   ) => {
     // Validar usuario activo
     if (!user) return
@@ -219,27 +245,6 @@ export default function ProductosPage() {
     setIsSearching(true)
     setPaginaActual(1)
 
-    // Guardar filters en sessionStorage para persistencia
-    sessionStorage.setItem(
-      "productosFilters",
-      JSON.stringify({
-        filtroNombre: productonombre,
-        filtroCliente: clienteid.toString(),
-        filtroZona: zonaid.toString(),
-        filtroCatalogo: catalogoid.toString(),
-        filtroEstatus: estatus,
-        filtroPresentacion: presentacion,
-        filtroFormaFarmaceutica: formafarmaceuticaid.toString(),
-        filtroObjetivo: objetivo,
-        filtroEnvase: envase,
-        filtroFormula: formula,
-        filtroMateriaPrima: materiaprima,
-        filtroEnvaseAvanzado: envaseavanzado,
-        filtroEmpaque: empaque,
-      }),
-    )
-
-    // Formatear variables a mandar como parametros
     const auxEstatus =
       estatus === "-1"
         ? "Todos"
@@ -248,8 +253,54 @@ export default function ProductosPage() {
           : arrActivoFalse.includes(estatus)
             ? false
             : "Todos"
-    // Ejecutar Consulta principal
+
+    const formafarmaceuticaidNum =
+      formafarmaceuticaid === "-1" || formafarmaceuticaid === "" ? -1 : Number.parseInt(formafarmaceuticaid, 10)
+    const sistemaIdNum = objetivo === "-1" || objetivo === "" ? -1 : Number.parseInt(objetivo, 10)
+    const materialIdNum =
+      filtroMaterialEnvaseEmpId !== null && filtroMaterialEnvaseEmpId !== undefined ? filtroMaterialEnvaseEmpId : -1
+    const formulaidNum = filtroFormulaId !== null && filtroFormulaId !== undefined ? filtroFormulaId : -1
+    const materiaprimaidNum =
+      filtroMateriaPrimaId !== null && filtroMateriaPrimaId !== undefined ? filtroMateriaPrimaId : -1
+
     try {
+      console.log(
+        "parametros 111111111: " +
+          "productonombre: " +
+          productonombre +
+          " clienteid: " +
+          clienteid +
+          " zonaid: " +
+          zonaid +
+          " catalogoid: " +
+          catalogoid +
+          " estatus: " +
+          estatus +
+          " presentacion: " +
+          presentacion +
+          " formafarmaceuticaid: " +
+          formafarmaceuticaid +
+          "  objetivo: " +
+          objetivo +
+          " envase: " +
+          envase +
+          " filtroFormulaId: " +
+          filtroFormulaId +
+          " filtroMateriaPrimaId: " +
+          filtroMateriaPrimaId +
+          " envaseavanzado: " +
+          envaseavanzado +
+          " empaque: " +
+          empaque +
+          "codigo: " +
+          codigo +
+          " tipocomision: " +
+          tipocomision +
+          " envaseeml: " +
+          envaseeml +
+          " filtroMaterialEnvaseEmpId: " +
+          filtroMaterialEnvaseEmpId,
+      )
       const result = await obtenerProductos(
         -1, // productoid
         productonombre,
@@ -257,14 +308,53 @@ export default function ProductosPage() {
         zonaid,
         catalogoid,
         auxEstatus,
-        presentacion, // Pass advanced filters
-        formafarmaceuticaid,
-        objetivo,
-        envase,
-        formula,
-        materiaprima,
-        envaseavanzado,
-        empaque,
+        codigo,
+        presentacion, // Keep as string, don't convert
+        formafarmaceuticaidNum, // Now passing as number
+        sistemaIdNum, // Now passing as number (converted from objetivo)
+        tipocomision,
+        envase, // Keep as string, don't convert
+        envaseeml,
+        formulaidNum, // Now passing as number
+        materiaprimaidNum, // Now passing as number
+        materialIdNum, // Now passing as number
+      )
+      console.log(
+        "parametros: " +
+          "productonombre: " +
+          productonombre +
+          " clienteid: " +
+          clienteid +
+          " zonaid: " +
+          zonaid +
+          " catalogoid: " +
+          catalogoid +
+          " auxEstatus: " +
+          auxEstatus +
+          " presentacion: " +
+          presentacion +
+          " formafarmaceuticaidNum: " +
+          formafarmaceuticaidNum +
+          "  sistemaIdNum: " +
+          sistemaIdNum +
+          " envase: " +
+          envase +
+          " formulaidNum: " +
+          formulaidNum +
+          " materiaprimaidNum: " +
+          materiaprimaidNum +
+          " envaseavanzado: " +
+          envaseavanzado +
+          " empaque: " +
+          empaque +
+          "codigo: " +
+          codigo +
+          " tipocomision: " +
+          tipocomision +
+          " envaseeml: " +
+          envaseeml +
+          " materialIdNum: " +
+          materialIdNum,
       )
       console.log("result: " + result.success)
       console.log("result.data: " + result.data)
@@ -321,20 +411,24 @@ export default function ProductosPage() {
           precioconivaaa: p.precioconivaaa,
           fechacreacion: p.fechacreacion,
           activo: p.activo,
-          productoscaracteristicas: {
-            descripcion: p.productoscaracteristicas?.descripcion || null,
-            presentacion: p.productoscaracteristicas?.presentacion || null,
-            porcion: p.productoscaracteristicas?.porcion || null,
-            modouso: p.productoscaracteristicas?.modouso || null,
-            porcionenvase: p.productoscaracteristicas?.porcionenvase || null,
-            categoriauso: p.productoscaracteristicas?.categoriauso || null,
-            propositoprincipal: p.productoscaracteristicas?.propositoprincipal || null,
-            propuestavalor: p.productoscaracteristicas?.propuestavalor || null,
-            instruccionesingesta: p.productoscaracteristicas?.instruccionesingesta || null,
-            edadminima: p.productoscaracteristicas?.edadminima || null,
-            advertencia: p.productoscaracteristicas?.advertencia || null,
-            condicionesalmacenamiento: p.productoscaracteristicas?.condicionesalmacenamiento || null,
-          },
+          productoscaracteristicas:
+            p.productoscaracteristicas?.map((pc) => ({
+              // Mapping products_characteristics correctly
+              id: pc.id,
+              productoId: pc.productoId,
+              descripcion: pc.descripcion,
+              presentacion: pc.presentacion,
+              porcion: pc.porcion,
+              modouso: pc.modouso,
+              porcionenvase: pc.porcionenvase,
+              categoriauso: pc.categoriauso,
+              propositoprincipal: pc.propositoprincipal,
+              propuestavalor: pc.propuestavalor,
+              instruccionesingesta: pc.instruccionesingesta,
+              edadminima: pc.edadminima,
+              advertencia: pc.advertencia,
+              condicionesalmacenamiento: pc.condicionesalmacenamiento,
+            })) || null, // Assuming products_characteristics is a single object or array of one
           productosxcatalogo:
             p.productosxcatalogo?.map((cat) => ({
               catalogoid: cat.catalogoid || null,
@@ -345,7 +439,6 @@ export default function ProductosPage() {
                 descripcion: cat.catalogos?.descripcion || null,
               },
             })) || [],
-
           formulasxproducto:
             p.formulasxproducto?.map((fxp) => ({
               formulaid: fxp.formulaid || null,
@@ -366,11 +459,11 @@ export default function ProductosPage() {
                       materiasprima: {
                         codigo: mxf.materiasprima?.codigo || null,
                         nombre: mxf.materiasprima?.nombre || null,
-                        unidadmedidaid: mxf.materiasprima?.codigo || null,
+                        unidadmedidaid: mxf.materiasprima?.unidadmedidaid || null, // Corrected from codigo
                         unidadesmedida: {
                           descripcion: mxf.unidadesmedida?.descripcion || null,
                         },
-                        costo: mxf.materiasprima?.codigo || null,
+                        costo: mxf.materiasprima?.costo || null,
                       },
                     })) || [],
                   formulasxformula:
@@ -381,11 +474,11 @@ export default function ProductosPage() {
                       formulas: {
                         codigo: fxf.formulas?.codigo || null,
                         nombre: fxf.formulas?.nombre || null,
-                        unidadmedidaid: fxf.formulas?.codigo || null,
+                        unidadmedidaid: fxf.formulas?.unidadmedidaid || null, // Corrected from codigo
                         unidadesmedida: {
                           descripcion: fxf.unidadesmedida?.descripcion || null,
                         },
-                        costo: fxf.formulas?.codigo || null,
+                        costo: fxf.formulas?.costo || null,
                       },
                     })) || [],
                 } || null,
@@ -404,6 +497,8 @@ export default function ProductosPage() {
       } else {
         // Retorno de información
         setProductos([])
+        setProductosFiltrados([]) // Also clear filtered products
+        setTotalProductos(0)
         return { success: false, mensaje: "No hay datos o la consulta falló." }
       }
     } catch (error) {
@@ -411,6 +506,8 @@ export default function ProductosPage() {
       console.error("Error inesperado al buscar productos: ", error)
       console.log("Error inesperado al buscar productos: ", error)
       setProductos([])
+      setProductosFiltrados([]) // Also clear filtered products
+      setTotalProductos(0)
       return { error: true, mensaje: "Error inesperado al buscar productos: " + error }
     } finally {
       setIsSearching(false)
@@ -465,7 +562,11 @@ export default function ProductosPage() {
 
       // DDL Catalogos
       console.log("[v0] Calling listaDesplegableCatalogos with:", -1, "")
-      const { data: catalogosData, error: catalogosError } = await listaDesplegableCatalogos(-1, "")
+      const { data: catalogosData, error: catalogosError } = await listaDesplegableCatalogos(
+        -1,
+        "",
+        auxClienteId === -1 ? undefined : auxClienteId,
+      )
       console.log("[v0] catalogosData:", catalogosData, "catalogosError:", catalogosError)
       if (catalogosError || !catalogosData) {
         console.log("Error al cargar catálogos:", catalogosError)
@@ -495,11 +596,22 @@ export default function ProductosPage() {
         console.log("Error al cargar Sistemas (Objetivos):", sistemasResult.error)
       }
 
-      const envasesResult = await listaDesplegableEnvase(-1, "")
+      const envasesResult = await listaDesplegableEnvase()
+      console.log("env", envasesResult.data)
       if (envasesResult.success && envasesResult.data) {
-        setEnvasesOptions([{ value: "Todos", text: "Todos" }, ...envasesResult.data])
+        setEnvasesOptions([{ value: "-1", text: "Todos" }, ...envasesResult.data]) // Changed "Todos" value to "-1" for consistency
       } else {
         console.log("Error al cargar Envases:", envasesResult.error)
+      }
+
+      const tiposComisionesResult = await listaDesplegableProductosTiposComisiones(-1, "")
+      if (tiposComisionesResult.success && tiposComisionesResult.data) {
+        setTiposComisionesOptions([{ value: "-1", text: "Todos" }, ...tiposComisionesResult.data])
+      }
+
+      const envaseMlResult = await listaDesplegableEnvaseMl(-1, "")
+      if (envaseMlResult.success && envaseMlResult.data) {
+        setEnvaseMlOptions([{ value: "-1", text: "Todos" }, ...envaseMlResult.data])
       }
 
       if (savedFilters) {
@@ -516,10 +628,30 @@ export default function ProductosPage() {
         setFiltroFormaFarmaceutica(filters.filtroFormaFarmaceutica || "-1")
         setFiltroObjetivo(filters.filtroObjetivo || "-1")
         setFiltroEnvase(filters.filtroEnvase || "-1")
-        setFiltroFormula(filters.filtroFormula || "")
-        setFiltroMateriaPrima(filters.filtroMateriaPrima || "")
+        setFiltroFormula(filters.filtroFormula || "") // Assuming text field for formula filter
+        setFiltroMateriaPrima(filters.filtroMateriaPrima || "") // Assuming text field for materia prima filter
         setFiltroEnvaseAvanzado(filters.filtroEnvaseAvanzado || "")
         setFiltroEmpaque(filters.filtroEmpaque || "")
+        setFiltroCodigo(filters.filtroCodigo || "")
+        setFiltroTipoComision(filters.filtroTipoComision || "-1")
+        setFiltroEnvaseMl(filters.filtroEnvaseMl || "-1")
+        setFiltroMaterialEnvaseEmpaque(filters.filtroMaterialEnvaseEmpaque || "")
+
+        // Set the selected IDs based on the loaded text filters
+        // Formula
+        if (filters.filtroFormula) {
+          // Assuming you have a way to get formula results here or call a function
+          // For now, setting to null if not found immediately
+          setFormulaid(null) // Placeholder, actual logic to find ID based on text would go here
+        }
+        // Materia Prima
+        if (filters.filtroMateriaPrima) {
+          setMateriaprimaid(null) // Placeholder
+        }
+        // Material Envase Empaque
+        if (filters.filtroMaterialEnvaseEmpaque) {
+          setMaterialEnvaseid(null) // Placeholder
+        }
 
         // If there is a selected client, load zones
         if (filters.filtroCliente && filters.filtroCliente !== "-1") {
@@ -547,12 +679,18 @@ export default function ProductosPage() {
           filters.filtroEstatus || "True",
           filters.filtroPresentacion || "",
           Number(filters.filtroFormaFarmaceutica) || -1,
-          filters.filtroObjetivo || "-1",
+          Number(filters.filtroObjetivo) || -1,
           filters.filtroEnvase || "-1",
-          filters.filtroFormula || "",
-          filters.filtroMateriaPrima || "",
+          // Pass the selected IDs for formula, material prima, and material envase empaque
+          formulaid,
+          materiaprimaid,
           filters.filtroEnvaseAvanzado || "",
           filters.filtroEmpaque || "",
+          // Passing restored new filters
+          filters.filtroCodigo || "",
+          filters.filtroTipoComision === "-1" ? "" : filters.filtroTipoComision, // Use conditional logic here
+          filters.filtroEnvaseMl || "-1",
+          materialEnvaseid,
         )
 
         if (!Result.success) {
@@ -572,12 +710,17 @@ export default function ProductosPage() {
           "True", // estatus
           "", // filtroPresentacion
           -1, // filtroFormaFarmaceutica
-          "-1", // filtroObjetivo
-          "-1", // filtroEnvase
-          "", // filtroFormula
-          "", // filtroMateriaPrima
+          -1, // filtroObjetivo
+          "", // filtroEnvase
+          -1, // filtroFormulaId (default to null if no saved filter)
+          -1, // filtroMateriaPrimaId (default to null if no saved filter)
           "", // filtroEnvaseAvanzado
           "", // filtroEmpaque
+          // Passing default values for new filters
+          "", // filtroCodigo
+          "", // filtroTipoComision (default to empty string)
+          "", // filtroEnvaseMl
+          -1, // filtroMaterialEnvaseEmpId (default to null if no saved filter)
         )
         if (!Result.success) {
           setModalAlert({
@@ -592,7 +735,7 @@ export default function ProductosPage() {
       console.log("Error al cargar datos iniciales: ", error)
       setModalError({
         Titulo: "Error al cargar datos iniciales",
-        Mensaje: error,
+        Mensaje: `Error: ${error}`,
       })
       setShowModalError(true)
     } finally {
@@ -607,7 +750,7 @@ export default function ProductosPage() {
         const [formasResult, sistemasResult, envasesResult] = await Promise.all([
           listaDesplegableFormasFarmaceuticas(-1, ""),
           listaDesplegableSistemas(-1, ""), // Assuming 'listaDesplegableSistemas' provides data for 'Objetivo (Uso)'
-          listaDesplegableEnvase(-1, ""),
+          listaDesplegableEnvase(),
         ])
 
         if (formasResult.success && formasResult.data) {
@@ -619,7 +762,12 @@ export default function ProductosPage() {
         }
 
         if (envasesResult.success && envasesResult.data) {
-          setEnvasesOptions([{ value: "Todos", text: "Todos" }, ...envasesResult.data])
+          const envasesTransformed = envasesResult.data.map((envase: any) => ({
+            value: envase.id?.toString() || envase.value,
+            text: envase.nombre || envase.text,
+          }))
+          console.log("envatransformed", envasesTransformed)
+          setEnvasesOptions([{ value: "-1", text: "Todos" }, ...envasesTransformed]) // Changed "Todos" value to "-1"
         }
       } catch (error) {
         console.error("Error loading dropdown options:", error)
@@ -630,20 +778,20 @@ export default function ProductosPage() {
         setShowModalError(true)
       }
     }
-    // Solo cargar opciones si los DDLs básicos ya están cargados o si es necesario
+    // Only load options if basic DDLs are loaded or if necessary
     if (clientes.length > 0 && catalogos.length > 0) {
       cargarOpciones()
     } else if (clientes.length === 0 && catalogos.length === 0 && !showPageLoading) {
-      // Si los DDLs básicos no se cargaron correctamente y la página no está en loading, intentar cargar opciones
-      // Esto previene carga doble si cargarDatosIniciales ya las cargó.
-      // O si hubo error en DDLs básicos, quizás queramos intentar cargar opciones de filtros avanzados de todos modos.
+      // If basic DDLs didn't load correctly and page is not loading, try loading advanced options anyway.
+      // This prevents double loading if cargarDatosIniciales already loaded them.
+      // Or if there was an error in basic DDLs, we might still want to try loading advanced filters.
       cargarOpciones()
     }
-  }, [clientes, catalogos, showPageLoading]) // Dependencia ajustada
+  }, [clientes, catalogos, showPageLoading]) // Adjusted dependency
 
   useEffect(() => {
     const buscarFormulas = async () => {
-      if (formulaBuscar.trim().length >= 2) {
+      if (formulaBuscar.trim().length >= 1) {
         const resultados = await listaDesplegableFormulasBuscar(formulaBuscar)
         setFormulasResultados(resultados)
         setShowFormulasDropdown(true)
@@ -659,7 +807,7 @@ export default function ProductosPage() {
 
   useEffect(() => {
     const buscarMateriaPrimas = async () => {
-      if (materiaprimaBuscar.trim().length >= 2) {
+      if (materiaprimaBuscar.trim().length >= 1) {
         const resultados = await listaDesplegableMateriasPrimasBuscar(materiaprimaBuscar)
         setMateriaprimasResultados(resultados)
         setShowMateriaprimasDropdown(true)
@@ -675,7 +823,7 @@ export default function ProductosPage() {
 
   useEffect(() => {
     const buscarEnvases = async () => {
-      if (envaseBuscar.trim().length >= 2) {
+      if (envaseBuscar.trim().length >= 1) {
         const resultados = await listaDesplegableMaterialesEtiquetadosBuscar(envaseBuscar)
         const envasesFiltrados = resultados.filter((m) => m.tipomaterialid === 2)
         setEnvasesResultadosBuscar(envasesFiltrados)
@@ -707,6 +855,23 @@ export default function ProductosPage() {
     return () => clearTimeout(timeoutId)
   }, [empaqueBuscar])
 
+  // Effect for searching material of envase or empaque
+  useEffect(() => {
+    const buscarMaterialesEnvaseEmpaque = async () => {
+      if (materialEnvaseBuscar.trim().length >= 2) {
+        const resultados = await listaDesplegableMaterialesEtiquetadosBuscar(materialEnvaseBuscar)
+        setMaterialesEnvaseResultados(resultados)
+        setShowMaterialEnvaseDropdown(resultados.length > 0)
+      } else {
+        setMaterialesEnvaseResultados([])
+        setShowMaterialEnvaseDropdown(false)
+      }
+    }
+
+    const timeoutId = setTimeout(buscarMaterialesEnvaseEmpaque, 300)
+    return () => clearTimeout(timeoutId)
+  }, [materialEnvaseBuscar])
+
   // --- Manejadores (Handles) --
   // Busqueda - Ejecutar
   const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
@@ -716,14 +881,50 @@ export default function ProductosPage() {
     const ZonaId = Number.parseInt(filtroZona, 10)
     const CatalogoId = Number.parseInt(filtroCatalogo, 10)
     const Estatus = filtroEstatus
+    const Codigo = filtroCodigo.trim()
     const Presentacion = filtroPresentacion.trim()
     const FormaFarmaceuticaId = Number.parseInt(filtroFormaFarmaceutica, 10)
-    const Objetivo = filtroObjetivo
-    const Envase = filtroEnvase
-    const Formula = filtroFormula.trim()
-    const MateriaPrima = filtroMateriaPrima.trim()
-    const EnvaseAvanzado = filtroEnvaseAvanzado.trim()
-    const Empaque = filtroEmpaque.trim()
+    const Objetivo = Number.parseInt(filtroObjetivo, 10)
+    const TipoComision = filtroTipoComision === "-1" ? "" : filtroTipoComision
+    const Envase = filtroEnvase === "-1" ? "" : filtroEnvase
+    const EnvaseMl = filtroEnvaseMl === "-1" ? "" : filtroEnvaseMl
+    // Get the IDs from the selected states
+    const FormulaId = formulaid === null ? -1 : formulaid
+    const MateriaPrimaId = materiaprimaid === null ? -1 : materiaprimaid
+    const MaterialEnvaseEmpaqueId = materialEnvaseid === null ? -1 : materialEnvaseid
+
+    console.log(
+      "habdel buscar: Nombre " +
+        Nombre +
+        " ClienteId:" +
+        ClienteId +
+        " ZonaId:" +
+        ZonaId +
+        " CatalogoId:" +
+        CatalogoId +
+        " Estatus:" +
+        Estatus +
+        " Codigo:" +
+        Codigo +
+        " Presentacion:" +
+        Presentacion +
+        " FormaFarmaceuticaId:" +
+        FormaFarmaceuticaId +
+        " Objetivo:" +
+        Objetivo +
+        " TipoComision:" +
+        TipoComision +
+        " Envase:" +
+        Envase +
+        " EnvaseMl:" +
+        EnvaseMl +
+        " FormulaId:" +
+        FormulaId +
+        " MateriaPrimaId:" +
+        MateriaPrimaId +
+        " MaterialEnvaseEmpaqueId:" +
+        MaterialEnvaseEmpaqueId,
+    )
 
     ejecutarBusquedaProductos(
       Nombre,
@@ -732,13 +933,19 @@ export default function ProductosPage() {
       CatalogoId,
       Estatus,
       Presentacion,
-      FormaFarmaceuticaId,
-      Objetivo,
-      Envase,
-      Formula,
-      MateriaPrima,
-      EnvaseAvanzado,
-      Empaque,
+      FormaFarmaceuticaId, // Pass as number
+      Objetivo, // Pass as number
+      Envase, // Pass as string
+      // Passing the selected IDs
+      FormulaId,
+      MateriaPrimaId,
+      Envase, // Pass as string for advanced envase filter
+      "", // Pass as string for empaque filter
+      // Passing new filter values
+      Codigo,
+      TipoComision,
+      EnvaseMl,
+      MaterialEnvaseEmpaqueId,
     )
   }
 
@@ -756,18 +963,35 @@ export default function ProductosPage() {
     setFiltroFormaFarmaceutica("-1")
     setFiltroObjetivo("-1")
     setFiltroEnvase("-1")
-    setFiltroFormula("")
-    setFiltroMateriaPrima("")
+    setFiltroFormula("") // Clear search term
+    setFiltroMateriaPrima("") // Clear search term
     setFiltroEnvaseAvanzado("")
     setFiltroEmpaque("")
+    // Resetting new filters
+    setFiltroCodigo("")
+    setFiltroTipoComision("-1")
+    setFiltroEnvaseMl("-1")
+    setFiltroMaterialEnvaseEmpaque("") // Clear search term
+
     setFormulaBuscar("")
-    setMateriaprimaBuscar("") // Corrected state variable name
-    setEnvaseBuscar("")
-    setEmpaqueBuscar("")
+    setFormulaid(null) // Clear ID
     setFormulaSeleccionada(null)
+
+    setMateriaprimaBuscar("") // Corrected state variable name
+    setMateriaprimaid(null) // Clear ID
     setMateriaprimaSeleccionada(null) // Corrected state variable name
+
+    setEnvaseBuscar("")
+    setEnvaseid(null)
     setEnvaseSeleccionado(null)
+
+    setEmpaqueBuscar("")
+    setEmpaqueid(null)
     setEmpaqueSeleccionado(null)
+
+    setMaterialEnvaseBuscar("") // Added for new filter
+    setMaterialEnvaseid(null) // Clear ID
+    setMaterialEnvaseSeleccionado(null) // Added for new filter
 
     // Limpiar resultados
     setProductos([])
@@ -836,7 +1060,7 @@ export default function ProductosPage() {
       console.log("Error al cambiar cliente: ", error)
       setModalError({
         Titulo: "Error al cambiar cliente",
-        Mensaje: error,
+        Mensaje: `Error: ${error}`,
       })
       setShowModalError(true)
     }
@@ -911,6 +1135,7 @@ export default function ProductosPage() {
   }
 
   const handleFormulaSelect = (formula: any) => {
+    console.log("formulaaaaa", formula)
     setFormulaSeleccionada({ id: formula.value, text: formula.text })
     setFormulaid(formula.value)
     setFormulaBuscar(formula.text)
@@ -940,6 +1165,15 @@ export default function ProductosPage() {
     setEmpaqueBuscar(empaque.nombre)
     setShowEmpaqueDropdown(false)
     setFiltroEmpaque(empaque.nombre) // Update the filter directly
+  }
+
+  // Handler for selecting Material de Envase o Empaque
+  const handleMaterialEnvaseSelect = (material: any) => {
+    setMaterialEnvaseSeleccionado({ id: material.id, text: material.text })
+    setMaterialEnvaseid(material.id)
+    setMaterialEnvaseBuscar(material.text) // Set search term to selected item's text
+    setShowMaterialEnvaseDropdown(false)
+    setFiltroMaterialEnvaseEmpaque(material.text) // Update the filter directly
   }
 
   // --- Carga Inicial y Seguridad ---
@@ -1121,6 +1355,19 @@ export default function ProductosPage() {
               <div className="space-y-4 pt-4 border-t">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
+                    <label htmlFor="txtCodigo" className="text-sm font-medium">
+                      Código
+                    </label>
+                    <Input
+                      id="txtCodigo"
+                      name="txtCodigo"
+                      type="text"
+                      placeholder="Buscar por código..."
+                      value={filtroCodigo}
+                      onChange={(e) => setFiltroCodigo(e.target.value)}
+                    />
+                  </div>
+                  <div>
                     <label htmlFor="txtPresentacion" className="text-sm font-medium">
                       Presentación
                     </label>
@@ -1171,6 +1418,26 @@ export default function ProductosPage() {
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label htmlFor="ddlTipoComision" className="text-sm font-medium">
+                      Tipo de Comisión
+                    </label>
+                    <Select name="ddlTipoComision" value={filtroTipoComision} onValueChange={setFiltroTipoComision}>
+                      <SelectTrigger id="ddlTipoComision">
+                        <SelectValue placeholder="Selecciona tipo comisión" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {tiposComisionesOptions.map((tipo) => (
+                          <SelectItem key={tipo.value} value={tipo.value}>
+                            {tipo.text}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <div>
                     <label htmlFor="ddlEnvase" className="text-sm font-medium">
                       Envase
@@ -1188,9 +1455,26 @@ export default function ProductosPage() {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div>
+                    <label htmlFor="ddlEnvaseMl" className="text-sm font-medium">
+                      Envase ML
+                    </label>
+                    <Select name="ddlEnvaseMl" value={filtroEnvaseMl} onValueChange={setFiltroEnvaseMl}>
+                      <SelectTrigger id="ddlEnvaseMl">
+                        <SelectValue placeholder="Selecciona envase ML" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {envaseMlOptions.map((envase) => (
+                          <SelectItem key={envase.value} value={envase.value}>
+                            {envase.text}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {/* Fórmula */}
                   <div className="relative">
                     <label htmlFor="txtFormula" className="text-sm font-medium">
@@ -1204,7 +1488,7 @@ export default function ProductosPage() {
                       value={formulaBuscar}
                       onChange={(e) => {
                         setFormulaBuscar(e.target.value)
-                        setFiltroFormula(e.target.value) // Also update filtroFormula directly
+                        setFiltroFormula(e.target.value) // Keep the search term in the filter state
                       }}
                       onFocus={() => formulasResultados.length > 0 && setShowFormulasDropdown(true)}
                       autoComplete="off"
@@ -1239,7 +1523,7 @@ export default function ProductosPage() {
                       value={materiaprimaBuscar}
                       onChange={(e) => {
                         setMateriaprimaBuscar(e.target.value)
-                        setFiltroMateriaPrima(e.target.value) // Also update filtroMateriaPrima directly
+                        setFiltroMateriaPrima(e.target.value) // Keep the search term in the filter state
                       }}
                       onFocus={() => materiaprimasResultados.length > 0 && setShowMateriaprimasDropdown(true)}
                       autoComplete="off"
@@ -1261,74 +1545,39 @@ export default function ProductosPage() {
                     <input type="hidden" name="materiaprimaid" value={materiaprimaid || ""} />
                   </div>
 
-                  {/* Envase Avanzado */}
+                  {/* Material de Envase o Empaque */}
                   <div className="relative">
-                    <label htmlFor="txtEnvaseAvanzado" className="text-sm font-medium">
-                      Envase
+                    <label htmlFor="txtMaterialEnvaseEmpaque" className="text-sm font-medium">
+                      Material de Envase o Empaque
                     </label>
                     <Input
-                      id="txtEnvaseAvanzado"
-                      name="txtEnvaseAvanzado"
+                      id="txtMaterialEnvaseEmpaque"
+                      name="txtMaterialEnvaseEmpaque"
                       type="text"
-                      placeholder="Buscar por envase..."
-                      value={envaseBuscar}
+                      placeholder="Buscar por material..."
+                      value={materialEnvaseBuscar}
                       onChange={(e) => {
-                        setEnvaseBuscar(e.target.value)
-                        setFiltroEnvaseAvanzado(e.target.value) // Also update filtroEnvaseAvanzado directly
+                        setMaterialEnvaseBuscar(e.target.value)
+                        setFiltroMaterialEnvaseEmpaque(e.target.value) // Keep the search term in the filter state
                       }}
-                      onFocus={() => envasesResultadosBuscar.length > 0 && setShowEnvasesDropdown(true)}
+                      onFocus={() => materialesEnvaseResultados.length > 0 && setShowMaterialEnvaseDropdown(true)}
                       autoComplete="off"
                     />
-                    {showEnvasesDropdown && envasesResultadosBuscar.length > 0 && (
+                    {showMaterialEnvaseDropdown && materialesEnvaseResultados.length > 0 && (
                       <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                        {envasesResultadosBuscar.map((envase) => (
+                        {materialesEnvaseResultados.map((material) => (
                           <button
-                            key={envase.id}
+                            key={material.id}
                             type="button"
                             className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
-                            onClick={() => handleEnvaseSelect(envase)}
+                            onClick={() => handleMaterialEnvaseSelect(material)}
                           >
-                            {envase.codigo} - {envase.nombre}
+                            {material.text}
                           </button>
                         ))}
                       </div>
                     )}
-                    <input type="hidden" name="envaseid" value={envaseid || ""} />
-                  </div>
-
-                  {/* Empaque */}
-                  <div className="relative">
-                    <label htmlFor="txtEmpaque" className="text-sm font-medium">
-                      Empaque
-                    </label>
-                    <Input
-                      id="txtEmpaque"
-                      name="txtEmpaque"
-                      type="text"
-                      placeholder="Buscar por empaque..."
-                      value={empaqueBuscar}
-                      onChange={(e) => {
-                        setEmpaqueBuscar(e.target.value)
-                        setFiltroEmpaque(e.target.value) // Also update filtroEmpaque directly
-                      }}
-                      onFocus={() => empaquesResultados.length > 0 && setShowEmpaqueDropdown(true)}
-                      autoComplete="off"
-                    />
-                    {showEmpaqueDropdown && empaquesResultados.length > 0 && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                        {empaquesResultados.map((empaque) => (
-                          <button
-                            key={empaque.id}
-                            type="button"
-                            className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
-                            onClick={() => handleEmpaqueSelect(empaque)}
-                          >
-                            {empaque.codigo} - {empaque.nombre}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    <input type="hidden" name="empaqueid" value={empaqueid || ""} />
+                    <input type="hidden" name="materialenvaseid" value={materialEnvaseid || ""} />
                   </div>
                 </div>
               </div>

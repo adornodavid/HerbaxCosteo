@@ -481,15 +481,32 @@ export default function VerFormulaPage() {
                           <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
                             ID: {producto.productoid}
                           </span>
-                          <span className="text-sm font-semibold text-purple-700">{producto.codigoproducto || "N/A"}</span>
+                          <span className="text-sm font-semibold text-purple-700">
+                            {producto.codigoproducto || "N/A"}
+                          </span>
                           <span className="text-sm text-gray-900 truncate font-medium">
                             {producto.producto || "N/A"}
                           </span>
                         </div>
 
-                        
+                        <div className="text-xs text-gray-600 space-y-0.5">
+                          <div>
+                            <span className="font-semibold">Producto:</span> {producto.producto || "N/A"}
+                          </div>
+                          <div>
+                            <span className="font-semibold">Presentación:</span> {producto.presentacionp || "N/A"}
+                          </div>
+                          <div>
+                            <span className="font-semibold">Código:</span> {producto.codigoproducto || "N/A"}
+                          </div>
+                          <div>
+                            <span className="font-semibold">Cliente:</span> {producto.clientenombre || "N/A"}
+                          </div>
+                          <div>
+                            <span className="font-semibold">Zona:</span> {producto.zonanombre || "N/A"}
+                          </div>
+                        </div>
                       </div>
-
                     </div>
                   ))}
                 </div>

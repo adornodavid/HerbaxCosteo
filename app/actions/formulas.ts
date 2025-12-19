@@ -41,6 +41,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
     - obtenerFormulasXFormula: Función para obtener formulas relacionadas a una formula
     - listaDesplegableFormulasBuscar
     - obtenerProductosXFormulas: Función para obtener productos relacionados a una formula
+    - obtenerFormulasIdsXMateriaprima: Función para obtener en un array el listado de los ids de formulas
   
   * UPDATES: EDIT/ACTUALIZAR/UPDATE
     - actualizarFormula / updFormula    
@@ -694,6 +695,41 @@ export async function obtenerProductosXFormulas(formulasid: number) {
     return {
       success: false,
       error: "Error interno del servidor, al ejecutar obtenerProductosXFormulas de actions/formulas",
+    }
+  }
+}
+
+// Función: obtenerFormulasIdsXMateriaprima: Función para obtener en un array el listado de los ids de formulas
+export async function obtenerFormulasIdsXMateriaprima(
+  materiaprimaid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (materiaprimaid <= 0) {
+      return { success: false, error: "ID de materia prima inválido" }
+    }
+
+    const { data, error } = await supabase
+      .from("materiasprimasxformula")
+      .select("formulaid")
+      .eq("materiaprimaid", materiaprimaid)
+
+    if (error) {
+      console.error("Error en query obtenerFormulasIdsXMateriaprima:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const DataIds: number[] = data.map((item) => item.formulaid)
+
+    return { success: true, data: DataIds }
+  } catch (error) {
+    console.error("Error en obtenerFormulasIdsXMateriaprima de actions/formulas:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerFormulasIdsXMateriaprima de actions/formulas",
     }
   }
 }

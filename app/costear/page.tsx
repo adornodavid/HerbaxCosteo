@@ -840,7 +840,7 @@ export default function CostearPage() {
                         </span>
                       </div>
                       <div className="py-1">
-                        <span className="font-semibold text-sky-700">Categoria:</span>
+                        <span className="font-semibold text-sky-700">Tipo comisión:</span>
                         <span className="ml-2 text-white bg-blue-500 py-1 rounded px-2">
                           {productoXCliente.scategoria || "Sin categoria"}
                         </span>

@@ -74,7 +74,7 @@ export default function ReporteProductosPage() {
     { header: "Porción", field: "sporcion" },
     { header: "Objetivo", field: "sobjetivo" },
     { header: "Unidad de Medida", field: "sunidadmedida" },
-    { header: "Categoría", field: "scategoria" },
+    { header: "Tipo Comision", field: "scategoria" },
     { header: "Código Maestro", field: "scodigomaestro" },
     { header: "Envase", field: "senvase" },
     { header: "Envase ML", field: "senvaseml" },
@@ -606,7 +606,7 @@ export default function ReporteProductosPage() {
                   {/* Categoría */}
                   <div>
                     <label htmlFor="ddlCategoria" className="text-sm font-medium text-gray-700 mb-1 block">
-                      Categoría
+                      Tipo Comision
                     </label>
                     <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
                       <SelectTrigger id="ddlCategoria" className="bg-white">

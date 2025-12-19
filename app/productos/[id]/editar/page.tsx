@@ -987,7 +987,24 @@ export default function EditarProductoPage() {
           }
 
           // Cargar producto
-          const result = await obtenerProductos(productoId, "", -1, -1, -1, "Todos")
+          const result = await obtenerProductos(
+            productoId,
+            "",
+            -1,
+            -1,
+            -1,
+            "Todos",
+            "", // codigo
+            "", // presentacion
+            -1, // formafarmaceuticaid
+            -1, // sistemaid
+            "", // categoria
+            "", // envase
+            "", // envaseml
+            -1, // formulaid
+            -1, // materiaprimaid
+            -1, // materialid
+          )
           if (result.success && result.data && result.data.length > 0) {
             const oProductoData: oProducto = result.data[0]
             setProducto(oProductoData)
@@ -1770,7 +1787,7 @@ export default function EditarProductoPage() {
                               <span className="ml-2 text-gray-900">{producto.porcion || "Sin porción"}</span>
                             </div>
                             <div>
-                              <span className="font-semibold text-sky-700">Sistema:</span>
+                              <span className="font-semibold text-sky-700">Objetivo (Uso):</span>
                               <span className="ml-2 text-gray-900">{producto.sistemas?.nombre || "Sin sistema"}</span>
                             </div>
                             <div>
@@ -1800,7 +1817,7 @@ export default function EditarProductoPage() {
                               <span className="ml-2 text-gray-900">{producto.envaseml || "Sin envase ml"}</span>
                             </div>
                             <div>
-                              <span className="font-semibold text-sky-700">Categoría:</span>
+                              <span className="font-semibold text-sky-700">Tipo comisión:</span>
                               <span className="ml-2 text-gray-900">{producto.categoria || "Sin categoría"}</span>
                             </div>
                             <div>

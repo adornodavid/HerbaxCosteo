@@ -230,6 +230,45 @@ export async function listaDesplegableEnvase(id = "", value = "") {
   }
 }
 
+// Función: listaDesplegableEnvaseMl: función que se utiliza para los dropdownlist de envases ml de productos
+export async function listaDesplegableEnvaseMl(id = -1, value = "") {
+  try {
+    // Query principal con DISTINCT
+    let query = supabase.from("productos").select("envaseml").not("envaseml", "is", null)
+
+    // Filtros en query, dependiendo parametros
+    if (id !== -1) {
+      query = query.eq("envaseml", value)
+    }
+    if (value !== "") {
+      query = query.ilike("envaseml", `%${value}%`)
+    }
+
+    // Ejecutar query
+    const { data: envasesml, error } = await query
+
+    if (error) {
+      console.error("Error obteniendo la lista desplegable de envases ml de productos:", error)
+      return { success: false, error: error.message }
+    }
+
+    // Obtener valores únicos (DISTINCT) y ordenar
+    const envasesmlUnicos = Array.from(new Set(envasesml?.map((item) => item.envaseml) || []))
+      .filter((env) => env !== null && env !== "")
+      .sort()
+
+    const data: ddlItem[] = envasesmlUnicos.map((envaseml) => ({
+      value: envaseml,
+      text: envaseml,
+    }))
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en listaDesplegableEnvaseMl:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
 // Función: listaDesplegableCatalogos: función para obtener el listado de catalogos para dropdownlist con filtros opcionales
 export async function listaDesplegableCatalogos(id = -1, nombre = "", clienteid = -1) {
   try {
@@ -665,5 +704,40 @@ export async function actualizarPrecioProductoCatalogo(
       success: false,
       error: error.message,
     }
+  }
+}
+
+// Función: listaDesplegableMaterialEnvaseSinFiltro: función para obtener el listado de materiales de envase sin filtro de tipo
+export async function listaDesplegableMaterialEnvaseSinFiltro(buscar = "") {
+  try {
+    // Query de materiales de envase sin filtro de tipo
+    let query = supabase.from("materialetiquetado").select("id, codigo, nombre").neq("estado", false)
+
+    // Filtro de búsqueda si existe
+    if (buscar !== "") {
+      query = query.or(`codigo.ilike.%${buscar}%,nombre.ilike.%${buscar}%`)
+    }
+
+    // Ejecutar query
+    const { data: materiales, error } = await query.order("nombre", { ascending: true })
+
+    if (error) {
+      console.error("Error obteniendo materiales de envase sin filtro:", error)
+      return { success: false, error: error.message }
+    }
+
+    // Mapear resultados
+    const data = (materiales || []).map((item: any) => ({
+      id: item.id,
+      value: item.id,
+      text: `${item.codigo} - ${item.nombre}`,
+      codigo: item.codigo,
+      nombre: item.nombre,
+    }))
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en listaDesplegableMaterialEnvaseSinFiltro:", error)
+    return { success: false, error: "Error interno del servidor" }
   }
 }

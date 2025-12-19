@@ -434,7 +434,7 @@ export default function ReporteCosteoPage() {
           "FOLIO",
           "CÓDIGO",
           "NOMBRE",
-          "CATEGORIA",
+          "TIPO COMISION",
           "PRECIO VENTA 2025",
           "PRECIO VENTA SIN IVA",
           "PRECIO VENTA CON IVA",
@@ -836,7 +836,7 @@ export default function ReporteCosteoPage() {
                         className="border border-gray-300 p-3 text-right text-sm font-semibold text-white bg-blue-700 sticky z-10"
                         style={{ top: "0px", minWidth: "70px" }}
                       >
-                        CATEGORIA
+                        TIPO COMISION
                       </th>
 
                       {/* Columna precio 2025 */}

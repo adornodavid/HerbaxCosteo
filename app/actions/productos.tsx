@@ -40,6 +40,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - obtenerProductosCaracteristicas / selProductosCaracteristicas
     - obtenerProductosXCatalogos / selProductosXCatalogos
     - obtenerProductosXClientes / selProductosXClientes
+    - obtenerProductosIdsXFormulas / selProductosIdsXFormulas
+    - obtenerProductosIdsXMateriales / selProductosIdsXMateriales // Added
     
   * UPDATES: EDIT/ACTUALIZAR/UPDATE
     - actualizarProducto / updProducto
@@ -75,9 +77,36 @@ export async function objetoProducto(
   zonaid = -1,
   catalogoid = -1,
   activo = "Todos",
+  codigo = "",
+  presentacion = "",
+  formafarmaceuticaid = -1,
+  sistemaid = -1,
+  categoria = "",
+  envase = "",
+  envaseml = "",
+  formulaid = -1,
+  materiaprimaid = -1,
+  materialid = -1,
 ): Promise<{ success: boolean; data?: oProducto; error?: string }> {
   try {
-    const resultado = await obtenerProductos(productoid, productonombre, clienteid, zonaid, catalogoid, activo)
+    const resultado = await obtenerProductos(
+      productoid,
+      productonombre,
+      clienteid,
+      zonaid,
+      catalogoid,
+      activo,
+      codigo,
+      presentacion,
+      formafarmaceuticaid,
+      sistemaid,
+      categoria,
+      envase,
+      envaseml,
+      formulaid,
+      materiaprimaid,
+      materialid,
+    )
 
     if (!resultado.success || !resultado.data) {
       return { success: false, error: resultado.error || "No se encontraron datos" }
@@ -104,9 +133,36 @@ export async function objetoProductos(
   zonaid = -1,
   catalogoid = -1,
   activo = "Todos",
+  codigo = "",
+  presentacion = "",
+  formafarmaceuticaid = -1,
+  sistemaid = -1,
+  categoria = "",
+  envase = "",
+  envaseml = "",
+  formulaid = -1,
+  materiaprimaid = -1,
+  materialid = -1,
 ): Promise<{ success: boolean; data?: oProducto[]; error?: string }> {
   try {
-    const resultado = await obtenerProductos(productoid, productonombre, clienteid, zonaid, catalogoid, activo)
+    const resultado = await obtenerProductos(
+      productoid,
+      productonombre,
+      clienteid,
+      zonaid,
+      catalogoid,
+      activo,
+      codigo,
+      presentacion,
+      formafarmaceuticaid,
+      sistemaid,
+      categoria,
+      envase,
+      envaseml,
+      formulaid,
+      materiaprimaid,
+      materialid,
+    )
 
     if (!resultado.success || !resultado.data) {
       return { success: false, error: resultado.error || "No se encontraron datos" }
@@ -136,6 +192,16 @@ export async function crearProducto(formData: FormData) {
         Number.parseInt(formData.get("zonaid") as string) || -1,
         -1,
         "Todos",
+        "", // Added new parameters with default values
+        "",
+        -1,
+        -1,
+        "",
+        "",
+        "",
+        -1,
+        -1,
+        -1,
       )
       return resultado.success && resultado.data && resultado.data.length >= 1
     })()
@@ -279,15 +345,96 @@ export async function obtenerProductos(
   zonaid = -1,
   catalogoid = -1,
   activo = "Todos",
+  codigo = "",
+  presentacion = "",
+  formafarmaceuticaid = -1,
+  sistemaid = -1,
+  categoria = "",
+  envase = "",
+  envaseml = "",
+  formulaid = -1,
+  materiaprimaid = -1,
+  materialid = -1,
 ) {
   try {
+    console.log("[v0] obtenerProductos called with params:", {
+      productoid,
+      productonombre,
+      clienteid,
+      zonaid,
+      catalogoid,
+      activo,
+      codigo,
+      presentacion,
+      formafarmaceuticaid,
+      sistemaid,
+      categoria,
+      envase,
+      envaseml,
+      formulaid,
+      materiaprimaid,
+      materialid,
+    })
+
+    // Array de ProductosIds con relacion a Catalogos
     let Ids: number[] = []
     if (catalogoid > 0) {
+      console.log("[v0] Calling obtenerProductosXCatalogos with catalogoid:", catalogoid)
       const resultado = await obtenerProductosXCatalogos(catalogoid)
+      console.log("[v0] obtenerProductosXCatalogos result:", resultado)
       if (resultado.success && resultado.data) {
         Ids = resultado.data
       }
     }
+
+    // Array de ProductosIds con relacion a Formula
+    let IdsPXF: number[] = []
+    if (formulaid > 0) {
+      console.log("[v0] Calling obtenerProductosIdsXFormulas with formulaid:", formulaid)
+      const resultado = await obtenerProductosIdsXFormulas(formulaid, [])
+      console.log("[v0] obtenerProductosIdsXFormulas result:", resultado)
+      if (resultado.success && resultado.data) {
+        IdsPXF = resultado.data
+      }
+    }
+
+    // Array de ProductosIds con relacion a Formulasid con relacion a materia prima
+    let IdsPXMP: number[] = []
+    if (materiaprimaid > 0) {
+      console.log("[v0] Calling obtenerFormulasIdsXMateriaprima with materiaprimaid:", materiaprimaid)
+      const formulasResult = await obtenerFormulasIdsXMateriaprima(materiaprimaid)
+      console.log("[v0] obtenerFormulasIdsXMateriaprima result:", formulasResult)
+      if (formulasResult.success && formulasResult.data) {
+        console.log("[v0] Calling obtenerProductosIdsXFormulas with formulas array:", formulasResult.data)
+        const productosResult = await obtenerProductosIdsXFormulas(-1, formulasResult.data)
+        console.log("[v0] obtenerProductosIdsXFormulas (from formulas) result:", productosResult)
+        if (productosResult.success && productosResult.data) {
+          IdsPXMP = productosResult.data
+        }
+      }
+    }
+
+    // Array de ProductosIds con relacion a materiales (Envase y/o Empaque)
+    let IdsPXM: number[] = []
+    if (materialid > 0) {
+      console.log("[v0] Calling obtenerProductosIdsXMateriales with materialid:", materialid)
+      const resultado = await obtenerProductosIdsXMateriales(materialid)
+      console.log("[v0] obtenerProductosIdsXMateriales result:", resultado)
+      if (resultado.success && resultado.data) {
+        IdsPXM = resultado.data
+      }
+    }
+
+    console.log(
+      "[v0] Filter arrays - Ids:",
+      Ids.length,
+      "IdsPXF:",
+      IdsPXF.length,
+      "IdsPXMP:",
+      IdsPXMP.length,
+      "IdsPXM:",
+      IdsPXM.length,
+    )
 
     let query = supabase.from("productos").select(`
         id,
@@ -414,7 +561,41 @@ export async function obtenerProductos(
       query = query.ilike("producto", `%${productonombre}%`)
     }
     if (catalogoid > 0) {
+      console.log("[v0] Adding catalog filter with Ids:", Ids)
       query = query.in("id", Ids)
+    }
+    if (codigo !== "") {
+      query = query.ilike("codigo", `%${codigo}%`)
+    }
+    if (presentacion !== "") {
+      query = query.ilike("presentacion", `%${presentacion}%`)
+    }
+    if (formafarmaceuticaid > 0) {
+      query = query.eq("formafarmaceuticaid", formafarmaceuticaid)
+    }
+    if (sistemaid > 0) {
+      query = query.eq("sistemaid", sistemaid)
+    }
+    if (categoria !== "") {
+      query = query.ilike("categoria", `%${categoria}%`)
+    }
+    if (envase !== "") {
+      query = query.ilike("envase", `%${envase}%`)
+    }
+    if (envaseml !== "") {
+      query = query.ilike("envaseml", `%${envaseml}%`)
+    }
+    if (IdsPXF.length > 0) {
+      console.log("[v0] Adding formula filter with IdsPXF:", IdsPXF)
+      query = query.in("id", IdsPXF)
+    }
+    if (IdsPXMP.length > 0) {
+      console.log("[v0] Adding materia prima filter with IdsPXMP:", IdsPXMP)
+      query = query.in("id", IdsPXMP)
+    }
+    if (IdsPXM.length > 0) {
+      console.log("[v0] Adding material filter with IdsPXM:", IdsPXM)
+      query = query.in("id", IdsPXM)
     }
     if (activo !== "Todos") {
       const isActive = ["True", "true", "Activo", "1", true].includes(activo)
@@ -430,19 +611,25 @@ export async function obtenerProductos(
     //Ejecutar query
     query = query.order("nombre", { ascending: true })
 
+    console.log("[v0] About to execute query")
+
     //Varaibles y resultados del query
     const { data, error } = await query
 
+    console.log("[v0] Query executed - Error:", error, "Data count:", data?.length)
+
     //Error en query
     if (error) {
-      console.error("Error obteniendo productos:", error)
+      console.error("[v0] Error obteniendo productos:", error)
       return { success: false, error: error.message }
     }
+
+    console.log("[v0] obtenerProductos success - returned", data?.length, "products")
 
     //Retorno de data
     return { success: true, data }
   } catch (error) {
-    console.error("Error en app/actions/productos en obtenerProductos:", error)
+    console.error("[v0] Error en app/actions/productos en obtenerProductos:", error)
     return { success: false, error: "Error interno del servidor" }
   }
 }
@@ -655,6 +842,41 @@ export async function obtenerProductosXClientes(
   }
 }
 
+// Función: obtenerProductosIdsXMateriales: Agregar función para obtener IDs de productos filtrados por material etiquetado
+export async function obtenerProductosIdsXMateriales(
+  materialetiquetadoid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (materialetiquetadoid <= 0) {
+      return { success: false, error: "ID de material etiquetado inválido" }
+    }
+
+    const { data, error } = await supabase
+      .from("materialesetiquetadoxproducto")
+      .select("productoid")
+      .eq("materialetiquetadoid", materialetiquetadoid)
+
+    if (error) {
+      console.error("Error en query obtenerProductosIdsXMateriales:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const DataIds: number[] = data.map((item) => item.productoid)
+
+    return { success: true, data: DataIds }
+  } catch (error) {
+    console.error("Error en obtenerProductosIdsXMateriales de actions/productos:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerProductosIdsXMateriales de actions/productos",
+    }
+  }
+}
+
 // Funcion: obtenerProductos / selProductos: FUNCION para obtener
 export async function obtenerProductosXClientesOptima(productoid = -1, clienteid = -1) {
   try {
@@ -746,6 +968,76 @@ export async function obtenerProductosXClientesArray(
       success: false,
       error: "Error interno del servidor, al ejecutar obtenerProductosXClientes de actions/productos",
     }
+  }
+}
+
+// Use the imported function
+export async function obtenerProductosIdsXFormulas(
+  formulaid = -1,
+  formulasids: number[] = [],
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (formulaid <= 0 && formulasids.length < 1) {
+      return { success: false, error: "ID de fórmula inválido" }
+    }
+
+    let query = supabase.from("formulasxproducto").select("productoid")
+
+    if (formulaid > 0) {
+      query = query.eq("formulaid", formulaid)
+    } else if (formulasids.length > 0) {
+      query = query.in("formulaid", formulasids)
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error("Error en query obtenerProductosIdsXFormulas:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const DataIds: number[] = data.map((item) => item.productoid)
+
+    return { success: true, data: DataIds }
+  } catch (error) {
+    console.error("Error en obtenerProductosIdsXFormulas:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Dummy function to satisfy the call in obtenerProductos
+export async function obtenerFormulasIdsXMateriaprima(
+  materiaprimaid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (materiaprimaid <= 0) {
+      return { success: false, error: "ID de materia prima inválido" }
+    }
+
+    const { data, error } = await supabase
+      .from("materiasprimasxformula")
+      .select("formulaid")
+      .eq("materiaprimaid", materiaprimaid)
+
+    if (error) {
+      console.error("Error en query obtenerFormulasIdsXMateriaprima:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const DataIds: number[] = data.map((item) => item.formulaid)
+
+    return { success: true, data: DataIds }
+  } catch (error) {
+    console.error("Error en obtenerFormulasIdsXMateriaprima:", error)
+    return { success: false, error: "Error interno del servidor" }
   }
 }
 
@@ -1063,7 +1355,7 @@ export async function recalcularProducto(productoid: number): Promise<{ success:
     const { data: memSumData, error: memSumError } = await supabase
       .from("materialesetiquetadoxproducto")
       .select(`
-              costoparcial, 
+              costoparcial,
               materialesetiquetado!inner(tipomaterialid)
               `)
       .eq("productoid", productoid)
@@ -1091,7 +1383,7 @@ export async function recalcularProducto(productoid: number): Promise<{ success:
     const { data: meSumData, error: meSumError } = await supabase
       .from("materialesetiquetadoxproducto")
       .select(`
-              costoparcial, 
+              costoparcial,
               materialesetiquetado!inner(tipomaterialid)
               `)
       .eq("productoid", productoid)

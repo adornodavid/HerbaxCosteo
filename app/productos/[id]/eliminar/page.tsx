@@ -117,7 +117,24 @@ export default function EliminarProductoPage() {
     const cargarProducto = async () => {
       try {
         setShowPageLoading(true)
-        const result = await obtenerProductos(productoId, -1, -1, "", "", "Todos")
+        const result = await obtenerProductos(
+          productoId,
+          "",
+          -1,
+          -1,
+          -1,
+          "Todos",
+          "", // codigo
+          "", // presentacion
+          -1, // formafarmaceuticaid
+          -1, // sistemaid
+          "", // categoria
+          "", // envase
+          "", // envaseml
+          -1, // formulaid
+          -1, // materiaprimaid
+          -1, // materialid
+        )
 
         if (result.success && result.data && result.data.length > 0) {
           setProducto(result.data[0])
