@@ -1404,7 +1404,7 @@ export default function ReporteCosteoPage() {
                           style={{ top: "0px", minWidth: "180px", position: "sticky" }}
                         >
                           {typeof row.sprecioactualporcentajeutilidad === "number"
-                            ? `${row.sprecioactualporcentajeutilidad.toFixed(2)}%`
+                            ? `${row.sprecioactualporcentajeutilidad.toFixed(2) * 100}%`
                             : row.sprecioactualporcentajeutilidad || "-"}
                         </td>
 
@@ -1614,7 +1614,7 @@ export default function ReporteCosteoPage() {
                           style={{ top: "0px", minWidth: "180px", position: "sticky" }}
                         >
                           {typeof row.scostoutilidadanual === "number"
-                            ? `$${row.scostoutilidadanual.toFixed(2)}`
+                            ? `${row.scostoutilidadanual.toFixed(2)}%`
                             : row.scostoutilidadanual || "-"}
                         </td>
 
