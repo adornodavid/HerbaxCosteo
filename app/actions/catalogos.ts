@@ -258,8 +258,8 @@ export async function listaDesplegableEnvaseMl(id = -1, value = "") {
       .sort()
 
     const data: ddlItem[] = envasesmlUnicos.map((envaseml) => ({
-      value: envaseml,
-      text: envaseml,
+      value: String(envaseml),
+      text: String(envaseml),
     }))
 
     return { success: true, data }

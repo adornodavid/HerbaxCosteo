@@ -604,9 +604,20 @@ export default function ProductosPage() {
         console.log("Error al cargar Envases:", envasesResult.error)
       }
 
-      const tiposComisionesResult = await listaDesplegableProductosTiposComisiones(-1, "")
+      const tiposComisionesResult = await listaDesplegableProductosTiposComisiones("", "")
+      console.log("[v0] tiposComisionesResult:", tiposComisionesResult)
       if (tiposComisionesResult.success && tiposComisionesResult.data) {
+        console.log("[v0] Setting tiposComisiones with:", tiposComisionesResult.data)
         setTiposComisionesOptions([{ value: "-1", text: "Todos" }, ...tiposComisionesResult.data])
+      } else {
+        console.log(
+          "[v0] Error or no data for tipos comisiones - success:",
+          tiposComisionesResult.success,
+          "data:",
+          tiposComisionesResult.data,
+          "error:",
+          tiposComisionesResult.error,
+        )
       }
 
       const envaseMlResult = await listaDesplegableEnvaseMl(-1, "")
@@ -858,10 +869,19 @@ export default function ProductosPage() {
   // Effect for searching material of envase or empaque
   useEffect(() => {
     const buscarMaterialesEnvaseEmpaque = async () => {
-      if (materialEnvaseBuscar.trim().length >= 2) {
+      console.log("[v0] materialEnvaseBuscar changed to:", materialEnvaseBuscar)
+      if (materialEnvaseBuscar.trim().length >= 1) {
+        console.log("[v0] Calling listaDesplegableMaterialesEtiquetadosBuscar with:", materialEnvaseBuscar)
         const resultados = await listaDesplegableMaterialesEtiquetadosBuscar(materialEnvaseBuscar)
-        setMaterialesEnvaseResultados(resultados)
-        setShowMaterialEnvaseDropdown(resultados.length > 0)
+        console.log("[v0] listaDesplegableMaterialesEtiquetadosBuscar result:", resultados)
+        // Mapeamos a {id, text} para consistencia con el dropdown
+        const materialesData = Array.isArray(resultados)
+          ? resultados.map((m: any) => ({ id: m.id, text: m.nombre }))
+          : []
+        console.log("[v0] materialesData to set:", materialesData)
+        setMaterialesEnvaseResultados(materialesData)
+        setShowMaterialEnvaseDropdown(materialesData.length > 0)
+        console.log("[v0] showMaterialEnvaseDropdown set to:", materialesData.length > 0)
       } else {
         setMaterialesEnvaseResultados([])
         setShowMaterialEnvaseDropdown(false)
@@ -997,6 +1017,28 @@ export default function ProductosPage() {
     setProductos([])
     setTotalProductos(0)
     setPaginaActual(1)
+
+    ejecutarBusquedaProductos(
+      "",
+      -1,
+      -1,
+      -1,
+      "True",
+      "",
+      -1, // Pass as number
+      -1, // Pass as number
+      "", // Pass as string
+      // Passing the selected IDs
+      -1,
+      -1,
+      "", // Pass as string for advanced envase filter
+      "", // Pass as string for empaque filter
+      // Passing new filter values
+      "",
+      "",
+      "",
+      -1,
+    )
   }
 
   // Busqueda, camabiar cliente seleccionado
@@ -1173,6 +1215,7 @@ export default function ProductosPage() {
     setMaterialEnvaseid(material.id)
     setMaterialEnvaseBuscar(material.text) // Set search term to selected item's text
     setShowMaterialEnvaseDropdown(false)
+    setMaterialesEnvaseResultados([])
     setFiltroMaterialEnvaseEmpaque(material.text) // Update the filter directly
   }
 
@@ -1217,7 +1260,7 @@ export default function ProductosPage() {
     }
   }, [filtroCliente])
 
-  // --- Renders (contenidos auxiliares) ---
+  // --- Renders (contenidos auxiliares) --
   // Loading
   if (showPageLoading) {
     return <PageLoadingScreen message="Cargando Productos..." />
@@ -1558,7 +1601,7 @@ export default function ProductosPage() {
                       value={materialEnvaseBuscar}
                       onChange={(e) => {
                         setMaterialEnvaseBuscar(e.target.value)
-                        setFiltroMaterialEnvaseEmpaque(e.target.value) // Keep the search term in the filter state
+                        setFiltroMaterialEnvaseEmpaque(e.target.value)
                       }}
                       onFocus={() => materialesEnvaseResultados.length > 0 && setShowMaterialEnvaseDropdown(true)}
                       autoComplete="off"

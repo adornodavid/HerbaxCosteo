@@ -26,7 +26,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - objetoProductos / oProductos (Listado / Array)
     - objetoProductoXCliente / oProductoXCliente (Individual)
     - objetoProductosXClientes / oProductosXCliente (Listado / Array)
-  
+
   --------------------
   Funciones
   --------------------
@@ -42,7 +42,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the su
     - obtenerProductosXClientes / selProductosXClientes
     - obtenerProductosIdsXFormulas / selProductosIdsXFormulas
     - obtenerProductosIdsXMateriales / selProductosIdsXMateriales // Added
-    
+
   * UPDATES: EDIT/ACTUALIZAR/UPDATE
     - actualizarProducto / updProducto
     - actualizarProductoCaracteristicas / updProductoCaracteristicas
@@ -519,7 +519,7 @@ export async function obtenerProductos(
               cantidad,
               costoparcial,
               materiasprima!materiaprimaid(
-                codigo, 
+                codigo,
                 nombre,
                 unidadmedidaid,
                 unidadesmedida!unidadmedidaid(descripcion),
@@ -533,7 +533,7 @@ export async function obtenerProductos(
               cantidad,
               costoparcial,
               formulas!secundariaid(
-                codigo, 
+                codigo,
                 nombre,
                 unidadmedidaid,
                 unidadesmedida!unidadmedidaid(descripcion),
@@ -583,7 +583,10 @@ export async function obtenerProductos(
       query = query.ilike("envase", `%${envase}%`)
     }
     if (envaseml !== "") {
-      query = query.ilike("envaseml", `%${envaseml}%`)
+      const envasemlNum = Number.parseFloat(envaseml)
+      if (!isNaN(envasemlNum)) {
+        query = query.eq("envaseml", envasemlNum)
+      }
     }
     if (IdsPXF.length > 0) {
       console.log("[v0] Adding formula filter with IdsPXF:", IdsPXF)
@@ -768,7 +771,8 @@ export async function obtenerProductosXClientes(
     //const { data, error } = await supabase.from("productos").select("productoid").eq("clienteid", clienteid)
     const { data, error } = await supabase
       .from("productos")
-      .select(`
+      .select(
+        `
         idrec,
         clienteid,
         clientes!clienteid(nombre),
@@ -808,7 +812,7 @@ export async function obtenerProductosXClientes(
         porcentajecosto,
         totalcosto,
         utilidadmarginal,
-        precioactualporcentajeutilidad,        
+        precioactualporcentajeutilidad,
         fechacreacion,
         fechamodificacion,
         activo,
@@ -818,7 +822,8 @@ export async function obtenerProductosXClientes(
         precioventaconivaaa,
         preciopublicoconiva,
         preciopublicosiniva
-      `)
+      `,
+      )
       .eq("clienteid", clienteid)
 
     if (error) {
@@ -1354,10 +1359,12 @@ export async function recalcularProducto(productoid: number): Promise<{ success:
 
     const { data: memSumData, error: memSumError } = await supabase
       .from("materialesetiquetadoxproducto")
-      .select(`
+      .select(
+        `
               costoparcial,
               materialesetiquetado!inner(tipomaterialid)
-              `)
+              `,
+      )
       .eq("productoid", productoid)
       .eq("materialesetiquetado.tipomaterialid", 1)
 
@@ -1382,10 +1389,12 @@ export async function recalcularProducto(productoid: number): Promise<{ success:
 
     const { data: meSumData, error: meSumError } = await supabase
       .from("materialesetiquetadoxproducto")
-      .select(`
+      .select(
+        `
               costoparcial,
               materialesetiquetado!inner(tipomaterialid)
-              `)
+              `,
+      )
       .eq("productoid", productoid)
       .eq("materialesetiquetado.tipomaterialid", 2)
 
