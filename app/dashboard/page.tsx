@@ -435,7 +435,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/*<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="border-blue-200 shadow-sm hover:shadow-lg transition-all bg-gradient-to-br from-blue-50 to-white">
             <CardContent className="p-3">
               <div className="flex items-center justify-between mb-2">
@@ -594,7 +594,7 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </div>*/}
 
         <Card className="border-slate-200 shadow-sm">
           <CardHeader>
@@ -708,7 +708,7 @@ export default function DashboardPage() {
                               <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-lg border-2 border-emerald-300">
                                 <span className="text-xs font-bold text-emerald-800">% Utilidad</span>
                                 <span className="text-base font-bold text-emerald-900">
-                                  {(item.sprecioactualporcentajeutilidad).toFixed(2)}%
+                                  {item.sprecioactualporcentajeutilidad.toFixed(2)}%
                                 </span>
                               </div>
                             </div>
@@ -824,74 +824,9 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between text-slate-800">
-                <div className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-blue-600" />
-                  Total Productos Registrados
-                </div>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => setProductosPorZonaTab("cliente")}
-                    className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                      productosPorZonaTab === "cliente"
-                        ? "bg-blue-600 text-white"
-                        : "bg-blue-100 text-blue-700 hover:bg-blue-200"
-                    }`}
-                  >
-                    Cliente
-                  </button>
-                  <button
-                    onClick={() => setProductosPorZonaTab("zona")}
-                    className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                      productosPorZonaTab === "zona"
-                        ? "bg-purple-600 text-white"
-                        : "bg-purple-100 text-purple-700 hover:bg-purple-200"
-                    }`}
-                  >
-                    Zona
-                  </button>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  {productosPorZonaTab === "cliente" ? (
-                    <BarChart data={estadisticas?.productosPorCliente || []}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                      <XAxis dataKey="cliente" tick={{ fontSize: 12 }} stroke="#64748b" />
-                      <YAxis stroke="#64748b" />
-                      <ChartTooltip content={<ChartTooltipContent />} cursor={{ fill: "rgba(59, 130, 246, 0.1)" }} />
-                      <Bar dataKey="cantidad" radius={[4, 4, 0, 0]}>
-                        {estadisticas?.productosPorCliente.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                        <LabelList dataKey="cantidad" position="top" fill="#374151" fontSize={12} fontWeight={600} />
-                      </Bar>
-                    </BarChart>
-                  ) : (
-                    <BarChart data={productosPorZonaData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                      <XAxis dataKey="zona" tick={{ fontSize: 12 }} stroke="#64748b" />
-                      <YAxis stroke="#64748b" />
-                      <ChartTooltip content={<ChartTooltipContent />} cursor={{ fill: "rgba(139, 92, 246, 0.1)" }} />
-                      <Bar dataKey="cantidad" radius={[4, 4, 0, 0]}>
-                        {productosPorZonaData.map((entry, index) => (
-                          <Cell key={`cell-zona-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
-                        ))}
-                        <LabelList dataKey="cantidad" position="top" fill="#374151" fontSize={12} fontWeight={600} />
-                      </Bar>
-                    </BarChart>
-                  )}
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-slate-800">
                 <TrendingUp className="h-5 w-5 text-indigo-600" />
@@ -918,6 +853,15 @@ export default function DashboardPage() {
                       <th className="text-center p-2 text-indigo-900 font-semibold text-xs border-b-2 border-indigo-200">
                         Var %
                       </th>
+                      <th className="text-center p-2 text-indigo-900 font-semibold text-xs border-b-2 border-indigo-200">
+                        CostoTotal
+                      </th>
+                      <th className="text-center p-2 text-indigo-900 font-semibold text-xs border-b-2 border-indigo-200">
+                        Ut.Marginal
+                      </th>
+                      <th className="text-center p-2 text-indigo-900 font-semibold text-xs border-b-2 border-indigo-200">
+                        PA.%Utilidad
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -933,15 +877,22 @@ export default function DashboardPage() {
                                 ${item.sdiferencia.toFixed(2)}
                               </td>
                               <td className="text-center p-2">
-                                <span
-                                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
-                                    item.svaraa < 0
-                                      ? "bg-red-100 text-red-700 border border-red-200"
-                                      : "bg-green-100 text-green-700 border border-green-200"
-                                  }`}
-                                >
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
                                   {item.svaraa < 0 ? "-" : "+"}
                                   {Math.abs(item.svaraa).toFixed(2)}%
+                                </span>
+                              </td>
+                              <td className="text-right p-2 text-slate-700">${item.stotalcostos.toFixed(2)}</td>
+                              <td className="text-right p-2 text-slate-700">${item.sutilidadmarginal.toFixed(2)}</td>
+                              <td className="text-right p-2">
+                                <span
+                                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
+                                    item.sprecioactualporcentajeutilidad * 100 >= 30
+                                      ? "bg-green-500 text-white border border-green-600"
+                                      : "bg-green-200 text-green-800 border border-green-300"
+                                  }`}
+                                >
+                                  {(item.sprecioactualporcentajeutilidad * 100).toFixed(2)}%
                                 </span>
                               </td>
                             </tr>
@@ -1048,6 +999,73 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between text-slate-800">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-blue-600" />
+                  Total Productos Registrados
+                </div>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setProductosPorZonaTab("cliente")}
+                    className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                      productosPorZonaTab === "cliente"
+                        ? "bg-blue-600 text-white"
+                        : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                    }`}
+                  >
+                    Cliente
+                  </button>
+                  <button
+                    onClick={() => setProductosPorZonaTab("zona")}
+                    className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                      productosPorZonaTab === "zona"
+                        ? "bg-purple-600 text-white"
+                        : "bg-purple-100 text-purple-700 hover:bg-purple-200"
+                    }`}
+                  >
+                    Zona
+                  </button>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  {productosPorZonaTab === "cliente" ? (
+                    <BarChart data={estadisticas?.productosPorCliente || []}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                      <XAxis dataKey="cliente" tick={{ fontSize: 12 }} stroke="#64748b" />
+                      <YAxis stroke="#64748b" />
+                      <ChartTooltip content={<ChartTooltipContent />} cursor={{ fill: "rgba(59, 130, 246, 0.1)" }} />
+                      <Bar dataKey="cantidad" radius={[4, 4, 0, 0]}>
+                        {estadisticas?.productosPorCliente.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                        <LabelList dataKey="cantidad" position="top" fill="#374151" fontSize={12} fontWeight={600} />
+                      </Bar>
+                    </BarChart>
+                  ) : (
+                    <BarChart data={productosPorZonaData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                      <XAxis dataKey="zona" tick={{ fontSize: 12 }} stroke="#64748b" />
+                      <YAxis stroke="#64748b" />
+                      <ChartTooltip content={<ChartTooltipContent />} cursor={{ fill: "rgba(139, 92, 246, 0.1)" }} />
+                      <Bar dataKey="cantidad" radius={[4, 4, 0, 0]}>
+                        {productosPorZonaData.map((entry, index) => (
+                          <Cell key={`cell-zona-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+                        ))}
+                        <LabelList dataKey="cantidad" position="top" fill="#374151" fontSize={12} fontWeight={600} />
+                      </Bar>
+                    </BarChart>
+                  )}
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
         </div>
 
         {/* Section for Products by Zone Chart */}
@@ -1193,7 +1211,7 @@ export default function DashboardPage() {
         </Card>
         */}
 
-        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+        {/*<Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-slate-800">
               <Activity className="h-5 w-5 text-green-600" />
@@ -1224,7 +1242,7 @@ export default function DashboardPage() {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card>*/}
       </div>
     </div>
   )

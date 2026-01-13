@@ -12,7 +12,7 @@ export function PageTitlePlusNew({ Titulo, Subtitulo, Visible, BotonTexto, Ruta 
         <h1 className="text-3xl font-bold tracking-tight">{Titulo}</h1>
         <p className="text-muted-foreground">{Subtitulo}</p>
       </div>
-      {Visible && (
+      {Visible && Ruta && (
         <div className="flex justify-end">
           <Link href={Ruta} passHref>
             <Button className="bg-[#5d8f72] hover:bg-[#44785a] text-white">

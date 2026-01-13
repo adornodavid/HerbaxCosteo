@@ -67,6 +67,16 @@ export function IconSidebar({ onToggleNavigation }: IconSidebarProps) {
         <span className="text-xs text-gray-600">Costear</span>
       </Link>
 
+      {/* Inventario Icon */}
+      <Link
+        href="/inventarios"
+        className="flex flex-col items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-6 p-2"
+        title="Inventario"
+      >
+        <Icons.Package2 className="w-6 h-6 text-gray-700 mb-1" />
+        <span className="text-xs text-gray-600">Inventario</span>
+      </Link>
+
       {/* Reports Icon */}
       {/*<Link
         href="/reportecosteo"
