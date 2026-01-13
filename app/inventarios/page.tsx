@@ -929,6 +929,14 @@ export default function InventarioPage() {
                         <td className="border border-gray-300 p-3 text-sm text-right whitespace-nowrap">
                           <input
                             type="number"
+                            value={row.ventamensual || 0}
+                            onChange={(e) => handleCellChange(rowIndex, "ventadehoy", e.target.value)}
+                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </td>
+                        <td className="border border-gray-300 p-3 text-sm text-right whitespace-nowrap">
+                          <input
+                            type="number"
                             step="0.01"
                             value={
                               typeof row.porcentajemes === "number"

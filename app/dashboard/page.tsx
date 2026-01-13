@@ -7,9 +7,8 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Package, TrendingUp, Activity, DollarSign, BarChart3, Bell, Settings, Info } from "lucide-react"
+import { Package, TrendingUp, Activity, DollarSign, BarChart3, Bell, Settings, Info, TrendingDown } from "lucide-react"
 import {
   obtenerResumenesDashboard,
   obtenerEstadisticasEmpresariales,
@@ -18,6 +17,7 @@ import {
   consultarVariacionPrecios,
   obtenerProductosPorZona, // Agregar nueva función
 } from "@/app/actions/dashboard-actions"
+import { obtenerInventario } from "@/app/actions/inventarios"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import { listDesplegableZonas } from "@/app/actions/zonas"
 import { obtenerReporteCosteo } from "@/app/actions/reportecosteo"
@@ -34,11 +34,9 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   Cell,
-  Line,
-  LineChart,
-  Area,
-  AreaChart,
   LabelList, // Agregar LabelList para mostrar valores en barras
+  LineChart, // Importar LineChart
+  Line, // Importar Line
 } from "recharts"
 
 /* ==================================================
@@ -108,11 +106,26 @@ interface VariacionPreciosItem {
   sprecioventaconivaaa: number
   sdiferencia: number
   svaraa: number
+  stotalcostos: number // Added from updates context
+  sutilidadmarginal: number // Added from updates context
+  sprecioactualporcentajeutilidad: number // Added from updates context
 }
 
 interface ProductosPorZona {
   zona: string
   cantidad: number
+}
+
+// New interface for inventory data
+interface InventarioItem {
+  id: number // Added for selectedProducto comparison
+  codigo: string // Added
+  producto: string // Added
+  presentacion: string // Added
+  inventario: number | null // Changed to number | null
+  ventadehoy: number | null // Added
+  ventamensual: number | null // Changed to number | null
+  porcentajemes: number
 }
 
 const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4"]
@@ -133,7 +146,7 @@ export default function DashboardPage() {
   const { user, isLoading: authLoading } = useAuth()
 
   const [filtroClienteId, setFiltroClienteId] = useState("")
-  const [filtroZonaId, setFiltroZonaId] = useState("-1")
+  const [filtroZonaId, setFiltroZonaId] = useState("2")
   const [clientesOptions, setClientesOptions] = useState<ddlItem[]>([])
   const [zonasOptions, setZonasOptions] = useState<ddlItem[]>([])
   const [reporteCosteoData, setReporteCosteoData] = useState<ReporteCosteoItem[]>([])
@@ -144,6 +157,12 @@ export default function DashboardPage() {
   const [utilidadActualData, setUtilidadActualData] = useState<UtilidadActualItem[]>([])
 
   const [variacionPreciosData, setVariacionPreciosData] = useState<VariacionPreciosItem[]>([])
+
+  const [requerimientoProduccionData, setRequerimientoProduccionData] = useState<InventarioItem[]>([]) // Changed type to InventarioItem
+
+  // CHANGE: Agregar estado para producto seleccionado y datos de proyección
+  const [selectedProducto, setSelectedProducto] = useState<InventarioItem | null>(null)
+  const [proyeccionData, setProyeccionData] = useState<{ mes: string; inventario: number }[]>([])
 
   const [topPreciosData, setTopPreciosData] = useState<UtilidadActualItem[]>([])
 
@@ -319,13 +338,125 @@ export default function DashboardPage() {
       if (filtroClienteId) {
         const result = await consultarVariacionPrecios(Number(filtroClienteId), Number(filtroZonaId))
         if (result.success && result.data) {
-          const top10 = result.data.sort((a: any, b: any) => b.svaraa - a.svaraa).slice(0, 10)
+          // Assuming result.data contains all necessary fields for VariacionPreciosItem
+          const top10 = result.data
+            .map((item: any) => ({
+              sproductoid: item.sproductoid,
+              snombre: item.snombre,
+              sprecioventasiniva: item.sprecioventasiniva,
+              sprecioventaconivaaa: item.sprecioventaconivaaa,
+              sdiferencia: item.sdiferencia,
+              svaraa: item.svaraa,
+              stotalcostos: item.stotalcostos || 0, // Ensure these fields exist or provide defaults
+              sutilidadmarginal: item.sutilidadmarginal || 0,
+              sprecioactualporcentajeutilidad: item.sprecioactualporcentajeutilidad || 0,
+            }))
+            .sort((a: any, b: any) => b.svaraa - a.svaraa)
+            .slice(0, 10)
           setVariacionPreciosData(top10)
         }
       }
     }
     cargarVariacionPrecios()
   }, [filtroClienteId, filtroZonaId])
+
+  // start
+  useEffect(() => {
+    const cargarRequerimientoProduccion = async () => {
+      if (!filtroClienteId || filtroClienteId === "0" || filtroZonaId === "-1" || filtroZonaId === "0") {
+        setRequerimientoProduccionData([])
+        setSelectedProducto(null) // Reset selected product when filters change
+        setProyeccionData([]) // Reset projection data
+        return
+      }
+
+      const result = await obtenerInventario(Number(filtroClienteId), Number(filtroZonaId))
+
+      if (result.success && result.data) {
+        // Calculate %mes for each product and filter/sort
+        const dataWithPercentage = result.data
+          .map((item: any) => ({
+            ...item,
+            porcentajemes: item.ventamensual && item.ventamensual > 0 ? (item.inventario || 0) / item.ventamensual : 0,
+            id: item.id || Math.random(), // Assign a unique ID if not present
+          }))
+          .filter((item: any) => item.porcentajemes > 0) // Only show products with valid percentage
+          .sort((a: any, b: any) => a.porcentajemes - b.porcentajemes) // Sort ascending by %mes
+          .slice(0, 10) // Take only top 10 lowest
+
+        setRequerimientoProduccionData(dataWithPercentage)
+
+        if (dataWithPercentage.length > 0) {
+          const firstProduct = dataWithPercentage[0]
+          setSelectedProducto(firstProduct)
+          const proyeccion = calcularProyeccion(firstProduct)
+          setProyeccionData(proyeccion)
+        }
+      } else {
+        setRequerimientoProduccionData([])
+      }
+    }
+
+    cargarRequerimientoProduccion()
+  }, [filtroClienteId, filtroZonaId])
+  // end
+
+  // CHANGE: Función para calcular la proyección de inventario por mes
+  const calcularProyeccion = (producto: InventarioItem) => {
+    const meses = [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ]
+    const mesActual = new Date().getMonth()
+    const proyeccion: { mes: string; inventario: number }[] = []
+
+    let inventarioRestante = Number(producto.inventario) || 0
+    const ventaMensual = Number(producto.ventamensual) || 1 // Evitar división por cero
+
+    for (let i = 0; i < 12; i++) {
+      const mesIndex = (mesActual + i) % 12
+      const mesNombre = meses[mesIndex]
+
+      proyeccion.push({
+        mes: mesNombre,
+        inventario: Math.max(0, inventarioRestante),
+      })
+
+      inventarioRestante -= ventaMensual
+
+      // Si el inventario llega a 0 o menos, los siguientes meses serán 0
+      if (inventarioRestante <= 0) {
+        // Agregar los meses restantes con inventario 0
+        for (let j = i + 1; j < 12; j++) {
+          const mesIndexRestante = (mesActual + j) % 12
+          proyeccion.push({
+            mes: meses[mesIndexRestante],
+            inventario: 0,
+          })
+        }
+        break
+      }
+    }
+
+    return proyeccion
+  }
+
+  // CHANGE: Función para manejar el clic en un producto
+  const handleProductoClick = (producto: InventarioItem) => {
+    setSelectedProducto(producto)
+    const proyeccion = calcularProyeccion(producto)
+    setProyeccionData(proyeccion)
+  }
 
   if (loading) {
     return (
@@ -825,7 +956,6 @@ export default function DashboardPage() {
         </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-slate-800">
@@ -1065,7 +1195,6 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-
         </div>
 
         {/* Section for Products by Zone Chart */}
@@ -1138,111 +1267,138 @@ export default function DashboardPage() {
           </CardContent>
         </Card>*/}
 
-        {/*<Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+        {/* CHANGE: Nueva sección: Productos con requerimiento de producción */}
+        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-slate-800">
-              <Activity className="h-5 w-5 text-green-600" />
-              Acciones Rápidas
+              <Package className="h-5 w-5 text-orange-600" />
+              Productos con requerimiento de producción
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              <Link href="/productos">
-                <Button
-                  variant="outline"
-                  className="h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:from-blue-100 hover:to-blue-200 transition-all duration-300"
-                >
-                  <Package className="h-8 w-8 text-blue-600" />
-                  <span className="text-sm font-medium text-blue-700">Productos</span>
-                </Button>
-              </Link>
+            {/* CHANGE: Layout con dos columnas: gráfico a la izquierda y tabla a la derecha */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* CHANGE: Gráfico de proyección de inventario */}
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4 border border-orange-200">
+                <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                  <TrendingDown className="h-4 w-4 text-orange-600" />
+                  Proyección de Inventario
+                </h3>
+                {selectedProducto ? (
+                  <div>
+                    <div className="mb-3 p-3 bg-white rounded-lg border border-orange-200">
+                      <p className="text-xs text-slate-600">Producto seleccionado:</p>
+                      <p className="font-semibold text-slate-800 text-sm truncate">{selectedProducto.producto}</p>
+                      <p className="text-xs text-slate-500">{selectedProducto.codigo}</p>
+                    </div>
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={proyeccionData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#fed7aa" />
+                          <XAxis
+                            dataKey="mes"
+                            tick={{ fontSize: 10 }}
+                            stroke="#9a3412"
+                            angle={-45}
+                            textAnchor="end"
+                            height={60}
+                          />
+                          <YAxis stroke="#9a3412" tick={{ fontSize: 10 }} />
+                          <ChartTooltip
+                            content={<ChartTooltipContent />}
+                            cursor={{ stroke: "#ea580c", strokeWidth: 2 }}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="inventario"
+                            stroke="#ea580c"
+                            strokeWidth={3}
+                            dot={{ fill: "#ea580c", r: 4 }}
+                            activeDot={{ r: 6 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-64 text-center">
+                    <div className="w-16 h-16 bg-orange-200 rounded-full flex items-center justify-center mb-3">
+                      <TrendingDown className="h-8 w-8 text-orange-600" />
+                    </div>
+                    <p className="text-sm text-slate-600 font-medium">Seleccione un producto de la tabla</p>
+                    <p className="text-xs text-slate-500 mt-1">para ver su proyección de inventario</p>
+                  </div>
+                )}
+              </div>
 
-              <Link href="/formulas">
-                <Button
-                  variant="outline"
-                  className="h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:from-green-100 hover:to-green-200 transition-all duration-300"
-                >
-                  <Beaker className="h-8 w-8 text-green-600" />
-                  <span className="text-sm font-medium text-green-700">Fórmulas</span>
-                </Button>
-              </Link>
-
-              <Link href="/ingredientes">
-                <Button
-                  variant="outline"
-                  className="h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:from-purple-100 hover:to-purple-200 transition-all duration-300"
-                >
-                  <ShoppingCart className="h-8 w-8 text-purple-600" />
-                  <span className="text-sm font-medium text-purple-700">Ingredientes</span>
-                </Button>
-              </Link>
-
-              <Link href="/catalogos">
-                <Button
-                  variant="outline"
-                  className="h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:from-orange-100 hover:to-orange-200 transition-all duration-300"
-                >
-                  <Package className="h-8 w-8 text-orange-600" />
-                  <span className="text-sm font-medium text-orange-700">Catálogos</span>
-                </Button>
-              </Link>
-
-              <Link href="/clientes">
-                <Button
-                  variant="outline"
-                  className="h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200 hover:from-indigo-100 hover:to-indigo-200 transition-all duration-300"
-                >
-                  <Users className="h-8 w-8 text-indigo-600" />
-                  <span className="text-sm font-medium text-indigo-700">Clientes</span>
-                </Button>
-              </Link>
-
-              <Link href="/analisis-costos">
-                <Button
-                  variant="outline"
-                  className="h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-pink-50 to-pink-100 border-pink-200 hover:from-pink-100 hover:to-pink-200 transition-all duration-300"
-                >
-                  <BarChart3 className="h-8 w-8 text-pink-600" />
-                  <span className="text-sm font-medium text-pink-700">Análisis</span>
-                </Button>
-              </Link>
+              {/* CHANGE: Tabla de productos con requerimiento */}
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gradient-to-r from-orange-600 to-orange-700 text-white">
+                      <th className="text-left p-2 font-semibold text-xs border-b-2 border-orange-200">Código</th>
+                      <th className="text-left p-2 font-semibold text-xs border-b-2 border-orange-200">Producto</th>
+                      <th className="text-left p-2 font-semibold text-xs border-b-2 border-orange-200">Presentación</th>
+                      <th className="text-right p-2 font-semibold text-xs border-b-2 border-orange-200">Inventario</th>
+                      <th className="text-right p-2 font-semibold text-xs border-b-2 border-orange-200">
+                        Venta de Hoy
+                      </th>
+                      <th className="text-right p-2 font-semibold text-xs border-b-2 border-orange-200">
+                        Venta Mensual
+                      </th>
+                      <th className="text-center p-3 font-bold text-sm border-b-2 border-orange-200 w-28">%Mes</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {requerimientoProduccionData.map((item, index) => (
+                      <tr
+                        key={index}
+                        onClick={() => handleProductoClick(item)}
+                        className={`transition-all cursor-pointer border-b border-slate-100 ${
+                          selectedProducto?.id === item.id ? "bg-orange-200 hover:bg-orange-200" : "hover:bg-orange-50"
+                        }`}
+                      >
+                        <td className="p-2 text-slate-700 font-medium">{item.codigo}</td>
+                        <td className="p-2 text-slate-700 max-w-[200px] truncate">{item.producto}</td>
+                        <td className="p-2 text-slate-700">{item.presentacion}</td>
+                        <td className="text-right p-2 text-slate-700">
+                          {item.inventario !== null ? Number(item.inventario).toFixed(2) : "0.00"}
+                        </td>
+                        <td className="text-right p-2 text-slate-700">
+                          {item.ventadehoy !== null ? Number(item.ventadehoy).toFixed(2) : "0.00"}
+                        </td>
+                        <td className="text-right p-2 text-slate-700">
+                          {item.ventamensual !== null ? Number(item.ventamensual).toFixed(2) : "0.00"}
+                        </td>
+                        <td className="text-center p-3 w-28">
+                          <span
+                            className={`inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-bold shadow-md ${
+                              item.porcentajemes < 3.0
+                                ? "bg-red-500 text-white border-2 border-red-600"
+                                : "bg-green-500 text-white border-2 border-green-600"
+                            }`}
+                          >
+                            {item.porcentajemes.toFixed(2)}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {requerimientoProduccionData.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-12 px-4">
+                    <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                      <Package className="h-8 w-8 text-orange-600" />
+                    </div>
+                    <p className="text-sm text-slate-500 text-center font-medium">
+                      Seleccione un cliente y zona para visualizar productos con requerimiento de producción
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
-        */}
-
-        {/*<Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-800">
-              <Activity className="h-5 w-5 text-green-600" />
-              Estado del Sistema
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-3 mb-6">
-              <Badge className="bg-green-100 text-green-800 border-green-200 px-3 py-1">✓ Sistema Operativo</Badge>
-              <Badge className="bg-blue-100 text-blue-800 border-blue-200 px-3 py-1">✓ Base de Datos Conectada</Badge>
-              <Badge className="bg-purple-100 text-purple-800 border-purple-200 px-3 py-1">✓ Sesión Activa</Badge>
-              <Badge className="bg-orange-100 text-orange-800 border-orange-200 px-3 py-1">
-                Usuario: {sesion.Email}
-              </Badge>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-slate-600">
-              <div className="bg-slate-50 p-4 rounded-lg">
-                <p className="font-medium text-slate-800">Última actualización</p>
-                <p>{new Date().toLocaleString("es-ES")}</p>
-              </div>
-              <div className="bg-slate-50 p-4 rounded-lg">
-                <p className="font-medium text-slate-800">Rol de Usuario</p>
-                <p>ID: {sesion.RolId}</p>
-              </div>
-              <div className="bg-slate-50 p-4 rounded-lg">
-                <p className="font-medium text-slate-800">Hotel Asignado</p>
-                <p>{sesion.HotelId || "No asignado"}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>*/}
       </div>
     </div>
   )
