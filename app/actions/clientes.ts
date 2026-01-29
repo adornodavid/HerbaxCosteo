@@ -7,8 +7,6 @@ import { createClient, createServerClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
 import { imagenSubir } from "@/app/actions/utilerias"
 import { createClient as createSupabaseClient } from "@supabase/supabase-js"
-import { cookies } from "next/headers"
-import { createServerSupabaseClientWrapper } from "@/lib/supabase-wrapper" // Assuming this is the correct import path
 
 /* ==================================================
   Conexion a la base de datos: Supabase
