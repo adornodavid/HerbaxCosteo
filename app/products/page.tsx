@@ -1,5 +1,7 @@
 "use client"
 
+import { useRef } from "react"
+
 /* ==================================================
 	Imports
 ================================================== */
@@ -143,6 +145,10 @@ export default function ProductosPage() {
   const [formasFarmaceuticasOptions, setFormasFarmaceuticasOptions] = useState<ddlItem[]>([])
   const [objetivosOptions, setObjetivosOptions] = useState<ddlItem[]>([])
   const [envasesOptions, setEnvasesOptions] = useState<ddlItem[]>([])
+
+  // --- useRef para evitar ejecuciones duplicadas ---
+  const isInitialLoadingRef = useRef(false)
+  const hasInitialLoadedRef = useRef(false)
 
   // --- Estados ---
   const [productos, setProductos] = useState<oProductoAvanzado[]>([])
@@ -457,9 +463,14 @@ export default function ProductosPage() {
       setProductosFiltrados([]) // Also clear filtered products
       setTotalProductos(0)
       return { error: true, mensaje: "Error inesperado al buscar productos: " + error }
-    } finally {
-      setIsSearching(false)
-    }
+  } finally {
+  setShowPageLoading(false)
+  setIsLoadingInitialData(false)
+    // ✅ Marcar como completado exitosamente
+    isInitialLoadingRef.current = false
+    hasInitialLoadedRef.current = true
+  }
+  }
   }
 
   // --- Carga inicial de datos ---
@@ -467,6 +478,20 @@ export default function ProductosPage() {
     // Validar existe usuario
     if (!user) return
 
+    // ✅ GUARD: Evitar ejecuciones duplicadas simultáneas
+    if (isInitialLoadingRef.current) {
+      console.log("[v0] cargarDatosIniciales ya se está ejecutando, saltando llamada duplicada")
+      return
+    }
+
+    // ✅ GUARD: Si ya se cargó exitosamente, no volver a cargar
+    if (hasInitialLoadedRef.current) {
+      console.log("[v0] cargarDatosIniciales ya se ejecutó exitosamente, saltando llamada duplicada")
+      return
+    }
+
+    // Marcar como en ejecución
+    isInitialLoadingRef.current = true
     setIsLoadingInitialData(true)
 
     console.log("[v0] DEBUG cargarDatosIniciales START - Initial state:", {
@@ -478,8 +503,36 @@ export default function ProductosPage() {
       userClienteId: user?.ClienteId
     })
 
+    // Función para reintentar peticiones con backoff exponencial
+    const fetchWithRetry = async (fetchFunction: () => Promise<any>, maxRetries = 3) => {
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          const result = await fetchFunction()
+          return result
+        } catch (error: any) {
+          const isTooManyRequests = 
+            error?.message?.includes('Too Many') || 
+            error?.message?.includes('429') ||
+            error?.message?.includes('is not valid JSON') ||
+            error?.message?.includes('Rate limit')
+          
+          const isLastAttempt = attempt === maxRetries - 1
+          
+          if (isTooManyRequests && !isLastAttempt) {
+            const waitTime = Math.pow(2, attempt) * 1000
+            console.log(`[v0] Rate limited, esperando ${waitTime/1000}s antes de reintentar (intento ${attempt + 1}/${maxRetries})...`)
+            await new Promise(resolve => setTimeout(resolve, waitTime))
+            continue
+          } else {
+            throw error
+          }
+        }
+      }
+    }
+
     try {
       const CACHE_DURATION_CARGAR_DATOS = 5 * 60 * 1000 // 5 minutos
+      let cacheWasUsedSuccessfully = false
 
       // Verificar si hay caché válido para cargarDatosIniciales
       const cachedDataTimestamp = localStorage.getItem('cargarDatosIniciales_timestamp')
@@ -508,42 +561,19 @@ export default function ProductosPage() {
               setFiltroZona("-1")
             }
             
+            cacheWasUsedSuccessfully = true
             console.log('[v0] cargarDatosIniciales desde caché completado exitosamente (clientes y zonas)')
+          } catch (cacheParseError) {
+            console.log("[v0] Error al parsear caché de cargarDatosIniciales, continuando con carga normal...")
+          }
+        } else {
+          console.log(`[v0] Caché de cargarDatosIniciales expirado (edad: ${Math.round(age/1000)}s), recargando...`)
+        }
+      } else {
+        console.log('[v0] No hay caché, cargando catálogos desde Supabase...')
+      }
             
-            // Ejecutar búsqueda inicial de productos incluso cuando usamos caché
-            const auxClienteId = esAdminDDLs === true ? -1 : user.ClienteId
-            console.log("[v0] Ejecutando búsqueda inicial de productos con clienteid:", auxClienteId)
-            const searchResult = await ejecutarBusquedaProductos(
-              "", // filtroNombre
-              auxClienteId, // clienteid
-              -1, // zonaid
-              -1, // catalogoid
-              "True", // estatus
-              "", // filtroPresentacion
-              -1, // filtroFormaFarmaceutica
-              -1, // filtroObjetivo
-              "", // filtroEnvase
-              -1, // filtroFormulaId
-              -1, // filtroMateriaPrimaId
-              "", // filtroEnvaseAvanzado
-              "", // filtroEmpaque
-              "", // filtroCodigoMaestro
-              "", // filtroCodigo
-              "", // filtroCodigoInterno
-              "", // filtroTipoComision
-              "", // filtroEnvaseMl
-              -1, // filtroMaterialEnvaseEmpId
-            )
-            
-            if (!searchResult.success) {
-              setModalAlert({
-                Titulo: "Error en búsqueda inicial",
-                Mensaje: searchResult.mensaje,
-              })
-              setShowModalAlert(true)
-            }
-            
-            return // Salir - no hacer más peticiones, los datos ya están en caché
+            console.log('[v0] cargarDatosIniciales desde caché completado exitosamente (clientes y zonas)')
           } catch (cacheParseError) {
             console.log("[v0] Error al parsear caché de cargarDatosIniciales, continuando con carga normal...")
           }
@@ -551,7 +581,7 @@ export default function ProductosPage() {
           console.log(`[v0] Caché de cargarDatosIniciales expirado (edad: ${Math.round(age/1000)}s), recargando...`)
         }
       }
-
+      
       // Auxiliar para definir DDLs
       const auxClienteId = esAdminDDLs === true ? -1 : user.ClienteId
 
@@ -570,10 +600,14 @@ export default function ProductosPage() {
       const savedFilters = sessionStorage.getItem("productosFilters")
       console.log("[v0] savedFilters:", savedFilters)
 
-      // -- Cargar DDLs primero CON RETRY Y CACHÉ
-      // DDL Clientes
-      console.log("[v0] Calling listaDesplegableClientes with:", auxClienteId)
-      const { data: clientesData, error: clientesError } = await fetchWithRetry(() => listaDesplegableClientes(auxClienteId, ""))
+      // Si el caché fue usado exitosamente, saltar la carga desde Supabase
+      if (cacheWasUsedSuccessfully) {
+        console.log("[v0] Saltando carga de clientes/zonas desde Supabase - datos ya en caché")
+      } else {
+        // -- Cargar DDLs primero CON RETRY Y CACHÉ
+        // DDL Clientes
+        console.log("[v0] Calling listaDesplegableClientes with:", auxClienteId)
+        const { data: clientesData, error: clientesError } = await fetchWithRetry(() => listaDesplegableClientes(auxClienteId, ""))
       console.log("[v0] clientesData:", clientesData, "clientesError:", clientesError)
       if (clientesError || !clientesData) {
         console.log("Error al cargar clientes:", clientesError)
@@ -813,49 +847,49 @@ export default function ProductosPage() {
         console.error('[v0] Error guardando timestamp en caché:', cacheError)
       }
     } catch (error) {
-      console.error("Error al cargar datos iniciales: ", error)
-      console.log("Error al cargar datos iniciales: ", error)
+      console.error(\"Error al cargar datos iniciales: \", error)\
+      console.log(\"Error al cargar datos iniciales: \", error)
       setModalError({
-        Titulo: "Error al cargar datos iniciales",
-        Mensaje: `Error: ${error}`,
-      })
+        Titulo: \"Error al cargar datos iniciales",\
+        Mensaje: `Error: ${error}`,\
+      })\
       setShowModalError(true)
-    } finally {
-      setShowPageLoading(false)
+    } finally {\
+      setShowPageLoading(false)\
       setIsLoadingInitialData(false)
     }
   }
-
+\
   // --- Cargar Opciones para DDLs Avanzados ---
-  // Función para reintentar peticiones con backoff exponencial
-  const fetchWithRetry = async (fetchFunction: () => Promise<any>, maxRetries = 3) => {
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      try {
-        const result = await fetchFunction()
-        return result
-      } catch (error: any) {
-        const isTooManyRequests = 
-          error?.message?.includes('Too Many') || 
-          error?.message?.includes('429') ||
-          error?.message?.includes('is not valid JSON') ||
-          error?.message?.includes('Rate limit')
-        
-        const isLastAttempt = attempt === maxRetries - 1
-        
-        if (isTooManyRequests && !isLastAttempt) {
-          const waitTime = Math.pow(2, attempt) * 1000
-          console.log(`[v0] Rate limited, esperando ${waitTime/1000}s antes de reintentar (intento ${attempt + 1}/${maxRetries})...`)
-          await new Promise(resolve => setTimeout(resolve, waitTime))
-          continue
-        } else {
-          throw error
-        }
-      }
-    }
-  }
-
   useEffect(() => {
     const cargarOpciones = async () => {
+      // Función para reintentar peticiones con backoff exponencial
+      const fetchWithRetry = async (fetchFunction: () => Promise<any>, maxRetries = 3) => {
+        for (let attempt = 0; attempt < maxRetries; attempt++) {
+          try {
+            const result = await fetchFunction()
+            return result
+          } catch (error: any) {
+            const isTooManyRequests = 
+              error?.message?.includes('Too Many') || 
+              error?.message?.includes('429') ||
+              error?.message?.includes('is not valid JSON') ||
+              error?.message?.includes('Rate limit')
+            
+            const isLastAttempt = attempt === maxRetries - 1
+            
+            if (isTooManyRequests && !isLastAttempt) {
+              const waitTime = Math.pow(2, attempt) * 1000
+              console.log(`[v0] Rate limited, esperando ${waitTime/1000}s antes de reintentar (intento ${attempt + 1}/${maxRetries})...`)
+              await new Promise(resolve => setTimeout(resolve, waitTime))
+              continue
+            } else {
+              throw error
+            }
+          }
+        }
+      }
+
       try {
         const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
 
@@ -1205,9 +1239,9 @@ export default function ProductosPage() {
       // This prevents double loading if cargarDatosIniciales already loaded them.
       // Or if there was an error in basic DDLs, we might still want to try loading advanced filters.
       cargarOpciones()
-    }
+    }\
   }, [clientes, catalogos, showPageLoading]) // Adjusted dependency
-
+\
   useEffect(() => {
     const buscarFormulas = async () => {
       if (formulaBuscar.trim().length >= 1) {
@@ -1224,7 +1258,7 @@ export default function ProductosPage() {
     return () => clearTimeout(timeoutId)
   }, [formulaBuscar])
 
-  useEffect(() => {
+  useEffect(() => {\
     const buscarMateriaPrimas = async () => {
       if (materiaprimaBuscar.trim().length >= 1) {
         const resultados = await listaDesplegableMateriasPrimasBuscar(materiaprimaBuscar)
@@ -1240,7 +1274,7 @@ export default function ProductosPage() {
     return () => clearTimeout(timeoutId)
   }, [materiaprimaBuscar])
 
-  useEffect(() => {
+  useEffect(() => {\
     const buscarEnvases = async () => {
       if (envaseBuscar.trim().length >= 1) {
         const resultados = await listaDesplegableMaterialesEtiquetadosBuscar(envaseBuscar)
@@ -1257,7 +1291,7 @@ export default function ProductosPage() {
     return () => clearTimeout(timeoutId)
   }, [envaseBuscar])
 
-  useEffect(() => {
+  useEffect(() => {\
     const buscarEmpaques = async () => {
       if (empaqueBuscar.trim().length >= 2) {
         const resultados = await listaDesplegableMaterialesEtiquetadosBuscar(empaqueBuscar)
@@ -1273,7 +1307,7 @@ export default function ProductosPage() {
     const timeoutId = setTimeout(buscarEmpaques, 300)
     return () => clearTimeout(timeoutId)
   }, [empaqueBuscar])
-
+\
   // Effect for searching material of envase or empaque
   useEffect(() => {
     const buscarMaterialesEnvaseEmpaque = async () => {
@@ -1300,7 +1334,7 @@ export default function ProductosPage() {
     return () => clearTimeout(timeoutId)
   }, [materialEnvaseBuscar])
 
-  // --- Manejadores (Handles) --
+  // --- Manejadores (Handles) --\
   // Busqueda - Ejecutar
   const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -3005,4 +3039,4 @@ export default function ProductosPage() {
       {/* Removed modal dialog for product details */}
     </div>
   )
-}
+}\
