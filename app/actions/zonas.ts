@@ -8,7 +8,6 @@ import { createClient } from "@/lib/supabase"
 import { arrActivoTrue, arrActivoFalse } from "@/lib/config"
 import { imagenSubir } from "@/app/actions/utilerias"
 import { executeServerActionWithRetry } from "@/lib/execute-with-retry"
-import { error } from "console" // Declare the error variable
 
 /* ==================================================
   Conexion a la base de datos: Supabase

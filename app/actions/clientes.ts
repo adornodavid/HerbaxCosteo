@@ -8,7 +8,6 @@ import { revalidatePath } from "next/cache"
 import { imagenSubir } from "@/app/actions/utilerias"
 import { cookies } from "next/headers"
 import { executeServerActionWithRetry } from "@/lib/execute-with-retry"
-import { createServerSupabaseClientWrapper } from "@/app/actions/utilerias"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
