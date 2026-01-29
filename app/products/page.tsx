@@ -4,7 +4,7 @@
    Imports
 ================================================== */
 // -- Assets --
-import { useState, useEffect, useMemo, useRef } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -143,10 +143,6 @@ export default function ProductosPage() {
   const [formasFarmaceuticasOptions, setFormasFarmaceuticasOptions] = useState<ddlItem[]>([])
   const [objetivosOptions, setObjetivosOptions] = useState<ddlItem[]>([])
   const [envasesOptions, setEnvasesOptions] = useState<ddlItem[]>([])
-
-  // --- useRef para evitar ejecuciones duplicadas ---
-  const isInitialLoadingRef = useRef(false)
-  const hasInitialLoadedRef = useRef(false)
 
   // --- Estados ---
   const [productos, setProductos] = useState<oProductoAvanzado[]>([])
@@ -464,9 +460,6 @@ export default function ProductosPage() {
     } finally {
       setShowPageLoading(false)
       setIsLoadingInitialData(false)
-      // ✅ Marcar como completado exitosamente
-      isInitialLoadingRef.current = false
-      hasInitialLoadedRef.current = true
     }
   }
 
@@ -475,20 +468,6 @@ export default function ProductosPage() {
     // Validar existe usuario
     if (!user) return
 
-    // ✅ GUARD: Evitar ejecuciones duplicadas simultáneas
-    if (isInitialLoadingRef.current) {
-      console.log("[v0] cargarDatosIniciales ya se está ejecutando, saltando llamada duplicada")
-      return
-    }
-
-    // ✅ GUARD: Si ya se cargó exitosamente, no volver a cargar
-    if (hasInitialLoadedRef.current) {
-      console.log("[v0] cargarDatosIniciales ya se ejecutó exitosamente, saltando llamada duplicada")
-      return
-    }
-
-    // Marcar como en ejecución
-    isInitialLoadingRef.current = true
     setIsLoadingInitialData(true)
 
     console.log("[v0] DEBUG cargarDatosIniciales START - Initial state:", {
