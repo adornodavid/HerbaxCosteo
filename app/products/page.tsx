@@ -927,7 +927,13 @@ export default function ProductosPage() {
               setEspecificacionesMateriaPrimaFiltrado(cachedData.especificacionesMateriaPrima)
             }
 
-            return // Salir sin hacer peticiones a Supabase
+            // ⭐ NO hacer return aquí - dejar que el código continúe
+            // Esto asegura que los estados se actualicen aunque sea desde caché
+            // return // Salir sin hacer peticiones a Supabase
+            
+            // Si llegamos aquí desde caché, ejecutar el resto del código sin peticiones
+            // Los datos ya están en cachedData y en los states
+            console.log('[v0] Caché aplicado exitosamente, saltando peticiones a Supabase')
           } else {
             console.log(`[v0] Caché expirado (edad: ${Math.round(age/1000)}s), recargando...`)
           }
@@ -935,8 +941,12 @@ export default function ProductosPage() {
           console.log('[v0] No hay caché, cargando catálogos desde Supabase...')
         }
 
-        // GRUPO 1: Catálogos básicos (5 llamadas en paralelo con retry)
-        console.log("[v0] Cargando GRUPO 1: Catálogos básicos...")
+        // Si ya usamos caché exitosamente, saltamos todas las peticiones
+        const cacheWasUsedSuccessfully = cachedTimestamp && (Date.now() - parseInt(cachedTimestamp)) < CACHE_DURATION
+        
+        if (!cacheWasUsedSuccessfully) {
+          // GRUPO 1: Catálogos básicos (5 llamadas en paralelo con retry)
+          console.log("[v0] Cargando GRUPO 1: Catálogos básicos...")
         const [formasResult, sistemasResult, envasesResult, presentacionesResult, tiposComisionResult] = await Promise.all([
           fetchWithRetry(() => listaDesplegableFormasFarmaceuticas(-1, "")),
           fetchWithRetry(() => listaDesplegableSistemas(-1, "")),
@@ -1122,42 +1132,43 @@ export default function ProductosPage() {
         // Guardar todos los datos en localStorage para futuras visitas
         console.log('[v0] Guardando catálogos en caché...')
         try {
-          localStorage.setItem('catalogos_formas', JSON.stringify(formasResult.data || []))
-          localStorage.setItem('catalogos_sistemas', JSON.stringify(sistemasResult.data || []))
-          const envasesTransformed = envasesResult.data?.map((envase: any) => ({
+          localStorage.setItem('catalogos_formas', JSON.stringify(formasResult?.data || []))
+          localStorage.setItem('catalogos_sistemas', JSON.stringify(sistemasResult?.data || []))
+          const envasesTransformed = envasesResult?.data?.map((envase: any) => ({
             value: envase.id?.toString() || envase.value,
             text: envase.nombre || envase.text,
           })) || []
           localStorage.setItem('catalogos_envases', JSON.stringify(envasesTransformed))
-          localStorage.setItem('catalogos_presentaciones', JSON.stringify(presentacionesResult.data || []))
-          localStorage.setItem('catalogos_tiposComision', JSON.stringify(tiposComisionResult.data || []))
-          localStorage.setItem('catalogos_frecuencias', JSON.stringify(frecuenciasResult.data || []))
-          localStorage.setItem('catalogos_codigosMaestros', JSON.stringify(codigosMaestrosResult.data || []))
-          localStorage.setItem('catalogos_codigos', JSON.stringify(codigosResult.data || []))
-          localStorage.setItem('catalogos_codigosInternos', JSON.stringify(codigosInternosResult.data || []))
-          localStorage.setItem('catalogos_nombresMateriales', JSON.stringify(nombresMaterialesResult.data || []))
-          localStorage.setItem('catalogos_codigosMateriales', JSON.stringify(codigosMaterialesResult.data || []))
-          localStorage.setItem('catalogos_detallesMateriales', JSON.stringify(detallesMat2Result.data || []))
-          localStorage.setItem('catalogos_especificacionesMateriales', JSON.stringify(especificacionesMat2Result.data || []))
-          localStorage.setItem('catalogos_familiasEmpaque', JSON.stringify(familiasEmpaque3Result.data || []))
-          localStorage.setItem('catalogos_paises', JSON.stringify(paises3Result.data || []))
-          localStorage.setItem('catalogos_medidasEmpaque', JSON.stringify(medidasEmpaque3Result.data || []))
-          localStorage.setItem('catalogos_nombresFormulas', JSON.stringify(nombresFormulasResult.data || []))
-          localStorage.setItem('catalogos_codigosFormulas', JSON.stringify(codigosFormulasResult.data || []))
-          localStorage.setItem('catalogos_especificacionesFormulas', JSON.stringify(especificacionesFormulasResult.data || []))
-          localStorage.setItem('catalogos_formulas', JSON.stringify(formulasDropdownResult.data || []))
-          localStorage.setItem('catalogos_medidasFormula', JSON.stringify(medidasFormulaResult.data || []))
-          localStorage.setItem('catalogos_coloresEmpaque', JSON.stringify(coloresEmpaqueResult.data || []))
-          localStorage.setItem('catalogos_familiasMateriaPrima', JSON.stringify(familiasMateriaPrimaResult.data || []))
-          localStorage.setItem('catalogos_presentacionesMateriaPrima', JSON.stringify(presentacionesMateriaPrimaResult.data || []))
-          localStorage.setItem('catalogos_nombresMateriaPrima', JSON.stringify(nombresMateriaPrimaResult.data || []))
-          localStorage.setItem('catalogos_codigosMateriaPrima', JSON.stringify(codigosMateriaPrimaResult.data || []))
-          localStorage.setItem('catalogos_especificacionesMateriaPrima', JSON.stringify(especificacionesMateriaPrimaResult.data || []))
+          localStorage.setItem('catalogos_presentaciones', JSON.stringify(presentacionesResult?.data || []))
+          localStorage.setItem('catalogos_tiposComision', JSON.stringify(tiposComisionResult?.data || []))
+          localStorage.setItem('catalogos_frecuencias', JSON.stringify(frecuenciasResult?.data || []))
+          localStorage.setItem('catalogos_codigosMaestros', JSON.stringify(codigosMaestrosResult?.data || []))
+          localStorage.setItem('catalogos_codigos', JSON.stringify(codigosResult?.data || []))
+          localStorage.setItem('catalogos_codigosInternos', JSON.stringify(codigosInternosResult?.data || []))
+          localStorage.setItem('catalogos_nombresMateriales', JSON.stringify(nombresMaterialesResult?.data || []))
+          localStorage.setItem('catalogos_codigosMateriales', JSON.stringify(codigosMaterialesResult?.data || []))
+          localStorage.setItem('catalogos_detallesMateriales', JSON.stringify(detallesMat2Result?.data || []))
+          localStorage.setItem('catalogos_especificacionesMateriales', JSON.stringify(especificacionesMat2Result?.data || []))
+          localStorage.setItem('catalogos_familiasEmpaque', JSON.stringify(familiasEmpaque3Result?.data || []))
+          localStorage.setItem('catalogos_paises', JSON.stringify(paises3Result?.data || []))
+          localStorage.setItem('catalogos_medidasEmpaque', JSON.stringify(medidasEmpaque3Result?.data || []))
+          localStorage.setItem('catalogos_nombresFormulas', JSON.stringify(nombresFormulasResult?.data || []))
+          localStorage.setItem('catalogos_codigosFormulas', JSON.stringify(codigosFormulasResult?.data || []))
+          localStorage.setItem('catalogos_especificacionesFormulas', JSON.stringify(especificacionesFormulasResult?.data || []))
+          localStorage.setItem('catalogos_formulas', JSON.stringify(formulasDropdownResult?.data || []))
+          localStorage.setItem('catalogos_medidasFormula', JSON.stringify(medidasFormulaResult?.data || []))
+          localStorage.setItem('catalogos_coloresEmpaque', JSON.stringify(coloresEmpaqueResult?.data || []))
+          localStorage.setItem('catalogos_familiasMateriaPrima', JSON.stringify(familiasMateriaPrimaResult?.data || []))
+          localStorage.setItem('catalogos_presentacionesMateriaPrima', JSON.stringify(presentacionesMateriaPrimaResult?.data || []))
+          localStorage.setItem('catalogos_nombresMateriaPrima', JSON.stringify(nombresMateriaPrimaResult?.data || []))
+          localStorage.setItem('catalogos_codigosMateriaPrima', JSON.stringify(codigosMateriaPrimaResult?.data || []))
+          localStorage.setItem('catalogos_especificacionesMateriaPrima', JSON.stringify(especificacionesMateriaPrimaResult?.data || []))
           localStorage.setItem('catalogos_timestamp', Date.now().toString())
           console.log('[v0] Catálogos guardados en caché exitosamente')
         } catch (cacheError) {
           console.error('[v0] Error guardando en caché (continuando normalmente):', cacheError)
         }
+        } // ← Cierre del if (!cacheWasUsedSuccessfully)
       } catch (error) {
         console.error("Error loading dropdown options:", error)
         setModalError({
