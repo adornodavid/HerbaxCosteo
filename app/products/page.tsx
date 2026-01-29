@@ -920,6 +920,7 @@ export default function ProductosPage() {
           fetchWithRetry(() => listadopresentacion()),
           fetchWithRetry(() => listadotipocomision()),
         ])
+        console.log('tiposComisionResult', tiposComisionResult)
 
         if (sistemasResult.success && sistemasResult.data) {
           setObjetivosOptions([{ value: "-1", text: "Todos" }, ...sistemasResult.data])
