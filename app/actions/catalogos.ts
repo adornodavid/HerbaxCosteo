@@ -1,7 +1,10 @@
 /* ==================================================
   Imports
 ================================================== */
-import { createClient } from "@/lib/supabase"
+"use server"
+
+import { createServerClient } from "@/lib/supabase"
+import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import type { ddlItem } from "@/types/common.types"
 
 /* ==================================================
@@ -9,7 +12,7 @@ import type { ddlItem } from "@/types/common.types"
 ================================================== */
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const supabase = createClient(supabaseUrl, supabaseServiceKey) // Declare the supabase variable
+const supabase = createSupabaseClient(supabaseUrl, supabaseServiceKey)
 
 /* ==================================================
   Funciones

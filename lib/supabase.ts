@@ -1,4 +1,6 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js"
+import { createServerClient as createSupabaseServerClient } from "@supabase/ssr"
+import { cookies } from "next/headers"
 import type { Database } from "@/lib/types-sistema-costeo"
 
 // Verify environment variables are available
@@ -54,10 +56,32 @@ export type Enums<PublicEnumNameOrOptions extends keyof PublicSchema["Enums"] | 
       ? PublicSchema["Enums"][PublicEnumNameOrOptions]
       : never
 
+// Client-side client
 export const createClient = () => createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey)
 
-// Server-side client (same as client-side in this setup)
-export const createServerClient = () => createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey)
+// Server-side client for Server Actions and Route Handlers
+export const createServerClient = async () => {
+  const cookieStore = await cookies()
+  
+  return createSupabaseServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll()
+      },
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          )
+        } catch {
+          // The `setAll` method was called from a Server Component.
+          // This can be ignored if you have middleware refreshing
+          // user sessions.
+        }
+      },
+    },
+  })
+}
 
 // Instancia principal de Supabase (para uso en cliente)
 export const supabase = createClient()

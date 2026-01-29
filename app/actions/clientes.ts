@@ -3,18 +3,19 @@
 /* ==================================================
   Imports
 ================================================== */
-import { createClient } from "@/lib/supabase"
+import { createClient, createServerClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
 import { imagenSubir } from "@/app/actions/utilerias"
+import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import { cookies } from "next/headers"
-//import { createServerSupabaseClientWrapper } from "@/app/actions/utilerias"
+import { createServerSupabaseClientWrapper } from "@/lib/supabase-wrapper" // Assuming this is the correct import path
 
 /* ==================================================
   Conexion a la base de datos: Supabase
 ================================================== */
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const supabase = createClient(supabaseUrl, supabaseServiceKey) 
+const supabase = createSupabaseClient(supabaseUrl, supabaseServiceKey) 
 
 /* ==================================================
   --------------------
@@ -370,8 +371,13 @@ export async function estatusActivoCliente(id: number, activo: boolean): Promise
 // Función: listaDesplegableClientes / ddlCliente: Función que se utiliza para los dropdownlist
 export async function listaDesplegableClientes(id = -1, nombre = "", activo = "Todos") {
   try {
+    console.log("[v0] listaDesplegableClientes called with:", { id, nombre, activo })
+    
+    // Crear cliente de servidor para Server Actions
+    const serverClient = await createServerClient()
+    
     // Query principal
-    let query = supabase.from("clientes").select("id, nombre")
+    let query = serverClient.from("clientes").select("id, nombre")
 
     // Filtros en query, dependiendo parametros
     if (id !== -1) {
@@ -397,14 +403,19 @@ export async function listaDesplegableClientes(id = -1, nombre = "", activo = "T
     const { data, error } = await query
 
     if (error) {
-      console.error("Error obteniendo la lista desplegable de clientes:", error)
-      return { success: false, error: error.message }
+      console.error("[v0] Error obteniendo la lista desplegable de clientes:", error)
+      return { success: false, error: error.message, data: null }
     }
 
-    return { success: true, data }
+    // Convertir a objetos simples (POJOs) para serialización
+    const plainData = data ? JSON.parse(JSON.stringify(data)) : []
+    
+    console.log("[v0] listaDesplegableClientes returning:", plainData.length, "clientes")
+
+    return { success: true, data: plainData, error: null }
   } catch (error) {
-    console.error("Error en listaDesplegableClientes:", error)
-    return { success: false, error: "Error interno del servidor" }
+    console.error("[v0] Error en listaDesplegableClientes:", error)
+    return { success: false, error: "Error interno del servidor", data: null }
   }
 }
 
