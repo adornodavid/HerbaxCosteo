@@ -58,12 +58,10 @@ import { useAuth } from "@/contexts/auth-context"
 import { obtenerProductos, estatusActivoProducto, obtenerProductosAvanzado, listadopresentacion, listadotipocomision, listadofrecuencia, listadocodigomaestro, listadocodigo, listadocodigointerno, listadonombrematerial, listadocodigomaterial, listadodetallematerial, listadoespecificacionesmaterial, listadonombresformulas, listadocodigosformulas, listadoespecificacionesformulas, listadonombresmateriaspri, listadocodigosmateriaspri, listadofamiliasmateriaspri, listadoespecificacionesmateriaspri, listadopresentacionesmateriaspri, listadoformula, listadomedidaformula, listadofamiliamaterialempaque, listadopais, listadomedidaempaque, listadocolorempaque, listadofamiliamateriaprima, listadopresentacionmateriaprima } from "@/app/actions/products"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import {
-  listaDesplegableCatalogos,
   listaDesplegableFormasFarmaceuticas,
   listaDesplegableSistemas,
   listaDesplegableEnvase,
-  listaDesplegableProductosTiposComisiones, // Import for commission types
-  listaDesplegableEnvaseMl, // Import for ML units
+  listaDesplegableProductosTiposComisiones, 
 } from "@/app/actions/catalogos"
 import { listDesplegableZonas } from "@/app/actions/zonas"
 import { listaDesplegableFormulasBuscar } from "@/app/actions/formulas"
@@ -519,26 +517,7 @@ export default function ProductosPage() {
         setClientes(clientesConTodos)
       }
 
-      // DDL Catalogos
-      console.log("[v0] Calling listaDesplegableCatalogos with:", -1, "")
-      const { data: catalogosData, error: catalogosError } = await listaDesplegableCatalogos(
-        -1,
-        "",
-        auxClienteId === -1 ? undefined : auxClienteId,
-      )
-      console.log("[v0] catalogosData:", catalogosData, "catalogosError:", catalogosError)
-      if (catalogosError || !catalogosData) {
-        console.log("Error al cargar catálogos:", catalogosError)
-        setModalError({
-          Titulo: "Error al cargar Catálogos",
-          Mensaje: catalogosError || "Error desconocido.",
-        })
-        setShowModalError(true)
-      } else {
-        const catalogosConTodos = [{ value: "-1", text: "Todos" }, ...catalogosData]
-        console.log("[v0] Setting catalogos with:", catalogosConTodos)
-        setCatalogos(catalogosConTodos)
-      }
+      
 
       // Cargar opciones de filtros avanzados
       const formasResult = await listaDesplegableFormasFarmaceuticas(-1, "")
@@ -579,11 +558,7 @@ export default function ProductosPage() {
         )
       }
 
-      const envaseMlResult = await listaDesplegableEnvaseMl(-1, "")
-      if (envaseMlResult.success && envaseMlResult.data) {
-        setEnvaseMlOptions([{ value: "-1", text: "Todos" }, ...envaseMlResult.data])
-      } 
-        
+
 
       if (savedFilters) {
         const filters = JSON.parse(savedFilters)
@@ -1317,31 +1292,7 @@ export default function ProductosPage() {
         console.log("[v0] handleClienteChange - Resetting zones for 'Todos' client.")
       }
 
-      // Preparar query para catálogos
-      console.log("[v0] Calling listaDesplegableCatalogos with clienteIdNum:", clienteIdNum)
-      const { data: catalogosData, error: catalogosError } = await listaDesplegableCatalogos(
-        -1,
-        "",
-        clienteIdNum === -1 ? undefined : clienteIdNum, // Pass undefined if "Todos" client
-      )
-      console.log("[v0] catalogosData after handleClienteChange:", catalogosData, "catalogosError:", catalogosError)
-
-      if (!catalogosError && catalogosData) {
-        // Cargar input de filtro
-        const catalogosConTodos = [{ value: "-1", text: "Todos" }, ...catalogosData]
-        setCatalogos(catalogosConTodos)
-        setFiltroCatalogo("-1") // Reset catalog filter when client changes
-        console.log("[v0] handleClienteChange - Setting catalogs with:", catalogosConTodos)
-      } else {
-        // Mostrar error
-        console.error("Error al cargar catálogos por cliente: ", catalogosError)
-        setCatalogos([{ value: "-1", text: "Todos" }]) // Reset catalogs if error
-        setModalError({
-          Titulo: "Error al cargar Catálogos",
-          Mensaje: catalogosError || "Error desconocido.",
-        })
-        setShowModalError(true)
-      }
+      
     } catch (error) {
       console.error("Error al cambiar cliente: ", error)
       console.log("Error al cambiar cliente: ", error)
