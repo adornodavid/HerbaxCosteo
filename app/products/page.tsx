@@ -509,6 +509,41 @@ export default function ProductosPage() {
             }
             
             console.log('[v0] cargarDatosIniciales desde caché completado exitosamente (clientes y zonas)')
+            
+            // Ejecutar búsqueda inicial de productos incluso cuando usamos caché
+            const auxClienteId = esAdminDDLs === true ? -1 : user.ClienteId
+            console.log("[v0] Ejecutando búsqueda inicial de productos con clienteid:", auxClienteId)
+            const searchResult = await ejecutarBusquedaProductos(
+              "", // filtroNombre
+              auxClienteId, // clienteid
+              -1, // zonaid
+              -1, // catalogoid
+              "True", // estatus
+              "", // filtroPresentacion
+              -1, // filtroFormaFarmaceutica
+              -1, // filtroObjetivo
+              "", // filtroEnvase
+              -1, // filtroFormulaId
+              -1, // filtroMateriaPrimaId
+              "", // filtroEnvaseAvanzado
+              "", // filtroEmpaque
+              "", // filtroCodigoMaestro
+              "", // filtroCodigo
+              "", // filtroCodigoInterno
+              "", // filtroTipoComision
+              "", // filtroEnvaseMl
+              -1, // filtroMaterialEnvaseEmpId
+            )
+            
+            if (!searchResult.success) {
+              setModalAlert({
+                Titulo: "Error en búsqueda inicial",
+                Mensaje: searchResult.mensaje,
+              })
+              setShowModalAlert(true)
+            }
+            
+            return // Salir - no hacer más peticiones, los datos ya están en caché
           } catch (cacheParseError) {
             console.log("[v0] Error al parsear caché de cargarDatosIniciales, continuando con carga normal...")
           }
