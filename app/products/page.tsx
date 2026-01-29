@@ -1,12 +1,10 @@
 "use client"
 
-import { useRef } from "react"
-
 /* ==================================================
-	Imports
+   Imports
 ================================================== */
 // -- Assets --
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -847,19 +845,19 @@ export default function ProductosPage() {
         console.error('[v0] Error guardando timestamp en caché:', cacheError)
       }
     } catch (error) {
-      console.error(\"Error al cargar datos iniciales: \", error)\
-      console.log(\"Error al cargar datos iniciales: \", error)
+      console.error("Error al cargar datos iniciales: ", error)
+      console.log("Error al cargar datos iniciales: ", error)
       setModalError({
-        Titulo: \"Error al cargar datos iniciales",\
-        Mensaje: `Error: ${error}`,\
-      })\
+        Titulo: "Error al cargar datos iniciales",
+        Mensaje: `Error: ${error}`,
+      })
       setShowModalError(true)
-    } finally {\
-      setShowPageLoading(false)\
+    } finally {
+      setShowPageLoading(false)
       setIsLoadingInitialData(false)
     }
   }
-\
+
   // --- Cargar Opciones para DDLs Avanzados ---
   useEffect(() => {
     const cargarOpciones = async () => {
@@ -1239,9 +1237,9 @@ export default function ProductosPage() {
       // This prevents double loading if cargarDatosIniciales already loaded them.
       // Or if there was an error in basic DDLs, we might still want to try loading advanced filters.
       cargarOpciones()
-    }\
+    }
   }, [clientes, catalogos, showPageLoading]) // Adjusted dependency
-\
+
   useEffect(() => {
     const buscarFormulas = async () => {
       if (formulaBuscar.trim().length >= 1) {
@@ -1258,7 +1256,7 @@ export default function ProductosPage() {
     return () => clearTimeout(timeoutId)
   }, [formulaBuscar])
 
-  useEffect(() => {\
+  useEffect(() => {
     const buscarMateriaPrimas = async () => {
       if (materiaprimaBuscar.trim().length >= 1) {
         const resultados = await listaDesplegableMateriasPrimasBuscar(materiaprimaBuscar)
@@ -1274,7 +1272,7 @@ export default function ProductosPage() {
     return () => clearTimeout(timeoutId)
   }, [materiaprimaBuscar])
 
-  useEffect(() => {\
+  useEffect(() => {
     const buscarEnvases = async () => {
       if (envaseBuscar.trim().length >= 1) {
         const resultados = await listaDesplegableMaterialesEtiquetadosBuscar(envaseBuscar)
@@ -1291,7 +1289,7 @@ export default function ProductosPage() {
     return () => clearTimeout(timeoutId)
   }, [envaseBuscar])
 
-  useEffect(() => {\
+  useEffect(() => {
     const buscarEmpaques = async () => {
       if (empaqueBuscar.trim().length >= 2) {
         const resultados = await listaDesplegableMaterialesEtiquetadosBuscar(empaqueBuscar)
@@ -1307,7 +1305,7 @@ export default function ProductosPage() {
     const timeoutId = setTimeout(buscarEmpaques, 300)
     return () => clearTimeout(timeoutId)
   }, [empaqueBuscar])
-\
+
   // Effect for searching material of envase or empaque
   useEffect(() => {
     const buscarMaterialesEnvaseEmpaque = async () => {
@@ -1334,7 +1332,7 @@ export default function ProductosPage() {
     return () => clearTimeout(timeoutId)
   }, [materialEnvaseBuscar])
 
-  // --- Manejadores (Handles) --\
+  // --- Manejadores (Handles) ---
   // Busqueda - Ejecutar
   const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -3039,4 +3037,4 @@ export default function ProductosPage() {
       {/* Removed modal dialog for product details */}
     </div>
   )
-}\
+}
