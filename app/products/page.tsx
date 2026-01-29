@@ -1,7 +1,7 @@
 "use client"
 
 /* ==================================================
-   Imports
+	Imports
 ================================================== */
 // -- Assets --
 import { useState, useEffect, useMemo } from "react"
@@ -458,8 +458,7 @@ export default function ProductosPage() {
       setTotalProductos(0)
       return { error: true, mensaje: "Error inesperado al buscar productos: " + error }
     } finally {
-      setShowPageLoading(false)
-      setIsLoadingInitialData(false)
+      setIsSearching(false)
     }
   }
 
@@ -479,36 +478,8 @@ export default function ProductosPage() {
       userClienteId: user?.ClienteId
     })
 
-    // Función para reintentar peticiones con backoff exponencial
-    const fetchWithRetry = async (fetchFunction: () => Promise<any>, maxRetries = 3) => {
-      for (let attempt = 0; attempt < maxRetries; attempt++) {
-        try {
-          const result = await fetchFunction()
-          return result
-        } catch (error: any) {
-          const isTooManyRequests = 
-            error?.message?.includes('Too Many') || 
-            error?.message?.includes('429') ||
-            error?.message?.includes('is not valid JSON') ||
-            error?.message?.includes('Rate limit')
-          
-          const isLastAttempt = attempt === maxRetries - 1
-          
-          if (isTooManyRequests && !isLastAttempt) {
-            const waitTime = Math.pow(2, attempt) * 1000
-            console.log(`[v0] Rate limited, esperando ${waitTime/1000}s antes de reintentar (intento ${attempt + 1}/${maxRetries})...`)
-            await new Promise(resolve => setTimeout(resolve, waitTime))
-            continue
-          } else {
-            throw error
-          }
-        }
-      }
-    }
-
     try {
       const CACHE_DURATION_CARGAR_DATOS = 5 * 60 * 1000 // 5 minutos
-      let cacheWasUsedSuccessfully = false
 
       // Verificar si hay caché válido para cargarDatosIniciales
       const cachedDataTimestamp = localStorage.getItem('cargarDatosIniciales_timestamp')
@@ -537,27 +508,15 @@ export default function ProductosPage() {
               setFiltroZona("-1")
             }
             
-            cacheWasUsedSuccessfully = true
-            console.log('[v0] cargarDatosIniciales desde caché completado exitosamente (clientes y zonas)')
+            return // Salir sin hacer peticiones
           } catch (cacheParseError) {
-            console.log("[v0] Error al parsear caché de cargarDatosIniciales, continuando con carga normal...")
-          }
-        } else {
-          console.log(`[v0] Caché de cargarDatosIniciales expirado (edad: ${Math.round(age/1000)}s), recargando...`)
-        }
-      } else {
-        console.log('[v0] No hay caché, cargando catálogos desde Supabase...')
-      }
-            
-            console.log('[v0] cargarDatosIniciales desde caché completado exitosamente (clientes y zonas)')
-          } catch (cacheParseError) {
-            console.log("[v0] Error al parsear caché de cargarDatosIniciales, continuando con carga normal...")
+            console.log("[v0] Error al parsear caché, continuando con carga normal...")
           }
         } else {
           console.log(`[v0] Caché de cargarDatosIniciales expirado (edad: ${Math.round(age/1000)}s), recargando...`)
         }
       }
-      
+
       // Auxiliar para definir DDLs
       const auxClienteId = esAdminDDLs === true ? -1 : user.ClienteId
 
@@ -576,14 +535,10 @@ export default function ProductosPage() {
       const savedFilters = sessionStorage.getItem("productosFilters")
       console.log("[v0] savedFilters:", savedFilters)
 
-      // Si el caché fue usado exitosamente, saltar la carga desde Supabase
-      if (cacheWasUsedSuccessfully) {
-        console.log("[v0] Saltando carga de clientes/zonas desde Supabase - datos ya en caché")
-      } else {
-        // -- Cargar DDLs primero CON RETRY Y CACHÉ
-        // DDL Clientes
-        console.log("[v0] Calling listaDesplegableClientes with:", auxClienteId)
-        const { data: clientesData, error: clientesError } = await fetchWithRetry(() => listaDesplegableClientes(auxClienteId, ""))
+      // -- Cargar DDLs primero CON RETRY Y CACHÉ
+      // DDL Clientes
+      console.log("[v0] Calling listaDesplegableClientes with:", auxClienteId)
+      const { data: clientesData, error: clientesError } = await fetchWithRetry(() => listaDesplegableClientes(auxClienteId, ""))
       console.log("[v0] clientesData:", clientesData, "clientesError:", clientesError)
       if (clientesError || !clientesData) {
         console.log("Error al cargar clientes:", clientesError)
@@ -837,143 +792,37 @@ export default function ProductosPage() {
   }
 
   // --- Cargar Opciones para DDLs Avanzados ---
-  useEffect(() => {
-    const cargarOpciones = async () => {
-      // Función para reintentar peticiones con backoff exponencial
-      const fetchWithRetry = async (fetchFunction: () => Promise<any>, maxRetries = 3) => {
-        for (let attempt = 0; attempt < maxRetries; attempt++) {
-          try {
-            const result = await fetchFunction()
-            return result
-          } catch (error: any) {
-            const isTooManyRequests = 
-              error?.message?.includes('Too Many') || 
-              error?.message?.includes('429') ||
-              error?.message?.includes('is not valid JSON') ||
-              error?.message?.includes('Rate limit')
-            
-            const isLastAttempt = attempt === maxRetries - 1
-            
-            if (isTooManyRequests && !isLastAttempt) {
-              const waitTime = Math.pow(2, attempt) * 1000
-              console.log(`[v0] Rate limited, esperando ${waitTime/1000}s antes de reintentar (intento ${attempt + 1}/${maxRetries})...`)
-              await new Promise(resolve => setTimeout(resolve, waitTime))
-              continue
-            } else {
-              throw error
-            }
-          }
+  // Función para reintentar peticiones con backoff exponencial
+  const fetchWithRetry = async (fetchFunction: () => Promise<any>, maxRetries = 3) => {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const result = await fetchFunction()
+        return result
+      } catch (error: any) {
+        const isTooManyRequests = 
+          error?.message?.includes('Too Many') || 
+          error?.message?.includes('429') ||
+          error?.message?.includes('is not valid JSON') ||
+          error?.message?.includes('Rate limit')
+        
+        const isLastAttempt = attempt === maxRetries - 1
+        
+        if (isTooManyRequests && !isLastAttempt) {
+          const waitTime = Math.pow(2, attempt) * 1000
+          console.log(`[v0] Rate limited, esperando ${waitTime/1000}s antes de reintentar (intento ${attempt + 1}/${maxRetries})...`)
+          await new Promise(resolve => setTimeout(resolve, waitTime))
+          continue
+        } else {
+          throw error
         }
       }
+    }
+  }
 
+  useEffect(() => {
+    const cargarOpciones = async () => {
       try {
-        const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
-
-        // Verificar si hay caché válido
-        const cachedTimestamp = localStorage.getItem('catalogos_timestamp')
-        if (cachedTimestamp) {
-          const age = Date.now() - parseInt(cachedTimestamp)
-          
-          if (age < CACHE_DURATION) {
-            console.log(`[v0] Usando caché de catálogos (edad: ${Math.round(age/1000)}s)`)
-            
-            // Cargar todos los datos del caché
-            const cachedData = {
-              formas: JSON.parse(localStorage.getItem('catalogos_formas') || 'null'),
-              sistemas: JSON.parse(localStorage.getItem('catalogos_sistemas') || 'null'),
-              envases: JSON.parse(localStorage.getItem('catalogos_envases') || 'null'),
-              presentaciones: JSON.parse(localStorage.getItem('catalogos_presentaciones') || 'null'),
-              tiposComision: JSON.parse(localStorage.getItem('catalogos_tiposComision') || 'null'),
-              frecuencias: JSON.parse(localStorage.getItem('catalogos_frecuencias') || 'null'),
-              codigosMaestros: JSON.parse(localStorage.getItem('catalogos_codigosMaestros') || 'null'),
-              codigos: JSON.parse(localStorage.getItem('catalogos_codigos') || 'null'),
-              codigosInternos: JSON.parse(localStorage.getItem('catalogos_codigosInternos') || 'null'),
-              nombresMateriales: JSON.parse(localStorage.getItem('catalogos_nombresMateriales') || 'null'),
-              codigosMateriales: JSON.parse(localStorage.getItem('catalogos_codigosMateriales') || 'null'),
-              detallesMateriales: JSON.parse(localStorage.getItem('catalogos_detallesMateriales') || 'null'),
-              especificacionesMateriales: JSON.parse(localStorage.getItem('catalogos_especificacionesMateriales') || 'null'),
-              familiasEmpaque: JSON.parse(localStorage.getItem('catalogos_familiasEmpaque') || 'null'),
-              paises: JSON.parse(localStorage.getItem('catalogos_paises') || 'null'),
-              medidasEmpaque: JSON.parse(localStorage.getItem('catalogos_medidasEmpaque') || 'null'),
-              nombresFormulas: JSON.parse(localStorage.getItem('catalogos_nombresFormulas') || 'null'),
-              codigosFormulas: JSON.parse(localStorage.getItem('catalogos_codigosFormulas') || 'null'),
-              especificacionesFormulas: JSON.parse(localStorage.getItem('catalogos_especificacionesFormulas') || 'null'),
-              formulas: JSON.parse(localStorage.getItem('catalogos_formulas') || 'null'),
-              medidasFormula: JSON.parse(localStorage.getItem('catalogos_medidasFormula') || 'null'),
-              coloresEmpaque: JSON.parse(localStorage.getItem('catalogos_coloresEmpaque') || 'null'),
-              familiasMateriaPrima: JSON.parse(localStorage.getItem('catalogos_familiasMateriaPrima') || 'null'),
-              presentacionesMateriaPrima: JSON.parse(localStorage.getItem('catalogos_presentacionesMateriaPrima') || 'null'),
-              nombresMateriaPrima: JSON.parse(localStorage.getItem('catalogos_nombresMateriaPrima') || 'null'),
-              codigosMateriaPrima: JSON.parse(localStorage.getItem('catalogos_codigosMateriaPrima') || 'null'),
-              especificacionesMateriaPrima: JSON.parse(localStorage.getItem('catalogos_especificacionesMateriaPrima') || 'null'),
-            }
-
-            // Setear todos los estados desde el caché
-            if (cachedData.formas) setFormasFarmaceuticasOptions([{ value: "-1", text: "Todos" }, ...cachedData.formas])
-            if (cachedData.sistemas) setObjetivosOptions([{ value: "-1", text: "Todos" }, ...cachedData.sistemas])
-            if (cachedData.envases) setEnvasesOptions([{ value: "-1", text: "Todos" }, ...cachedData.envases])
-            if (cachedData.presentaciones) setPresentaciones(cachedData.presentaciones)
-            if (cachedData.tiposComision) setTiposComisionesOptions([{ value: "-1", text: "Todos" }, ...cachedData.tiposComision])
-            if (cachedData.frecuencias) setFrecuencias(cachedData.frecuencias)
-            if (cachedData.codigosMaestros) setCodigosMaestros(cachedData.codigosMaestros)
-            if (cachedData.codigos) setCodigos(cachedData.codigos)
-            if (cachedData.codigosInternos) setCodigosInternos(cachedData.codigosInternos)
-            if (cachedData.nombresMateriales) {
-              setNombresMateriales(cachedData.nombresMateriales)
-              setNombreMaterialFiltrado(cachedData.nombresMateriales)
-            }
-            if (cachedData.codigosMateriales) {
-              setCodigosMateriales(cachedData.codigosMateriales)
-              setCodigoMaterialFiltrado(cachedData.codigosMateriales)
-            }
-            if (cachedData.detallesMateriales) {
-              setDetallesMateriales(cachedData.detallesMateriales)
-              setDetalleMaterialFiltrado(cachedData.detallesMateriales)
-            }
-            if (cachedData.especificacionesMateriales) {
-              setEspecificacionesMateriales(cachedData.especificacionesMateriales)
-              setEspecificacionesMaterialFiltrado(cachedData.especificacionesMateriales)
-            }
-            if (cachedData.familiasEmpaque) setFamiliasEmpaque(cachedData.familiasEmpaque)
-            if (cachedData.paises) setPaises(cachedData.paises)
-            if (cachedData.medidasEmpaque) setMedidasEmpaque(cachedData.medidasEmpaque)
-            if (cachedData.nombresFormulas) {
-              setNombresFormulas(cachedData.nombresFormulas)
-              setNombreFormulaFiltrado(cachedData.nombresFormulas)
-            }
-            if (cachedData.codigosFormulas) {
-              setCodigosFormulas(cachedData.codigosFormulas)
-              setCodigoFormulaFiltrado(cachedData.codigosFormulas)
-            }
-            if (cachedData.especificacionesFormulas) {
-              setEspecificacionesFormulas(cachedData.especificacionesFormulas)
-              setEspecificacionesFormulaFiltrado(cachedData.especificacionesFormulas)
-            }
-            if (cachedData.formulas) setFormulasDropdown(cachedData.formulas)
-            if (cachedData.medidasFormula) setMedidasFormula(cachedData.medidasFormula)
-            if (cachedData.coloresEmpaque) setColoresEmpaque(cachedData.coloresEmpaque)
-            if (cachedData.familiasMateriaPrima) setFamiliasMateriaPrima(cachedData.familiasMateriaPrima)
-            if (cachedData.presentacionesMateriaPrima) setPresentacionesMateriaPrima(cachedData.presentacionesMateriaPrima)
-            if (cachedData.nombresMateriaPrima) {
-              setNombresMateriaPrima(cachedData.nombresMateriaPrima)
-              setNombreMateriaPrimaFiltrado(cachedData.nombresMateriaPrima)
-            }
-            if (cachedData.codigosMateriaPrima) {
-              setCodigosMateriaPrima(cachedData.codigosMateriaPrima)
-              setCodigoMateriaPrimaFiltrado(cachedData.codigosMateriaPrima)
-            }
-            if (cachedData.especificacionesMateriaPrima) {
-              setEspecificacionesMateriaPrima(cachedData.especificacionesMateriaPrima)
-              setEspecificacionesMateriaPrimaFiltrado(cachedData.especificacionesMateriaPrima)
-            }
-
-            return // Salir sin hacer peticiones a Supabase
-          } else {
-            console.log(`[v0] Caché expirado (edad: ${Math.round(age/1000)}s), recargando...`)
-          }
-        } else {
-          console.log('[v0] No hay caché, cargando catálogos desde Supabase...')
-        }
+        console.log('[v0] Cargando catálogos desde Supabase...')
 
         // GRUPO 1: Catálogos básicos (5 llamadas en paralelo con retry)
         console.log("[v0] Cargando GRUPO 1: Catálogos básicos...")
@@ -1006,9 +855,9 @@ export default function ProductosPage() {
           setPresentaciones(presentacionesResult.data)
         }
 
-          if (tiposComisionResult.success && tiposComisionResult.data) {
-            setTiposComisionesOptions([{ value: "-1", text: "Todos" }, ...tiposComisionResult.data])
-          }
+        if (tiposComisionResult.success && tiposComisionResult.data) {
+          setTiposComision(tiposComisionResult.data)
+        }
 
         // GRUPO 2: Códigos y frecuencias (4 llamadas en paralelo con retry)
         console.log("[v0] Cargando GRUPO 2: Códigos y frecuencias...")
@@ -1159,45 +1008,7 @@ export default function ProductosPage() {
           setEspecificacionesMateriaPrimaFiltrado(especificacionesMateriaPrimaResult.data)
         }
 
-        // Guardar todos los datos en localStorage para futuras visitas
-        console.log('[v0] Guardando catálogos en caché...')
-        try {
-          localStorage.setItem('catalogos_formas', JSON.stringify(formasResult.data || []))
-          localStorage.setItem('catalogos_sistemas', JSON.stringify(sistemasResult.data || []))
-          const envasesTransformed = envasesResult.data?.map((envase: any) => ({
-            value: envase.id?.toString() || envase.value,
-            text: envase.nombre || envase.text,
-          })) || []
-          localStorage.setItem('catalogos_envases', JSON.stringify(envasesTransformed))
-          localStorage.setItem('catalogos_presentaciones', JSON.stringify(presentacionesResult.data || []))
-          localStorage.setItem('catalogos_tiposComision', JSON.stringify(tiposComisionResult.data || []))
-          localStorage.setItem('catalogos_frecuencias', JSON.stringify(frecuenciasResult.data || []))
-          localStorage.setItem('catalogos_codigosMaestros', JSON.stringify(codigosMaestrosResult.data || []))
-          localStorage.setItem('catalogos_codigos', JSON.stringify(codigosResult.data || []))
-          localStorage.setItem('catalogos_codigosInternos', JSON.stringify(codigosInternosResult.data || []))
-          localStorage.setItem('catalogos_nombresMateriales', JSON.stringify(nombresMaterialesResult.data || []))
-          localStorage.setItem('catalogos_codigosMateriales', JSON.stringify(codigosMaterialesResult.data || []))
-          localStorage.setItem('catalogos_detallesMateriales', JSON.stringify(detallesMat2Result.data || []))
-          localStorage.setItem('catalogos_especificacionesMateriales', JSON.stringify(especificacionesMat2Result.data || []))
-          localStorage.setItem('catalogos_familiasEmpaque', JSON.stringify(familiasEmpaque3Result.data || []))
-          localStorage.setItem('catalogos_paises', JSON.stringify(paises3Result.data || []))
-          localStorage.setItem('catalogos_medidasEmpaque', JSON.stringify(medidasEmpaque3Result.data || []))
-          localStorage.setItem('catalogos_nombresFormulas', JSON.stringify(nombresFormulasResult.data || []))
-          localStorage.setItem('catalogos_codigosFormulas', JSON.stringify(codigosFormulasResult.data || []))
-          localStorage.setItem('catalogos_especificacionesFormulas', JSON.stringify(especificacionesFormulasResult.data || []))
-          localStorage.setItem('catalogos_formulas', JSON.stringify(formulasDropdownResult.data || []))
-          localStorage.setItem('catalogos_medidasFormula', JSON.stringify(medidasFormulaResult.data || []))
-          localStorage.setItem('catalogos_coloresEmpaque', JSON.stringify(coloresEmpaqueResult.data || []))
-          localStorage.setItem('catalogos_familiasMateriaPrima', JSON.stringify(familiasMateriaPrimaResult.data || []))
-          localStorage.setItem('catalogos_presentacionesMateriaPrima', JSON.stringify(presentacionesMateriaPrimaResult.data || []))
-          localStorage.setItem('catalogos_nombresMateriaPrima', JSON.stringify(nombresMateriaPrimaResult.data || []))
-          localStorage.setItem('catalogos_codigosMateriaPrima', JSON.stringify(codigosMateriaPrimaResult.data || []))
-          localStorage.setItem('catalogos_especificacionesMateriaPrima', JSON.stringify(especificacionesMateriaPrimaResult.data || []))
-          localStorage.setItem('catalogos_timestamp', Date.now().toString())
-          console.log('[v0] Catálogos guardados en caché exitosamente')
-        } catch (cacheError) {
-          console.error('[v0] Error guardando en caché (continuando normalmente):', cacheError)
-        }
+        console.log('[v0] Catálogos cargados exitosamente desde Supabase')
       } catch (error) {
         console.error("Error loading dropdown options:", error)
         setModalError({
@@ -1310,7 +1121,7 @@ export default function ProductosPage() {
     return () => clearTimeout(timeoutId)
   }, [materialEnvaseBuscar])
 
-  // --- Manejadores (Handles) ---
+  // --- Manejadores (Handles) --
   // Busqueda - Ejecutar
   const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -2051,9 +1862,9 @@ export default function ProductosPage() {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="-1">Todos</SelectItem>
-                              {tiposComisionesOptions.map((tipo) => (
-                                <SelectItem key={tipo.value} value={tipo.value}>
-                                  {tipo.text}
+                              {tiposComision.map((tipo) => (
+                                <SelectItem key={tipo} value={tipo}>
+                                  {tipo}
                                 </SelectItem>
                               ))}
                             </SelectContent>
