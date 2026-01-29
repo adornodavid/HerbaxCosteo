@@ -593,13 +593,7 @@ export default function ProductosPage() {
         setCatalogos(catalogosConTodos)
       }
 
-      // Cargar opciones de filtros avanzados
-      const formasResult = await listaDesplegableFormasFarmaceuticas(-1, "")
-      if (formasResult.success && formasResult.data) {
-        setFormasFarmaceuticasOptions([{ value: "-1", text: "Todos" }, ...formasResult.data])
-      } else {
-        console.log("Error al cargar Formas Farmacéuticas:", formasResult.error)
-      }
+
 
       const sistemasResult = await listaDesplegableSistemas(-1, "")
       if (sistemasResult.success && sistemasResult.data) {
@@ -939,17 +933,12 @@ export default function ProductosPage() {
         }
 
         console.log('[v0] cacheWasUsedSuccessfully después de validar:', cacheWasUsedSuccessfully)
-        const [formasResult, sistemasResult, envasesResult, presentacionesResult, tiposComisionResult] = await Promise.all([
-          fetchWithRetry(() => listaDesplegableFormasFarmaceuticas(-1, "")),
+        const [sistemasResult, envasesResult, presentacionesResult, tiposComisionResult] = await Promise.all([
           fetchWithRetry(() => listaDesplegableSistemas(-1, "")),
           fetchWithRetry(() => listaDesplegableEnvase()),
           fetchWithRetry(() => listadopresentacion()),
           fetchWithRetry(() => listadotipocomision()),
         ])
-
-        if (formasResult.success && formasResult.data) {
-          setFormasFarmaceuticasOptions([{ value: "-1", text: "Todos" }, ...formasResult.data])
-        }
 
         if (sistemasResult.success && sistemasResult.data) {
           setObjetivosOptions([{ value: "-1", text: "Todos" }, ...sistemasResult.data])
@@ -1124,7 +1113,7 @@ export default function ProductosPage() {
         // Guardar todos los datos en localStorage para futuras visitas
         console.log('[v0] Guardando catálogos en caché...')
         try {
-          localStorage.setItem('catalogos_formas', JSON.stringify(formasResult?.data || []))
+          
           localStorage.setItem('catalogos_sistemas', JSON.stringify(sistemasResult?.data || []))
           const envasesTransformed = envasesResult?.data?.map((envase: any) => ({
             value: envase.id?.toString() || envase.value,
