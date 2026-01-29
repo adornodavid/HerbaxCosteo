@@ -479,44 +479,6 @@ export default function ProductosPage() {
     })
 
     try {
-      const CACHE_DURATION_CARGAR_DATOS = 5 * 60 * 1000 // 5 minutos
-
-      // Verificar si hay caché válido para cargarDatosIniciales
-      const cachedDataTimestamp = localStorage.getItem('cargarDatosIniciales_timestamp')
-      if (cachedDataTimestamp) {
-        const age = Date.now() - parseInt(cachedDataTimestamp)
-        
-        if (age < CACHE_DURATION_CARGAR_DATOS) {
-          console.log(`[v0] Usando caché de cargarDatosIniciales (edad: ${Math.round(age/1000)}s)`)
-          
-          // Cargar todos los datos del caché
-          try {
-            const cachedClientes = JSON.parse(localStorage.getItem('cargarDatosIniciales_clientes') || 'null')
-            const cachedZonas = JSON.parse(localStorage.getItem('cargarDatosIniciales_zonas') || 'null')
-            
-            if (cachedClientes) {
-              const clientesTransformados = cachedClientes.map((c: any) => ({
-                value: c.id.toString(),
-                text: c.nombre,
-              }))
-              setClientes([{ value: "-1", text: "Todos" }, ...clientesTransformados])
-              setFiltroCliente("-1")
-            }
-            
-            if (cachedZonas) {
-              setZonasOptions([{ value: "-1", text: "Todos" }, ...cachedZonas])
-              setFiltroZona("-1")
-            }
-            
-            return // Salir sin hacer peticiones
-          } catch (cacheParseError) {
-            console.log("[v0] Error al parsear caché, continuando con carga normal...")
-          }
-        } else {
-          console.log(`[v0] Caché de cargarDatosIniciales expirado (edad: ${Math.round(age/1000)}s), recargando...`)
-        }
-      }
-
       // Auxiliar para definir DDLs
       const auxClienteId = esAdminDDLs === true ? -1 : user.ClienteId
 
@@ -555,14 +517,6 @@ export default function ProductosPage() {
         const clientesConTodos = [{ value: "-1", text: "Todos" }, ...clientesTransformados]
         console.log("[v0] Setting clientes with:", clientesConTodos)
         setClientes(clientesConTodos)
-        
-        // Guardar en caché
-        try {
-          localStorage.setItem('cargarDatosIniciales_clientes', JSON.stringify(clientesData))
-          console.log('[v0] Clientes guardados en caché')
-        } catch (cacheError) {
-          console.error('[v0] Error guardando clientes en caché:', cacheError)
-        }
       }
 
       // DDL Catalogos
@@ -683,14 +637,7 @@ export default function ProductosPage() {
           if (zonasResult.success && zonasResult.data) {
             setZonasOptions([{ value: "-1", text: "Todos" }, ...zonasResult.data])
             console.log("[v0] Loaded zones after restoring filters:", zonasResult.data)
-            
-            // Guardar zonas en caché
-            try {
-              localStorage.setItem('cargarDatosIniciales_zonas', JSON.stringify(zonasResult.data))
-              console.log('[v0] Zonas guardadas en caché')
-            } catch (cacheError) {
-              console.error('[v0] Error guardando zonas en caché:', cacheError)
-            }
+
           } else {
             console.log("Error al cargar Zonas:", zonasResult.error)
             setZonasOptions([{ value: "-1", text: "Todos" }]) // Reset zones if error
@@ -770,13 +717,7 @@ export default function ProductosPage() {
         }
       }
       
-      // Guardar timestamp de cargarDatosIniciales al final
-      try {
-        localStorage.setItem('cargarDatosIniciales_timestamp', Date.now().toString())
-        console.log('[v0] Timestamp de cargarDatosIniciales guardado en caché')
-      } catch (cacheError) {
-        console.error('[v0] Error guardando timestamp en caché:', cacheError)
-      }
+
     } catch (error) {
       console.error("Error al cargar datos iniciales: ", error)
       console.log("Error al cargar datos iniciales: ", error)
