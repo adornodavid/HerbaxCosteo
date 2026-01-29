@@ -515,7 +515,7 @@ export default function ProductosPage() {
               setFiltroZona("-1")
             }
             
-            return // Salir sin hacer peticiones
+            console.log('[v0] cargarDatosIniciales desde caché completado exitosamente')
           } catch (cacheParseError) {
             console.log("[v0] Error al parsear caché, continuando con carga normal...")
           }
@@ -920,7 +920,7 @@ export default function ProductosPage() {
             if (cachedData.familiasMateriaPrima) setFamiliasMateriaPrima(cachedData.familiasMateriaPrima)
             if (cachedData.presentacionesMateriaPrima) setPresentacionesMateriaPrima(cachedData.presentacionesMateriaPrima)
             if (cachedData.nombresMateriaPrima) {
-              setNombreMateriaPrima(cachedData.nombresMateriaPrima)
+              setNombresMateriaPrima(cachedData.nombresMateriaPrima)
               setNombreMateriaPrimaFiltrado(cachedData.nombresMateriaPrima)
             }
             if (cachedData.codigosMateriaPrima) {
@@ -1160,7 +1160,6 @@ export default function ProductosPage() {
         } catch (cacheError) {
           console.error('[v0] Error guardando en caché (continuando normalmente):', cacheError)
         }
-        } // ← Cierre del if (!cacheWasUsedSuccessfully)
       } catch (error) {
         console.error("Error loading dropdown options:", error)
         setModalError({
