@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { executeWithRetry } from "@/lib/execute-with-retry"
 import {
   Search,
   Eye,
@@ -59,6 +58,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { obtenerProductos, estatusActivoProducto, obtenerProductosAvanzado, listadopresentacion, listadotipocomision, listadofrecuencia, listadocodigomaestro, listadocodigo, listadocodigointerno, listadonombrematerial, listadocodigomaterial, listadodetallematerial, listadoespecificacionesmaterial, listadonombresformulas, listadocodigosformulas, listadoespecificacionesformulas, listadonombresmateriaspri, listadocodigosmateriaspri, listadofamiliasmateriaspri, listadoespecificacionesmateriaspri, listadopresentacionesmateriaspri, listadoformula, listadomedidaformula, listadofamiliamaterialempaque, listadopais, listadomedidaempaque, listadocolorempaque, listadofamiliamateriaprima, listadopresentacionmateriaprima } from "@/app/actions/products"
 import { listaDesplegableClientes } from "@/app/actions/clientes"
 import {
+  listaDesplegableCatalogos,
   listaDesplegableFormasFarmaceuticas,
   listaDesplegableSistemas,
   listaDesplegableEnvase,
@@ -120,6 +120,7 @@ export default function ProductosPage() {
   const [catalogos, setCatalogos] = useState<ddlItem[]>([])
   const [zonasOptions, setZonasOptions] = useState<ddlItem[]>([{ value: "-1", text: "Todos" }])
   const [presentaciones, setPresentaciones] = useState<string[]>([])
+  const [tiposComision, setTiposComision] = useState<string[]>([])
   const [frecuencias, setFrecuencias] = useState<string[]>([])
   const [codigosMaestros, setCodigosMaestros] = useState<string[]>([])
   const [showCodigoMaestroDropdown, setShowCodigoMaestroDropdown] = useState(false)
@@ -198,7 +199,6 @@ export default function ProductosPage() {
   const [filtroMedidaEmpaque, setFiltroMedidaEmpaque] = useState("-1")
   const [filtroColor, setFiltroColor] = useState("-1")
   const [formulasDropdown, setFormulasDropdown] = useState<string[]>([])
-  const [formulas, setFormulas] = useState<string[]>([])
   const [medidasFormula, setMedidasFormula] = useState<string[]>([])
   const [familiasEmpaque, setFamiliasEmpaque] = useState<string[]>([])
   const [paises, setPaises] = useState<string[]>([])
@@ -215,7 +215,6 @@ export default function ProductosPage() {
   const [detallesMateriales, setDetallesMateriales] = useState<string[]>([])
   const [showDetalleMaterialDropdown, setShowDetalleMaterialDropdown] = useState(false)
   const [detalleMaterialFiltrado, setDetalleMaterialFiltrado] = useState<string[]>([])
-  const [detallesMaterialFiltrado, setDetallesMaterialFiltrado] = useState<string[]>([])
   const [especificacionesMateriales, setEspecificacionesMateriales] = useState<string[]>([])
   const [showEspecificacionesMaterialDropdown, setShowEspecificacionesMaterialDropdown] = useState(false)
   const [especificacionesMaterialFiltrado, setEspecificacionesMaterialFiltrado] = useState<string[]>([])
@@ -262,6 +261,7 @@ export default function ProductosPage() {
 
   const [tiposComisionesOptions, setTiposComisionesOptions] = useState<ddlItem[]>([])
   const [envaseMlOptions, setEnvaseMlOptions] = useState<ddlItem[]>([])
+
 
   const [materialEnvaseBuscar, setMaterialEnvaseBuscar] = useState("")
   const [materialesEnvaseResultados, setMaterialesEnvaseResultados] = useState<any[]>([])
@@ -396,11 +396,7 @@ export default function ProductosPage() {
       )
       console.log("[v0] Frontend - Llamando obtenerProductosAvanzado con clienteid:", clienteid)
       
-      const result = await executeWithRetry(
-        () => obtenerProductosAvanzado(productonombre,clienteid,zonaid,auxEstatus,codigomaestro,codigo,codigointerno,presentacion,objetivo,tipocomision,envase,nombreformula,codigoformula,especificacionesformula,formula,medidasformula,nombrematerialempaque,codigoempaque,familiaempaque,detalleempaque,especificacionesempaque,pais,medidaempaque,color,nombremateriaprima,codigomateriaprima,familiamateriaprima,especificacionesmateriaprima,presentacionmateriaprima),
-        3,
-        "obtenerProductosAvanzado"
-      )
+      const result = await obtenerProductosAvanzado(productonombre,clienteid,zonaid,auxEstatus,codigomaestro,codigo,codigointerno,presentacion,objetivo,tipocomision,envase,nombreformula,codigoformula,especificacionesformula,formula,medidasformula,nombrematerialempaque,codigoempaque,familiaempaque,detalleempaque,especificacionesempaque,pais,medidaempaque,color,nombremateriaprima,codigomateriaprima,familiamateriaprima,especificacionesmateriaprima,presentacionmateriaprima)
       
       console.log("[v0] Frontend - Respuesta recibida, success:", result.success)
       console.log("[v0] Frontend - Total de productos recibidos:", result.data?.length || 0)
@@ -512,7 +508,7 @@ export default function ProductosPage() {
               setFiltroZona("-1")
             }
             
-            console.log('[v0] cargarDatosIniciales desde caché completado exitosamente')
+            return // Salir sin hacer peticiones
           } catch (cacheParseError) {
             console.log("[v0] Error al parsear caché, continuando con carga normal...")
           }
@@ -570,9 +566,33 @@ export default function ProductosPage() {
       }
 
       // DDL Catalogos
-      
+      console.log("[v0] Calling listaDesplegableCatalogos with:", -1, "")
+      const { data: catalogosData, error: catalogosError } = await listaDesplegableCatalogos(
+        -1,
+        "",
+        auxClienteId === -1 ? undefined : auxClienteId,
+      )
+      console.log("[v0] catalogosData:", catalogosData, "catalogosError:", catalogosError)
+      if (catalogosError || !catalogosData) {
+        console.log("Error al cargar catálogos:", catalogosError)
+        setModalError({
+          Titulo: "Error al cargar Catálogos",
+          Mensaje: catalogosError || "Error desconocido.",
+        })
+        setShowModalError(true)
+      } else {
+        const catalogosConTodos = [{ value: "-1", text: "Todos" }, ...catalogosData]
+        console.log("[v0] Setting catalogos with:", catalogosConTodos)
+        setCatalogos(catalogosConTodos)
+      }
 
-
+      // Cargar opciones de filtros avanzados
+      const formasResult = await listaDesplegableFormasFarmaceuticas(-1, "")
+      if (formasResult.success && formasResult.data) {
+        setFormasFarmaceuticasOptions([{ value: "-1", text: "Todos" }, ...formasResult.data])
+      } else {
+        console.log("Error al cargar Formas Farmacéuticas:", formasResult.error)
+      }
 
       const sistemasResult = await listaDesplegableSistemas(-1, "")
       if (sistemasResult.success && sistemasResult.data) {
@@ -803,8 +823,6 @@ export default function ProductosPage() {
     const cargarOpciones = async () => {
       try {
         const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
-        
-        let cacheWasUsedSuccessfully = false // Inicializar en false
 
         // Verificar si hay caché válido
         const cachedTimestamp = localStorage.getItem('catalogos_timestamp')
@@ -813,7 +831,6 @@ export default function ProductosPage() {
           
           if (age < CACHE_DURATION) {
             console.log(`[v0] Usando caché de catálogos (edad: ${Math.round(age/1000)}s)`)
-            cacheWasUsedSuccessfully = true // ⭐ MARCAR COMO TRUE AQUÍ ADENTRO
             
             // Cargar todos los datos del caché
             const cachedData = {
@@ -851,7 +868,7 @@ export default function ProductosPage() {
             if (cachedData.sistemas) setObjetivosOptions([{ value: "-1", text: "Todos" }, ...cachedData.sistemas])
             if (cachedData.envases) setEnvasesOptions([{ value: "-1", text: "Todos" }, ...cachedData.envases])
             if (cachedData.presentaciones) setPresentaciones(cachedData.presentaciones)
-            if (cachedData.tiposComision) setTiposComisionesOptions(cachedData.tiposComision)
+            if (cachedData.tiposComision) setTiposComisionesOptions([{ value: "-1", text: "Todos" }, ...cachedData.tiposComision])
             if (cachedData.frecuencias) setFrecuencias(cachedData.frecuencias)
             if (cachedData.codigosMaestros) setCodigosMaestros(cachedData.codigosMaestros)
             if (cachedData.codigos) setCodigos(cachedData.codigos)
@@ -866,7 +883,7 @@ export default function ProductosPage() {
             }
             if (cachedData.detallesMateriales) {
               setDetallesMateriales(cachedData.detallesMateriales)
-              setDetallesMaterialFiltrado(cachedData.detallesMateriales)
+              setDetalleMaterialFiltrado(cachedData.detallesMateriales)
             }
             if (cachedData.especificacionesMateriales) {
               setEspecificacionesMateriales(cachedData.especificacionesMateriales)
@@ -887,7 +904,7 @@ export default function ProductosPage() {
               setEspecificacionesFormulas(cachedData.especificacionesFormulas)
               setEspecificacionesFormulaFiltrado(cachedData.especificacionesFormulas)
             }
-            if (cachedData.formulas) setFormulas(cachedData.formulas)
+            if (cachedData.formulas) setFormulasDropdown(cachedData.formulas)
             if (cachedData.medidasFormula) setMedidasFormula(cachedData.medidasFormula)
             if (cachedData.coloresEmpaque) setColoresEmpaque(cachedData.coloresEmpaque)
             if (cachedData.familiasMateriaPrima) setFamiliasMateriaPrima(cachedData.familiasMateriaPrima)
@@ -904,6 +921,8 @@ export default function ProductosPage() {
               setEspecificacionesMateriaPrima(cachedData.especificacionesMateriaPrima)
               setEspecificacionesMateriaPrimaFiltrado(cachedData.especificacionesMateriaPrima)
             }
+
+            return // Salir sin hacer peticiones a Supabase
           } else {
             console.log(`[v0] Caché expirado (edad: ${Math.round(age/1000)}s), recargando...`)
           }
@@ -911,63 +930,53 @@ export default function ProductosPage() {
           console.log('[v0] No hay caché, cargando catálogos desde Supabase...')
         }
 
-        console.log('[v0] cacheWasUsedSuccessfully después de validar:', cacheWasUsedSuccessfully)
-        
-        // Declarar variables fuera del bloque condicional para evitar problemas de scope
-        let sistemasResult: any, envasesResult: any, presentacionesResult: any, tiposComisionResult: any;
-        let frecuenciasResult: any, codigosMaestrosResult: any, codigosResult: any, codigosInternosResult: any;
-        let nombresMaterialesResult: any, codigosMaterialesResult: any, detallesMat2Result: any, especificacionesMat2Result: any;
-        let familiasEmpaque3Result: any, paises3Result: any, medidasEmpaque3Result: any;
-        let nombresFormulasResult: any, codigosFormulasResult: any, especificacionesFormulasResult: any, formulasDropdownResult: any, medidasFormulaResult: any;
-        let coloresEmpaqueResult: any;
-        let familiasMateriaPrimaResult: any, presentacionesMateriaPrimaResult: any;
-        let nombresMateriaPrimaResult: any, codigosMateriaPrimaResult: any, especificacionesMateriaPrimaResult: any;
-        
-        // Solo cargar desde Supabase si NO usamos caché
-        if (!cacheWasUsedSuccessfully) {
-          console.log('[v0] Cargando catálogos desde Supabase (no hay caché válido)...')
-          
-          [sistemasResult, envasesResult, presentacionesResult, tiposComisionResult] = await Promise.all([
-            fetchWithRetry(() => listaDesplegableSistemas(-1, "")),
-            fetchWithRetry(() => listaDesplegableEnvase()),
-            fetchWithRetry(() => listadopresentacion()),
-            fetchWithRetry(() => listadotipocomision()),
-          ])
-          console.log('tiposComisionResult', tiposComisionResult)
+        // GRUPO 1: Catálogos básicos (5 llamadas en paralelo con retry)
+        console.log("[v0] Cargando GRUPO 1: Catálogos básicos...")
+        const [formasResult, sistemasResult, envasesResult, presentacionesResult, tiposComisionResult] = await Promise.all([
+          fetchWithRetry(() => listaDesplegableFormasFarmaceuticas(-1, "")),
+          fetchWithRetry(() => listaDesplegableSistemas(-1, "")),
+          fetchWithRetry(() => listaDesplegableEnvase()),
+          fetchWithRetry(() => listadopresentacion()),
+          fetchWithRetry(() => listadotipocomision()),
+        ])
 
-          if (sistemasResult.success && sistemasResult.data) {
-            setObjetivosOptions([{ value: "-1", text: "Todos" }, ...sistemasResult.data])
-          }
+        if (formasResult.success && formasResult.data) {
+          setFormasFarmaceuticasOptions([{ value: "-1", text: "Todos" }, ...formasResult.data])
+        }
 
-          if (envasesResult.success && envasesResult.data) {
-            const envasesTransformed = envasesResult.data.map((envase: any) => ({
-              value: envase.id?.toString() || envase.value,
-              text: envase.nombre || envase.text,
-            }))
-            console.log("envatransformed", envasesTransformed)
-            setEnvasesOptions([{ value: "-1", text: "Todos" }, ...envasesTransformed])
-          }
+        if (sistemasResult.success && sistemasResult.data) {
+          setObjetivosOptions([{ value: "-1", text: "Todos" }, ...sistemasResult.data])
+        }
 
-          if (presentacionesResult.success && presentacionesResult.data) {
-            setPresentaciones(presentacionesResult.data)
-          }
+        if (envasesResult.success && envasesResult.data) {
+          const envasesTransformed = envasesResult.data.map((envase: any) => ({
+            value: envase.id?.toString() || envase.value,
+            text: envase.nombre || envase.text,
+          }))
+          console.log("envatransformed", envasesTransformed)
+          setEnvasesOptions([{ value: "-1", text: "Todos" }, ...envasesTransformed])
+        }
+
+        if (presentacionesResult.success && presentacionesResult.data) {
+          setPresentaciones(presentacionesResult.data)
+        }
 
           if (tiposComisionResult.success && tiposComisionResult.data) {
-            setTiposComisionesOptions(tiposComisionResult.data)
+            setTiposComisionesOptions([{ value: "-1", text: "Todos" }, ...tiposComisionResult.data])
           }
 
-          // GRUPO 2: Códigos y frecuencias (4 llamadas en paralelo con retry)
-          console.log("[v0] Cargando GRUPO 2: Códigos y frecuencias...")
-          ;[frecuenciasResult, codigosMaestrosResult, codigosResult, codigosInternosResult] = await Promise.all([
-            fetchWithRetry(() => listadofrecuencia()),
-            fetchWithRetry(() => listadocodigomaestro()),
-            fetchWithRetry(() => listadocodigo()),
-            fetchWithRetry(() => listadocodigointerno()),
-          ])
+        // GRUPO 2: Códigos y frecuencias (4 llamadas en paralelo con retry)
+        console.log("[v0] Cargando GRUPO 2: Códigos y frecuencias...")
+        const [frecuenciasResult, codigosMaestrosResult, codigosResult, codigosInternosResult] = await Promise.all([
+          fetchWithRetry(() => listadofrecuencia()),
+          fetchWithRetry(() => listadocodigomaestro()),
+          fetchWithRetry(() => listadocodigo()),
+          fetchWithRetry(() => listadocodigointerno()),
+        ])
 
-          if (frecuenciasResult.success && frecuenciasResult.data) {
-            setFrecuencias(frecuenciasResult.data)
-          }
+        if (frecuenciasResult.success && frecuenciasResult.data) {
+          setFrecuencias(frecuenciasResult.data)
+        }
 
         if (codigosMaestrosResult.success && codigosMaestrosResult.data) {
           setCodigosMaestros(codigosMaestrosResult.data)
@@ -985,7 +994,7 @@ export default function ProductosPage() {
         }
 
         // GRUPO 2: Materiales (con retry)
-        ;[nombresMaterialesResult, codigosMaterialesResult, detallesMat2Result, especificacionesMat2Result] = await Promise.all([
+        const [nombresMaterialesResult, codigosMaterialesResult, detallesMat2Result, especificacionesMat2Result] = await Promise.all([
           fetchWithRetry(() => listadonombrematerial()),
           fetchWithRetry(() => listadocodigomaterial()),
           fetchWithRetry(() => listadodetallematerial()),
@@ -1014,7 +1023,7 @@ export default function ProductosPage() {
 
         // GRUPO 3: Detalles y especificaciones de materiales (5 llamadas en paralelo con retry)
         console.log("[v0] Cargando GRUPO 3: Detalles de materiales...")
-        ;[familiasEmpaque3Result, paises3Result, medidasEmpaque3Result] = await Promise.all([
+        const [familiasEmpaque3Result, paises3Result, medidasEmpaque3Result] = await Promise.all([
           fetchWithRetry(() => listadofamiliamaterialempaque()),
           fetchWithRetry(() => listadopais()),
           fetchWithRetry(() => listadomedidaempaque()),
@@ -1036,7 +1045,7 @@ export default function ProductosPage() {
 
         // GRUPO 4: Fórmulas (6 llamadas en paralelo con retry)
         console.log("[v0] Cargando GRUPO 4: Fórmulas...")
-        ;[nombresFormulasResult, codigosFormulasResult, especificacionesFormulasResult, formulasDropdownResult, medidasFormulaResult, coloresEmpaqueResult] = await Promise.all([
+        const [nombresFormulasResult, codigosFormulasResult, especificacionesFormulasResult, formulasDropdownResult, medidasFormulaResult, coloresEmpaqueResult] = await Promise.all([
           fetchWithRetry(() => listadonombresformulas()),
           fetchWithRetry(() => listadocodigosformulas()),
           fetchWithRetry(() => listadoespecificacionesformulas()),
@@ -1074,7 +1083,7 @@ export default function ProductosPage() {
 
         // GRUPO 5: Materias primas (5 llamadas en paralelo con retry)
         console.log("[v0] Cargando GRUPO 5: Materias primas...")
-        ;[familiasMateriaPrimaResult, presentacionesMateriaPrimaResult, nombresMateriaPrimaResult, codigosMateriaPrimaResult, especificacionesMateriaPrimaResult] = await Promise.all([
+        const [familiasMateriaPrimaResult, presentacionesMateriaPrimaResult, nombresMateriaPrimaResult, codigosMateriaPrimaResult, especificacionesMateriaPrimaResult] = await Promise.all([
           fetchWithRetry(() => listadofamiliamateriaprima()),
           fetchWithRetry(() => listadopresentacionmateriaprima()),
           fetchWithRetry(() => listadonombresmateriaspri()),
@@ -1105,53 +1114,53 @@ export default function ProductosPage() {
           setEspecificacionesMateriaPrimaFiltrado(especificacionesMateriaPrimaResult.data)
         }
 
-          // Guardar todos los datos en localStorage para futuras visitas
-          console.log('[v0] Guardando catálogos en caché...')
-          try {
-            
-            localStorage.setItem('catalogos_sistemas', JSON.stringify(sistemasResult?.data || []))
-          const envasesTransformed = envasesResult?.data?.map((envase: any) => ({
+        // Guardar todos los datos en localStorage para futuras visitas
+        console.log('[v0] Guardando catálogos en caché...')
+        try {
+          localStorage.setItem('catalogos_formas', JSON.stringify(formasResult.data || []))
+          localStorage.setItem('catalogos_sistemas', JSON.stringify(sistemasResult.data || []))
+          const envasesTransformed = envasesResult.data?.map((envase: any) => ({
             value: envase.id?.toString() || envase.value,
             text: envase.nombre || envase.text,
           })) || []
           localStorage.setItem('catalogos_envases', JSON.stringify(envasesTransformed))
-          localStorage.setItem('catalogos_presentaciones', JSON.stringify(presentacionesResult?.data || []))
-          localStorage.setItem('catalogos_tiposComision', JSON.stringify(tiposComisionResult?.data || []))
-          localStorage.setItem('catalogos_frecuencias', JSON.stringify(frecuenciasResult?.data || []))
-          localStorage.setItem('catalogos_codigosMaestros', JSON.stringify(codigosMaestrosResult?.data || []))
-          localStorage.setItem('catalogos_codigos', JSON.stringify(codigosResult?.data || []))
-          localStorage.setItem('catalogos_codigosInternos', JSON.stringify(codigosInternosResult?.data || []))
-          localStorage.setItem('catalogos_nombresMateriales', JSON.stringify(nombresMaterialesResult?.data || []))
-          localStorage.setItem('catalogos_codigosMateriales', JSON.stringify(codigosMaterialesResult?.data || []))
-          localStorage.setItem('catalogos_detallesMateriales', JSON.stringify(detallesMat2Result?.data || []))
-          localStorage.setItem('catalogos_especificacionesMateriales', JSON.stringify(especificacionesMat2Result?.data || []))
-          localStorage.setItem('catalogos_familiasEmpaque', JSON.stringify(familiasEmpaque3Result?.data || []))
-          localStorage.setItem('catalogos_paises', JSON.stringify(paises3Result?.data || []))
-          localStorage.setItem('catalogos_medidasEmpaque', JSON.stringify(medidasEmpaque3Result?.data || []))
-          localStorage.setItem('catalogos_nombresFormulas', JSON.stringify(nombresFormulasResult?.data || []))
-          localStorage.setItem('catalogos_codigosFormulas', JSON.stringify(codigosFormulasResult?.data || []))
-          localStorage.setItem('catalogos_especificacionesFormulas', JSON.stringify(especificacionesFormulasResult?.data || []))
-          localStorage.setItem('catalogos_formulas', JSON.stringify(formulasDropdownResult?.data || []))
-          localStorage.setItem('catalogos_medidasFormula', JSON.stringify(medidasFormulaResult?.data || []))
-          localStorage.setItem('catalogos_coloresEmpaque', JSON.stringify(coloresEmpaqueResult?.data || []))
-          localStorage.setItem('catalogos_familiasMateriaPrima', JSON.stringify(familiasMateriaPrimaResult?.data || []))
-          localStorage.setItem('catalogos_presentacionesMateriaPrima', JSON.stringify(presentacionesMateriaPrimaResult?.data || []))
-          localStorage.setItem('catalogos_nombresMateriaPrima', JSON.stringify(nombresMateriaPrimaResult?.data || []))
-          localStorage.setItem('catalogos_codigosMateriaPrima', JSON.stringify(codigosMateriaPrimaResult?.data || []))
-          localStorage.setItem('catalogos_especificacionesMateriaPrima', JSON.stringify(especificacionesMateriaPrimaResult?.data || []))
+          localStorage.setItem('catalogos_presentaciones', JSON.stringify(presentacionesResult.data || []))
+          localStorage.setItem('catalogos_tiposComision', JSON.stringify(tiposComisionResult.data || []))
+          localStorage.setItem('catalogos_frecuencias', JSON.stringify(frecuenciasResult.data || []))
+          localStorage.setItem('catalogos_codigosMaestros', JSON.stringify(codigosMaestrosResult.data || []))
+          localStorage.setItem('catalogos_codigos', JSON.stringify(codigosResult.data || []))
+          localStorage.setItem('catalogos_codigosInternos', JSON.stringify(codigosInternosResult.data || []))
+          localStorage.setItem('catalogos_nombresMateriales', JSON.stringify(nombresMaterialesResult.data || []))
+          localStorage.setItem('catalogos_codigosMateriales', JSON.stringify(codigosMaterialesResult.data || []))
+          localStorage.setItem('catalogos_detallesMateriales', JSON.stringify(detallesMat2Result.data || []))
+          localStorage.setItem('catalogos_especificacionesMateriales', JSON.stringify(especificacionesMat2Result.data || []))
+          localStorage.setItem('catalogos_familiasEmpaque', JSON.stringify(familiasEmpaque3Result.data || []))
+          localStorage.setItem('catalogos_paises', JSON.stringify(paises3Result.data || []))
+          localStorage.setItem('catalogos_medidasEmpaque', JSON.stringify(medidasEmpaque3Result.data || []))
+          localStorage.setItem('catalogos_nombresFormulas', JSON.stringify(nombresFormulasResult.data || []))
+          localStorage.setItem('catalogos_codigosFormulas', JSON.stringify(codigosFormulasResult.data || []))
+          localStorage.setItem('catalogos_especificacionesFormulas', JSON.stringify(especificacionesFormulasResult.data || []))
+          localStorage.setItem('catalogos_formulas', JSON.stringify(formulasDropdownResult.data || []))
+          localStorage.setItem('catalogos_medidasFormula', JSON.stringify(medidasFormulaResult.data || []))
+          localStorage.setItem('catalogos_coloresEmpaque', JSON.stringify(coloresEmpaqueResult.data || []))
+          localStorage.setItem('catalogos_familiasMateriaPrima', JSON.stringify(familiasMateriaPrimaResult.data || []))
+          localStorage.setItem('catalogos_presentacionesMateriaPrima', JSON.stringify(presentacionesMateriaPrimaResult.data || []))
+          localStorage.setItem('catalogos_nombresMateriaPrima', JSON.stringify(nombresMateriaPrimaResult.data || []))
+          localStorage.setItem('catalogos_codigosMateriaPrima', JSON.stringify(codigosMateriaPrimaResult.data || []))
+          localStorage.setItem('catalogos_especificacionesMateriaPrima', JSON.stringify(especificacionesMateriaPrimaResult.data || []))
           localStorage.setItem('catalogos_timestamp', Date.now().toString())
           console.log('[v0] Catálogos guardados en caché exitosamente')
-          } catch (cacheError) {
-            console.error('[v0] Error guardando en caché (continuando normalmente):', cacheError)
-          }
-        } // ← Cierre del if (!cacheWasUsedSuccessfully)
+        } catch (cacheError) {
+          console.error('[v0] Error guardando en caché (continuando normalmente):', cacheError)
+        }
       } catch (error) {
-      console.error("Error loading dropdown options:", error)
-      setModalError({
-        Titulo: "Error al cargar opciones de filtros",
-        Mensaje: `Hubo un error al cargar las opciones para los filtros avanzados: ${error}`,
-      })
-      setShowModalError(true)
+        console.error("Error loading dropdown options:", error)
+        setModalError({
+          Titulo: "Error al cargar opciones de filtros",
+          Mensaje: `Hubo un error al cargar las opciones para los filtros avanzados: ${error}`,
+        })
+        setShowModalError(true)
+      }
     }
     // Only load options if basic DDLs are loaded or if necessary
     if (clientes.length > 0 && catalogos.length > 0) {
@@ -1509,9 +1518,36 @@ export default function ProductosPage() {
         setZonasOptions([{ value: "-1", text: "Todos" }])
         setFiltroZona("-1") // Reset zona if "Todos" client is selected
         console.log("[v0] handleClienteChange - Resetting zones for 'Todos' client.")
-        }
-      } catch (error) {
+      }
+
+      // Preparar query para catálogos
+      console.log("[v0] Calling listaDesplegableCatalogos with clienteIdNum:", clienteIdNum)
+      const { data: catalogosData, error: catalogosError } = await listaDesplegableCatalogos(
+        -1,
+        "",
+        clienteIdNum === -1 ? undefined : clienteIdNum, // Pass undefined if "Todos" client
+      )
+      console.log("[v0] catalogosData after handleClienteChange:", catalogosData, "catalogosError:", catalogosError)
+
+      if (!catalogosError && catalogosData) {
+        // Cargar input de filtro
+        const catalogosConTodos = [{ value: "-1", text: "Todos" }, ...catalogosData]
+        setCatalogos(catalogosConTodos)
+        setFiltroCatalogo("-1") // Reset catalog filter when client changes
+        console.log("[v0] handleClienteChange - Setting catalogs with:", catalogosConTodos)
+      } else {
+        // Mostrar error
+        console.error("Error al cargar catálogos por cliente: ", catalogosError)
+        setCatalogos([{ value: "-1", text: "Todos" }]) // Reset catalogs if error
+        setModalError({
+          Titulo: "Error al cargar Catálogos",
+          Mensaje: catalogosError || "Error desconocido.",
+        })
+        setShowModalError(true)
+      }
+    } catch (error) {
       console.error("Error al cambiar cliente: ", error)
+      console.log("Error al cambiar cliente: ", error)
       setModalError({
         Titulo: "Error al cambiar cliente",
         Mensaje: `Error: ${error}`,
@@ -1551,6 +1587,7 @@ export default function ProductosPage() {
   const handleVerDetalles = (producto: oProductoAvanzado) => {
     router.push(`/productos/${producto.id}/ver`)
   }
+
   const handleToggleStatusClickProducto = (id: number, activo: boolean) => {
     setProductoToToggle({ id, activo })
     setShowConfirmDialog(true)
