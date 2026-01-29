@@ -120,7 +120,6 @@ export default function ProductosPage() {
   const [catalogos, setCatalogos] = useState<ddlItem[]>([])
   const [zonasOptions, setZonasOptions] = useState<ddlItem[]>([{ value: "-1", text: "Todos" }])
   const [presentaciones, setPresentaciones] = useState<string[]>([])
-  const [tiposComision, setTiposComision] = useState<string[]>([])
   const [frecuencias, setFrecuencias] = useState<string[]>([])
   const [codigosMaestros, setCodigosMaestros] = useState<string[]>([])
   const [showCodigoMaestroDropdown, setShowCodigoMaestroDropdown] = useState(false)
@@ -263,6 +262,7 @@ export default function ProductosPage() {
 
   const [tiposComisionesOptions, setTiposComisionesOptions] = useState<ddlItem[]>([])
   const [envaseMlOptions, setEnvaseMlOptions] = useState<ddlItem[]>([])
+  const [tiposComision, setTiposComision] = useState<string[]>([])
 
 
   const [materialEnvaseBuscar, setMaterialEnvaseBuscar] = useState("")
@@ -853,7 +853,7 @@ export default function ProductosPage() {
             if (cachedData.sistemas) setObjetivosOptions([{ value: "-1", text: "Todos" }, ...cachedData.sistemas])
             if (cachedData.envases) setEnvasesOptions([{ value: "-1", text: "Todos" }, ...cachedData.envases])
             if (cachedData.presentaciones) setPresentaciones(cachedData.presentaciones)
-            if (cachedData.tiposComision) setTiposComision(cachedData.tiposComision)
+            if (cachedData.tiposComision) setTiposComisionesOptions(cachedData.tiposComision)
             if (cachedData.frecuencias) setFrecuencias(cachedData.frecuencias)
             if (cachedData.codigosMaestros) setCodigosMaestros(cachedData.codigosMaestros)
             if (cachedData.codigos) setCodigos(cachedData.codigos)
@@ -945,7 +945,7 @@ export default function ProductosPage() {
           }
 
           if (tiposComisionResult.success && tiposComisionResult.data) {
-            setTiposComision(tiposComisionResult.data)
+            setTiposComisionesOptions(tiposComisionResult.data)
           }
 
           // GRUPO 2: Códigos y frecuencias (4 llamadas en paralelo con retry)
@@ -1136,15 +1136,14 @@ export default function ProductosPage() {
         } catch (cacheError) {
           console.error('[v0] Error guardando en caché (continuando normalmente):', cacheError)
         }
-      } catch (error) {
-        console.error("Error loading dropdown options:", error)
-        setModalError({
-          Titulo: "Error al cargar opciones de filtros",
-          Mensaje: `Hubo un error al cargar las opciones para los filtros avanzados: ${error}`,
-        })
-        setShowModalError(true)
       }
-    }
+    } catch (error) {
+      console.error("Error loading dropdown options:", error)
+      setModalError({
+        Titulo: "Error al cargar opciones de filtros",
+        Mensaje: `Hubo un error al cargar las opciones para los filtros avanzados: ${error}`,
+      })
+      setShowModalError(true)
     }
     // Only load options if basic DDLs are loaded or if necessary
     if (clientes.length > 0 && catalogos.length > 0) {
@@ -1505,7 +1504,6 @@ export default function ProductosPage() {
         }
       } catch (error) {
       console.error("Error al cambiar cliente: ", error)
-      console.log("Error al cambiar cliente: ", error)
       setModalError({
         Titulo: "Error al cambiar cliente",
         Mensaje: `Error: ${error}`,
@@ -1545,7 +1543,6 @@ export default function ProductosPage() {
   const handleVerDetalles = (producto: oProductoAvanzado) => {
     router.push(`/productos/${producto.id}/ver`)
   }
-
   const handleToggleStatusClickProducto = (id: number, activo: boolean) => {
     setProductoToToggle({ id, activo })
     setShowConfirmDialog(true)
@@ -1964,9 +1961,9 @@ export default function ProductosPage() {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="-1">Todos</SelectItem>
-                              {tiposComision.map((tipo) => (
-                                <SelectItem key={tipo} value={tipo}>
-                                  {tipo}
+                              {tiposComisionesOptions.map((tipo) => (
+                                <SelectItem key={tipo.value} value={tipo.value}>
+                                  {tipo.text}
                                 </SelectItem>
                               ))}
                             </SelectContent>
