@@ -934,13 +934,8 @@ export default function ProductosPage() {
         setShowModalError(true)
       }
     }
-    // Only load options if basic DDLs are loaded or if necessary
-    if (clientes.length > 0 && catalogos.length > 0) {
-      cargarOpciones()
-    } else if (clientes.length === 0 && catalogos.length === 0 && !showPageLoading) {
-      // If basic DDLs didn't load correctly and page is not loading, try loading advanced options anyway.
-      // This prevents double loading if cargarDatosIniciales already loaded them.
-      // Or if there was an error in basic DDLs, we might still want to try loading advanced filters.
+    // Load options if basic DDLs are loaded
+    if (clientes.length > 0) {
       cargarOpciones()
     }
   }, [clientes, catalogos, showPageLoading]) // Adjusted dependency
