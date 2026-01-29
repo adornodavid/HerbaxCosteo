@@ -28,7 +28,7 @@ import { PageModalError } from "@/components/page-modal-error"
 import { PageModalTutorial } from "@/components/page-modal-tutorial"
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
-import { obtenerProductos } from "@/app/actions/productos"
+import { obtenerProductos } from "@/app/actions/products"
 import { cotizacionProducto, cotizacionOptima25, cotizacionOptima30 } from "@/app/actions/productos-cotizaciones"
 import type { ProductoXClienteN, ProductoXClienteOptimoN, ProductoXClienteOptimo } from "@/types/productos.types"
 // -- Libraries --
@@ -1609,7 +1609,7 @@ export default function VerProductoPage() {
               </>
             )}
 
-            <Button className="bg-gray-500 hover:bg-gray-600 text-white" onClick={() => router.push("/products")}>
+            <Button className="bg-gray-500 hover:bg-gray-600 text-white" onClick={() => router.push("/productos")}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Regresar a listado
             </Button>

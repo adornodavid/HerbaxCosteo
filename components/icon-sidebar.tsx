@@ -39,7 +39,7 @@ export function IconSidebar({ onToggleNavigation }: IconSidebarProps) {
 
       {/* Products Icon */}
       <Link
-        href="/productos"
+        href="/products"
         className="flex flex-col items-center justify-center rounded-lg hover:bg-gray-100 transition-colors mb-6 p-2"
         title="Productos"
       >

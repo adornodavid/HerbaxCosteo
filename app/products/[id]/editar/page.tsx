@@ -36,7 +36,7 @@ import { PageModalValidation } from "@/components/page-modal-validation"
 import { PageModalError } from "@/components/page-modal-error"
 // -- Backend --
 import { useAuth } from "@/contexts/auth-context"
-import { obtenerProductos, actualizarProducto, recalcularProducto } from "@/app/actions/productos"
+import { obtenerProductos, actualizarProducto, recalcularProducto } from "@/app/actions/products"
 import { obtenerClientes } from "@/app/actions/clientes"
 import {
   listaDesplegableUnidadesMedida,

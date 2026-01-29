@@ -51,7 +51,7 @@ export function AppSidebar() {
   const menuItems = useMemo(() => {
     const getHealthyLabSubmenu = () => {
       const allSubmenus = [
-        { name: "Productos", href: "/productos", icon: Icons.PillBottle },
+        { name: "Productos", href: "/products", icon: Icons.PillBottle },
         { name: "Fórmulas", href: "/formulas", icon: Icons.FlaskRound },
         { name: "Empaque", href: "/materialetiquetado", icon: Icons.Package },
         { name: "Materia Prima", href: "/materiaprima", icon: Icons.Pill },
