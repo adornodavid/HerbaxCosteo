@@ -117,7 +117,6 @@ export default function ProductosPage() {
   const [clientes, setClientes] = useState<ddlItem[]>([])
   const [catalogos, setCatalogos] = useState<ddlItem[]>([])
   const [zonasOptions, setZonasOptions] = useState<ddlItem[]>([{ value: "-1", text: "Todos" }])
-  const [presentaciones, setPresentaciones] = useState<string[]>([])
   const [tiposComision, setTiposComision] = useState<string[]>([])
   const [frecuencias, setFrecuencias] = useState<string[]>([])
   const [codigosMaestros, setCodigosMaestros] = useState<string[]>([])
@@ -186,48 +185,25 @@ export default function ProductosPage() {
   const [formulaid, setFormulaid] = useState<number | null>(null)
   const [showFormulasDropdown, setShowFormulasDropdown] = useState(false)
   const [filtroCodigoFormula, setFiltroCodigoFormula] = useState("")
-  const [filtroEspecificacionesFormula, setFiltroEspecificacionesFormula] = useState("")
   const [filtroFormulaDropdown, setFiltroFormulaDropdown] = useState("-1")
-  const [filtroMedidasFormula, setFiltroMedidasFormula] = useState("-1")
   const [filtroCodigoEmpaque, setFiltroCodigoEmpaque] = useState("")
-  const [filtroFamiliaEmpaque, setFiltroFamiliaEmpaque] = useState("-1")
-  const [filtroDetalleEmpaque, setFiltroDetalleEmpaque] = useState("")
-  const [filtroEspecificacionesEmpaque, setFiltroEspecificacionesEmpaque] = useState("")
   const [filtroPais, setFiltroPais] = useState("-1")
-  const [filtroMedidaEmpaque, setFiltroMedidaEmpaque] = useState("-1")
   const [filtroColor, setFiltroColor] = useState("-1")
   const [formulasDropdown, setFormulasDropdown] = useState<string[]>([])
-  const [medidasFormula, setMedidasFormula] = useState<string[]>([])
-  const [familiasEmpaque, setFamiliasEmpaque] = useState<string[]>([])
   const [paises, setPaises] = useState<string[]>([])
-  const [medidasEmpaque, setMedidasEmpaque] = useState<string[]>([])
   const [coloresEmpaque, setColoresEmpaque] = useState<string[]>([])
-  const [familiasMateriaPrima, setFamiliasMateriaPrima] = useState<string[]>([])
-  const [presentacionesMateriaPrima, setPresentacionesMateriaPrima] = useState<string[]>([])
   const [nombresMateriales, setNombresMateriales] = useState<string[]>([])
   const [showNombreMaterialDropdown, setShowNombreMaterialDropdown] = useState(false)
   const [nombreMaterialFiltrado, setNombreMaterialFiltrado] = useState<string[]>([])
   const [codigosMateriales, setCodigosMateriales] = useState<string[]>([])
   const [showCodigoMaterialDropdown, setShowCodigoMaterialDropdown] = useState(false)
   const [codigoMaterialFiltrado, setCodigoMaterialFiltrado] = useState<string[]>([])
-  const [detallesMateriales, setDetallesMateriales] = useState<string[]>([])
-  const [showDetalleMaterialDropdown, setShowDetalleMaterialDropdown] = useState(false)
-  const [detalleMaterialFiltrado, setDetalleMaterialFiltrado] = useState<string[]>([])
-  const [especificacionesMateriales, setEspecificacionesMateriales] = useState<string[]>([])
-  const [showEspecificacionesMaterialDropdown, setShowEspecificacionesMaterialDropdown] = useState(false)
-  const [especificacionesMaterialFiltrado, setEspecificacionesMaterialFiltrado] = useState<string[]>([])
   const [nombresFormulas, setNombresFormulas] = useState<string[]>([])
   const [showNombreFormulaDropdown, setShowNombreFormulaDropdown] = useState(false)
   const [nombreFormulaFiltrado, setNombreFormulaFiltrado] = useState<string[]>([])
   const [codigosFormulas, setCodigosFormulas] = useState<string[]>([])
   const [showCodigoFormulaDropdown, setShowCodigoFormulaDropdown] = useState(false)
   const [codigoFormulaFiltrado, setCodigoFormulaFiltrado] = useState<string[]>([])
-  const [especificacionesFormulas, setEspecificacionesFormulas] = useState<string[]>([])
-  const [showEspecificacionesFormulaDropdown, setShowEspecificacionesFormulaDropdown] = useState(false)
-  const [especificacionesFormulaFiltrado, setEspecificacionesFormulaFiltrado] = useState<string[]>([])
-  const [filtroFamiliaMateriaPrima, setFiltroFamiliaMateriaPrima] = useState("-1")
-  const [filtroEspecificacionesMateriaPrima, setFiltroEspecificacionesMateriaPrima] = useState("")
-  const [filtroPresentacionMateriaPrima, setFiltroPresentacionMateriaPrima] = useState("-1")
   const [filtroCodigoMateriaPrima, setFiltroCodigoMateriaPrima] = useState("")
   const [nombresMateriaPrima, setNombresMateriaPrima] = useState<string[]>([])
   const [showNombreMateriaPrimaDropdown, setShowNombreMateriaPrimaDropdown] = useState(false)
@@ -235,9 +211,6 @@ export default function ProductosPage() {
   const [codigosMateriaPrima, setCodigosMateriaPrima] = useState<string[]>([])
   const [showCodigoMateriaPrimaDropdown, setShowCodigoMateriaPrimaDropdown] = useState(false)
   const [codigoMateriaPrimaFiltrado, setCodigoMateriaPrimaFiltrado] = useState<string[]>([])
-  const [especificacionesMateriaPrima, setEspecificacionesMateriaPrima] = useState<string[]>([])
-  const [showEspecificacionesMateriaPrimaDropdown, setShowEspecificacionesMateriaPrimaDropdown] = useState(false)
-  const [especificacionesMateriaPrimaFiltrado, setEspecificacionesMateriaPrimaFiltrado] = useState<string[]>([])
 
   const [materiaprimaBuscar, setMateriaprimaBuscar] = useState("")
   const [materiaprimasResultados, setMateriaprimasResultados] = useState<any[]>([])
@@ -740,13 +713,12 @@ export default function ProductosPage() {
       try {
         console.log('[v0] Cargando catálogos desde Supabase...')
 
-        // GRUPO 1: Catálogos básicos (5 llamadas en paralelo con retry)
+        // GRUPO 1: Catálogos básicos (4 llamadas en paralelo con retry)
         console.log("[v0] Cargando GRUPO 1: Catálogos básicos...")
-        const [formasResult, sistemasResult, envasesResult, presentacionesResult, tiposComisionResult] = await Promise.all([
+        const [formasResult, sistemasResult, envasesResult, tiposComisionResult] = await Promise.all([
           fetchWithRetry(() => listaDesplegableFormasFarmaceuticas(-1, "")),
           fetchWithRetry(() => listaDesplegableSistemas(-1, "")),
           fetchWithRetry(() => listaDesplegableEnvase()),
-          fetchWithRetry(() => listadopresentacion()),
           fetchWithRetry(() => listadotipocomision()),
         ])
 
@@ -765,10 +737,6 @@ export default function ProductosPage() {
           }))
           console.log("envatransformed", envasesTransformed)
           setEnvasesOptions([{ value: "-1", text: "Todos" }, ...envasesTransformed])
-        }
-
-        if (presentacionesResult.success && presentacionesResult.data) {
-          setPresentaciones(presentacionesResult.data)
         }
 
         if (tiposComisionResult.success && tiposComisionResult.data) {
@@ -803,12 +771,10 @@ export default function ProductosPage() {
           setCodigoInternoFiltrado(codigosInternosResult.data)
         }
 
-        // GRUPO 2: Materiales (con retry)
-        const [nombresMaterialesResult, codigosMaterialesResult, detallesMat2Result, especificacionesMat2Result] = await Promise.all([
+        // GRUPO 2: Materiales - solo nombre y código (con retry)
+        const [nombresMaterialesResult, codigosMaterialesResult] = await Promise.all([
           fetchWithRetry(() => listadonombrematerial()),
           fetchWithRetry(() => listadocodigomaterial()),
-          fetchWithRetry(() => listadodetallematerial()),
-          fetchWithRetry(() => listadoespecificacionesmaterial()),
         ])
 
         if (nombresMaterialesResult.success && nombresMaterialesResult.data) {
@@ -821,47 +787,29 @@ export default function ProductosPage() {
           setCodigoMaterialFiltrado(codigosMaterialesResult.data)
         }
 
-        if (detallesMat2Result.success && detallesMat2Result.data) {
-          setDetallesMateriales(detallesMat2Result.data)
-          setDetalleMaterialFiltrado(detallesMat2Result.data)
-        }
-
-        if (especificacionesMat2Result.success && especificacionesMat2Result.data) {
-          setEspecificacionesMateriales(especificacionesMat2Result.data)
-          setEspecificacionesMaterialFiltrado(especificacionesMat2Result.data)
-        }
-
-        // GRUPO 3: Detalles y especificaciones de materiales (5 llamadas en paralelo con retry)
-        console.log("[v0] Cargando GRUPO 3: Detalles de materiales...")
-        const [familiasEmpaque3Result, paises3Result, medidasEmpaque3Result] = await Promise.all([
-          fetchWithRetry(() => listadofamiliamaterialempaque()),
+        // GRUPO 3: Solo países y colores (2 llamadas en paralelo con retry)
+        console.log("[v0] Cargando GRUPO 3: Países y colores...")
+        const [paises3Result, coloresEmpaqueResult] = await Promise.all([
           fetchWithRetry(() => listadopais()),
-          fetchWithRetry(() => listadomedidaempaque()),
+          fetchWithRetry(() => listadocolorempaque()),
         ])
 
         console.log("paises3Result", paises3Result)
-
-        if (familiasEmpaque3Result.success && familiasEmpaque3Result.data) {
-          setFamiliasEmpaque(familiasEmpaque3Result.data)
-        }
 
         if (paises3Result.success && paises3Result.data) {
           setPaises(paises3Result.data)
         }
 
-        if (medidasEmpaque3Result.success && medidasEmpaque3Result.data) {
-          setMedidasEmpaque(medidasEmpaque3Result.data)
+        if (coloresEmpaqueResult.success && coloresEmpaqueResult.data) {
+          setColoresEmpaque(coloresEmpaqueResult.data)
         }
 
-        // GRUPO 4: Fórmulas (6 llamadas en paralelo con retry)
+        // GRUPO 4: Fórmulas - solo nombre, código y dropdown (3 llamadas en paralelo con retry)
         console.log("[v0] Cargando GRUPO 4: Fórmulas...")
-        const [nombresFormulasResult, codigosFormulasResult, especificacionesFormulasResult, formulasDropdownResult, medidasFormulaResult, coloresEmpaqueResult] = await Promise.all([
+        const [nombresFormulasResult, codigosFormulasResult, formulasDropdownResult] = await Promise.all([
           fetchWithRetry(() => listadonombresformulas()),
           fetchWithRetry(() => listadocodigosformulas()),
-          fetchWithRetry(() => listadoespecificacionesformulas()),
           fetchWithRetry(() => listadoformula()),
-          fetchWithRetry(() => listadomedidaformula()),
-          fetchWithRetry(() => listadocolorempaque()),
         ])
 
         if (nombresFormulasResult.success && nombresFormulasResult.data) {
@@ -874,40 +822,16 @@ export default function ProductosPage() {
           setCodigoFormulaFiltrado(codigosFormulasResult.data)
         }
 
-        if (especificacionesFormulasResult.success && especificacionesFormulasResult.data) {
-          setEspecificacionesFormulas(especificacionesFormulasResult.data)
-          setEspecificacionesFormulaFiltrado(especificacionesFormulasResult.data)
-        }
-
         if (formulasDropdownResult.success && formulasDropdownResult.data) {
           setFormulasDropdown(formulasDropdownResult.data)
         }
 
-        if (medidasFormulaResult.success && medidasFormulaResult.data) {
-          setMedidasFormula(medidasFormulaResult.data)
-        }
-
-        if (coloresEmpaqueResult.success && coloresEmpaqueResult.data) {
-          setColoresEmpaque(coloresEmpaqueResult.data)
-        }
-
-        // GRUPO 5: Materias primas (5 llamadas en paralelo con retry)
+        // GRUPO 5: Materias primas - solo nombre y código (2 llamadas en paralelo con retry)
         console.log("[v0] Cargando GRUPO 5: Materias primas...")
-        const [familiasMateriaPrimaResult, presentacionesMateriaPrimaResult, nombresMateriaPrimaResult, codigosMateriaPrimaResult, especificacionesMateriaPrimaResult] = await Promise.all([
-          fetchWithRetry(() => listadofamiliamateriaprima()),
-          fetchWithRetry(() => listadopresentacionmateriaprima()),
+        const [nombresMateriaPrimaResult, codigosMateriaPrimaResult] = await Promise.all([
           fetchWithRetry(() => listadonombresmateriaspri()),
           fetchWithRetry(() => listadocodigosmateriaspri()),
-          fetchWithRetry(() => listadoespecificacionesmateriaspri()),
         ])
-
-        if (familiasMateriaPrimaResult.success && familiasMateriaPrimaResult.data) {
-          setFamiliasMateriaPrima(familiasMateriaPrimaResult.data)
-        }
-
-        if (presentacionesMateriaPrimaResult.success && presentacionesMateriaPrimaResult.data) {
-          setPresentacionesMateriaPrima(presentacionesMateriaPrimaResult.data)
-        }
 
         if (nombresMateriaPrimaResult.success && nombresMateriaPrimaResult.data) {
           setNombresMateriaPrima(nombresMateriaPrimaResult.data)
@@ -917,11 +841,6 @@ export default function ProductosPage() {
         if (codigosMateriaPrimaResult.success && codigosMateriaPrimaResult.data) {
           setCodigosMateriaPrima(codigosMateriaPrimaResult.data)
           setCodigoMateriaPrimaFiltrado(codigosMateriaPrimaResult.data)
-        }
-
-        if (especificacionesMateriaPrimaResult.success && especificacionesMateriaPrimaResult.data) {
-          setEspecificacionesMateriaPrima(especificacionesMateriaPrimaResult.data)
-          setEspecificacionesMateriaPrimaFiltrado(especificacionesMateriaPrimaResult.data)
         }
 
         console.log('[v0] Catálogos cargados exitosamente desde Supabase')
@@ -1775,24 +1694,6 @@ export default function ProductosPage() {
                           </Select>
                         </div>
                         <div>
-                          <label htmlFor="ddlProductoPresentacion" className="text-sm font-medium">
-                            Presentación
-                          </label>
-                          <Select value={filtroPresentacion} onValueChange={setFiltroPresentacion}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecciona presentación" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="-1">Todos</SelectItem>
-                              {presentaciones.map((presentacion) => (
-                                <SelectItem key={presentacion} value={presentacion}>
-                                  {presentacion}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
                           <label htmlFor="ddlProductoSubforma" className="text-sm font-medium">
                             Subforma
                           </label>
@@ -1969,48 +1870,6 @@ export default function ProductosPage() {
                             </div>
                           )}
                         </div>
-                        <div className="relative">
-                          <label htmlFor="txtFormulaEspecificaciones" className="text-sm font-medium">
-                            Especificaciones
-                          </label>
-                          <Input
-                            id="txtFormulaEspecificaciones"
-                            type="text"
-                            placeholder="Especificaciones..."
-                            value={filtroEspecificacionesFormula}
-                            onChange={(e) => {
-                              const value = e.target.value
-                              setFiltroEspecificacionesFormula(value)
-                              
-                              if (value) {
-                                const filtrados = especificacionesFormulas.filter((esp) =>
-                                  esp.toLowerCase().includes(value.toLowerCase())
-                                )
-                                setEspecificacionesFormulaFiltrado(filtrados)
-                              } else {
-                                setEspecificacionesFormulaFiltrado(especificacionesFormulas)
-                              }
-                            }}
-                            onFocus={() => setShowEspecificacionesFormulaDropdown(true)}
-                            onBlur={() => setTimeout(() => setShowEspecificacionesFormulaDropdown(false), 200)}
-                          />
-                          {showEspecificacionesFormulaDropdown && especificacionesFormulaFiltrado.length > 0 && (
-                            <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                              {especificacionesFormulaFiltrado.map((esp) => (
-                                <div
-                                  key={esp}
-                                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                                  onClick={() => {
-                                    setFiltroEspecificacionesFormula(esp)
-                                    setShowEspecificacionesFormulaDropdown(false)
-                                  }}
-                                >
-                                  {esp}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
                         <div>
                           <label htmlFor="ddlFormula" className="text-sm font-medium">
                             Fórmula
@@ -2024,24 +1883,6 @@ export default function ProductosPage() {
                               {formulasDropdown.map((formula) => (
                                 <SelectItem key={formula} value={formula}>
                                   {formula}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <label htmlFor="ddlFormulaMedida" className="text-sm font-medium">
-                            Medida Formula
-                          </label>
-                          <Select value={filtroMedidasFormula} onValueChange={setFiltroMedidasFormula}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecciona medida" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="-1">Todos</SelectItem>
-                              {medidasFormula.map((medida) => (
-                                <SelectItem key={medida} value={medida}>
-                                  {medida}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -2153,110 +1994,6 @@ export default function ProductosPage() {
                       )}
                     </div>
                         <div>
-                          <label htmlFor="ddlMaterialFamilia" className="text-sm font-medium">
-                            Familia Empaque/Envase
-                          </label>
-                          <Select value={filtroFamiliaEmpaque} onValueChange={setFiltroFamiliaEmpaque}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecciona familia" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="-1">Todos</SelectItem>
-                              {familiasEmpaque.map((familia) => (
-                                <SelectItem key={familia} value={familia}>
-                                  {familia}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="relative">
-                          <label htmlFor="txtMaterialDetalle" className="text-sm font-medium">
-                            Detalle
-                          </label>
-                          <Input
-                            id="txtMaterialDetalle"
-                            type="text"
-                            placeholder="Detalle..."
-                            value={filtroDetalleEmpaque}
-                            onChange={(e) => {
-                              const value = e.target.value
-                              setFiltroDetalleEmpaque(value)
-                              
-                              // Filtrar detalles de materiales
-                              if (value) {
-                                const filtrados = detallesMateriales.filter((detalle) =>
-                                  detalle.toLowerCase().includes(value.toLowerCase())
-                                )
-                                setDetalleMaterialFiltrado(filtrados)
-                              } else {
-                                setDetalleMaterialFiltrado(detallesMateriales)
-                              }
-                            }}
-                            onFocus={() => setShowDetalleMaterialDropdown(true)}
-                            onBlur={() => setTimeout(() => setShowDetalleMaterialDropdown(false), 200)}
-                          />
-                          {showDetalleMaterialDropdown && detalleMaterialFiltrado.length > 0 && (
-                            <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                              {detalleMaterialFiltrado.map((detalle) => (
-                                <div
-                                  key={detalle}
-                                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                                  onClick={() => {
-                                    setFiltroDetalleEmpaque(detalle)
-                                    setShowDetalleMaterialDropdown(false)
-                                  }}
-                                >
-                                  {detalle}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                        <div className="relative">
-                          <label htmlFor="txtMaterialEspecificaciones" className="text-sm font-medium">
-                            Especificaciones
-                          </label>
-                          <Input
-                            id="txtMaterialEspecificaciones"
-                            type="text"
-                            placeholder="Especificaciones..."
-                            value={filtroEspecificacionesEmpaque}
-                            onChange={(e) => {
-                              const value = e.target.value
-                              setFiltroEspecificacionesEmpaque(value)
-                              
-                              // Filtrar especificaciones de materiales
-                              if (value) {
-                                const filtrados = especificacionesMateriales.filter((especificacion) =>
-                                  especificacion.toLowerCase().includes(value.toLowerCase())
-                                )
-                                setEspecificacionesMaterialFiltrado(filtrados)
-                              } else {
-                                setEspecificacionesMaterialFiltrado(especificacionesMateriales)
-                              }
-                            }}
-                            onFocus={() => setShowEspecificacionesMaterialDropdown(true)}
-                            onBlur={() => setTimeout(() => setShowEspecificacionesMaterialDropdown(false), 200)}
-                          />
-                          {showEspecificacionesMaterialDropdown && especificacionesMaterialFiltrado.length > 0 && (
-                            <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                              {especificacionesMaterialFiltrado.map((especificacion) => (
-                                <div
-                                  key={especificacion}
-                                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                                  onClick={() => {
-                                    setFiltroEspecificacionesEmpaque(especificacion)
-                                    setShowEspecificacionesMaterialDropdown(false)
-                                  }}
-                                >
-                                  {especificacion}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                        <div>
                           <label htmlFor="ddlMaterialPais" className="text-sm font-medium">
                             País
                           </label>
@@ -2269,24 +2006,6 @@ export default function ProductosPage() {
                               {paises.map((pais) => (
                                 <SelectItem key={pais} value={pais}>
                                   {pais}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <label htmlFor="ddlMaterialMedida" className="text-sm font-medium">
-                            Medida Empaque/Envase
-                          </label>
-                          <Select value={filtroMedidaEmpaque} onValueChange={setFiltroMedidaEmpaque}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecciona medida" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="-1">Todos</SelectItem>
-                              {medidasEmpaque.map((medida) => (
-                                <SelectItem key={medida} value={medida}>
-                                  {medida}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -2412,84 +2131,6 @@ export default function ProductosPage() {
                               ))}
                             </div>
                           )}
-                        </div>
-                        <div className="relative">
-                          <label htmlFor="txtMateriaEspecificaciones" className="text-sm font-medium">
-                            Especificaciones Materia Prima
-                          </label>
-                          <Input
-                            id="txtMateriaEspecificaciones"
-                            type="text"
-                            placeholder="Especificaciones..."
-                            value={filtroEspecificacionesMateriaPrima}
-                            onChange={(e) => {
-                              const value = e.target.value
-                              setFiltroEspecificacionesMateriaPrima(value)
-                              
-                              if (value) {
-                                const filtrados = especificacionesMateriaPrima.filter((esp) =>
-                                  esp.toLowerCase().includes(value.toLowerCase())
-                                )
-                                setEspecificacionesMateriaPrimaFiltrado(filtrados)
-                              } else {
-                                setEspecificacionesMateriaPrimaFiltrado(especificacionesMateriaPrima)
-                              }
-                            }}
-                            onFocus={() => setShowEspecificacionesMateriaPrimaDropdown(true)}
-                            onBlur={() => setTimeout(() => setShowEspecificacionesMateriaPrimaDropdown(false), 200)}
-                          />
-                          {showEspecificacionesMateriaPrimaDropdown && especificacionesMateriaPrimaFiltrado.length > 0 && (
-                            <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                              {especificacionesMateriaPrimaFiltrado.map((esp) => (
-                                <div
-                                  key={esp}
-                                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                                  onClick={() => {
-                                    setFiltroEspecificacionesMateriaPrima(esp)
-                                    setShowEspecificacionesMateriaPrimaDropdown(false)
-                                  }}
-                                >
-                                  {esp}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <label htmlFor="ddlMateriaFamilia" className="text-sm font-medium">
-                            Familia
-                          </label>
-                          <Select value={filtroFamiliaMateriaPrima} onValueChange={setFiltroFamiliaMateriaPrima}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecciona familia" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="-1">Todos</SelectItem>
-                              {familiasMateriaPrima.map((familia) => (
-                                <SelectItem key={familia} value={familia}>
-                                  {familia}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <label htmlFor="ddlMateriaPresentacion" className="text-sm font-medium">
-                            Presentación
-                          </label>
-                          <Select value={filtroPresentacionMateriaPrima} onValueChange={setFiltroPresentacionMateriaPrima}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecciona presentación" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="-1">Todos</SelectItem>
-                              {presentacionesMateriaPrima.map((presentacion) => (
-                                <SelectItem key={presentacion} value={presentacion}>
-                                  {presentacion}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
                         </div>
                       </div>
                     </div>
