@@ -200,6 +200,7 @@ export default function ProductosPage() {
   const [filtroMedidaEmpaque, setFiltroMedidaEmpaque] = useState("-1")
   const [filtroColor, setFiltroColor] = useState("-1")
   const [formulasDropdown, setFormulasDropdown] = useState<string[]>([])
+  const [formulas, setFormulas] = useState<string[]>([])
   const [medidasFormula, setMedidasFormula] = useState<string[]>([])
   const [familiasEmpaque, setFamiliasEmpaque] = useState<string[]>([])
   const [paises, setPaises] = useState<string[]>([])
@@ -216,6 +217,7 @@ export default function ProductosPage() {
   const [detallesMateriales, setDetallesMateriales] = useState<string[]>([])
   const [showDetalleMaterialDropdown, setShowDetalleMaterialDropdown] = useState(false)
   const [detalleMaterialFiltrado, setDetalleMaterialFiltrado] = useState<string[]>([])
+  const [detallesMaterialFiltrado, setDetallesMaterialFiltrado] = useState<string[]>([])
   const [especificacionesMateriales, setEspecificacionesMateriales] = useState<string[]>([])
   const [showEspecificacionesMaterialDropdown, setShowEspecificacionesMaterialDropdown] = useState(false)
   const [especificacionesMaterialFiltrado, setEspecificacionesMaterialFiltrado] = useState<string[]>([])
@@ -828,6 +830,8 @@ export default function ProductosPage() {
     const cargarOpciones = async () => {
       try {
         const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
+        
+        let cacheWasUsedSuccessfully = false // Inicializar en false
 
         // Verificar si hay caché válido
         const cachedTimestamp = localStorage.getItem('catalogos_timestamp')
@@ -836,6 +840,7 @@ export default function ProductosPage() {
           
           if (age < CACHE_DURATION) {
             console.log(`[v0] Usando caché de catálogos (edad: ${Math.round(age/1000)}s)`)
+            cacheWasUsedSuccessfully = true // ⭐ MARCAR COMO TRUE AQUÍ ADENTRO
             
             // Cargar todos los datos del caché
             const cachedData = {
@@ -888,7 +893,7 @@ export default function ProductosPage() {
             }
             if (cachedData.detallesMateriales) {
               setDetallesMateriales(cachedData.detallesMateriales)
-              setDetalleMaterialFiltrado(cachedData.detallesMateriales)
+              setDetallesMaterialFiltrado(cachedData.detallesMateriales)
             }
             if (cachedData.especificacionesMateriales) {
               setEspecificacionesMateriales(cachedData.especificacionesMateriales)
@@ -909,13 +914,13 @@ export default function ProductosPage() {
               setEspecificacionesFormulas(cachedData.especificacionesFormulas)
               setEspecificacionesFormulaFiltrado(cachedData.especificacionesFormulas)
             }
-            if (cachedData.formulas) setFormulasDropdown(cachedData.formulas)
+            if (cachedData.formulas) setFormulas(cachedData.formulas)
             if (cachedData.medidasFormula) setMedidasFormula(cachedData.medidasFormula)
             if (cachedData.coloresEmpaque) setColoresEmpaque(cachedData.coloresEmpaque)
             if (cachedData.familiasMateriaPrima) setFamiliasMateriaPrima(cachedData.familiasMateriaPrima)
             if (cachedData.presentacionesMateriaPrima) setPresentacionesMateriaPrima(cachedData.presentacionesMateriaPrima)
             if (cachedData.nombresMateriaPrima) {
-              setNombresMateriaPrima(cachedData.nombresMateriaPrima)
+              setNombreMateriaPrima(cachedData.nombresMateriaPrima)
               setNombreMateriaPrimaFiltrado(cachedData.nombresMateriaPrima)
             }
             if (cachedData.codigosMateriaPrima) {
@@ -926,14 +931,6 @@ export default function ProductosPage() {
               setEspecificacionesMateriaPrima(cachedData.especificacionesMateriaPrima)
               setEspecificacionesMateriaPrimaFiltrado(cachedData.especificacionesMateriaPrima)
             }
-
-            // ⭐ NO hacer return aquí - dejar que el código continúe
-            // Esto asegura que los estados se actualicen aunque sea desde caché
-            // return // Salir sin hacer peticiones a Supabase
-            
-            // Si llegamos aquí desde caché, ejecutar el resto del código sin peticiones
-            // Los datos ya están en cachedData y en los states
-            console.log('[v0] Caché aplicado exitosamente, saltando peticiones a Supabase')
           } else {
             console.log(`[v0] Caché expirado (edad: ${Math.round(age/1000)}s), recargando...`)
           }
@@ -941,12 +938,7 @@ export default function ProductosPage() {
           console.log('[v0] No hay caché, cargando catálogos desde Supabase...')
         }
 
-        // Si ya usamos caché exitosamente, saltamos todas las peticiones
-        const cacheWasUsedSuccessfully = cachedTimestamp && (Date.now() - parseInt(cachedTimestamp)) < CACHE_DURATION
-        
-        if (!cacheWasUsedSuccessfully) {
-          // GRUPO 1: Catálogos básicos (5 llamadas en paralelo con retry)
-          console.log("[v0] Cargando GRUPO 1: Catálogos básicos...")
+        console.log('[v0] cacheWasUsedSuccessfully después de validar:', cacheWasUsedSuccessfully)
         const [formasResult, sistemasResult, envasesResult, presentacionesResult, tiposComisionResult] = await Promise.all([
           fetchWithRetry(() => listaDesplegableFormasFarmaceuticas(-1, "")),
           fetchWithRetry(() => listaDesplegableSistemas(-1, "")),
