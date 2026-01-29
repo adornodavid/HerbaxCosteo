@@ -7,6 +7,8 @@ import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase"
 import { arrActivoTrue, arrActivoFalse } from "@/lib/config"
 import { imagenSubir } from "@/app/actions/utilerias"
+import { executeServerActionWithRetry } from "@/lib/execute-with-retry"
+import { error } from "console" // Declare the error variable
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -331,55 +333,61 @@ export async function estatusActivoZona(id: number, activo: boolean): Promise<bo
 
 // Función: listaDesplegableZonas / ddlZonas: Función que se utiliza para los dropdownlist
 export async function listDesplegableZonas(zonaid = -1, zonanombre = "", clienteid = -1) {
-  try {
-    // Paso 1: Preparar Query
-    let query = supabase.from("zonasxcliente").select(`
-        idrec,
-        clienteid,
-        zonaid,
-        zonas!zonaid(
-        id,
-        nombre)
-      `)
+  return executeServerActionWithRetry(
+    async () => {
+      try {
+        // Paso 1: Preparar Query
+        let query = supabase.from("zonasxcliente").select(`
+            idrec,
+            clienteid,
+            zonaid,
+            zonas!zonaid(
+            id,
+            nombre)
+          `)
 
-    // Paso 2: Filtros en query, dependiendo parametros
-    if (zonaid !== -1) {
-      query = query.eq("zonaid", zonaid)
-    }
-    if (zonanombre !== "") {
-      query = query.ilike("zonas.nombre", `%${zonanombre}%`)
-    }
-    if (clienteid !== -1) {
-      query = query.eq("clienteid", clienteid)
-    }
+        // Paso 2: Filtros en query, dependiendo parametros
+        if (zonaid !== -1) {
+          query = query.eq("zonaid", zonaid)
+        }
+        if (zonanombre !== "") {
+          query = query.ilike("zonas.nombre", `%${zonanombre}%`)
+        }
+        if (clienteid !== -1) {
+          query = query.eq("clienteid", clienteid)
+        }
 
-    // Paso 3: Ejecutar query
-    query = query.order("idrec", { ascending: true })
+        // Paso 3: Ejecutar query
+        query = query.order("idrec", { ascending: true })
 
-    // Paso 4: Variables y resultados del query
-    const { data: zonas, error } = await query
+        // Paso 4: Variables y resultados del query
+        const { data: zonas, error } = await query
 
-    // Error en query
-    if (error) {
-      console.error("Error obteniendo zonas de query en listDesplegableZonas de actions/zonas: ", error)
-      return { success: false, error: error.message }
-    }
+        // Error en query
+        if (error) {
+          console.error("Error obteniendo zonas de query en listDesplegableZonas de actions/zonas: ", error)
+          return { success: false, error: error.message }
+        }
 
-    // Paso 5: Transformar datos al formato ddlItem
-    const data: { value: string; text: string }[] = zonas
-      ? zonas.map((zona: any) => ({
-          value: zona.zonas.id.toString(),
-          text: zona.zonas.nombre,
-        }))
-      : []
+        // Paso 5: Transformar datos al formato ddlItem
+        const data: { value: string; text: string }[] = zonas
+          ? zonas.map((zona: any) => ({
+              value: zona.zonas.id.toString(),
+              text: zona.zonas.nombre,
+            }))
+          : []
 
-    // Paso 6: Retorno de data
-    return { success: true, data }
-  } catch (error) {
-    console.error("Error en listDesplegableZonas de actions/zonas: " + error)
-    return {
-      success: false,
-      error: "Error interno del servidor, al ejecutar listDesplegableZonas de actions/zonas: " + error,
-    }
-  }
+        // Paso 6: Retorno de data
+        return { success: true, data }
+      } catch (error) {
+        console.error("Error en listDesplegableZonas de actions/zonas: " + error)
+        return {
+          success: false,
+          error: "Error interno del servidor",
+        }
+      }
+    },
+    "listDesplegableZonas",
+    3
+  )
 }

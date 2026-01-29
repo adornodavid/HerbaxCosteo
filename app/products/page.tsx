@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { executeWithRetry } from "@/lib/execute-with-retry"
 import {
   Search,
   Eye,
@@ -396,7 +397,11 @@ export default function ProductosPage() {
       )
       console.log("[v0] Frontend - Llamando obtenerProductosAvanzado con clienteid:", clienteid)
       
-      const result = await obtenerProductosAvanzado(productonombre,clienteid,zonaid,auxEstatus,codigomaestro,codigo,codigointerno,presentacion,objetivo,tipocomision,envase,nombreformula,codigoformula,especificacionesformula,formula,medidasformula,nombrematerialempaque,codigoempaque,familiaempaque,detalleempaque,especificacionesempaque,pais,medidaempaque,color,nombremateriaprima,codigomateriaprima,familiamateriaprima,especificacionesmateriaprima,presentacionmateriaprima)
+      const result = await executeWithRetry(
+        () => obtenerProductosAvanzado(productonombre,clienteid,zonaid,auxEstatus,codigomaestro,codigo,codigointerno,presentacion,objetivo,tipocomision,envase,nombreformula,codigoformula,especificacionesformula,formula,medidasformula,nombrematerialempaque,codigoempaque,familiaempaque,detalleempaque,especificacionesempaque,pais,medidaempaque,color,nombremateriaprima,codigomateriaprima,familiamateriaprima,especificacionesmateriaprima,presentacionmateriaprima),
+        3,
+        "obtenerProductosAvanzado"
+      )
       
       console.log("[v0] Frontend - Respuesta recibida, success:", result.success)
       console.log("[v0] Frontend - Total de productos recibidos:", result.data?.length || 0)

@@ -7,7 +7,8 @@ import { createClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
 import { imagenSubir } from "@/app/actions/utilerias"
 import { cookies } from "next/headers"
-//import { createServerSupabaseClientWrapper } from "@/app/actions/utilerias"
+import { executeServerActionWithRetry } from "@/lib/execute-with-retry"
+import { createServerSupabaseClientWrapper } from "@/app/actions/utilerias"
 
 /* ==================================================
   Conexion a la base de datos: Supabase
@@ -369,43 +370,49 @@ export async function estatusActivoCliente(id: number, activo: boolean): Promise
 
 // Función: listaDesplegableClientes / ddlCliente: Función que se utiliza para los dropdownlist
 export async function listaDesplegableClientes(id = -1, nombre = "", activo = "Todos") {
-  try {
-    // Query principal
-    let query = supabase.from("clientes").select("id, nombre")
+  return executeServerActionWithRetry(
+    async () => {
+      try {
+        // Query principal
+        let query = supabase.from("clientes").select("id, nombre")
 
-    // Filtros en query, dependiendo parametros
-    if (id !== -1) {
-      query = query.eq("id", id)
-    }
-    if (nombre !== "") {
-      query = query.ilike("nombre", `%${nombre}%`)
-    }
-    if (activo !== "Todos") {
-      const isActive = ["True", "true", "Activo", "1", true].includes(activo)
-      const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
-      if (isActive) {
-        query = query.eq("activo", true)
-      } else if (isInactive) {
-        query = query.eq("activo", false)
+        // Filtros en query, dependiendo parametros
+        if (id !== -1) {
+          query = query.eq("id", id)
+        }
+        if (nombre !== "") {
+          query = query.ilike("nombre", `%${nombre}%`)
+        }
+        if (activo !== "Todos") {
+          const isActive = ["True", "true", "Activo", "1", true].includes(activo)
+          const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
+          if (isActive) {
+            query = query.eq("activo", true)
+          } else if (isInactive) {
+            query = query.eq("activo", false)
+          }
+        }
+
+        // Ejecutar query
+        query = query.order("nombre", { ascending: true })
+
+        // Varaibles y resultados del query
+        const { data, error } = await query
+
+        if (error) {
+          console.error("Error obteniendo la lista desplegable de clientes:", error)
+          return { success: false, error: error.message }
+        }
+
+        return { success: true, data }
+      } catch (error) {
+        console.error("Error en listaDesplegableClientes:", error)
+        return { success: false, error: "Error interno del servidor" }
       }
-    }
-
-    // Ejecutar query
-    query = query.order("nombre", { ascending: true })
-
-    // Varaibles y resultados del query
-    const { data, error } = await query
-
-    if (error) {
-      console.error("Error obteniendo la lista desplegable de clientes:", error)
-      return { success: false, error: error.message }
-    }
-
-    return { success: true, data }
-  } catch (error) {
-    console.error("Error en listaDesplegableClientes:", error)
-    return { success: false, error: "Error interno del servidor" }
-  }
+    },
+    "listaDesplegableClientes",
+    3
+  )
 }
 
 export async function listaDesplegableClientes2(id = "-1", nombre = "") {
