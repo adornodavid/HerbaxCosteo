@@ -913,11 +913,21 @@ export default function ProductosPage() {
 
         console.log('[v0] cacheWasUsedSuccessfully después de validar:', cacheWasUsedSuccessfully)
         
+        // Declarar variables fuera del bloque condicional para evitar problemas de scope
+        let sistemasResult: any, envasesResult: any, presentacionesResult: any, tiposComisionResult: any;
+        let frecuenciasResult: any, codigosMaestrosResult: any, codigosResult: any, codigosInternosResult: any;
+        let nombresMaterialesResult: any, codigosMaterialesResult: any, detallesMat2Result: any, especificacionesMat2Result: any;
+        let familiasEmpaque3Result: any, paises3Result: any, medidasEmpaque3Result: any;
+        let nombresFormulasResult: any, codigosFormulasResult: any, especificacionesFormulasResult: any, formulasDropdownResult: any, medidasFormulaResult: any;
+        let coloresEmpaqueResult: any;
+        let familiasMateriaPrimaResult: any, presentacionesMateriaPrimaResult: any;
+        let nombresMateriaPrimaResult: any, codigosMateriaPrimaResult: any, especificacionesMateriaPrimaResult: any;
+        
         // Solo cargar desde Supabase si NO usamos caché
         if (!cacheWasUsedSuccessfully) {
           console.log('[v0] Cargando catálogos desde Supabase (no hay caché válido)...')
           
-          const [sistemasResult, envasesResult, presentacionesResult, tiposComisionResult] = await Promise.all([
+          [sistemasResult, envasesResult, presentacionesResult, tiposComisionResult] = await Promise.all([
             fetchWithRetry(() => listaDesplegableSistemas(-1, "")),
             fetchWithRetry(() => listaDesplegableEnvase()),
             fetchWithRetry(() => listadopresentacion()),
@@ -948,7 +958,7 @@ export default function ProductosPage() {
 
           // GRUPO 2: Códigos y frecuencias (4 llamadas en paralelo con retry)
           console.log("[v0] Cargando GRUPO 2: Códigos y frecuencias...")
-          const [frecuenciasResult, codigosMaestrosResult, codigosResult, codigosInternosResult] = await Promise.all([
+          ;[frecuenciasResult, codigosMaestrosResult, codigosResult, codigosInternosResult] = await Promise.all([
             fetchWithRetry(() => listadofrecuencia()),
             fetchWithRetry(() => listadocodigomaestro()),
             fetchWithRetry(() => listadocodigo()),
@@ -975,7 +985,7 @@ export default function ProductosPage() {
         }
 
         // GRUPO 2: Materiales (con retry)
-        const [nombresMaterialesResult, codigosMaterialesResult, detallesMat2Result, especificacionesMat2Result] = await Promise.all([
+        ;[nombresMaterialesResult, codigosMaterialesResult, detallesMat2Result, especificacionesMat2Result] = await Promise.all([
           fetchWithRetry(() => listadonombrematerial()),
           fetchWithRetry(() => listadocodigomaterial()),
           fetchWithRetry(() => listadodetallematerial()),
@@ -1004,7 +1014,7 @@ export default function ProductosPage() {
 
         // GRUPO 3: Detalles y especificaciones de materiales (5 llamadas en paralelo con retry)
         console.log("[v0] Cargando GRUPO 3: Detalles de materiales...")
-        const [familiasEmpaque3Result, paises3Result, medidasEmpaque3Result] = await Promise.all([
+        ;[familiasEmpaque3Result, paises3Result, medidasEmpaque3Result] = await Promise.all([
           fetchWithRetry(() => listadofamiliamaterialempaque()),
           fetchWithRetry(() => listadopais()),
           fetchWithRetry(() => listadomedidaempaque()),
@@ -1026,7 +1036,7 @@ export default function ProductosPage() {
 
         // GRUPO 4: Fórmulas (6 llamadas en paralelo con retry)
         console.log("[v0] Cargando GRUPO 4: Fórmulas...")
-        const [nombresFormulasResult, codigosFormulasResult, especificacionesFormulasResult, formulasDropdownResult, medidasFormulaResult, coloresEmpaqueResult] = await Promise.all([
+        ;[nombresFormulasResult, codigosFormulasResult, especificacionesFormulasResult, formulasDropdownResult, medidasFormulaResult, coloresEmpaqueResult] = await Promise.all([
           fetchWithRetry(() => listadonombresformulas()),
           fetchWithRetry(() => listadocodigosformulas()),
           fetchWithRetry(() => listadoespecificacionesformulas()),
@@ -1064,7 +1074,7 @@ export default function ProductosPage() {
 
         // GRUPO 5: Materias primas (5 llamadas en paralelo con retry)
         console.log("[v0] Cargando GRUPO 5: Materias primas...")
-        const [familiasMateriaPrimaResult, presentacionesMateriaPrimaResult, nombresMateriaPrimaResult, codigosMateriaPrimaResult, especificacionesMateriaPrimaResult] = await Promise.all([
+        ;[familiasMateriaPrimaResult, presentacionesMateriaPrimaResult, nombresMateriaPrimaResult, codigosMateriaPrimaResult, especificacionesMateriaPrimaResult] = await Promise.all([
           fetchWithRetry(() => listadofamiliamateriaprima()),
           fetchWithRetry(() => listadopresentacionmateriaprima()),
           fetchWithRetry(() => listadonombresmateriaspri()),
