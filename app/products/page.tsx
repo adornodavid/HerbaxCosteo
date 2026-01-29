@@ -914,47 +914,52 @@ export default function ProductosPage() {
         }
 
         console.log('[v0] cacheWasUsedSuccessfully después de validar:', cacheWasUsedSuccessfully)
-        const [sistemasResult, envasesResult, presentacionesResult, tiposComisionResult] = await Promise.all([
-          fetchWithRetry(() => listaDesplegableSistemas(-1, "")),
-          fetchWithRetry(() => listaDesplegableEnvase()),
-          fetchWithRetry(() => listadopresentacion()),
-          fetchWithRetry(() => listadotipocomision()),
-        ])
-        console.log('tiposComisionResult', tiposComisionResult)
+        
+        // Solo cargar desde Supabase si NO usamos caché
+        if (!cacheWasUsedSuccessfully) {
+          console.log('[v0] Cargando catálogos desde Supabase (no hay caché válido)...')
+          
+          const [sistemasResult, envasesResult, presentacionesResult, tiposComisionResult] = await Promise.all([
+            fetchWithRetry(() => listaDesplegableSistemas(-1, "")),
+            fetchWithRetry(() => listaDesplegableEnvase()),
+            fetchWithRetry(() => listadopresentacion()),
+            fetchWithRetry(() => listadotipocomision()),
+          ])
+          console.log('tiposComisionResult', tiposComisionResult)
 
-        if (sistemasResult.success && sistemasResult.data) {
-          setObjetivosOptions([{ value: "-1", text: "Todos" }, ...sistemasResult.data])
-        }
+          if (sistemasResult.success && sistemasResult.data) {
+            setObjetivosOptions([{ value: "-1", text: "Todos" }, ...sistemasResult.data])
+          }
 
-        if (envasesResult.success && envasesResult.data) {
-          const envasesTransformed = envasesResult.data.map((envase: any) => ({
-            value: envase.id?.toString() || envase.value,
-            text: envase.nombre || envase.text,
-          }))
-          console.log("envatransformed", envasesTransformed)
-          setEnvasesOptions([{ value: "-1", text: "Todos" }, ...envasesTransformed])
-        }
+          if (envasesResult.success && envasesResult.data) {
+            const envasesTransformed = envasesResult.data.map((envase: any) => ({
+              value: envase.id?.toString() || envase.value,
+              text: envase.nombre || envase.text,
+            }))
+            console.log("envatransformed", envasesTransformed)
+            setEnvasesOptions([{ value: "-1", text: "Todos" }, ...envasesTransformed])
+          }
 
-        if (presentacionesResult.success && presentacionesResult.data) {
-          setPresentaciones(presentacionesResult.data)
-        }
+          if (presentacionesResult.success && presentacionesResult.data) {
+            setPresentaciones(presentacionesResult.data)
+          }
 
-        if (tiposComisionResult.success && tiposComisionResult.data) {
-          setTiposComision(tiposComisionResult.data)
-        }
+          if (tiposComisionResult.success && tiposComisionResult.data) {
+            setTiposComision(tiposComisionResult.data)
+          }
 
-        // GRUPO 2: Códigos y frecuencias (4 llamadas en paralelo con retry)
-        console.log("[v0] Cargando GRUPO 2: Códigos y frecuencias...")
-        const [frecuenciasResult, codigosMaestrosResult, codigosResult, codigosInternosResult] = await Promise.all([
-          fetchWithRetry(() => listadofrecuencia()),
-          fetchWithRetry(() => listadocodigomaestro()),
-          fetchWithRetry(() => listadocodigo()),
-          fetchWithRetry(() => listadocodigointerno()),
-        ])
+          // GRUPO 2: Códigos y frecuencias (4 llamadas en paralelo con retry)
+          console.log("[v0] Cargando GRUPO 2: Códigos y frecuencias...")
+          const [frecuenciasResult, codigosMaestrosResult, codigosResult, codigosInternosResult] = await Promise.all([
+            fetchWithRetry(() => listadofrecuencia()),
+            fetchWithRetry(() => listadocodigomaestro()),
+            fetchWithRetry(() => listadocodigo()),
+            fetchWithRetry(() => listadocodigointerno()),
+          ])
 
-        if (frecuenciasResult.success && frecuenciasResult.data) {
-          setFrecuencias(frecuenciasResult.data)
-        }
+          if (frecuenciasResult.success && frecuenciasResult.data) {
+            setFrecuencias(frecuenciasResult.data)
+          }
 
         if (codigosMaestrosResult.success && codigosMaestrosResult.data) {
           setCodigosMaestros(codigosMaestrosResult.data)
@@ -1139,6 +1144,7 @@ export default function ProductosPage() {
         })
         setShowModalError(true)
       }
+    }
     }
     // Only load options if basic DDLs are loaded or if necessary
     if (clientes.length > 0 && catalogos.length > 0) {
@@ -1506,9 +1512,6 @@ export default function ProductosPage() {
       })
       setShowModalError(true)
     }
-
-
-      
   }
 
   // ESTE ES EL ÚNICO LUGAR DONDE SE EJECUTA LA BÚSQUEDA
