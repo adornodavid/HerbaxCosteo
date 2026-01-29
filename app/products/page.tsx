@@ -508,9 +508,9 @@ export default function ProductosPage() {
               setFiltroZona("-1")
             }
             
-            return // Salir sin hacer peticiones
+            console.log('[v0] cargarDatosIniciales desde caché completado exitosamente (clientes y zonas)')
           } catch (cacheParseError) {
-            console.log("[v0] Error al parsear caché, continuando con carga normal...")
+            console.log("[v0] Error al parsear caché de cargarDatosIniciales, continuando con carga normal...")
           }
         } else {
           console.log(`[v0] Caché de cargarDatosIniciales expirado (edad: ${Math.round(age/1000)}s), recargando...`)
