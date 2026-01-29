@@ -823,12 +823,12 @@ export default function ProductosPage() {
         console.error('[v0] Error guardando timestamp en caché:', cacheError)
       }
     } catch (error) {
-      console.error(\"Error al cargar datos iniciales: ", error)\
+      console.error("Error al cargar datos iniciales: ", error)
       console.log("Error al cargar datos iniciales: ", error)
       setModalError({
         Titulo: "Error al cargar datos iniciales",
         Mensaje: `Error: ${error}`,
-      })\
+      })
       setShowModalError(true)
     } finally {
       setShowPageLoading(false)
@@ -856,17 +856,17 @@ export default function ProductosPage() {
             
             if (isTooManyRequests && !isLastAttempt) {
               const waitTime = Math.pow(2, attempt) * 1000
-              console.log(\`[v0] Rate limited, esperando ${waitTime/1000}s antes de reintentar (intento ${attempt + 1}/${maxRetries})...`)\
+              console.log(`[v0] Rate limited, esperando ${waitTime/1000}s antes de reintentar (intento ${attempt + 1}/${maxRetries})...`)
               await new Promise(resolve => setTimeout(resolve, waitTime))
               continue
             } else {
               throw error
-            }\
+            }
           }
         }
       }
 
-      try {\
+      try {
         const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
 
         // Verificar si hay caché válido
@@ -1207,7 +1207,7 @@ export default function ProductosPage() {
         setShowModalError(true)
       }
     }
-    // Only load options if basic DDLs are loaded or if necessary\
+    // Only load options if basic DDLs are loaded or if necessary
     if (clientes.length > 0 && catalogos.length > 0) {
       cargarOpciones()
     } else if (clientes.length === 0 && catalogos.length === 0 && !showPageLoading) {
@@ -1217,7 +1217,7 @@ export default function ProductosPage() {
       cargarOpciones()
     }
   }, [clientes, catalogos, showPageLoading]) // Adjusted dependency
-\
+
   useEffect(() => {
     const buscarFormulas = async () => {
       if (formulaBuscar.trim().length >= 1) {
@@ -1234,7 +1234,7 @@ export default function ProductosPage() {
     return () => clearTimeout(timeoutId)
   }, [formulaBuscar])
 
-  useEffect(() => {\
+  useEffect(() => {
     const buscarMateriaPrimas = async () => {
       if (materiaprimaBuscar.trim().length >= 1) {
         const resultados = await listaDesplegableMateriasPrimasBuscar(materiaprimaBuscar)
@@ -1250,7 +1250,7 @@ export default function ProductosPage() {
     return () => clearTimeout(timeoutId)
   }, [materiaprimaBuscar])
 
-  useEffect(() => {\
+  useEffect(() => {
     const buscarEnvases = async () => {
       if (envaseBuscar.trim().length >= 1) {
         const resultados = await listaDesplegableMaterialesEtiquetadosBuscar(envaseBuscar)
@@ -1267,7 +1267,7 @@ export default function ProductosPage() {
     return () => clearTimeout(timeoutId)
   }, [envaseBuscar])
 
-  useEffect(() => {\
+  useEffect(() => {
     const buscarEmpaques = async () => {
       if (empaqueBuscar.trim().length >= 2) {
         const resultados = await listaDesplegableMaterialesEtiquetadosBuscar(empaqueBuscar)
@@ -1283,7 +1283,7 @@ export default function ProductosPage() {
     const timeoutId = setTimeout(buscarEmpaques, 300)
     return () => clearTimeout(timeoutId)
   }, [empaqueBuscar])
-\
+
   // Effect for searching material of envase or empaque
   useEffect(() => {
     const buscarMaterialesEnvaseEmpaque = async () => {
@@ -1310,7 +1310,7 @@ export default function ProductosPage() {
     return () => clearTimeout(timeoutId)
   }, [materialEnvaseBuscar])
 
-  // --- Manejadores (Handles) ---\
+  // --- Manejadores (Handles) ---
   // Busqueda - Ejecutar
   const handleBuscar = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -3015,4 +3015,4 @@ export default function ProductosPage() {
       {/* Removed modal dialog for product details */}
     </div>
   )
-}\
+}
