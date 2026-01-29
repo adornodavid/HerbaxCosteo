@@ -456,7 +456,7 @@ export default function VerFormulaPage() {
                   {productosRelacionados.map((producto, index) => (
                     <div
                       key={index}
-                      onClick={() => router.push(`/productos/${producto.productoid}/ver`)}
+                      onClick={() => router.push(`/products/${producto.productoid}/ver`)}
                       className="flex items-center gap-4 border rounded-lg p-3 hover:bg-purple-50 hover:border-purple-300 cursor-pointer transition-all duration-200"
                     >
                       {/* Imagen del producto */}
