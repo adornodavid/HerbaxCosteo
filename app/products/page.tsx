@@ -1095,11 +1095,11 @@ export default function ProductosPage() {
           setEspecificacionesMateriaPrimaFiltrado(especificacionesMateriaPrimaResult.data)
         }
 
-        // Guardar todos los datos en localStorage para futuras visitas
-        console.log('[v0] Guardando catálogos en caché...')
-        try {
-          
-          localStorage.setItem('catalogos_sistemas', JSON.stringify(sistemasResult?.data || []))
+          // Guardar todos los datos en localStorage para futuras visitas
+          console.log('[v0] Guardando catálogos en caché...')
+          try {
+            
+            localStorage.setItem('catalogos_sistemas', JSON.stringify(sistemasResult?.data || []))
           const envasesTransformed = envasesResult?.data?.map((envase: any) => ({
             value: envase.id?.toString() || envase.value,
             text: envase.nombre || envase.text,
@@ -1131,11 +1131,11 @@ export default function ProductosPage() {
           localStorage.setItem('catalogos_especificacionesMateriaPrima', JSON.stringify(especificacionesMateriaPrimaResult?.data || []))
           localStorage.setItem('catalogos_timestamp', Date.now().toString())
           console.log('[v0] Catálogos guardados en caché exitosamente')
-        } catch (cacheError) {
-          console.error('[v0] Error guardando en caché (continuando normalmente):', cacheError)
-        }
-      }
-    } catch (error) {
+          } catch (cacheError) {
+            console.error('[v0] Error guardando en caché (continuando normalmente):', cacheError)
+          }
+        } // ← Cierre del if (!cacheWasUsedSuccessfully)
+      } catch (error) {
       console.error("Error loading dropdown options:", error)
       setModalError({
         Titulo: "Error al cargar opciones de filtros",
