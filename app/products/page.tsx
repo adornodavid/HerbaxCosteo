@@ -1495,7 +1495,16 @@ export default function ProductosPage() {
         setZonasOptions([{ value: "-1", text: "Todos" }])
         setFiltroZona("-1") // Reset zona if "Todos" client is selected
         console.log("[v0] handleClienteChange - Resetting zones for 'Todos' client.")
-      }
+      } catch (error) {
+      console.error("Error al cambiar cliente: ", error)
+      console.log("Error al cambiar cliente: ", error)
+      setModalError({
+        Titulo: "Error al cambiar cliente",
+        Mensaje: `Error: ${error}`,
+      })
+      setShowModalError(true)
+    }
+
 
       
   }
