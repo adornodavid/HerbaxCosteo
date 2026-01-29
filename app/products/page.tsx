@@ -262,8 +262,6 @@ export default function ProductosPage() {
 
   const [tiposComisionesOptions, setTiposComisionesOptions] = useState<ddlItem[]>([])
   const [envaseMlOptions, setEnvaseMlOptions] = useState<ddlItem[]>([])
-  const [tiposComision, setTiposComision] = useState<string[]>([])
-
 
   const [materialEnvaseBuscar, setMaterialEnvaseBuscar] = useState("")
   const [materialesEnvaseResultados, setMaterialesEnvaseResultados] = useState<any[]>([])
