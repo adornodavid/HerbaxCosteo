@@ -163,7 +163,6 @@ export default function ProductosPage() {
   const [showFormulaFilters, setShowFormulaFilters] = useState(false)
   const [showMaterialesFilters, setShowMaterialesFilters] = useState(false)
   const [showMateriaPrimaFilters, setShowMateriaPrimaFilters] = useState(false)
-  const [filtroPresentacion, setFiltroPresentacion] = useState("")
   const [filtroFormaFarmaceutica, setFiltroFormaFarmaceutica] = useState("-1")
   const [filtroObjetivo, setFiltroObjetivo] = useState("-1")
   const [filtroEnvase, setFiltroEnvase] = useState("-1")
@@ -266,45 +265,31 @@ export default function ProductosPage() {
     zonaid: number,
     catalogoid: number,
     estatus: string,
-    presentacion: string, // Added for advanced search
-    formafarmaceuticaid: number, // Changed to string to match state
-    objetivo: number, // Changed to string to match state
-    envase: string, // Changed to string to match state
-    // formulaid: number | null, // Changed to accept ID
+    formafarmaceuticaid: number,
+    objetivo: number,
+    envase: string,
     filtroFormulaId: number | -1,
-    // materiaprmaid: number | null, // Changed to accept ID
     filtroMateriaPrimaId: number | -1,
-    envaseavanzado: string, // Changed to string to match state
-    empaque: string, // Changed to string to match state
-    // Passing new filters to the backend call
+    envaseavanzado: string,
+    empaque: string,
     codigomaestro: string,
     codigo: string,
     codigointerno: string,
     tipocomision: string,
     envaseeml: string,
-    // materialenvaseempId: number | null, // Changed to accept ID
     filtroMaterialEnvaseEmpId: number | -1,
     // Filtros a nivel fórmula
     nombreformula: string,
     codigoformula: string,
-    especificacionesformula: string,
     formula: string,
-    medidasformula: string,
     // Filtros a nivel materiales
     nombrematerialempaque: string,
     codigoempaque: string,
-    familiaempaque: string,
-    detalleempaque: string,
-    especificacionesempaque: string,
     pais: string,
-    medidaempaque: string,
     color: string,
     // Filtros a nivel materia prima
     nombremateriaprima: string,
     codigomateriaprima: string,
-    familiamateriaprima: string,
-    especificacionesmateriaprima: string,
-    presentacionmateriaprima: string,
   ) => {
     // Validar usuario activo
     if (!user) return
@@ -367,7 +352,7 @@ export default function ProductosPage() {
       )
       console.log("[v0] Frontend - Llamando obtenerProductosAvanzado con clienteid:", clienteid)
       
-      const result = await obtenerProductosAvanzado(productonombre,clienteid,zonaid,auxEstatus,codigomaestro,codigo,codigointerno,presentacion,objetivo,tipocomision,envase,nombreformula,codigoformula,especificacionesformula,formula,medidasformula,nombrematerialempaque,codigoempaque,familiaempaque,detalleempaque,especificacionesempaque,pais,medidaempaque,color,nombremateriaprima,codigomateriaprima,familiamateriaprima,especificacionesmateriaprima,presentacionmateriaprima)
+      const result = await obtenerProductosAvanzado(productonombre,clienteid,zonaid,auxEstatus,codigomaestro,codigo,codigointerno,"",objetivo,tipocomision,envase,nombreformula,codigoformula,"",formula,"",nombrematerialempaque,codigoempaque,"","","",pais,"",color,nombremateriaprima,codigomateriaprima,"","","")
       
       console.log("[v0] Frontend - Respuesta recibida, success:", result.success)
       console.log("[v0] Frontend - Total de productos recibidos:", result.data?.length || 0)
@@ -610,18 +595,30 @@ export default function ProductosPage() {
           filters.filtroNombre || "",
           Number(filters.filtroCliente) || auxClienteId,
           Number(filters.filtroZona) || -1,
+          -1,
           filters.filtroEstatus || "True",
+          Number(filters.filtroFormaFarmaceutica) || -1,
+          Number(filters.filtroObjetivo) || -1,
+          filters.filtroEnvase || "-1",
+          formulaid || -1,
+          materiaprimaid || -1,
+          "",
+          "",
           filters.filtroCodigoMaestro || "",
           filters.filtroCodigo || "",
           filters.filtroCodigoInterno || "",
-          filters.filtroPresentacion || "",
-          Number(filters.filtroObjetivo) || -1,
-          filters.filtroTipoComision === "-1" ? "" : filters.filtroTipoComision, // Use conditional logic here
-          filters.filtroEnvase || "-1",
-          // Pass the selected IDs for formula, material prima, and material envase empaque
-          formulaid || -1,
-          materiaprimaid || -1,
+          filters.filtroTipoComision === "-1" ? "" : filters.filtroTipoComision,
+          "",
           materialEnvaseid || -1,
+          "",
+          filters.filtroCodigoFormula || "",
+          filters.filtroFormulaDropdown || "",
+          "",
+          filters.filtroCodigoEmpaque || "",
+          filters.filtroPais || "",
+          filters.filtroColor || "",
+          "",
+          filters.filtroCodigoMateriaPrima || "",
         )
         
 
@@ -635,26 +632,33 @@ export default function ProductosPage() {
       } else {
         console.log("[v0] No saved filters found, performing initial search with clienteid:", auxClienteId)
         const Result = await ejecutarBusquedaProductos(
-          "", // filtroNombre
-          auxClienteId, // clienteid (filters by user's client if not admin)
-          -1, // zonaid
-          -1, // catalogoid
-          "True", // estatus (filters only active products)
-          "", // filtroPresentacion
-          -1, // filtroFormaFarmaceutica
-          -1, // filtroObjetivo
-          "", // filtroEnvase
-          -1, // filtroFormulaId (default to null if no saved filter)
-          -1, // filtroMateriaPrimaId (default to null if no saved filter)
-          "", // filtroEnvaseAvanzado
-          "", // filtroEmpaque
-          // Passing default values for new filters
-          "", // filtroCodigoMaestro
-          "", // filtroCodigo
-          "", // filtroCodigoInterno
-          "", // filtroTipoComision (default to empty string)
-          "", // filtroEnvaseMl
-          -1, // filtroMaterialEnvaseEmpId (default to null if no saved filter)
+          "",
+          auxClienteId,
+          -1,
+          -1,
+          "True",
+          -1,
+          -1,
+          "",
+          -1,
+          -1,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          -1,
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
         )
         if (!Result.success) {
           setModalAlert({
@@ -969,7 +973,6 @@ export default function ProductosPage() {
     const CodigoMaestro = filtroCodigoMaestro.trim()
     const Codigo = filtroCodigo.trim()
     const CodigoInterno = filtroCodigoInterno.trim()
-    const Presentacion = filtroPresentacion.trim()
     const FormaFarmaceuticaId = Number.parseInt(filtroFormaFarmaceutica, 10)
     const Objetivo = Number.parseInt(filtroObjetivo, 10)
     const TipoComision = filtroTipoComision === "-1" ? "" : filtroTipoComision
@@ -982,24 +985,15 @@ export default function ProductosPage() {
     // Filtros a nivel fórmula
     const NombreFormula = formulaBuscar.trim()
     const CodigoFormula = filtroCodigoFormula.trim()
-    const EspecificacionesFormula = filtroEspecificacionesFormula.trim()
     const Formula = filtroFormulaDropdown === "-1" ? "" : filtroFormulaDropdown
-    const MedidasFormulas = filtroMedidasFormula === "-1" ? "" : filtroMedidasFormula
     // Filtros a nivel materiales
     const NombreMaterialEmpaque = materialEnvaseBuscar.trim()
     const CodigoEmpaque = filtroCodigoEmpaque.trim()
-    const FamiliaEmpaque = filtroFamiliaEmpaque === "-1" ? "" : filtroFamiliaEmpaque
-    const DetalleEmpaque = filtroDetalleEmpaque.trim()
-    const EspecificacionesEmpaque = filtroEspecificacionesEmpaque.trim()
     const Pais = filtroPais === "-1" ? "" : filtroPais
-    const MedidaEmpaque = filtroMedidaEmpaque === "-1" ? "" : filtroMedidaEmpaque
     const Color = filtroColor === "-1" ? "" : filtroColor
     // Filtros a nivel materia prima
     const NombreMateriaPrima = materiaprimaBuscar.trim()
     const CodigoMateriaPrima = filtroCodigoMateriaPrima.trim()
-    const FamiliaMateriaPrima = filtroFamiliaMateriaPrima === "-1" ? "" : filtroFamiliaMateriaPrima
-    const EspecificacionesMateriaPrima = filtroEspecificacionesMateriaPrima.trim()
-    const PresentacionMateriaPrima = filtroPresentacionMateriaPrima === "-1" ? "" : filtroPresentacionMateriaPrima
 
     console.log(
       "habdel buscar: Nombre " +
@@ -1044,16 +1038,13 @@ export default function ProductosPage() {
       ZonaId,
       CatalogoId,
       Estatus,
-      Presentacion,
-      FormaFarmaceuticaId, // Pass as number
-      Objetivo, // Pass as number
-      Envase, // Pass as string
-      // Passing the selected IDs
+      FormaFarmaceuticaId,
+      Objetivo,
+      Envase,
       FormulaId,
       MateriaPrimaId,
-      "", // Pass as string for advanced envase filter
-      "", // Pass as string for empaque filter
-      // Passing new filter values
+      "",
+      "",
       CodigoMaestro,
       Codigo,
       CodigoInterno,
@@ -1063,24 +1054,15 @@ export default function ProductosPage() {
       // Filtros a nivel fórmula
       NombreFormula,
       CodigoFormula,
-      EspecificacionesFormula,
       Formula,
-      MedidasFormulas,
       // Filtros a nivel materiales
       NombreMaterialEmpaque,
       CodigoEmpaque,
-      FamiliaEmpaque,
-      DetalleEmpaque,
-      EspecificacionesEmpaque,
       Pais,
-      MedidaEmpaque,
       Color,
       // Filtros a nivel materia prima
       NombreMateriaPrima,
       CodigoMateriaPrima,
-      FamiliaMateriaPrima,
-      EspecificacionesMateriaPrima,
-      PresentacionMateriaPrima,
     )
   }
 
@@ -1156,22 +1138,28 @@ export default function ProductosPage() {
       -1,
       -1,
       "True",
+      -1,
+      -1,
       "",
-      -1, // Pass as number
-      -1, // Pass as number
-      "", // Pass as string
-      // Passing the selected IDs
       -1,
       -1,
-      "", // Pass as string for advanced envase filter
-      "", // Pass as string for empaque filter
-      // Passing new filter values
+      "",
+      "",
       "",
       "",
       "",
       "",
       "",
       -1,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
     )
   }
 
