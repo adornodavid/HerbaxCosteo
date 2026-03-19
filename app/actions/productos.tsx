@@ -1,0 +1,1892 @@
+"use server"
+
+/* ==================================================
+  Imports
+================================================== */
+import { createClient as createSupabaseClient } from "@supabase/supabase-js"
+import { revalidatePath } from "next/cache"
+import type { ddlItem } from "@/types/common.types"
+import type { oProducto } from "@/types/productos.types"
+import { imagenSubir } from "@/app/actions/utilerias"
+
+/* ==================================================
+  Conexion a la base de datos: Supabase
+================================================== */
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey) // Declare the supabaseAdmin variable
+const supabase = createSupabaseClient(supabaseUrl, supabaseServiceKey) // Declare the supabase variable
+
+/* ==================================================
+  --------------------
+  Objetos / Clases
+  --------------------
+  * Objetos
+    - objetoProducto / oProducto (Individual)
+    - objetoProductos / oProductos (Listado / Array)
+    - objetoProductoXCliente / oProductoXCliente (Individual)
+    - objetoProductosXClientes / oProductosXCliente (Listado / Array)
+
+  --------------------
+  Funciones
+  --------------------
+  * INSERTS: CREATE/CREAR/INSERT
+    - crearProducto / insProducto
+    - crearProductoCaracteristicas / insProductoCaracteristicas
+    - crearProductoXCatalogo / insProductoXCatalogo
+
+  * SELECTS: READ/OBTENER/SELECT
+    - obtenerProductos / selProductos
+    - obtenerProductosCaracteristicas / selProductosCaracteristicas
+    - obtenerProductosXCatalogos / selProductosXCatalogos
+    - obtenerProductosXClientes / selProductosXClientes
+    - obtenerProductosIdsXFormulas / selProductosIdsXFormulas
+    - obtenerProductosIdsXMateriales / selProductosIdsXMateriales // Added
+
+  * UPDATES: EDIT/ACTUALIZAR/UPDATE
+    - actualizarProducto / updProducto
+    - actualizarProductoCaracteristicas / updProductoCaracteristicas
+    - actualizarProductoXCatalogo / updProductoXCatalogo
+    - actualizarCosteoProducto
+    - recalcularProducto
+
+    x actualizarProductoEtapa1
+    x actualizarCostoProducto
+    x finalizarProducto (actualizar costo de producto)
+
+  * DELETES: DROP/ELIMINAR/DELETE
+    - eliminarProducto / delProducto
+    - eliminarProductoCaracteristicas / delProductoCaracteristicas
+    - eliminarProductoXCatalogo / delProductoXCatalogo
+
+    x eliminarProductoIncompleto
+
+  * SPECIALS: PROCESS/ESPECIAL/SPECIAL
+    - estatusActivoProducto / actProducto
+    - listaDesplegableProductos / ddlProductos
+================================================== */
+
+/*==================================================
+    OBJETOS / CLASES
+================================================== */
+// Función: objetoProducto / oProducto (Individual): Esta Función crea de manera individual un objeto/clase
+export async function objetoProducto(
+  productoid = -1,
+  productonombre = "",
+  clienteid = -1,
+  zonaid = -1,
+  catalogoid = -1,
+  activo = "Todos",
+  codigo = "",
+  presentacion = "",
+  formafarmaceuticaid = -1,
+  sistemaid = -1,
+  categoria = "",
+  envase = "",
+  envaseml = "",
+  formulaid = -1,
+  materiaprimaid = -1,
+  materialid = -1,
+): Promise<{ success: boolean; data?: oProducto; error?: string }> {
+  try {
+    const resultado = await obtenerProductos(
+      productoid,
+      productonombre,
+      clienteid,
+      zonaid,
+      catalogoid,
+      activo,
+      codigo,
+      presentacion,
+      formafarmaceuticaid,
+      sistemaid,
+      categoria,
+      envase,
+      envaseml,
+      formulaid,
+      materiaprimaid,
+      materialid,
+    )
+
+    if (!resultado.success || !resultado.data) {
+      return { success: false, error: resultado.error || "No se encontraron datos" }
+    }
+
+    if (resultado.data.length === 0) {
+      return { success: false, error: "Producto no encontrado" }
+    }
+
+    const producto: oProducto = resultado.data[0] as oProducto
+
+    return { success: true, data: producto }
+  } catch (error) {
+    console.error("Error en app/actions/productos en objetoProducto (Individual):", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: objetoProductos / oProductos (Listado): Esta Función crea un listado de objetos/clases, es un array
+export async function objetoProductos(
+  productoid = -1,
+  productonombre = "",
+  clienteid = -1,
+  zonaid = -1,
+  catalogoid = -1,
+  activo = "Todos",
+  codigo = "",
+  presentacion = "",
+  formafarmaceuticaid = -1,
+  sistemaid = -1,
+  categoria = "",
+  envase = "",
+  envaseml = "",
+  formulaid = -1,
+  materiaprimaid = -1,
+  materialid = -1,
+): Promise<{ success: boolean; data?: oProducto[]; error?: string }> {
+  try {
+    const resultado = await obtenerProductos(
+      productoid,
+      productonombre,
+      clienteid,
+      zonaid,
+      catalogoid,
+      activo,
+      codigo,
+      presentacion,
+      formafarmaceuticaid,
+      sistemaid,
+      categoria,
+      envase,
+      envaseml,
+      formulaid,
+      materiaprimaid,
+      materialid,
+    )
+
+    if (!resultado.success || !resultado.data) {
+      return { success: false, error: resultado.error || "No se encontraron datos" }
+    }
+
+    const productos: oProducto[] = resultado.data as oProducto[]
+
+    return { success: true, data: productos }
+  } catch (error) {
+    console.error("Error en app/actions/productos en objetoProductos (Listado/Array):", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+/*==================================================
+    INSERTS: CREATE / CREAR / INSERT
+================================================== */
+// Función: crearProducto / insProducto: función para insertar (Información basica)
+export async function crearProducto(formData: FormData) {
+  try {
+    //Validar si no existe
+    const existe: boolean = await (async () => {
+      const resultado = await obtenerProductos(
+        -1,
+        formData.get("nombre") as string,
+        Number.parseInt(formData.get("clienteid") as string),
+        Number.parseInt(formData.get("zonaid") as string) || -1,
+        -1,
+        "Todos",
+        "", // Added new parameters with default values
+        "",
+        -1,
+        -1,
+        "",
+        "",
+        "",
+        -1,
+        -1,
+        -1,
+      )
+      return resultado.success && resultado.data && resultado.data.length >= 1
+    })()
+
+    if (existe) {
+      return { success: false, error: "El producto que se intenta ingresar ya existe y no se puede proceder" }
+    }
+
+    //Subir imagen para obtener su url
+    let imagenurl = ""
+    const imagen = formData.get("imagen") as File
+    if (imagen && imagen.size > 0) {
+      const resultadoImagen = await imagenSubir(imagen, formData.get("nombre") as string, "productos")
+
+      if (!resultadoImagen.success) {
+        return { success: false, error: resultadoImagen.error || "Error al subir la imagen" }
+      }
+
+      imagenurl = resultadoImagen.url || ""
+    }
+
+    //Pasar datos del formData a variables con tipado de datos
+    const codigo = formData.get("codigo") as string
+    const clienteid = Number.parseInt(formData.get("clienteid") as string)
+    const zonaid = Number.parseInt(formData.get("zonaid") as string) || null
+    const nombre = formData.get("nombre") as string
+    const unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string) || null
+    const costo = 0.0
+    const fecha = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
+    const activo = true
+
+    //Ejecutar Query
+    const { data, error } = await supabase
+      .from("productos")
+      .insert({
+        codigo,
+        clienteid,
+        zonaid,
+        nombre,
+        unidadmedidaid,
+        costo,
+        imgurl: imagenurl,
+        fechacreacion: fecha,
+        activo,
+      })
+      .select("id")
+      .single()
+
+    //Return error
+    if (error) {
+      console.error("Error creando producto en app/Actions/productos en crearProducto:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/productos")
+
+    //Return resultados
+    return { success: true, data: data.id }
+  } catch (error) {
+    console.error("Error en actions/productos en crearProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: crearProductoCaracteristicas / insProductoCaracteristicas: Función para crear las caracteristicas de un producto (Información secundaria)
+export async function crearProductoCaracteristicas(productoid: number): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("productoscaracteristicas").insert({
+      productoid,
+      descripcion: null,
+      presentacion: null,
+      porcion: null,
+      modouso: null,
+      porcionenvase: null,
+      categoriauso: null,
+      propositoprincipal: null,
+      propuestavalor: null,
+      instruccionesingesta: null,
+      edadminima: null,
+      advertencia: null,
+      condicionesalmacenamiento: null,
+    })
+
+    if (error) {
+      console.error(
+        "Error creando características del producto en app/actions/productos en crearProductoCaracteristicas:",
+        error,
+      )
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en app/actions/productos en crearProductoCaracteristicas:", error)
+    return false
+  }
+}
+
+// Función: crearProductoXCatalogo / insProductoXCatalogo: función para crear la relacion de un producto con un catalogo
+export async function crearProductoXCatalogo(
+  productoid: number,
+  catalogoid: number,
+  precioventa: number,
+  margenutilidad: number,
+): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("productosxcatalogo").insert({
+      productoid,
+      catalogoid,
+      precioventa,
+      margenutilidad,
+      fechacreacion: new Date().toISOString(),
+      activo: true,
+    })
+
+    if (error) {
+      console.error(
+        "Error creando relación producto-catálogo en app/actions/productos en crearProductoXCatalogo:",
+        error,
+      )
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en app/actions/productos en crearProductoXCatalogo:", error)
+    return false
+  }
+}
+
+/*==================================================
+  SELECTS: READ / OBTENER / SELECT
+================================================== */
+// Funcion: obtenerProductos / selProductos: Funcion para obtener
+export async function obtenerProductos(
+  productoid = -1,
+  productonombre = "",
+  clienteid = -1,
+  zonaid = -1,
+  catalogoid = -1,
+  activo = "Todos",
+  codigo = "",
+  presentacion = "",
+  formafarmaceuticaid = -1,
+  sistemaid = -1,
+  categoria = "",
+  envase = "",
+  envaseml = "",
+  formulaid = -1,
+  materiaprimaid = -1,
+  materialid = -1,
+) {
+  try {
+    console.log("[v0] obtenerProductos called with params:", {
+      productoid,
+      productonombre,
+      clienteid,
+      zonaid,
+      catalogoid,
+      activo,
+      codigo,
+      presentacion,
+      formafarmaceuticaid,
+      sistemaid,
+      categoria,
+      envase,
+      envaseml,
+      formulaid,
+      materiaprimaid,
+      materialid,
+    })
+
+    // Array de ProductosIds con relacion a Catalogos
+    let Ids: number[] = []
+    if (catalogoid > 0) {
+      console.log("[v0] Calling obtenerProductosXCatalogos with catalogoid:", catalogoid)
+      const resultado = await obtenerProductosXCatalogos(catalogoid)
+      console.log("[v0] obtenerProductosXCatalogos result:", resultado)
+      if (resultado.success && resultado.data) {
+        Ids = resultado.data
+      }
+    }
+
+    // Array de ProductosIds con relacion a Formula
+    let IdsPXF: number[] = []
+    if (formulaid > 0) {
+      console.log("[v0] Calling obtenerProductosIdsXFormulas with formulaid:", formulaid)
+      const resultado = await obtenerProductosIdsXFormulas(formulaid, [])
+      console.log("[v0] obtenerProductosIdsXFormulas result:", resultado)
+      if (resultado.success && resultado.data) {
+        IdsPXF = resultado.data
+      }
+    }
+
+    // Array de ProductosIds con relacion a Formulasid con relacion a materia prima
+    let IdsPXMP: number[] = []
+    if (materiaprimaid > 0) {
+      console.log("[v0] Calling obtenerFormulasIdsXMateriaprima with materiaprimaid:", materiaprimaid)
+      const formulasResult = await obtenerFormulasIdsXMateriaprima(materiaprimaid)
+      console.log("[v0] obtenerFormulasIdsXMateriaprima result:", formulasResult)
+      if (formulasResult.success && formulasResult.data) {
+        console.log("[v0] Calling obtenerProductosIdsXFormulas with formulas array:", formulasResult.data)
+        const productosResult = await obtenerProductosIdsXFormulas(-1, formulasResult.data)
+        console.log("[v0] obtenerProductosIdsXFormulas (from formulas) result:", productosResult)
+        if (productosResult.success && productosResult.data) {
+          IdsPXMP = productosResult.data
+        }
+      }
+    }
+
+    // Array de ProductosIds con relacion a materiales (Envase y/o Empaque)
+    let IdsPXM: number[] = []
+    if (materialid > 0) {
+      console.log("[v0] Calling obtenerProductosIdsXMateriales with materialid:", materialid)
+      const resultado = await obtenerProductosIdsXMateriales(materialid)
+      console.log("[v0] obtenerProductosIdsXMateriales result:", resultado)
+      if (resultado.success && resultado.data) {
+        IdsPXM = resultado.data
+      }
+    }
+
+    console.log(
+      "[v0] Filter arrays - Ids:",
+      Ids.length,
+      "IdsPXF:",
+      IdsPXF.length,
+      "IdsPXMP:",
+      IdsPXMP.length,
+      "IdsPXM:",
+      IdsPXM.length,
+    )
+
+    let query = supabase.from("productos").select(`
+        id,
+        producto,
+        presentacion,
+        nombre,
+        formafarmaceuticaid,
+        formasfarmaceuticas!formafarmaceuticaid(nombre),
+        porcion,
+        sistemaid,
+        sistemas!sistemaid(nombre),
+        codigomaestro,
+        codigo,
+        ff,
+        cantidadpresentacion,
+        envase,
+        envaseml,
+        clienteid,
+        clientes!clienteid(nombre),
+        zonaid,
+        zonas!zonaid(nombre),
+        categoria,
+        imgurl,
+        unidadmedidaid,
+        unidadesmedida!unidadmedidaid(descripcion),
+        mp,
+        mem,
+        me,
+        ms,
+        mp_porcentaje,
+        mem_porcentaje,
+        me_porcentaje,
+        ms_porcentaje,
+        mp_costeado,
+        mem_costeado,
+        me_costeado,
+        ms_costeado,
+        costo,
+        preciohl,
+        utilidadhl,
+        forecasthl,
+        preciosinivaaa,
+        precioconivaaa,
+        fechacreacion,
+        activo,
+        productoscaracteristicas!productoid(
+          descripcion,
+          presentacion,
+          porcion,
+          modouso,
+          porcionenvase,
+          categoriauso,
+          propositoprincipal,
+          propuestavalor,
+          instruccionesingesta,
+          edadminima,
+          advertencia,
+          condicionesalmacenamiento
+        ),
+        materialesetiquetadoxproducto!productoid(
+          materialetiquetadoid,
+          materialesetiquetado!materialetiquetadoid(
+            codigo,
+            nombre,
+            imgurl,
+            tipomaterialid,
+            unidadmedidaid,
+            unidadesmedida!unidadmedidaid(descripcion),
+            costo
+          ),
+          cantidad,
+          costoparcial
+        ),
+        formulasxproducto!productoid(
+          formulaid,
+          formulas!formulaid(
+            id,
+            codigo,
+            nombre,
+            unidadmedidaid,
+            unidadesmedida!unidadmedidaid(descripcion),
+            costo,
+            materiasprimasxformula!formulaid(
+              materiaprimaid,
+              cantidad,
+              costoparcial,
+              materiasprima!materiaprimaid(
+                codigo,
+                nombre,
+                unidadmedidaid,
+                unidadesmedida!unidadmedidaid(descripcion),
+                costo,
+                factorimportacion,
+                costoconfactorimportacion
+              )
+            ),
+            formulasxformula!formulaid(
+              secundariaid,
+              cantidad,
+              costoparcial,
+              formulas!secundariaid(
+                codigo,
+                nombre,
+                unidadmedidaid,
+                unidadesmedida!unidadmedidaid(descripcion),
+                costo
+              )
+            )
+          ),
+          cantidad,
+          costoparcial
+        )
+      `)
+
+    //Filtros en query, dependiendo parametros
+    if (productoid !== -1) {
+      query = query.eq("id", productoid)
+    }
+
+    if (clienteid !== -1) {
+      query = query.eq("clienteid", clienteid)
+    }
+    if (zonaid !== -1) {
+      query = query.eq("zonaid", zonaid)
+    }
+    if (productonombre !== "") {
+      query = query.ilike("producto", `%${productonombre}%`)
+    }
+    if (catalogoid > 0) {
+      console.log("[v0] Adding catalog filter with Ids:", Ids)
+      query = query.in("id", Ids)
+    }
+    if (codigo !== "") {
+      query = query.ilike("codigo", `%${codigo}%`)
+    }
+    if (presentacion !== "") {
+      query = query.ilike("presentacion", `%${presentacion}%`)
+    }
+    if (formafarmaceuticaid > 0) {
+      query = query.eq("formafarmaceuticaid", formafarmaceuticaid)
+    }
+    if (sistemaid > 0) {
+      query = query.eq("sistemaid", sistemaid)
+    }
+    if (categoria !== "") {
+      query = query.ilike("categoria", `%${categoria}%`)
+    }
+    if (envase !== "") {
+      query = query.ilike("envase", `%${envase}%`)
+    }
+    if (envaseml !== "") {
+      const envasemlNum = Number.parseFloat(envaseml)
+      if (!isNaN(envasemlNum)) {
+        query = query.eq("envaseml", envasemlNum)
+      }
+    }
+    if (IdsPXF.length > 0) {
+      console.log("[v0] Adding formula filter with IdsPXF:", IdsPXF)
+      query = query.in("id", IdsPXF)
+    }
+    if (IdsPXMP.length > 0) {
+      console.log("[v0] Adding materia prima filter with IdsPXMP:", IdsPXMP)
+      query = query.in("id", IdsPXMP)
+    }
+    if (IdsPXM.length > 0) {
+      console.log("[v0] Adding material filter with IdsPXM:", IdsPXM)
+      query = query.in("id", IdsPXM)
+    }
+    if (activo !== "Todos") {
+      const isActive = ["True", "true", "Activo", "1", true].includes(activo)
+      const isInactive = ["False", "false", "Inactivo", "0", false].includes(activo)
+
+      if (isActive) {
+        query = query.eq("activo", true)
+      } else if (isInactive) {
+        query = query.eq("activo", false)
+      }
+    }
+
+    //Ejecutar query
+    query = query.order("nombre", { ascending: true })
+
+    console.log("[v0] About to execute query")
+
+    //Varaibles y resultados del query
+    const { data, error } = await query
+
+    console.log("[v0] Query executed - Error:", error, "Data count:", data?.length)
+
+    //Error en query
+    if (error) {
+      console.error("[v0] Error obteniendo productos:", error)
+      return { success: false, error: error.message }
+    }
+
+    console.log("[v0] obtenerProductos success - returned", data?.length, "products")
+
+    //Retorno de data
+    return { success: true, data }
+  } catch (error) {
+    console.error("[v0] Error en app/actions/productos en obtenerProductos:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Funcion: obtenerProductosCaracteristicas / selProductosCaracteristicas: FUNCION para obtener las características de un producto
+export async function obtenerProductosCaracteristicas(
+  idrec = -1,
+  productoid = -1,
+  descripcion = "",
+  presentacion = "",
+  porcion = "",
+  modouso = "",
+  porcionenvase = "",
+  categoriauso = "",
+  propositoprincipal = "",
+  propuestavalor = "",
+  instruccionesingesta = "",
+  edadminima = -1,
+  advertencia = "",
+  condicionesalmacenamiento = "",
+) {
+  try {
+    let query = supabase.from("productoscaracteristicas").select("*")
+
+    if (idrec !== -1) {
+      query = query.eq("id", idrec)
+    }
+
+    if (productoid !== -1) {
+      query = query.eq("productoid", productoid)
+    }
+
+    if (descripcion !== "") {
+      query = query.eq("descripcion", descripcion)
+    }
+
+    if (presentacion !== "") {
+      query = query.eq("presentacion", presentacion)
+    }
+
+    if (porcion !== "") {
+      query = query.eq("porcion", porcion)
+    }
+
+    if (modouso !== "") {
+      query = query.eq("modouso", modouso)
+    }
+
+    if (porcionenvase !== "") {
+      query = query.eq("porcionenvase", porcionenvase)
+    }
+
+    if (categoriauso !== "") {
+      query = query.eq("categoriauso", categoriauso)
+    }
+
+    if (propositoprincipal !== "") {
+      query = query.eq("propositoprincipal", propositoprincipal)
+    }
+
+    if (propuestavalor !== "") {
+      query = query.eq("propuestavalor", propuestavalor)
+    }
+
+    if (instruccionesingesta !== "") {
+      query = query.eq("instruccionesingesta", instruccionesingesta)
+    }
+
+    if (edadminima !== -1) {
+      query = query.eq("edadminima", edadminima)
+    }
+
+    if (advertencia !== "") {
+      query = query.eq("advertencia", advertencia)
+    }
+
+    if (condicionesalmacenamiento !== "") {
+      query = query.eq("condicionesalmacenamiento", condicionesalmacenamiento)
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error(
+        "Error obteniendo características de productos en app/actions/productos en obtenerProductosCaracteristicas:",
+        error,
+      )
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en app/actions/productos en obtenerProductosCaracteristicas:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: obtenerProductosXCatalogos / selProductosXCatalogos: FUNCION para obtener en un array el listado de los ids de productos
+export async function obtenerProductosXCatalogos(
+  catalogoid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (catalogoid <= 0) {
+      return { success: false, error: "ID de catálogo inválido" }
+    }
+
+    const { data, error } = await supabase.from("productosxcatalogo").select("productoid").eq("catalogoid", catalogoid)
+
+    if (error) {
+      console.error("Error en query obtenerProductosXCatalogos:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const DataIds: number[] = data.map((item) => item.productoid)
+
+    return { success: true, data: DataIds }
+  } catch (error) {
+    console.error("Error en obtenerProductosXCatalogos:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: obtenerProductosXClientes / selProductosXClientes: Función para obtener array de los ids de productos
+export async function obtenerProductosXClientes(
+  clienteid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (clienteid <= 0) {
+      return { success: false, error: "ID de cliente inválido" }
+    }
+
+    //const { data, error } = await supabase.from("productos").select("productoid").eq("clienteid", clienteid)
+    const { data, error } = await supabase
+      .from("productos")
+      .select(
+        `
+        idrec,
+        clienteid,
+        clientes!clienteid(nombre),
+        productoid,
+        productos!productoid(
+          codigo,
+          nombre,
+          mp,
+          me,
+          ms,
+          costo,
+          mp_porcentaje,
+          me_porcentaje,
+          ms_porcentaje,
+          mp_costeado,
+          me_costeado,
+          ms_costeado,
+          preciohl,
+          utilidadhl
+        ),
+        categoria,
+        forecast,
+        precioventasiniva,
+        precioventaconiva,
+        preciohl,
+        plangeneracional,
+        plannivel,
+        planinfinito,
+        ivapagado,
+        cda,
+        bonoiniciorapido,
+        constructoriniciorapido,
+        rutaexito,
+        reembolsos,
+        tarjetacredito,
+        envio,
+        porcentajecosto,
+        totalcosto,
+        utilidadmarginal,
+        precioactualporcentajeutilidad,
+        fechacreacion,
+        fechamodificacion,
+        activo,
+        costoanual,
+        utilidadanual,
+        costoutilidadanual,
+        precioventaconivaaa,
+        preciopublicoconiva,
+        preciopublicosiniva
+      `,
+      )
+      .eq("clienteid", clienteid)
+
+    if (error) {
+      console.error("Error en query obtenerProductosXClientes de actions/productos:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const DataIds: number[] = data.map((item) => item.productoid)
+
+    return { success: true, data: DataIds }
+  } catch (error) {
+    console.error("Error en obtenerProductosXClientes de actions/productos:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerProductosXClientes de actions/productos",
+    }
+  }
+}
+
+// Función: obtenerProductosIdsXMateriales: Agregar función para obtener IDs de productos filtrados por material etiquetado
+export async function obtenerProductosIdsXMateriales(
+  materialetiquetadoid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (materialetiquetadoid <= 0) {
+      return { success: false, error: "ID de material etiquetado inválido" }
+    }
+
+    const { data, error } = await supabase
+      .from("materialesetiquetadoxproducto")
+      .select("productoid")
+      .eq("materialetiquetadoid", materialetiquetadoid)
+
+    if (error) {
+      console.error("Error en query obtenerProductosIdsXMateriales:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const DataIds: number[] = data.map((item) => item.productoid)
+
+    return { success: true, data: DataIds }
+  } catch (error) {
+    console.error("Error en obtenerProductosIdsXMateriales de actions/productos:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerProductosIdsXMateriales de actions/productos",
+    }
+  }
+}
+
+// Funcion: obtenerProductos / selProductos: FUNCION para obtener
+export async function obtenerProductosXClientesOptima(productoid = -1, clienteid = -1) {
+  try {
+    let query = supabase.from("productosxcliente").select(`
+        idrec,
+        clienteid,
+        clientes!clienteid(nombre),
+        productoid,
+        productos!productoid(
+          codigo,
+          nombre,
+          mp,
+          me,
+          ms,
+          costo,
+          mp_porcentaje,
+          me_porcentaje,
+          ms_porcentaje,
+          mp_costeado,
+          me_costeado,
+          ms_costeado,
+          preciohl,
+          utilidadhl
+        ),
+        utilidadoptima,
+        comisiones_porcentaje,
+        costo_porcentaje,
+        comisionesmascosto,
+        preciometa,
+        preciometaconiva,
+        diferenciautilidadesperada,
+        precioventaconivaaa
+      `)
+
+    //Filtros en query, dependiendo parametros
+    if (productoid !== -1) {
+      query = query.eq("productoid", productoid)
+    }
+    if (clienteid !== -1) {
+      query = query.eq("clienteid", clienteid)
+    }
+
+    //Ejecutar query
+    query = query.order("productoid", { ascending: true })
+
+    //Varaibles y resultados del query
+    const { data, error } = await query
+
+    //Error en query
+    if (error) {
+      console.error("Error obteniendo productos:", error)
+      return { success: false, error: error.message }
+    }
+
+    //Retorno de data
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en app/actions/productos en obtenerProductos:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: obtenerProductosXClientes / selProductosXClientes: Función para obtener array de los ids de productos
+export async function obtenerProductosXClientesArray(
+  clienteid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (clienteid <= 0) {
+      return { success: false, error: "ID de cliente inválido" }
+    }
+
+    const { data, error } = await supabase.from("productos").select("productoid").eq("clienteid", clienteid)
+
+    if (error) {
+      console.error("Error en query obtenerProductosXClientes de actions/productos:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const DataIds: number[] = data.map((item) => item.productoid)
+
+    return { success: true, data: DataIds }
+  } catch (error) {
+    console.error("Error en obtenerProductosXClientes de actions/productos:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor, al ejecutar obtenerProductosXClientes de actions/productos",
+    }
+  }
+}
+
+// Use the imported function
+export async function obtenerProductosIdsXFormulas(
+  formulaid = -1,
+  formulasids: number[] = [],
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (formulaid <= 0 && formulasids.length < 1) {
+      return { success: false, error: "ID de fórmula inválido" }
+    }
+
+    let query = supabase.from("formulasxproducto").select("productoid")
+
+    if (formulaid > 0) {
+      query = query.eq("formulaid", formulaid)
+    } else if (formulasids.length > 0) {
+      query = query.in("formulaid", formulasids)
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error("Error en query obtenerProductosIdsXFormulas:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const DataIds: number[] = data.map((item) => item.productoid)
+
+    return { success: true, data: DataIds }
+  } catch (error) {
+    console.error("Error en obtenerProductosIdsXFormulas:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Dummy function to satisfy the call in obtenerProductos
+export async function obtenerFormulasIdsXMateriaprima(
+  materiaprimaid = -1,
+): Promise<{ success: boolean; data?: number[]; error?: string }> {
+  try {
+    if (materiaprimaid <= 0) {
+      return { success: false, error: "ID de materia prima inválido" }
+    }
+
+    const { data, error } = await supabase
+      .from("materiasprimasxformula")
+      .select("formulaid")
+      .eq("materiaprimaid", materiaprimaid)
+
+    if (error) {
+      console.error("Error en query obtenerFormulasIdsXMateriaprima:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    const DataIds: number[] = data.map((item) => item.formulaid)
+
+    return { success: true, data: DataIds }
+  } catch (error) {
+    console.error("Error en obtenerFormulasIdsXMateriaprima:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+/*==================================================
+  UPDATES: EDIT / ACTUALIZAR / UPDATE
+================================================== */
+// Funcion: actualizarProducto / updProducto: Función para actualizar
+export async function actualizarProducto(formData: FormData) {
+  try {
+    const productoid = Number.parseInt(formData.get("productoid") as string)
+
+    if (!productoid || productoid <= 0) {
+      return {
+        success: false,
+        error: "no se recibio el productoid a actualizar",
+      }
+    }
+
+    const updateData: any = {}
+
+    if (formData.get("producto")) updateData.producto = formData.get("producto") as string
+    if (formData.get("presentacion")) updateData.presentacion = formData.get("presentacion") as string
+    if (formData.get("formafarmaceuticaid"))
+      updateData.formafarmaceuticaid = Number.parseInt(formData.get("formafarmaceuticaid") as string)
+    if (formData.get("porcion")) updateData.porcion = formData.get("porcion") as string
+    if (formData.get("sistemaid")) updateData.sistemaid = Number.parseInt(formData.get("sistemaid") as string)
+    if (formData.get("codigomaestro")) updateData.codigomaestro = formData.get("codigomaestro") as string
+    if (formData.get("envase")) updateData.envase = formData.get("envase") as string
+    if (formData.get("envaseml")) updateData.envaseml = formData.get("envaseml") as string
+    // </CHANGE>
+
+    if (formData.get("codigo")) updateData.codigo = formData.get("codigo") as string
+    if (formData.get("nombre")) updateData.nombre = formData.get("nombre") as string
+    if (formData.get("clienteid")) updateData.clienteid = Number.parseInt(formData.get("clienteid") as string)
+    if (formData.get("zonaid")) updateData.zonaid = Number.parseInt(formData.get("zonaid") as string)
+    if (formData.get("unidadmedidaid"))
+      updateData.unidadmedidaid = Number.parseInt(formData.get("unidadmedidaid") as string)
+    if (formData.get("costo")) updateData.costo = Number.parseFloat(formData.get("costo") as string)
+    if (formData.get("activo") !== null) updateData.activo = formData.get("activo") === "true"
+
+    if (formData.get("mp_porcentaje")) {
+      const mpValue = formData.get("mp_porcentaje") as string
+      updateData.mp_porcentaje = Number.parseFloat(mpValue) / 100
+    }
+    if (formData.get("mem_porcentaje")) {
+      const memValue = formData.get("mem_porcentaje") as string
+      updateData.mem_porcentaje = Number.parseFloat(memValue) / 100
+    }
+    if (formData.get("me_porcentaje")) {
+      const meValue = formData.get("me_porcentaje") as string
+      updateData.me_porcentaje = Number.parseFloat(meValue) / 100
+    }
+    if (formData.get("ms_porcentaje")) {
+      const msValue = formData.get("ms_porcentaje") as string
+      updateData.ms_porcentaje = Number.parseFloat(msValue) / 100
+    }
+    // </CHANGE>
+
+    const imagen = formData.get("imagen") as File
+    if (imagen && imagen.size > 0) {
+      const resultadoImagen = await imagenSubir(imagen, formData.get("codigo") as string, "productos")
+
+      if (resultadoImagen.success && resultadoImagen.url) {
+        updateData.imgurl = resultadoImagen.url
+      }
+    }
+
+    //updateData.fechaactualizacion = new Date().toISOString()
+
+    const { error } = await supabase.from("productos").update(updateData).eq("id", productoid)
+
+    if (error) {
+      console.error("Error actualizando producto en app/actions/productos en actualizarProducto:", error)
+      return {
+        success: false,
+        error: error.message,
+      }
+    }
+
+    revalidatePath("/productos")
+    return {
+      success: true,
+      error: false,
+    }
+  } catch (error) {
+    console.error("Error en app/actions/productos en actualizarProducto:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor",
+    }
+  }
+}
+
+// Función: actualizarProductoCaracteristicas / updProductoCaracteristicas: Actualizar características de un producto
+export async function actualizarProductoCaracteristicas(
+  productoid: number,
+  caracteristicasData: any,
+): Promise<boolean> {
+  try {
+    const { error } = await supabaseAdmin
+      .from("productoscaracteristicas")
+      .update(caracteristicasData)
+      .eq("productoid", productoid)
+
+    if (error) {
+      console.error("Error actualizando características del producto:", error)
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en actualizarProductoCaracteristicas:", error)
+    return false
+  }
+}
+
+//Función: actualizarProductoXCatalogo / updProductoXCatalogo: Actualizar relación de un producto con un catálogo
+export async function actualizarProductoXCatalogo(
+  productoid: number,
+  catalogoid: number,
+  precioventa: number,
+  margenutilidad: number,
+): Promise<boolean> {
+  try {
+    const { error } = await supabaseAdmin
+      .from("productosxcatalogo")
+      .update({
+        precioventa,
+        margenutilidad,
+        fechaactualizacion: new Date().toISOString(),
+      })
+      .eq("productoid", productoid)
+      .eq("catalogoid", catalogoid)
+
+    if (error) {
+      console.error("Error actualizando relación producto-catálogo:", error)
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en actualizarProductoXCatalogo:", error)
+    return false
+  }
+}
+
+// Función: actualizarCosteoProducto: función para actualizar el costeo de un producto
+export async function actualizarCosteoProducto(
+  productosid: number,
+  clientesid: number,
+  preciosiniva: number,
+  forecasts: number,
+  PorcentajeGeneracional: number,
+  PorcentajeNivel: number,
+  PorcentajeInfinito: number,
+  PorcentajeIva: number,
+  PorcentajeBonoRapido: number,
+  PorcentajeCDA: number,
+  PorcentajeConstructor: number,
+  PorcentajeRuta: number,
+  PorcentajeReembolsos: number,
+  PorcentajeTarjeta: number,
+  PorcentajeEnvio: number,
+  ConversionMoneda: number,
+): Promise<{ success: boolean; data?: any; error?: string }> {
+  try {
+    const { data, error } = await supabase.rpc("actualizarcotizacion", {
+      productosid,
+      clientesid,
+      preciosiniva,
+      forecasts,
+      porcentajegeneracional: PorcentajeGeneracional,
+      porcentajenivel: PorcentajeNivel,
+      porcentajeinfinito: PorcentajeInfinito,
+      porcentajeiva: PorcentajeIva,
+      porcentajebonorapido: PorcentajeBonoRapido,
+      porcentajecda: PorcentajeCDA,
+      porcentajeconstructor: PorcentajeConstructor,
+      porcentajeruta: PorcentajeRuta,
+      porcentajereembolsos: PorcentajeReembolsos,
+      porcentajetarjeta: PorcentajeTarjeta,
+      porcentajeenvio: PorcentajeEnvio,
+      conversionmoneda: ConversionMoneda,
+    })
+
+    if (error) {
+      console.error("Error actualizando costeo del producto en actualizarCosteoProducto:", error)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/costear")
+    return { success: true, data }
+  } catch (error) {
+    console.error("Error en app/actions/productos en actualizarCosteoProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: recalcularProducto: Función para recalcular todos los costos de un producto
+export async function recalcularProducto(productoid: number): Promise<{ success: boolean; error: string | false }> {
+  try {
+    if (!productoid || productoid <= 0) {
+      return {
+        success: false,
+        error:
+          "No se recibieron los parametros necesarios para ejecuta la funcion recalcularProducto de app/actions/productos",
+      }
+    }
+
+    const { data: productoData, error: productoError } = await supabase
+      .from("productos")
+      .select("mp_porcentaje, mem_porcentaje, me_porcentaje, ms_porcentaje")
+      .eq("id", productoid)
+      .single()
+
+    if (productoError || !productoData) {
+      console.error("Error obteniendo porcentajes del producto:", productoError)
+      return { success: false, error: productoError?.message || "Producto no encontrado" }
+    }
+
+    const mp_porcentaje = productoData.mp_porcentaje || 0.35
+    const mem_porcentaje = productoData.mem_porcentaje || 0.35
+    const me_porcentaje = productoData.me_porcentaje || 0.35
+    const ms_porcentaje = productoData.ms_porcentaje || 0.35
+
+    const { data: formulasData, error: formulasError } = await supabase
+      .from("formulasxproducto")
+      .select(
+        `
+        formulaid,
+        cantidad,
+        formulas!formulaid(costo)
+      `,
+      )
+      .eq("productoid", productoid)
+
+    if (formulasError) {
+      console.error("Error obteniendo formulas relacionadas:", formulasError)
+      return { success: false, error: formulasError.message }
+    }
+
+    if (formulasData && formulasData.length > 0) {
+      for (const formula of formulasData) {
+        const cantidad = formula.cantidad || 0
+        const costo = (formula.formulas as any)?.costo || 0
+        const costoparcial = cantidad * costo
+
+        const { error: updateError } = await supabase
+          .from("formulasxproducto")
+          .update({ costoparcial })
+          .eq("formulaid", formula.formulaid)
+          .eq("productoid", productoid)
+
+        if (updateError) {
+          console.error("Error actualizando costoparcial de formula:", updateError)
+        }
+      }
+    }
+
+    const { data: mpSumData, error: mpSumError } = await supabase
+      .from("formulasxproducto")
+      .select("costoparcial")
+      .eq("productoid", productoid)
+
+    if (mpSumError) {
+      console.error("Error obteniendo suma de costoparcial de formulas:", mpSumError)
+      return { success: false, error: mpSumError.message }
+    }
+
+    const mp = mpSumData?.reduce((sum, item) => sum + (item.costoparcial || 0), 0) || 0
+
+    const mp_costeado = mp_porcentaje > 0 ? mp / mp_porcentaje : 0
+
+    const { error: updateMpError } = await supabase.from("productos").update({ mp, mp_costeado }).eq("id", productoid)
+
+    if (updateMpError) {
+      console.error("Error actualizando mp y mp_costeado:", updateMpError)
+      return { success: false, error: updateMpError.message }
+    }
+
+    const { data: materialesData, error: materialesError } = await supabase
+      .from("materialesetiquetadoxproducto")
+      .select(
+        `
+        materialetiquetadoid,
+        cantidad,
+        materialesetiquetado!materialetiquetadoid(costo)
+      `,
+      )
+      .eq("productoid", productoid)
+
+    if (materialesError) {
+      console.error("Error obteniendo materiales etiquetado relacionados:", materialesError)
+      return { success: false, error: materialesError.message }
+    }
+
+    if (materialesData && materialesData.length > 0) {
+      for (const material of materialesData) {
+        const cantidad = material.cantidad || 0
+        const costo = (material.materialesetiquetado as any)?.costo || 0
+        const costoparcial = cantidad * costo
+
+        const { error: updateError } = await supabase
+          .from("materialesetiquetadoxproducto")
+          .update({ costoparcial })
+          .eq("materialetiquetadoid", material.materialetiquetadoid)
+          .eq("productoid", productoid)
+
+        if (updateError) {
+          console.error("Error actualizando costoparcial de material etiquetado:", updateError)
+        }
+      }
+    }
+
+    const { data: memSumData, error: memSumError } = await supabase
+      .from("materialesetiquetadoxproducto")
+      .select(
+        `
+              costoparcial,
+              materialesetiquetado!inner(tipomaterialid)
+              `,
+      )
+      .eq("productoid", productoid)
+      .eq("materialesetiquetado.tipomaterialid", 1)
+
+    if (memSumError) {
+      console.error("Error obteniendo suma de costoparcial de materiales etiquetado MEM:", memSumError)
+      return { success: false, error: memSumError.message }
+    }
+
+    const mem = memSumData?.reduce((sum, item) => sum + (item.costoparcial || 0), 0) || 0
+
+    const mem_costeado = mem_porcentaje > 0 ? mem / mem_porcentaje : 0
+
+    const { error: updateMemError } = await supabase
+      .from("productos")
+      .update({ mem, mem_costeado })
+      .eq("id", productoid)
+
+    if (updateMemError) {
+      console.error("Error actualizando mem y mem_costeado:", updateMemError)
+      return { success: false, error: updateMemError.message }
+    }
+
+    const { data: meSumData, error: meSumError } = await supabase
+      .from("materialesetiquetadoxproducto")
+      .select(
+        `
+              costoparcial,
+              materialesetiquetado!inner(tipomaterialid)
+              `,
+      )
+      .eq("productoid", productoid)
+      .eq("materialesetiquetado.tipomaterialid", 2)
+
+    if (meSumError) {
+      console.error("Error obteniendo suma de costoparcial de materiales etiquetado:", meSumError)
+      return { success: false, error: meSumError.message }
+    }
+
+    const me = meSumData?.reduce((sum, item) => sum + (item.costoparcial || 0), 0) || 0
+
+    const me_costeado = me_porcentaje > 0 ? me / me_porcentaje : 0
+
+    const { error: updateMeError } = await supabase.from("productos").update({ me, me_costeado }).eq("id", productoid)
+
+    if (updateMeError) {
+      console.error("Error actualizando me y me_costeado:", updateMeError)
+      return { success: false, error: updateMeError.message }
+    }
+
+    const ms = (mp + mem + me) * 0.05
+
+    const ms_costeado = ms_porcentaje > 0 ? ms / ms_porcentaje : 0
+
+    const { error: updateMsError } = await supabase.from("productos").update({ ms, ms_costeado }).eq("id", productoid)
+
+    if (updateMsError) {
+      console.error("Error actualizando ms y ms_costeado:", updateMsError)
+      return { success: false, error: updateMsError.message }
+    }
+
+    const costoelaboracion = mp + mem + me + ms
+
+    const preciohl = mp_costeado + mem_costeado + me_costeado + ms_costeado
+
+    const preciohlFinal = preciohl <= 50.0 ? 50.0 : preciohl
+    const utilidadhlFinal = preciohlFinal - costoelaboracion
+
+    const { error: updateFinalError } = await supabase
+      .from("productos")
+      .update({
+        costo: costoelaboracion,
+        preciohl: preciohlFinal,
+        utilidadhl: utilidadhlFinal,
+      })
+      .eq("id", productoid)
+
+    if (updateFinalError) {
+      console.error("Error actualizando costo, preciohl y utilidadhl:", updateFinalError)
+      return { success: false, error: updateFinalError.message }
+    }
+
+    // Get clienteid for the product
+    const { data: productoInfo, error: productoInfoError } = await supabase
+      .from("productos")
+      .select("clienteid")
+      .eq("id", productoid)
+      .single()
+
+    if (!productoInfoError && productoInfo) {
+      const clientesid = productoInfo.clienteid
+
+      // Execute recalcularcosteogeneral function
+      const { data: recalcularData, error: recalcularError } = await supabase.rpc("recalcularcosteogeneral", {
+        productosid: productoid,
+        clientesid: clientesid,
+      })
+
+      if (recalcularError) {
+        console.error("Error ejecutando recalcularcosteogeneral:", recalcularError)
+        // Don't return error, just log it - we want to complete the update even if this fails
+      }
+    }
+    // </CHANGE>
+
+    revalidatePath("/productos")
+
+    return { success: true, error: false }
+  } catch (error) {
+    console.error("Error en app/actions/productos en recalcularProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+/*==================================================
+  * DELETES: DROP / ELIMINAR / DELETE
+================================================== */
+// Función: eliminarProducto / delProducto: Función para eliminar (Filtro indispensable: productoid)
+export async function eliminarProducto(productoid: number): Promise<boolean> {
+  try {
+    if (productoid <= 0) {
+      console.error("Error en eliminarProducto: productoid debe ser mayor a 0")
+      return false
+    }
+
+    const { error } = await supabase.from("productos").delete().eq("id", productoid)
+
+    if (error) {
+      console.error("Error eliminando producto en app/actions/productos en eliminarProducto:", error)
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en app/actions/productos en eliminarProducto:", error)
+    return false
+  }
+}
+
+// Función: eliminarProductoCaracteristicas / delProductoCaracteristicas: Eliminar registro por productoid
+export async function eliminarProductoCaracteristicas(productoid: number): Promise<boolean> {
+  try {
+    if (productoid <= 0) {
+      console.error("Error en eliminarProductoCaracteristicas: productoid debe ser mayor a 0")
+      return false
+    }
+
+    const { error } = await supabase.from("productoscaracteristicas").delete().eq("productoid", productoid)
+
+    if (error) {
+      console.error(
+        "Error eliminando características del producto en app/actions/productos en eliminarProductoCaracteristicas:",
+        error,
+      )
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en app/actions/productos en eliminarProductoCaracteristicas:", error)
+    return false
+  }
+}
+
+// Función: eliminarProductoXCatalogo / delProductoXCatalogo: Eliminar registro por productoid y catalogoid
+export async function eliminarProductoXCatalogo(productoid: number, catalogoid: number): Promise<boolean> {
+  try {
+    if (productoid <= 0 || catalogoid <= 0) {
+      console.error("Error en eliminarProductoXCatalogo: productoid y catalogoid deben ser mayores a 0")
+      return false
+    }
+
+    const { error } = await supabase
+      .from("productosxcatalogo")
+      .delete()
+      .eq("productoid", productoid)
+      .eq("catalogoid", catalogoid)
+
+    if (error) {
+      console.error(
+        "Error eliminando relación producto-catálogo en app/actions/productos en eliminarProductoXCatalogo:",
+        error,
+      )
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en app/actions/productos en eliminarProductoXCatalogo:", error)
+    return false
+  }
+}
+
+// XXXXXXXXXXXXXX Función: eliminarProductoIncompleto: función para eliminar un producto incompleto y sus detalles
+export async function eliminarProductoIncompleto(productoId: number) {
+  try {
+    // First, get the product info to delete the image if it exists
+    const { data: producto, error: productoError } = await supabaseAdmin
+      .from("productos")
+      .select("imgurl")
+      .eq("id", productoId)
+      .single()
+
+    if (productoError && productoError.code !== "PGRST116") {
+      console.error("Error obteniendo producto para eliminar:", productoError)
+      return { success: false, error: productoError.message }
+    }
+
+    // Delete image from storage if it exists
+    if (producto?.imgurl) {
+      try {
+        // Extract filename from URL
+        const urlParts = producto.imgurl.split("/")
+        const fileName = urlParts[urlParts.length - 1]
+
+        if (fileName && urlParts.includes("productos")) {
+          const filePath = `productos/${fileName}`
+
+          const { error: deleteImageError } = await supabaseAdmin.storage.from("herbax").remove([filePath])
+
+          if (deleteImageError) {
+            console.error("Error eliminando imagen:", deleteImageError)
+            // Continue with deletion even if image deletion fails
+          }
+        }
+      } catch (imageError) {
+        console.error("Error procesando eliminación de imagen:", imageError)
+        // Continue with deletion even if image deletion fails
+      }
+    }
+
+    // Delete from productosdetalles first (foreign key constraint)
+    const { error: detallesError } = await supabaseAdmin.from("productosdetalles").delete().eq("productoid", productoId)
+
+    if (detallesError) {
+      console.error("Error eliminando detalles del producto:", detallesError)
+      return { success: false, error: detallesError.message }
+    }
+
+    // Delete from productos table
+    const { error: productoDeleteError } = await supabaseAdmin.from("productos").delete().eq("id", productoId)
+
+    if (productoDeleteError) {
+      console.error("Error eliminando producto:", productoDeleteError)
+      return { success: false, error: productoDeleteError.message }
+    }
+
+    revalidatePath("/productos")
+    return { success: true }
+  } catch (error) {
+    console.error("Error en eliminarProductoIncompleto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: obtenerCostoTotalProducto: función para obtener el costo total de un producto
+export async function obtenerCostoTotalProducto(productoId: number) {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("productosdetalles")
+      .select("costoparcial")
+      .eq("productoid", productoId)
+
+    if (error) {
+      console.error("Error obteniendo costo total del producto:", error)
+      return { success: false, error: error.message, total: 0 }
+    }
+
+    // Calculate the sum of all costoparcial values
+    const total = data?.reduce((sum, item) => sum + (item.costoparcial || 0), 0) || 0
+
+    return { success: true, total }
+  } catch (error) {
+    console.error("Error en obtenerCostoTotalProducto:", error)
+    return { success: false, error: "Error interno del servidor", total: 0 }
+  }
+}
+
+// Función: finalizarProducto: función para finalizar un producto con insert a productoxcatalogo y update de costo
+export async function finalizarProducto(productoId: number, catalogoId: number) {
+  try {
+    // First, get the total cost of the product
+    const costoResult = await obtenerCostoTotalProducto(productoId)
+    if (!costoResult.success) {
+      return { success: false, error: "Error obteniendo costo total del producto" }
+    }
+
+    // Insert into productoxcatalogo
+    const { error: insertError } = await supabaseAdmin.from("productosxcatalogo").insert({
+      catalogoid: catalogoId,
+      productoid: productoId,
+      precioventa: null,
+      margenutilidad: null,
+      fechacreacion: new Date().toISOString(),
+      activo: true,
+    })
+
+    if (insertError) {
+      console.error("Error insertando en productosxcatalogo:", insertError)
+      return { success: false, error: insertError.message }
+    }
+
+    // Update productos table with the total cost
+    const { error: updateError } = await supabaseAdmin
+      .from("productos")
+      .update({
+        costo: costoResult.total,
+      })
+      .eq("id", productoId)
+
+    if (updateError) {
+      console.error("Error actualizando costo del producto:", updateError)
+      return { success: false, error: updateError.message }
+    }
+
+    revalidatePath("/productos")
+    return { success: true }
+  } catch (error) {
+    console.error("Error en finalizarProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+// Función: actualizarCostoProducto: función para actualizar solo el costo de un producto
+export async function actualizarCostoProducto(productoId: number) {
+  try {
+    // Get the total cost of the product
+    const costoResult = await obtenerCostoTotalProducto(productoId)
+    if (!costoResult.success) {
+      return { success: false, error: "Error obteniendo costo total del producto" }
+    }
+
+    // Update productos table with the total cost
+    const { error: updateError } = await supabaseAdmin
+      .from("productos")
+      .update({
+        costo: costoResult.total,
+      })
+      .eq("id", productoId)
+
+    if (updateError) {
+      console.error("Error actualizando costo del producto:", updateError)
+      return { success: false, error: updateError.message }
+    }
+
+    revalidatePath("/productos")
+    return { success: true }
+  } catch (error) {
+    console.error("Error en actualizarCostoProducto:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
+
+/*==================================================
+  * SPECIALS-ESPECIALES ()
+================================================== */
+// Función: estatusActivoProducto / actProducto: FUNCION que cambia la columna activo a true(activo) o false(inactivo) del producto
+export async function estatusActivoProducto(productoid: number, activo: boolean): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("productos").update({ activo: activo }).eq("id", productoid)
+
+    if (error) {
+      console.error(
+        "Error actualizando estatus activo del producto en app/actions/productos en estatusActivoProducto:",
+        error,
+      )
+      return false
+    }
+
+    revalidatePath("/productos")
+    return true
+  } catch (error) {
+    console.error("Error en app/actions/productos en estatusActivoProducto:", error)
+    return false
+  }
+}
+
+// Función: listaDesplegableProductos / ddlProductos: Lista desplegable de productos para agregar
+export async function listaDesplegableProductosBuscar(buscar: string): Promise<ddlItem[]> {
+  try {
+    let query = supabase.from("productos").select("id, codigo, nombre").eq("activo", true)
+
+    // Apply filter: search in nombre OR codigo
+    if (buscar && buscar.trim() !== "") {
+      query = query.or(`nombre.ilike.%${buscar}%,codigo.ilike.%${buscar}%`)
+    }
+
+    // Order by nombre
+    query = query.order("nombre", { ascending: true })
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error("Error obteniendo lista desplegable de productos:", error)
+      return []
+    }
+
+    // Map results to ddlItem format: value = id, text = "codigo - nombre"
+    const items: ddlItem[] =
+      data?.map((producto) => ({
+        value: producto.id.toString(),
+        text: `${producto.codigo} - ${producto.nombre}`,
+      })) || []
+
+    return items
+  } catch (error) {
+    console.error("Error en app/actions/productos en listaDesplegableProductos:", error)
+    return []
+  }
+}
+
+// Función: listaDesplegableProductosXClientes: Lista de productos filtrados por cliente
+export async function listaDesplegableProductosXClientes(
+  clienteid: number,
+  zonaid: number,
+): Promise<{ success: boolean; data?: oProducto[]; error?: string }> {
+  try {
+    // Variable productos de tipo oProducto[]
+    let productos: oProducto[] = []
+
+    // Ejecutar la función obtenerProductos con los parámetros por default excepto clienteid
+    const resultado = await obtenerProductos(
+      -1, // productoid (default)
+      "", // productonombre (default)
+      clienteid, // clienteid (parámetro recibido)
+      zonaid, // zonaid (default)
+      -1, // catalogoid (default)
+      "True", // activo (default)
+    )
+
+    // Verificar si hubo error
+    if (!resultado.success || !resultado.data) {
+      return {
+        success: false,
+        error: resultado.error || "No se encontraron productos para el cliente especificado",
+      }
+    }
+
+    // Asignar los productos obtenidos
+    productos = resultado.data as oProducto[]
+
+    // Obtener productos que ya tienen fórmulas asignadas
+    const { data: productosConFormulas } = await supabase
+      .from("formulasxproducto")
+      .select("productoid")
+      .eq("activo", true)
+
+    // Crear un Set con los IDs de productos que tienen fórmulas asignadas
+    const productosConFormulasIds = new Set(
+      (productosConFormulas || []).map((item: any) => item.productoid)
+    )
+
+    // Filtrar productos que NO tienen fórmulas asignadas
+    const productosFiltrados = productos.filter((producto) => !productosConFormulasIds.has(producto.id))
+
+    // Retornar success con los productos filtrados
+    return {
+      success: true,
+      data: productosFiltrados,
+    }
+  } catch (error) {
+    console.error("Error en app/actions/productos en listaDesplegableProductosXClientes:", error)
+    return {
+      success: false,
+      error: "Error interno del servidor al ejecutar listaDesplegableProductosXClientes",
+    }
+  }
+}
+
+// Función: operacionMP: Suma de la materia prima utilizada
+
+// Función: operacionME: Suma del material de etiquteado de un producto
+
+// Función: operacionMS: (MP(suma de materia prima) x ME(suma de material etiquetado)) x 0.05
+
+// Función: operacionElaboracion: Suma de MP(suma de materia prima) + ME(suma de material etiquetado) + MS((MP(suma de materia prima) x ME(suma de material etiquetado)) x 0.05)
+
+// Función: operacionMP_Porcentaje: MP/% MP, por lo general es 35%
+
+// Función: operacionME_Porcentaje: ME/% ME, por lo general es 35%
+
+// Función: operacionMS_Porcentaje: MS/% MS, por lo general es 35%
+
+// Función: operacionPrecioHL: Suma de MP_Porcentaje + ME_Porcentaje + MS_Porcentaje
+
+// Función: operacionUtilidadHL: Función para calcular la utilidad HL
+export async function operacionUtilidadHL(productoId: number) {
+  try {
+    const { data: productoData, error: productoError } = await supabase
+      .from("productos")
+      .select("preciohl, costo")
+      .eq("id", productoId)
+      .single()
+
+    if (productoError || !productoData) {
+      console.error("Error obteniendo datos del producto:", productoError)
+      return { success: false, error: productoError?.message || "Producto no encontrado" }
+    }
+
+    const preciohl = productoData.preciohl || 0
+    const costo = productoData.costo || 0
+
+    const utilidadhl = preciohl - costo
+
+    const { error: updateError } = await supabase.from("productos").update({ utilidadhl }).eq("id", productoId)
+
+    if (updateError) {
+      console.error("Error actualizando utilidad HL:", updateError)
+      return { success: false, error: updateError.message }
+    }
+
+    revalidatePath("/productos")
+    return { success: true }
+  } catch (error) {
+    console.error("Error en operacionUtilidadHL:", error)
+    return { success: false, error: "Error interno del servidor" }
+  }
+}
